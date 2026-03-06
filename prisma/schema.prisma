@@ -1,0 +1,1148 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                     String                  @id @default(cuid())
+  email                  String                  @unique
+  emailVerified          DateTime?
+  passwordHash           String
+  firstName              String
+  lastName               String
+  avatarUrl              String?
+  phone                  String?
+  role                   UserRole                @default(COMMUNITY_MEMBER)
+  isActive               Boolean                 @default(true)
+  isBanned               Boolean                 @default(false)
+  bannedAt               DateTime?
+  bannedReason           String?
+  lastLoginAt            DateTime?
+  lastLoginIp            String?
+  twoFactorEnabled       Boolean                 @default(false)
+  twoFactorSecret        String?
+  stripeCustomerId       String?                 @unique
+  referralCode           String?                 @unique
+  referredById           String?
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  aiUsageLogs            AIUsageLog[]
+  analyticsEvents        AnalyticsEvent[]
+  commissionTransactions CommissionTransaction[] @relation("CommissionRecipient")
+  memberships            CommunityMembership[]
+  contentProgress        ContentProgress[]
+  influencerProfile      Influencer?
+  liveSessionAttendees   LiveSessionAttendee[]
+  liveSessions           LiveSession[]           @relation("HostSessions")
+  marketplaceListings    MarketplaceListing[]    @relation("SellerListings")
+  marketplacePurchases   MarketplacePurchase[]
+  payments               Payment[]
+  refreshTokens          RefreshToken[]
+  referredBy             User?                   @relation("UserReferrals", fields: [referredById], references: [id])
+  referrals              User[]                  @relation("UserReferrals")
+  // Phase 1 — Feed
+  posts                  Post[]
+  comments               Comment[]
+  postReactions          PostReaction[]
+  commentReactions       CommentReaction[]
+  // Phase 2 — Profiles & Notifications
+  profile                UserProfile?
+  receivedNotifications  Notification[]          @relation("ReceivedNotifications")
+  sentNotifications      Notification[]          @relation("SentNotifications")
+  // Phase 3 — Gamification & Certs
+  userPoints             UserPoints[]
+  userBadges             UserBadge[]
+  certificates           Certificate[]
+  liveSessionRSVPs       LiveSessionRSVP[]
+  // Phase 5 — Email sequences
+  sequenceEnrollments    SequenceEnrollment[]
+  // Phase 7 — DMs
+  conversationParticipants ConversationParticipant[]
+  directMessages         DirectMessage[]
+  // Reports
+  reports                Report[]                @relation("UserReports")
+
+  @@index([email])
+  @@index([role])
+  @@index([stripeCustomerId])
+  @@index([referralCode])
+  @@index([createdAt])
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  isRevoked Boolean  @default(false)
+  createdAt DateTime @default(now())
+  ipAddress String?
+  userAgent String?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model Influencer {
+  id                  String      @id @default(cuid())
+  userId              String      @unique
+  displayName         String
+  bio                 String?
+  websiteUrl          String?
+  socialLinks         Json        @default("{}")
+  stripeAccountId     String?     @unique
+  stripeAccountStatus String?
+  isVerified          Boolean     @default(false)
+  isActive            Boolean     @default(true)
+  totalEarnings       Decimal     @default(0)
+  pendingPayout       Decimal     @default(0)
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+  communities         Community[]
+  user                User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([stripeAccountId])
+  @@map("influencers")
+}
+
+model Community {
+  id                String                  @id @default(cuid())
+  influencerId      String
+  name              String
+  slug              String                  @unique
+  description       String?
+  shortDescription  String?
+  logoUrl           String?
+  bannerUrl         String?
+  primaryColor      String                  @default("#6366f1")
+  secondaryColor    String                  @default("#4f46e5")
+  accentColor       String                  @default("#818ef8")
+  customDomain      String?                 @unique
+  isPublished       Boolean                 @default(false)
+  isPrivate         Boolean                 @default(false)
+  memberCount       Int                     @default(0)
+  maxMembers        Int?
+  welcomeMessage    String?
+  rules             String?
+  tags              Json                    @default("[]")
+  metaTitle         String?
+  metaDescription   String?
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
+  aiUsageLogs         AIUsageLog[]
+  analyticsEvents     AnalyticsEvent[]
+  commissionRules     CommissionRule[]
+  commissionTxns      CommissionTransaction[]
+  influencer          Influencer              @relation(fields: [influencerId], references: [id])
+  memberships         CommunityMembership[]
+  contentModules      ContentModule[]
+  liveSessions        LiveSession[]
+  subscriptionPlans   SubscriptionPlan[]
+  marketplaceListings MarketplaceListing[]    @relation("CommunityListings")
+  // Phase 1 — Feed
+  spaces              Space[]
+  posts               Post[]
+  // Phase 3 — Gamification
+  userPoints          UserPoints[]
+  badges              Badge[]
+  certificates        Certificate[]
+  // Phase 5 — Email
+  emailSequences      EmailSequence[]
+  // Phase 6 — Landing
+  faqs                CommunityFAQ[]
+  testimonials        CommunityTestimonial[]
+
+  @@index([slug])
+  @@index([influencerId])
+  @@index([customDomain])
+  @@index([isPublished])
+  @@map("communities")
+}
+
+// =============================================================================
+// PHASE 1 — FEED SOCIAL
+// =============================================================================
+
+model Space {
+  id          String    @id @default(cuid())
+  communityId String
+  name        String
+  slug        String
+  description String?
+  icon        String?
+  type        SpaceType @default(DISCUSSION)
+  sortOrder   Int       @default(0)
+  isDefault   Boolean   @default(false)
+  isLocked    Boolean   @default(false)
+  isPublic    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  posts       Post[]
+
+  @@unique([communityId, slug])
+  @@index([communityId])
+  @@map("spaces")
+}
+
+enum SpaceType {
+  DISCUSSION
+  ANNOUNCEMENT
+  QA
+  SHOWCASE
+}
+
+model Post {
+  id           String         @id @default(cuid())
+  spaceId      String
+  authorId     String
+  communityId  String
+  title        String?
+  body         String         @db.Text
+  type         PostType       @default(TEXT)
+  isPinned     Boolean        @default(false)
+  isLocked     Boolean        @default(false)
+  isHidden     Boolean        @default(false)
+  attachments  Json           @default("[]")
+  likeCount    Int            @default(0)
+  commentCount Int            @default(0)
+  viewCount    Int            @default(0)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  space        Space          @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  author       User           @relation(fields: [authorId], references: [id])
+  community    Community      @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  comments     Comment[]
+  reactions    PostReaction[]
+
+  @@index([spaceId, createdAt])
+  @@index([communityId, isPinned])
+  @@index([authorId])
+  @@map("posts")
+}
+
+enum PostType {
+  TEXT
+  IMAGE
+  LINK
+  POLL
+}
+
+model Comment {
+  id        String            @id @default(cuid())
+  postId    String
+  authorId  String
+  parentId  String?
+  body      String            @db.Text
+  isHidden  Boolean           @default(false)
+  likeCount Int               @default(0)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  post      Post              @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    User              @relation(fields: [authorId], references: [id])
+  parent    Comment?          @relation("Replies", fields: [parentId], references: [id])
+  replies   Comment[]         @relation("Replies")
+  reactions CommentReaction[]
+
+  @@index([postId])
+  @@index([parentId])
+  @@map("comments")
+}
+
+model PostReaction {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  type      String
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([postId, userId, type])
+  @@map("post_reactions")
+}
+
+model CommentReaction {
+  id        String   @id @default(cuid())
+  commentId String
+  userId    String
+  type      String
+  createdAt DateTime @default(now())
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([commentId, userId, type])
+  @@map("comment_reactions")
+}
+
+// =============================================================================
+// PHASE 2 — USER PROFILES + NOTIFICATIONS
+// =============================================================================
+
+model UserProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  bio         String?  @db.Text
+  location    String?
+  carBrand    String?
+  carModel    String?
+  carYear     Int?
+  interests   Json     @default("[]")
+  socialLinks Json     @default("{}")
+  isPublic    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  recipientId String
+  actorId     String?
+  type        NotificationType
+  title       String
+  body        String?
+  isRead      Boolean          @default(false)
+  readAt      DateTime?
+  link        String?
+  metadata    Json             @default("{}")
+  createdAt   DateTime         @default(now())
+  recipient   User             @relation("ReceivedNotifications", fields: [recipientId], references: [id], onDelete: Cascade)
+  actor       User?            @relation("SentNotifications", fields: [actorId], references: [id])
+
+  @@index([recipientId, isRead])
+  @@index([recipientId, createdAt])
+  @@map("notifications")
+}
+
+enum NotificationType {
+  NEW_COMMENT
+  NEW_REPLY
+  POST_REACTION
+  NEW_MEMBER
+  LIVE_SESSION_LIVE
+  SUBSCRIPTION_EXPIRING
+  PAYMENT_FAILED
+  ACHIEVEMENT_UNLOCKED
+  DIRECT_MESSAGE
+  MENTION
+  WELCOME
+}
+
+// =============================================================================
+// PHASE 3 — GAMIFICATION + CERTIFICATES + EVENTS
+// =============================================================================
+
+model UserPoints {
+  id           String             @id @default(cuid())
+  userId       String
+  communityId  String
+  points       Int                @default(0)
+  totalEarned  Int                @default(0)
+  level        Int                @default(1)
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  user         User               @relation(fields: [userId], references: [id])
+  community    Community          @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  transactions PointTransaction[]
+
+  @@unique([userId, communityId])
+  @@index([communityId, points])
+  @@map("user_points")
+}
+
+model PointTransaction {
+  id           String     @id @default(cuid())
+  userPointsId String
+  amount       Int
+  reason       String
+  metadata     Json       @default("{}")
+  createdAt    DateTime   @default(now())
+  userPoints   UserPoints @relation(fields: [userPointsId], references: [id])
+
+  @@map("point_transactions")
+}
+
+model Badge {
+  id          String      @id @default(cuid())
+  communityId String?
+  name        String
+  description String
+  icon        String
+  color       String      @default("#3B82F6")
+  requirement Json
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  community   Community?  @relation(fields: [communityId], references: [id])
+  userBadges  UserBadge[]
+
+  @@map("badges")
+}
+
+model UserBadge {
+  id          String   @id @default(cuid())
+  userId      String
+  badgeId     String
+  communityId String?
+  awardedAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
+  badge       Badge    @relation(fields: [badgeId], references: [id])
+
+  @@unique([userId, badgeId, communityId])
+  @@map("user_badges")
+}
+
+model Certificate {
+  id          String    @id @default(cuid())
+  userId      String
+  communityId String
+  moduleId    String?
+  title       String
+  issuerName  String
+  completedAt DateTime
+  code        String    @unique @default(cuid())
+  pdfUrl      String?
+  metadata    Json      @default("{}")
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id])
+  community   Community @relation(fields: [communityId], references: [id])
+
+  @@index([userId])
+  @@index([code])
+  @@map("certificates")
+}
+
+model LiveSessionRSVP {
+  id        String      @id @default(cuid())
+  sessionId String
+  userId    String
+  status    RSVPStatus  @default(GOING)
+  createdAt DateTime    @default(now())
+  session   LiveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user      User        @relation(fields: [userId], references: [id])
+
+  @@unique([sessionId, userId])
+  @@map("live_session_rsvps")
+}
+
+enum RSVPStatus {
+  GOING
+  MAYBE
+  NOT_GOING
+}
+
+// =============================================================================
+// PHASE 5 — EMAIL MARKETING
+// =============================================================================
+
+model EmailSequence {
+  id          String               @id @default(cuid())
+  communityId String
+  name        String
+  trigger     SequenceTrigger      @default(ON_JOIN)
+  isActive    Boolean              @default(true)
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  community   Community            @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  steps       EmailSequenceStep[]
+  enrollments SequenceEnrollment[]
+
+  @@index([communityId])
+  @@map("email_sequences")
+}
+
+enum SequenceTrigger {
+  ON_JOIN
+  ON_SUBSCRIPTION
+  ON_LESSON_COMPLETE
+  MANUAL
+}
+
+model EmailSequenceStep {
+  id         String        @id @default(cuid())
+  sequenceId String
+  stepNumber Int
+  delayDays  Int           @default(0)
+  subject    String
+  bodyHtml   String        @db.Text
+  bodyText   String?       @db.Text
+  createdAt  DateTime      @default(now())
+  sequence   EmailSequence @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+
+  @@index([sequenceId])
+  @@map("email_sequence_steps")
+}
+
+model SequenceEnrollment {
+  id          String        @id @default(cuid())
+  sequenceId  String
+  userId      String
+  currentStep Int           @default(0)
+  isActive    Boolean       @default(true)
+  completedAt DateTime?
+  nextSendAt  DateTime?
+  createdAt   DateTime      @default(now())
+  sequence    EmailSequence @relation(fields: [sequenceId], references: [id])
+  user        User          @relation(fields: [userId], references: [id])
+
+  @@unique([sequenceId, userId])
+  @@index([nextSendAt, isActive])
+  @@map("sequence_enrollments")
+}
+
+// =============================================================================
+// PHASE 6 — LANDING PAGES
+// =============================================================================
+
+model CommunityFAQ {
+  id          String    @id @default(cuid())
+  communityId String
+  question    String
+  answer      String    @db.Text
+  sortOrder   Int       @default(0)
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+
+  @@index([communityId])
+  @@map("community_faqs")
+}
+
+model CommunityTestimonial {
+  id          String    @id @default(cuid())
+  communityId String
+  authorName  String
+  authorTitle String?
+  avatarUrl   String?
+  body        String    @db.Text
+  rating      Int       @default(5)
+  sortOrder   Int       @default(0)
+  isActive    Boolean   @default(true)
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+
+  @@index([communityId])
+  @@map("community_testimonials")
+}
+
+// =============================================================================
+// PHASE 7 — DIRECT MESSAGES
+// =============================================================================
+
+model Conversation {
+  id           String                    @id @default(cuid())
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+  participants ConversationParticipant[]
+  messages     DirectMessage[]
+
+  @@map("conversations")
+}
+
+model ConversationParticipant {
+  id             String       @id @default(cuid())
+  conversationId String
+  userId         String
+  lastReadAt     DateTime?
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id])
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+  @@map("conversation_participants")
+}
+
+model DirectMessage {
+  id             String       @id @default(cuid())
+  conversationId String
+  senderId       String
+  body           String       @db.Text
+  isRead         Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User         @relation(fields: [senderId], references: [id])
+
+  @@index([conversationId, createdAt])
+  @@map("direct_messages")
+}
+
+// =============================================================================
+// EXISTING MODELS (unchanged)
+// =============================================================================
+
+model SubscriptionPlan {
+  id                 String                @id @default(cuid())
+  communityId        String
+  name               String
+  description        String?
+  price              Decimal
+  currency           String                @default("brl")
+  intervalCount      Int                   @default(1)
+  interval           String                @default("month")
+  trialDays          Int                   @default(0)
+  features           Json                  @default("[]")
+  isActive           Boolean               @default(true)
+  isDefault          Boolean               @default(false)
+  sortOrder          Int                   @default(0)
+  stripePriceId      String?               @unique
+  stripeProductId    String?
+  maxMembers         Int?
+  hasContentAccess   Boolean               @default(true)
+  hasLiveAccess      Boolean               @default(true)
+  hasCommunityAccess Boolean               @default(true)
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+  memberships        CommunityMembership[]
+  community          Community             @relation(fields: [communityId], references: [id], onDelete: Cascade)
+
+  @@index([communityId])
+  @@index([stripePriceId])
+  @@map("subscription_plans")
+}
+
+model CommunityMembership {
+  id                   String                    @id @default(cuid())
+  userId               String
+  communityId          String
+  planId               String
+  status               CommunityMembershipStatus @default(ACTIVE)
+  subscriptionStatus   SubscriptionStatus        @default(ACTIVE)
+  stripeSubscriptionId String?                   @unique
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean                   @default(false)
+  canceledAt           DateTime?
+  trialStart           DateTime?
+  trialEnd             DateTime?
+  joinedAt             DateTime                  @default(now())
+  lastActiveAt         DateTime?
+  metadata             Json                      @default("{}")
+  createdAt            DateTime                  @default(now())
+  updatedAt            DateTime                  @updatedAt
+  community            Community                 @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  plan                 SubscriptionPlan          @relation(fields: [planId], references: [id])
+  user                 User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments             Payment[]
+
+  @@unique([userId, communityId])
+  @@index([userId])
+  @@index([communityId])
+  @@index([stripeSubscriptionId])
+  @@index([status])
+  @@index([currentPeriodEnd])
+  @@index([communityId, status])
+  @@index([status, currentPeriodEnd])
+  @@map("community_memberships")
+}
+
+model Payment {
+  id                    String                  @id @default(cuid())
+  userId                String
+  membershipId          String?
+  amount                Decimal
+  currency              String                  @default("brl")
+  status                PaymentStatus           @default(PENDING)
+  type                  PaymentType             @default(SUBSCRIPTION)
+  stripePaymentIntentId String?                 @unique
+  stripeInvoiceId       String?                 @unique
+  description           String?
+  metadata              Json                    @default("{}")
+  failureCode           String?
+  failureMessage        String?
+  refundedAt            DateTime?
+  refundAmount          Decimal?
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  commissions           CommissionTransaction[]
+  membership            CommunityMembership?    @relation(fields: [membershipId], references: [id])
+  user                  User                    @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([membershipId])
+  @@index([status])
+  @@index([stripePaymentIntentId])
+  @@index([stripeInvoiceId])
+  @@index([createdAt])
+  @@index([createdAt, status])
+  @@map("payments")
+}
+
+model CommissionRule {
+  id           String                  @id @default(cuid())
+  communityId  String
+  name         String
+  description  String?
+  type         CommissionType          @default(PERCENTAGE)
+  rate         Decimal
+  flatAmount   Decimal?
+  tiers        Json                    @default("[]")
+  minAmount    Decimal?
+  maxAmount    Decimal?
+  isActive     Boolean                 @default(true)
+  platformFee  Decimal                 @default(0.10)
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+  community    Community               @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  transactions CommissionTransaction[]
+
+  @@index([communityId])
+  @@map("commission_rules")
+}
+
+model CommissionTransaction {
+  id               String                      @id @default(cuid())
+  paymentId        String
+  communityId      String
+  ruleId           String
+  recipientId      String
+  grossAmount      Decimal
+  platformFee      Decimal
+  netAmount        Decimal
+  status           CommissionTransactionStatus @default(PENDING)
+  paidOutAt        DateTime?
+  stripeTransferId String?                     @unique
+  notes            String?
+  createdAt        DateTime                    @default(now())
+  updatedAt        DateTime                    @updatedAt
+  community        Community                   @relation(fields: [communityId], references: [id])
+  payment          Payment                     @relation(fields: [paymentId], references: [id])
+  recipient        User                        @relation("CommissionRecipient", fields: [recipientId], references: [id])
+  rule             CommissionRule              @relation(fields: [ruleId], references: [id])
+
+  @@index([paymentId])
+  @@index([communityId])
+  @@index([recipientId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("commission_transactions")
+}
+
+model SaasTool {
+  id           String           @id @default(cuid())
+  name         String
+  description  String
+  shortDesc    String?
+  category     SaaSToolCategory
+  logoUrl      String?
+  websiteUrl   String
+  affiliateUrl String?
+  isActive     Boolean          @default(true)
+  isFeatured   Boolean          @default(false)
+  sortOrder    Int              @default(0)
+  tags         Json             @default("[]")
+  pricing      Json             @default("{}")
+  rating       Float?
+  reviewCount  Int              @default(0)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@index([category])
+  @@index([isActive])
+  @@map("saas_tools")
+}
+
+model MarketplaceListing {
+  id            String                   @id @default(cuid())
+  sellerId      String
+  communityId   String?
+  title         String
+  slug          String                   @unique
+  description   String
+  shortDesc     String?
+  type          MarketplaceListingType   @default(COURSE)
+  status        MarketplaceListingStatus @default(DRAFT)
+  price         Decimal
+  currency      String                   @default("brl")
+  coverImageUrl String?
+  previewUrl    String?
+  tags          Json                     @default("[]")
+  categories    Json                     @default("[]")
+  features      Json                     @default("[]")
+  stripePriceId String?
+  totalSales    Int                      @default(0)
+  averageRating Float?
+  reviewCount   Int                      @default(0)
+  isFeatured    Boolean                  @default(false)
+  metadata      Json                     @default("{}")
+  createdAt     DateTime                 @default(now())
+  updatedAt     DateTime                 @updatedAt
+  seller        User                     @relation("SellerListings", fields: [sellerId], references: [id])
+  community     Community?               @relation("CommunityListings", fields: [communityId], references: [id])
+  purchases     MarketplacePurchase[]
+
+  @@index([sellerId])
+  @@index([communityId])
+  @@index([slug])
+  @@index([status])
+  @@index([type])
+  @@index([isFeatured])
+  @@map("marketplace_listings")
+}
+
+model MarketplacePurchase {
+  id                    String             @id @default(cuid())
+  buyerId               String
+  listingId             String
+  amount                Decimal
+  currency              String             @default("brl")
+  stripePaymentIntentId String?            @unique
+  accessGrantedAt       DateTime?
+  createdAt             DateTime           @default(now())
+  buyer                 User               @relation(fields: [buyerId], references: [id])
+  listing               MarketplaceListing @relation(fields: [listingId], references: [id])
+
+  @@unique([buyerId, listingId])
+  @@index([buyerId])
+  @@index([listingId])
+  @@map("marketplace_purchases")
+}
+
+model LiveSession {
+  id              String                @id @default(cuid())
+  communityId     String
+  hostId          String
+  title           String
+  description     String?
+  thumbnailUrl    String?
+  status          LiveSessionStatus     @default(SCHEDULED)
+  scheduledAt     DateTime
+  startedAt       DateTime?
+  endedAt         DateTime?
+  streamKey       String?               @unique
+  streamUrl       String?
+  replayUrl       String?
+  maxAttendees    Int?
+  actualAttendees Int                   @default(0)
+  isRecorded      Boolean               @default(true)
+  isPublic        Boolean               @default(false)
+  metadata        Json                  @default("{}")
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  attendees       LiveSessionAttendee[]
+  rsvps           LiveSessionRSVP[]
+  community       Community             @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  host            User                  @relation("HostSessions", fields: [hostId], references: [id])
+
+  @@index([communityId])
+  @@index([hostId])
+  @@index([status])
+  @@index([scheduledAt])
+  @@map("live_sessions")
+}
+
+model LiveSessionAttendee {
+  id           String      @id @default(cuid())
+  sessionId    String
+  userId       String
+  joinedAt     DateTime    @default(now())
+  leftAt       DateTime?
+  durationMins Int?
+  session      LiveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user         User        @relation(fields: [userId], references: [id])
+
+  @@unique([sessionId, userId])
+  @@index([sessionId])
+  @@index([userId])
+  @@map("live_session_attendees")
+}
+
+model ContentModule {
+  id              String          @id @default(cuid())
+  communityId     String
+  title           String
+  description     String?
+  sortOrder       Int             @default(0)
+  isPublished     Boolean         @default(false)
+  isLocked        Boolean         @default(false)
+  unlockAfterDays Int?
+  coverImageUrl   String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  lessons         ContentLesson[]
+  community       Community       @relation(fields: [communityId], references: [id], onDelete: Cascade)
+
+  @@index([communityId])
+  @@index([sortOrder])
+  @@map("content_modules")
+}
+
+model ContentLesson {
+  id              String            @id @default(cuid())
+  moduleId        String
+  title           String
+  description     String?
+  type            ContentType       @default(VIDEO)
+  content         String?
+  videoUrl        String?
+  videoProvider   String?
+  videoDuration   Int?
+  fileUrl         String?
+  fileSize        Int?
+  sortOrder       Int               @default(0)
+  isPublished     Boolean           @default(false)
+  isFree          Boolean           @default(false)
+  isDownloadable  Boolean           @default(false)
+  viewCount       Int               @default(0)
+  completionCount Int               @default(0)
+  transcriptUrl   String?
+  attachments     Json              @default("[]")
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  module          ContentModule     @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  progress        ContentProgress[]
+
+  @@index([moduleId])
+  @@index([sortOrder])
+  @@map("content_lessons")
+}
+
+model ContentProgress {
+  id           String        @id @default(cuid())
+  userId       String
+  lessonId     String
+  isCompleted  Boolean       @default(false)
+  completedAt  DateTime?
+  viewedAt     DateTime?
+  progressSecs Int           @default(0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  lesson       ContentLesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@index([userId])
+  @@index([lessonId])
+  @@map("content_progress")
+}
+
+model AIUsageLog {
+  id               String        @id @default(cuid())
+  userId           String
+  communityId      String?
+  sessionId        String
+  role             AIMessageRole
+  content          String
+  tokensUsed       Int           @default(0)
+  model            String        @default("gpt-4-turbo-preview")
+  promptTokens     Int           @default(0)
+  completionTokens Int           @default(0)
+  costUsd          Decimal       @default(0)
+  latencyMs        Int?
+  metadata         Json          @default("{}")
+  createdAt        DateTime      @default(now())
+  community        Community?    @relation(fields: [communityId], references: [id])
+  user             User          @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([communityId])
+  @@index([sessionId])
+  @@index([createdAt])
+  @@map("ai_usage_logs")
+}
+
+model AnalyticsEvent {
+  id          String             @id @default(cuid())
+  userId      String?
+  communityId String?
+  type        AnalyticsEventType
+  properties  Json               @default("{}")
+  sessionId   String?
+  ipAddress   String?
+  userAgent   String?
+  referrer    String?
+  createdAt   DateTime           @default(now())
+  community   Community?         @relation(fields: [communityId], references: [id])
+  user        User?              @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([communityId])
+  @@index([type])
+  @@index([createdAt])
+  @@index([sessionId])
+  @@map("analytics_events")
+}
+
+model PlatformConfig {
+  id        String   @id @default("singleton")
+  flags     Json     @default("{}")
+  config    Json     @default("{}")
+  updatedAt DateTime @updatedAt
+
+  @@map("platform_configs")
+}
+
+// =============================================================================
+// ENUMS
+// =============================================================================
+
+enum UserRole {
+  SUPER_ADMIN
+  INFLUENCER_ADMIN
+  COMMUNITY_MEMBER
+  MARKETPLACE_PARTNER
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  INCOMPLETE
+  INCOMPLETE_EXPIRED
+  TRIALING
+  UNPAID
+  PAUSED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+  DISPUTED
+  PARTIALLY_REFUNDED
+}
+
+enum PaymentType {
+  SUBSCRIPTION
+  ONE_TIME
+  COMMISSION_PAYOUT
+  MARKETPLACE_PURCHASE
+}
+
+enum CommissionType {
+  PERCENTAGE
+  FLAT_FEE
+  TIERED
+}
+
+enum CommissionTransactionStatus {
+  PENDING
+  CONFIRMED
+  PAID_OUT
+  REVERSED
+}
+
+enum ContentType {
+  VIDEO
+  AUDIO
+  TEXT
+  PDF
+  QUIZ
+  ASSIGNMENT
+  LIVE_REPLAY
+}
+
+enum LiveSessionStatus {
+  SCHEDULED
+  LIVE
+  ENDED
+  CANCELED
+}
+
+enum MarketplaceListingStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  SOLD_OUT
+  ARCHIVED
+}
+
+enum MarketplaceListingType {
+  COURSE
+  TEMPLATE
+  EBOOK
+  COACHING
+  TOOL
+  SERVICE
+}
+
+enum SaaSToolCategory {
+  PRODUCTIVITY
+  MARKETING
+  ANALYTICS
+  DESIGN
+  DEVELOPMENT
+  FINANCE
+  COMMUNICATION
+}
+
+enum AIMessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+enum AnalyticsEventType {
+  PAGE_VIEW
+  CONTENT_VIEW
+  CONTENT_COMPLETE
+  LESSON_COMPLETE
+  SUBSCRIPTION_START
+  SUBSCRIPTION_CANCEL
+  PAYMENT_SUCCESS
+  PAYMENT_FAIL
+  LOGIN
+  LOGOUT
+  INVITE_SENT
+  INVITE_ACCEPTED
+  LIVE_SESSION_JOIN
+  LIVE_SESSION_LEAVE
+  MARKETPLACE_VIEW
+  MARKETPLACE_PURCHASE
+  AI_QUERY
+  FILE_UPLOAD
+  PROFILE_UPDATE
+  COMMUNITY_CREATE
+  MEMBER_JOIN
+  POST_CREATE
+  CHECKOUT_INITIATED
+}
+
+enum CommunityMembershipStatus {
+  ACTIVE
+  CANCELED
+  EXPIRED
+  SUSPENDED
+  PENDING_PAYMENT
+}
+
+// =============================================================================
+// REPORT / MODERATION
+// =============================================================================
+
+enum ReportTargetType {
+  POST
+  COMMENT
+  USER
+}
+
+enum ReportStatus {
+  PENDING
+  RESOLVED
+  IGNORED
+}
+
+model Report {
+  id           String           @id @default(cuid())
+  reportedById String
+  targetType   ReportTargetType
+  targetId     String
+  reason       String
+  status       ReportStatus     @default(PENDING)
+  resolvedAt   DateTime?
+  resolvedBy   String?
+  createdAt    DateTime         @default(now())
+  reportedBy   User             @relation("UserReports", fields: [reportedById], references: [id])
+
+  @@index([status])
+  @@index([targetType, targetId])
+  @@index([reportedById])
+  @@map("reports")
+}
