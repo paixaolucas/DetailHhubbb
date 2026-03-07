@@ -28,6 +28,7 @@ model User {
   stripeCustomerId       String?                 @unique
   referralCode           String?                 @unique
   referredById           String?
+  notificationPrefs      Json                    @default("{}")
   createdAt              DateTime                @default(now())
   updatedAt              DateTime                @updatedAt
   aiUsageLogs            AIUsageLog[]

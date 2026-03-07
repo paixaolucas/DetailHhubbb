@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Users,
@@ -24,6 +24,8 @@ import {
   Wrench,
   Bot,
 } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useToast } from "@/components/ui/toast-provider";
 import {
   AreaChart,
   Area,
@@ -321,12 +323,26 @@ function InfluencerDashboard({ userName }: { userName: string }) {
 
 const COURSE_COLORS = ["bg-blue-500", "bg-purple-500", "bg-green-500", "bg-orange-500"];
 
-function MemberDashboard({ userName }: { userName: string }) {
+function MemberDashboardInner({ userName }: { userName: string }) {
   const firstName = userName.split(" ")[0] || "Aluno";
   const [learningData, setLearningData] = useState<any>(null);
   const [lives, setLives] = useState<any[]>([]);
   const [certCount, setCertCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const toast = useToast();
+
+  useEffect(() => {
+    const payment = searchParams.get("payment");
+    if (payment === "success") {
+      toast.success("Assinatura confirmada! Bem-vindo à comunidade.");
+      router.replace("/dashboard");
+    } else if (payment === "canceled") {
+      toast.error("Pagamento cancelado. Tente novamente se quiser.");
+      router.replace("/dashboard");
+    }
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("autoclub_access_token");
@@ -549,7 +565,7 @@ export default function DashboardPage() {
   switch (role) {
     case "SUPER_ADMIN": return <AdminDashboard />;
     case "INFLUENCER_ADMIN": return <InfluencerDashboard userName={userName} />;
-    case "COMMUNITY_MEMBER": return <MemberDashboard userName={userName} />;
+    case "COMMUNITY_MEMBER": return <Suspense fallback={<DashboardSkeleton />}><MemberDashboardInner userName={userName} /></Suspense>;
     case "MARKETPLACE_PARTNER": return <PartnerDashboard userName={userName} />;
     default: return <InfluencerDashboard userName={userName} />;
   }
