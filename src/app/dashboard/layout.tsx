@@ -54,6 +54,7 @@ const ADMIN_NAV = [
   { href: "/dashboard/badges", label: "Badges", icon: Award },
   { href: "/dashboard/ai", label: "Auto AI", icon: Bot },
   { href: "/dashboard/admin/comunidades", label: "Comunidades (Admin)", icon: Globe },
+  { href: "/dashboard/admin/ferramentas", label: "Ferramentas (Admin)", icon: Wrench },
   { href: "/dashboard/admin/plataforma", label: "Plataforma", icon: Server },
   { href: "/dashboard/admin/financeiro", label: "Financeiro", icon: DollarSign },
   { href: "/dashboard/settings", label: "Configurações", icon: Settings },

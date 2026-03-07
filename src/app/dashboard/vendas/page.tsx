@@ -21,12 +21,27 @@ const chartStyle = {
   },
 };
 
+interface Purchase {
+  id: string;
+  amount: string;
+  createdAt: string;
+  listing: { id: string; title: string; type: string; price: string };
+  buyer: { id: string; firstName: string; lastName: string };
+}
+
+const LISTING_TYPE_LABEL: Record<string, string> = {
+  COURSE: "Curso", TEMPLATE: "Template", EBOOK: "Ebook",
+  COACHING: "Coaching", TOOL: "Ferramenta", SERVICE: "Serviço",
+};
+
 export default function VendasPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
     totalRevenue: 0, totalSales: 0, thisMonthRevenue: 0, lastMonthRevenue: 0,
   });
+  const [purchases, setPurchases] = useState<Purchase[]>([]);
+  const [purchasesTotal, setPurchasesTotal] = useState(0);
 
   useEffect(() => {
     const role = localStorage.getItem("autoclub_user_role");
@@ -40,14 +55,21 @@ export default function VendasPage() {
       return;
     }
     const token = localStorage.getItem("autoclub_access_token");
-    fetch("/api/marketplace/listings?mine=true&pageSize=50", { headers: { Authorization: `Bearer ${token}` } })
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.success) {
-          const listings = d.data ?? [];
+    const headers = { Authorization: `Bearer ${token}` };
+    Promise.all([
+      fetch("/api/marketplace/listings?mine=true&pageSize=50", { headers }).then((r) => r.json()),
+      fetch("/api/marketplace/purchases/mine?pageSize=20", { headers }).then((r) => r.json()),
+    ])
+      .then(([listingsData, purchasesData]) => {
+        if (listingsData.success) {
+          const listings = listingsData.data ?? [];
           const totalRevenue = listings.reduce((s: number, l: any) => s + l.totalSales * Number(l.price), 0);
           const totalSales = listings.reduce((s: number, l: any) => s + l.totalSales, 0);
           setStats({ totalRevenue, totalSales, thisMonthRevenue: totalRevenue * 0.35, lastMonthRevenue: totalRevenue * 0.28 });
+        }
+        if (purchasesData.success) {
+          setPurchases(purchasesData.data?.items ?? []);
+          setPurchasesTotal(purchasesData.data?.pagination?.total ?? 0);
         }
       })
       .finally(() => setIsLoading(false));
@@ -174,12 +196,49 @@ export default function VendasPage() {
         </div>
       ) : (
         <div className="glass-card overflow-hidden">
-          <div className="p-5 border-b border-white/10">
+          <div className="p-5 border-b border-white/10 flex items-center justify-between">
             <h2 className="text-base font-semibold text-white">Vendas Recentes</h2>
+            {purchasesTotal > 0 && (
+              <span className="text-xs text-gray-500">{purchasesTotal} venda(s) no total</span>
+            )}
           </div>
-          <div className="p-6 text-center text-sm text-gray-500">
-            Histórico detalhado de vendas disponível em breve.
-          </div>
+          {purchases.length === 0 ? (
+            <div className="p-6 text-center text-sm text-gray-500">Nenhuma venda registrada.</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-white/5">
+                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-5 py-3">Produto</th>
+                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-5 py-3">Comprador</th>
+                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-5 py-3">Valor</th>
+                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-5 py-3">Data</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {purchases.map((p) => (
+                    <tr key={p.id} className="hover:bg-white/5 transition-colors">
+                      <td className="px-5 py-3.5">
+                        <div>
+                          <p className="text-white font-medium truncate max-w-[180px]">{p.listing.title}</p>
+                          <span className="text-xs text-gray-500">{LISTING_TYPE_LABEL[p.listing.type] ?? p.listing.type}</span>
+                        </div>
+                      </td>
+                      <td className="px-5 py-3.5 text-gray-300">
+                        {p.buyer.firstName} {p.buyer.lastName}
+                      </td>
+                      <td className="px-5 py-3.5 text-green-400 font-medium">
+                        {fmt(Number(p.amount))}
+                      </td>
+                      <td className="px-5 py-3.5 text-gray-400">
+                        {new Date(p.createdAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" })}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
     </div>

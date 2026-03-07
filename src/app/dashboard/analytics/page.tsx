@@ -12,7 +12,7 @@ import {
   BarChart,
   Bar,
 } from "recharts";
-import { TrendingUp, Users, DollarSign, Activity, Download, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { TrendingUp, Users, DollarSign, Activity, Download, ArrowUpRight, ArrowDownRight, Zap } from "lucide-react";
 
 const chartStyle = {
   grid: { strokeDasharray: "3 3", stroke: "rgba(255,255,255,0.05)" },
@@ -58,18 +58,33 @@ export default function AnalyticsPage() {
   const [data, setData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [role, setRole] = useState<string>("INFLUENCER_ADMIN");
+  const [events, setEvents] = useState<{ type: string; count: number }[]>([]);
+  const [recentEvents, setRecentEvents] = useState<any[]>([]);
+  const [eventsLoading, setEventsLoading] = useState(false);
+  const [eventFilter, setEventFilter] = useState("");
 
   useEffect(() => {
-    setRole(localStorage.getItem("autoclub_user_role") ?? "INFLUENCER_ADMIN");
+    const storedRole = localStorage.getItem("autoclub_user_role") ?? "INFLUENCER_ADMIN";
+    setRole(storedRole);
     const token = localStorage.getItem("autoclub_access_token");
-    const endpoint =
-      localStorage.getItem("autoclub_user_role") === "SUPER_ADMIN"
-        ? "/api/analytics/platform"
-        : "/api/analytics/influencer";
-    fetch(endpoint, { headers: { Authorization: `Bearer ${token}` } })
+    const headers = { Authorization: `Bearer ${token}` };
+    const endpoint = storedRole === "SUPER_ADMIN" ? "/api/analytics/platform" : "/api/analytics/influencer";
+    fetch(endpoint, { headers })
       .then((r) => r.json())
       .then((d) => d.success && setData(d.data))
       .finally(() => setIsLoading(false));
+    if (storedRole === "SUPER_ADMIN") {
+      setEventsLoading(true);
+      fetch("/api/admin/analytics/events?pageSize=20", { headers })
+        .then((r) => r.json())
+        .then((d) => {
+          if (d.success) {
+            setEvents(d.data?.typeCounts ?? []);
+            setRecentEvents(d.data?.items ?? []);
+          }
+        })
+        .finally(() => setEventsLoading(false));
+    }
   }, []);
 
   if (isLoading) {
@@ -193,6 +208,82 @@ export default function AnalyticsPage() {
           </AreaChart>
         </ResponsiveContainer>
       </div>
+
+      {/* Analytics Events widget (admin only) */}
+      {role === "SUPER_ADMIN" && (
+        <div className="glass-card overflow-hidden">
+          <div className="p-5 border-b border-white/10 flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4 text-yellow-400" />
+              <h2 className="text-base font-semibold text-white">Eventos Recentes</h2>
+            </div>
+            <div className="flex items-center gap-2">
+              <select
+                value={eventFilter}
+                onChange={(e) => setEventFilter(e.target.value)}
+                className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500/50"
+              >
+                <option value="" className="bg-gray-900">Todos os tipos</option>
+                {events.map((e) => (
+                  <option key={e.type} value={e.type} className="bg-gray-900">{e.type} ({e.count})</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          {events.length > 0 && (
+            <div className="p-4 border-b border-white/5 flex flex-wrap gap-2">
+              {events.slice(0, 8).map((e) => (
+                <span
+                  key={e.type}
+                  onClick={() => setEventFilter(eventFilter === e.type ? "" : e.type)}
+                  className={`text-xs px-2.5 py-1 rounded-full border cursor-pointer transition-colors ${
+                    eventFilter === e.type
+                      ? "bg-blue-600/30 border-blue-500/50 text-blue-300"
+                      : "bg-white/5 border-white/10 text-gray-400 hover:border-white/20 hover:text-white"
+                  }`}
+                >
+                  {e.type} · {e.count}
+                </span>
+              ))}
+            </div>
+          )}
+          {eventsLoading ? (
+            <div className="p-8 text-center">
+              <div className="w-6 h-6 border-[3px] border-blue-500 border-t-transparent rounded-full animate-spin mx-auto" />
+            </div>
+          ) : (
+            <div className="divide-y divide-white/5">
+              {recentEvents
+                .filter((e) => !eventFilter || e.type === eventFilter)
+                .slice(0, 15)
+                .map((e) => (
+                  <div key={e.id} className="flex items-center gap-3 px-5 py-3 hover:bg-white/5 transition-colors">
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 font-medium flex-shrink-0">
+                      {e.type}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      {e.user && (
+                        <span className="text-sm text-gray-300">
+                          {e.user.firstName} {e.user.lastName}
+                          <span className="text-gray-500 text-xs ml-1">({e.user.email})</span>
+                        </span>
+                      )}
+                      {e.community && (
+                        <span className="text-xs text-gray-500 ml-2">· {e.community.name}</span>
+                      )}
+                    </div>
+                    <span className="text-xs text-gray-500 flex-shrink-0">
+                      {new Date(e.createdAt).toLocaleString("pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                    </span>
+                  </div>
+                ))}
+              {recentEvents.filter((e) => !eventFilter || e.type === eventFilter).length === 0 && (
+                <div className="p-8 text-center text-sm text-gray-500">Nenhum evento encontrado.</div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Influencer stats table (admin only) */}
       {role === "SUPER_ADMIN" && (
