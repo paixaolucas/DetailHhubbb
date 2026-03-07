@@ -35,6 +35,8 @@ import {
   Rss,
   Search,
   Calendar,
+  HelpCircle,
+  Star,
 } from "lucide-react";
 import { RoleBadge } from "@/components/ui/badge";
 import { Logo } from "@/components/ui/logo";
@@ -53,6 +55,8 @@ const ADMIN_NAV = [
   { href: "/dashboard/email-sequences", label: "Seq. de Email", icon: Mail },
   { href: "/dashboard/badges", label: "Badges", icon: Award },
   { href: "/dashboard/ai", label: "Auto AI", icon: Bot },
+  { href: "/dashboard/faqs", label: "FAQs", icon: HelpCircle },
+  { href: "/dashboard/testimonials", label: "Depoimentos", icon: Star },
   { href: "/dashboard/admin/comunidades", label: "Comunidades (Admin)", icon: Globe },
   { href: "/dashboard/admin/ferramentas", label: "Ferramentas (Admin)", icon: Wrench },
   { href: "/dashboard/admin/plataforma", label: "Plataforma", icon: Server },
@@ -68,6 +72,8 @@ const INFLUENCER_NAV = [
   { href: "/dashboard/events", label: "Eventos", icon: Calendar },
   { href: "/dashboard/email-sequences", label: "Sequências de Email", icon: Mail },
   { href: "/dashboard/badges", label: "Badges", icon: Award },
+  { href: "/dashboard/faqs", label: "FAQs", icon: HelpCircle },
+  { href: "/dashboard/testimonials", label: "Depoimentos", icon: Star },
   { href: "/dashboard/analytics", label: "Analytics", icon: BarChart2 },
   { href: "/dashboard/marketplace", label: "Marketplace", icon: ShoppingBag },
   { href: "/dashboard/tools", label: "Ferramentas", icon: Wrench },
@@ -82,6 +88,7 @@ const MEMBER_NAV = [
   { href: "/dashboard/minhas-comunidades", label: "Minhas Comunidades", icon: Car },
   { href: "/dashboard/meu-aprendizado", label: "Meu Aprendizado", icon: GraduationCap },
   { href: "/dashboard/meu-aprendizado/certificados", label: "Certificados", icon: Award },
+  { href: "/dashboard/leaderboard", label: "Leaderboard", icon: Trophy },
   { href: "/dashboard/lives", label: "Lives", icon: PlayCircle },
   { href: "/dashboard/lives/calendar", label: "Calendário", icon: Calendar },
   { href: "/dashboard/marketplace", label: "Marketplace", icon: ShoppingBag },
