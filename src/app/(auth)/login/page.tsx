@@ -2,13 +2,12 @@
 
 import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Loader2, Car, Bot, Video } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 
 function LoginFormContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -46,8 +45,7 @@ function LoginFormContent() {
         }
       }
 
-      const redirect = searchParams.get("redirect");
-      router.push(redirect?.startsWith("/") ? redirect : "/dashboard");
+      router.push("/dashboard");
     } catch {
       setError("Erro de conexão. Tente novamente.");
     } finally {

@@ -17,6 +17,7 @@ import {
   BarChart2,
   Package,
   Bot,
+  Trophy,
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/components/ui/toast-provider";
@@ -343,6 +344,8 @@ function MemberDashboardInner({ userName }: { userName: string }) {
   const firstName = userName.split(" ")[0] || "Aluno";
   const [communities, setCommunities] = useState<CommunityCard[]>([]);
   const [loading, setLoading] = useState(true);
+  const [leaderboard, setLeaderboard] = useState<any[]>([]);
+  const [lbLoading, setLbLoading] = useState(true);
   const router = useRouter();
   const searchParams = useSearchParams();
   const toast = useToast();
@@ -369,6 +372,14 @@ function MemberDashboardInner({ userName }: { userName: string }) {
       .then((d) => { if (d.success) setCommunities(d.data ?? []); })
       .catch(console.error)
       .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/leaderboard?limit=5")
+      .then((r) => r.json())
+      .then((d) => { if (d.success) setLeaderboard(d.data ?? []); })
+      .catch(console.error)
+      .finally(() => setLbLoading(false));
   }, []);
 
   return (
@@ -460,6 +471,88 @@ function MemberDashboardInner({ userName }: { userName: string }) {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Platform Leaderboard */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Trophy className="w-5 h-5 text-violet-400" />
+            <h2 className="text-lg font-semibold text-gray-900">Ranking da Plataforma</h2>
+          </div>
+          <a href="/dashboard/leaderboard" className="text-sm text-violet-400 hover:text-violet-300 font-medium transition-colors">
+            Ver completo →
+          </a>
+        </div>
+        <div className="glass-card divide-y divide-gray-100">
+          {lbLoading ? (
+            <div className="p-4 space-y-3 animate-pulse">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <div className="w-5 h-4 bg-gray-200 rounded" />
+                  <div className="w-9 h-9 bg-gray-200 rounded-full" />
+                  <div className="flex-1 space-y-1">
+                    <div className="h-3.5 bg-gray-200 rounded w-32" />
+                    <div className="h-2.5 bg-gray-200 rounded w-16" />
+                  </div>
+                  <div className="w-14 h-4 bg-gray-200 rounded" />
+                </div>
+              ))}
+            </div>
+          ) : leaderboard.length === 0 ? (
+            <div className="p-8 text-center text-gray-400 text-sm">
+              Nenhum ranking disponível ainda. Participe das comunidades para ganhar pontos!
+            </div>
+          ) : (
+            leaderboard.map((entry, idx) => {
+              const name = entry.user
+                ? `${entry.user.firstName} ${entry.user.lastName ?? ""}`.trim()
+                : "Usuário";
+              const initials = name
+                .split(" ")
+                .slice(0, 2)
+                .map((n: string) => n[0])
+                .join("")
+                .toUpperCase();
+              const rankBg =
+                idx === 0
+                  ? "bg-yellow-500/10 text-yellow-600"
+                  : idx === 1
+                  ? "bg-gray-400/10 text-gray-500"
+                  : idx === 2
+                  ? "bg-orange-500/10 text-orange-500"
+                  : "bg-gray-100 text-gray-400";
+              return (
+                <div key={entry.userId} className="flex items-center gap-4 px-4 py-3 hover:bg-gray-50 transition-colors">
+                  <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 ${rankBg}`}>
+                    {idx + 1}
+                  </span>
+                  {entry.user?.avatarUrl ? (
+                    <img
+                      src={entry.user.avatarUrl}
+                      alt={name}
+                      className="w-9 h-9 rounded-full object-cover flex-shrink-0"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-600 to-purple-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                      {initials}
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-900 truncate">{name}</p>
+                    <p className="text-xs text-gray-400">Nível {entry.level}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-violet-500">
+                      {entry.totalPoints.toLocaleString("pt-BR")}
+                    </p>
+                    <p className="text-xs text-gray-400">pts</p>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
       </div>
     </div>
   );
