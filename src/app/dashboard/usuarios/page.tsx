@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Users, Search, Ban, CheckCircle, ShieldAlert, ShieldCheck, UserX } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { useToast } from "@/components/ui/toast-provider";
 
 const ALL_ROLES = ["SUPER_ADMIN", "INFLUENCER_ADMIN", "COMMUNITY_MEMBER", "MARKETPLACE_PARTNER"] as const;
 
@@ -41,6 +42,7 @@ interface Stats {
 }
 
 export default function UsuariosPage() {
+  const toast = useToast();
   const [users, setUsers] = useState<User[]>([]);
   const [stats, setStats] = useState<Stats>({ total: 0, active: 0, banned: 0, influencers: 0 });
   const [isLoading, setIsLoading] = useState(true);
@@ -66,9 +68,17 @@ export default function UsuariosPage() {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ role }),
       });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.error ?? "Erro ao alterar role");
+        return;
+      }
       const data = await res.json();
       if (data.success) {
         setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, role } : u));
+        toast.success("Role atualizado com sucesso");
+      } else {
+        toast.error(data.error ?? "Erro ao alterar role");
       }
     } finally { setRoleLoading(null); }
   }
@@ -107,9 +117,17 @@ export default function UsuariosPage() {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(body),
       });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.error ?? "Erro ao alterar status");
+        return;
+      }
       const data = await res.json();
       if (data.success) {
         setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, ...body } : u));
+        toast.success("Status atualizado com sucesso");
+      } else {
+        toast.error(data.error ?? "Erro ao alterar status");
       }
     } finally { setActionLoading(null); }
   }
@@ -294,7 +312,7 @@ export default function UsuariosPage() {
                       ) : (
                         <select
                           value={user.role}
-                          disabled={user.id === currentUserId}
+                          disabled={user.id === currentUserId || !!roleLoading}
                           onChange={(e) => updateRole(user.id, e.target.value)}
                           className="bg-white border border-gray-200 hover:border-violet-200 rounded-lg px-2 py-1 text-gray-900 text-xs focus:outline-none focus:ring-2 focus:ring-violet-400/30 disabled:opacity-40 disabled:cursor-not-allowed"
                         >

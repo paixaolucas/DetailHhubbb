@@ -120,7 +120,13 @@ export default function SpaceFeedPage() {
 
         if (json.success) {
           const newPosts: Post[] = json.data.posts ?? [];
-          setPosts((prev) => (isLoadMore ? [...prev, ...newPosts] : newPosts));
+          // Pinned posts always appear first
+          const sorted = (isLoadMore ? newPosts : newPosts).sort((a, b) => {
+            if (a.isPinned && !b.isPinned) return -1;
+            if (!a.isPinned && b.isPinned) return 1;
+            return 0;
+          });
+          setPosts((prev) => (isLoadMore ? [...prev, ...sorted] : sorted));
           setNextCursor(json.data.nextCursor ?? null);
         }
       } catch {
@@ -158,22 +164,17 @@ export default function SpaceFeedPage() {
           found = mineJson.data.find((c: Community) => c.slug === communitySlug) ?? null;
         }
 
-        // Fallback: check active member memberships
+        // Fallback: role-based access for members and admins
         if (!found) {
-          const [memberRes, pubRes] = await Promise.all([
-            fetch("/api/memberships/me", { headers: { Authorization: `Bearer ${token}` } }),
-            fetch("/api/communities", { headers: { Authorization: `Bearer ${token}` } }),
-          ]);
-          const memberJson = await memberRes.json();
+          const role = localStorage.getItem("detailhub_user_role");
+          const pubRes = await fetch("/api/communities?published=true", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
           const pubJson = await pubRes.json();
-
-          if (memberJson.success && pubJson.success) {
-            const memberIds: string[] = memberJson.data ?? [];
-            const allCommunities: Community[] = pubJson.data ?? [];
-            const candidate = allCommunities.find((c: Community) => c.slug === communitySlug);
-            if (candidate && memberIds.includes(candidate.id)) {
-              found = candidate;
-            }
+          const allCommunities: Community[] = pubJson.success ? (pubJson.communities ?? []) : [];
+          const candidate = allCommunities.find((c: Community) => c.slug === communitySlug);
+          if (candidate && (role === "SUPER_ADMIN" || role === "COMMUNITY_MEMBER" || role === "INFLUENCER_ADMIN")) {
+            found = candidate;
           }
         }
 
@@ -184,17 +185,22 @@ export default function SpaceFeedPage() {
         }
         setCommunity(found);
 
-        // 2. Check if current user is the community owner
-        try {
-          const detailRes = await fetch(`/api/communities/${found.id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          const detailJson = await detailRes.json();
-          if (detailJson.success && detailJson.data?.influencer?.userId === uid) {
-            setIsOwner(true);
+        // 2. Check if current user is the community owner or SUPER_ADMIN
+        const role = localStorage.getItem("detailhub_user_role");
+        if (role === "SUPER_ADMIN") {
+          setIsOwner(true);
+        } else {
+          try {
+            const detailRes = await fetch(`/api/communities/${found.id}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            const detailJson = await detailRes.json();
+            if (detailJson.success && detailJson.data?.influencer?.userId === uid) {
+              setIsOwner(true);
+            }
+          } catch {
+            // non-critical
           }
-        } catch {
-          // non-critical
         }
 
         // 2. Fetch spaces
@@ -265,6 +271,22 @@ export default function SpaceFeedPage() {
     await fetchPosts(activeSpace.id, nextCursor);
   }
 
+  function handlePostDelete(postId: string) {
+    setPosts((prev) => prev.filter((p) => p.id !== postId));
+  }
+
+  function handlePostUpdate(updated: { id: string; isPinned?: boolean; isHidden?: boolean }) {
+    setPosts((prev) => {
+      const next = prev.map((p) => (p.id === updated.id ? { ...p, ...updated } : p));
+      // Re-sort so pinned posts stay on top
+      return next.sort((a, b) => {
+        if (a.isPinned && !b.isPinned) return -1;
+        if (!a.isPinned && b.isPinned) return 1;
+        return 0;
+      });
+    });
+  }
+
   // ---------------------------------------------------------------------------
   // Error state
   // ---------------------------------------------------------------------------
@@ -292,7 +314,7 @@ export default function SpaceFeedPage() {
 
   return (
     <div className="text-gray-900">
-      <div className="max-w-3xl mx-auto px-4 py-6 flex flex-col gap-4">
+      <div className="max-w-3xl mx-auto px-3 sm:px-4 py-4 sm:py-6 flex flex-col gap-4">
         {/* Feed column */}
         <main className="flex flex-col gap-4">
           {/* Community banner */}
@@ -358,9 +380,8 @@ export default function SpaceFeedPage() {
                   currentUserId={currentUserId}
                   isOwner={isOwner}
                   onReact={(type) => handleReact(post.id, type)}
-                  onPostUpdate={(updated) =>
-                    setPosts((prev) => prev.map((p) => (p.id === updated.id ? { ...p, ...updated } : p)))
-                  }
+                  onPostUpdate={handlePostUpdate}
+                  onPostDelete={handlePostDelete}
                 />
               ))}
 

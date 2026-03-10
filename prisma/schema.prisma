@@ -341,6 +341,7 @@ enum NotificationType {
   DIRECT_MESSAGE
   MENTION
   WELCOME
+  BROADCAST
 }
 
 // =============================================================================

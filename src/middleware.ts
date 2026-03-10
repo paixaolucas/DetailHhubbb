@@ -50,6 +50,11 @@ function hasToken(req: NextRequest): boolean {
   return false;
 }
 
+/**
+ * Extracts user role from JWT for routing decisions ONLY.
+ * Uses manual base64 decode (no signature verification) — intentional for performance at the Edge.
+ * Authentication and authorization are enforced in API route middleware (withAuth / withRole).
+ */
 function extractRole(req: NextRequest): string {
   try {
     const cookie = req.cookies.get("detailhub_access_token")?.value;

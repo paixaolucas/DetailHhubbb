@@ -2,12 +2,12 @@
 
 import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Loader2, Car, Bot, Video } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 
 function LoginFormContent() {
-  const router = useRouter();
+  const searchParams = useSearchParams();
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -29,12 +29,12 @@ function LoginFormContent() {
 
       if (!res.ok) {
         setError(data.error ?? "Credenciais inválidas");
+        setIsLoading(false);
         return;
       }
 
       if (data.data?.tokens?.accessToken) {
         localStorage.setItem("detailhub_access_token", data.data.tokens.accessToken);
-        // Refresh token is now stored as httpOnly cookie by the server
       }
       if (data.data?.user) {
         localStorage.setItem("detailhub_user_role", data.data.user.role);
@@ -45,10 +45,11 @@ function LoginFormContent() {
         }
       }
 
-      router.push("/dashboard");
+      // Hard navigation garante que o cookie httpOnly seja enviado corretamente
+      const redirect = searchParams.get("redirect");
+      window.location.href = redirect && redirect.startsWith("/") ? redirect : "/dashboard";
     } catch {
       setError("Erro de conexão. Tente novamente.");
-    } finally {
       setIsLoading(false);
     }
   }

@@ -4,17 +4,18 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  ArrowLeft, Settings, Palette, CreditCard, Users, AlertTriangle,
-  Save, Trash2, Plus, Check, UserX, Crown, HelpCircle, Star, Pencil, X, Zap,
+  ArrowLeft, Settings, Palette, Users, AlertTriangle,
+  Save, Trash2, Plus, Check, UserX, Crown, HelpCircle, Star, Pencil, X, Zap, Megaphone,
 } from "lucide-react";
+import { useToast } from "@/components/ui/toast-provider";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import OnboardingChecklist from "@/components/community/OnboardingChecklist";
 
 const TABS = [
   { id: "general", label: "Geral", icon: Settings },
   { id: "appearance", label: "Aparência", icon: Palette },
-  { id: "plans", label: "Planos", icon: CreditCard },
   { id: "members", label: "Membros", icon: Users },
+  { id: "broadcast", label: "Broadcast", icon: Megaphone },
   { id: "faq", label: "FAQ", icon: HelpCircle },
   { id: "testimonials", label: "Depoimentos", icon: Star },
   { id: "danger", label: "Perigo", icon: AlertTriangle },
@@ -33,11 +34,6 @@ interface Community {
   isPrivate: boolean; isPublished?: boolean; tags: string[];
   welcomeMessage: string | null; rules: string | null;
   _count?: { spaces?: number; subscriptionPlans?: number };
-}
-
-interface Plan {
-  id: string; name: string; price: number; interval: string;
-  features: string[]; trialDays: number; isActive: boolean; isDefault: boolean;
 }
 
 interface Member {
@@ -63,12 +59,13 @@ export default function CommunitySettingsPage() {
   const params = useParams();
   const router = useRouter();
   const communityId = params.id as string;
+  const toast = useToast();
 
   const [activeTab, setActiveTab] = useState("general");
   const [community, setCommunity] = useState<Community | null>(null);
-  const [plans, setPlans] = useState<Plan[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -93,11 +90,6 @@ export default function CommunitySettingsPage() {
   const [pointsForm, setPointsForm] = useState({ amount: "", type: "EARNED", reason: "" });
   const [pointsSaving, setPointsSaving] = useState(false);
 
-  const [showNewPlan, setShowNewPlan] = useState(false);
-  const [planForm, setPlanForm] = useState({
-    name: "", description: "", price: "", interval: "month",
-    features: "", trialDays: "0",
-  });
 
   // FAQ state
   const [faqs, setFaqs] = useState<FAQ[]>([]);
@@ -115,13 +107,18 @@ export default function CommunitySettingsPage() {
     authorName: "", authorTitle: "", avatarUrl: "", body: "", rating: "5", sortOrder: "0",
   });
 
+  // Broadcast state
+  const [broadcastForm, setBroadcastForm] = useState({ title: "", body: "", link: "" });
+  const [broadcastSending, setBroadcastSending] = useState(false);
+
   useEffect(() => {
     const token = localStorage.getItem("detailhub_access_token");
+    const role = localStorage.getItem("detailhub_user_role");
+    setIsAdmin(role === "SUPER_ADMIN");
     Promise.all([
       fetch(`/api/communities/${communityId}`, { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json()),
-      fetch(`/api/communities/${communityId}/plans`, { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json()),
       fetch(`/api/communities/${communityId}/members`, { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json()),
-    ]).then(([commData, plansData, membersData]) => {
+    ]).then(([commData, membersData]) => {
       if (commData.success) {
         const c = commData.data;
         setCommunity(c);
@@ -137,7 +134,6 @@ export default function CommunitySettingsPage() {
           logoUrl: c.logoUrl ?? "", bannerUrl: (c as any).bannerUrl ?? "",
         });
       }
-      if (plansData.success) setPlans(plansData.data ?? []);
       if (membersData.success) setMembers(membersData.data ?? []);
     }).finally(() => setIsLoading(false));
   }, [communityId]);
@@ -155,43 +151,6 @@ export default function CommunitySettingsPage() {
       if (data.success) { setSuccess("Salvo com sucesso!"); if (data.data) setCommunity(data.data); }
       else setError(data.error ?? "Erro ao salvar");
     } finally { setSaving(false); }
-  }
-
-  async function createPlan() {
-    setSaving(true); setError("");
-    try {
-      const token = localStorage.getItem("detailhub_access_token");
-      const res = await fetch(`/api/communities/${communityId}/plans`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({
-          name: planForm.name, description: planForm.description || undefined,
-          price: parseFloat(planForm.price), interval: planForm.interval,
-          features: planForm.features ? planForm.features.split("\n").map((f) => f.trim()).filter(Boolean) : [],
-          trialDays: parseInt(planForm.trialDays),
-        }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setPlans((p) => [...p, data.data]);
-        setShowNewPlan(false);
-        setPlanForm({ name: "", description: "", price: "", interval: "month", features: "", trialDays: "0" });
-      } else setError(data.error ?? "Erro");
-    } finally { setSaving(false); }
-  }
-
-  async function deletePlan(planId: string) {
-    setConfirmState({
-      open: true, title: "Excluir plano?",
-      description: "Este plano de assinatura será removido permanentemente.",
-      variant: "danger", confirmLabel: "Excluir",
-      onConfirm: async () => {
-        setConfirmState((s) => ({ ...s, open: false }));
-        const token = localStorage.getItem("detailhub_access_token");
-        await fetch(`/api/communities/${communityId}/plans/${planId}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
-        setPlans((p) => p.filter((pl) => pl.id !== planId));
-      },
-    });
   }
 
   async function removeMember(membershipId: string) {
@@ -418,7 +377,7 @@ export default function CommunitySettingsPage() {
 
       {/* Tabs */}
       <div className="flex gap-1 glass-card p-1 mb-6 overflow-x-auto">
-        {TABS.map(({ id, label, icon: Icon }) => (
+        {TABS.filter((t) => t.id !== "danger" || isAdmin).map(({ id, label, icon: Icon }) => (
           <button
             key={id}
             onClick={() => {
@@ -547,91 +506,6 @@ export default function CommunitySettingsPage() {
             {saving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Save className="w-4 h-4" />}
             {saving ? "Salvando..." : "Salvar"}
           </button>
-        </div>
-      )}
-
-      {/* PLANS */}
-      {activeTab === "plans" && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-gray-900">Planos de Assinatura</h2>
-            <button onClick={() => setShowNewPlan(true)} className="flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all">
-              <Plus className="w-4 h-4" /> Novo Plano
-            </button>
-          </div>
-
-          {showNewPlan && (
-            <div className="glass-card p-6 space-y-4">
-              <h3 className="text-sm font-semibold text-gray-900">Novo Plano</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-gray-600 mb-1.5">Nome *</label>
-                  <input type="text" value={planForm.name} onChange={(e) => setPlanForm((p) => ({ ...p, name: e.target.value }))} placeholder="Membro Premium" className={fieldClass()} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1.5">Preço (R$) *</label>
-                  <input type="number" value={planForm.price} onChange={(e) => setPlanForm((p) => ({ ...p, price: e.target.value }))} placeholder="97.00" min="0.01" step="0.01" className={fieldClass()} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1.5">Intervalo</label>
-                  <select value={planForm.interval} onChange={(e) => setPlanForm((p) => ({ ...p, interval: e.target.value }))} className={`${fieldClass()} bg-[#F8F7FF]`}>
-                    <option value="month">Mensal</option>
-                    <option value="year">Anual</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1.5">Dias de Trial</label>
-                  <input type="number" value={planForm.trialDays} onChange={(e) => setPlanForm((p) => ({ ...p, trialDays: e.target.value }))} min="0" className={fieldClass()} />
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-gray-600 mb-1.5">Benefícios (um por linha)</label>
-                  <textarea value={planForm.features} onChange={(e) => setPlanForm((p) => ({ ...p, features: e.target.value }))} placeholder={"Acesso a todos os módulos\nLives ao vivo"} rows={3} className={`${fieldClass()} resize-none`} />
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <button onClick={createPlan} disabled={saving || !planForm.name || !planForm.price} className="bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
-                  {saving ? "Criando..." : "Criar Plano"}
-                </button>
-                <button onClick={() => setShowNewPlan(false)} className="px-5 py-2.5 border border-gray-200 hover:border-gray-300 rounded-xl text-sm text-gray-600 hover:text-gray-900 transition-all">
-                  Cancelar
-                </button>
-              </div>
-            </div>
-          )}
-
-          {plans.length === 0 && !showNewPlan ? (
-            <div className="glass-card p-12 text-center">
-              <CreditCard className="w-10 h-10 text-gray-500 mx-auto mb-3" />
-              <p className="text-gray-400 text-sm">Nenhum plano criado.</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {plans.map((plan) => (
-                <div key={plan.id} className={`glass-card p-5 ${plan.isDefault ? "border-violet-500/40" : ""}`}>
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-gray-900">{plan.name}</h3>
-                        {plan.isDefault && <span className="text-xs bg-violet-500/10 text-violet-400 border border-violet-500/20 px-2 py-0.5 rounded-full">Padrão</span>}
-                      </div>
-                      <p className="text-xl font-bold text-gray-900">
-                        R$ {Number(plan.price).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                        <span className="text-sm font-normal text-gray-400">/{plan.interval === "month" ? "mês" : "ano"}</span>
-                      </p>
-                      {Array.isArray(plan.features) && plan.features.slice(0, 3).map((f, i) => (
-                        <p key={i} className="flex items-center gap-1.5 text-xs text-gray-400 mt-1">
-                          <Check className="w-3 h-3 text-green-400" /> {f}
-                        </p>
-                      ))}
-                    </div>
-                    <button onClick={() => deletePlan(plan.id)} className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       )}
 
@@ -949,8 +823,96 @@ export default function CommunitySettingsPage() {
         </div>
       )}
 
+      {/* BROADCAST */}
+      {activeTab === "broadcast" && (
+        <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-5">
+          <div>
+            <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+              <Megaphone className="w-5 h-5 text-violet-500" />
+              Broadcast para Membros
+            </h2>
+            <p className="text-xs text-gray-500 mt-1">
+              Envie uma notificação para todos os membros ativos da comunidade.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1.5">Título *</label>
+              <input
+                type="text"
+                maxLength={100}
+                placeholder="Ex: Nova aula disponível!"
+                value={broadcastForm.title}
+                onChange={(e) => setBroadcastForm((f) => ({ ...f, title: e.target.value }))}
+                className="w-full bg-gray-50 border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm"
+              />
+              <p className="text-xs text-gray-400 mt-1 text-right">{broadcastForm.title.length}/100</p>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1.5">Mensagem *</label>
+              <textarea
+                rows={4}
+                maxLength={500}
+                placeholder="Escreva sua mensagem para os membros..."
+                value={broadcastForm.body}
+                onChange={(e) => setBroadcastForm((f) => ({ ...f, body: e.target.value }))}
+                className="w-full bg-gray-50 border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm resize-none"
+              />
+              <p className="text-xs text-gray-400 mt-1 text-right">{broadcastForm.body.length}/500</p>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1.5">Link (opcional)</label>
+              <input
+                type="text"
+                placeholder="Ex: /community/minha-comunidade/feed"
+                value={broadcastForm.link}
+                onChange={(e) => setBroadcastForm((f) => ({ ...f, link: e.target.value }))}
+                className="w-full bg-gray-50 border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm"
+              />
+            </div>
+          </div>
+
+          <button
+            disabled={broadcastSending || !broadcastForm.title.trim() || !broadcastForm.body.trim()}
+            onClick={async () => {
+              setBroadcastSending(true);
+              try {
+                const token = localStorage.getItem("detailhub_access_token");
+                const res = await fetch(`/api/communities/${communityId}/broadcast`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                  body: JSON.stringify({
+                    title: broadcastForm.title.trim(),
+                    body: broadcastForm.body.trim(),
+                    link: broadcastForm.link.trim() || undefined,
+                  }),
+                });
+                const json = await res.json();
+                if (json.success) {
+                  toast.success(`Broadcast enviado para ${json.data.sent} membro(s)!`);
+                  setBroadcastForm({ title: "", body: "", link: "" });
+                } else {
+                  toast.error(json.error ?? "Erro ao enviar broadcast");
+                }
+              } catch {
+                toast.error("Erro de conexão");
+              } finally {
+                setBroadcastSending(false);
+              }
+            }}
+            className="flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-all"
+          >
+            <Megaphone className="w-4 h-4" />
+            {broadcastSending ? "Enviando..." : "Enviar Broadcast"}
+          </button>
+        </div>
+      )}
+
       {/* DANGER */}
-      {activeTab === "danger" && (
+      {activeTab === "danger" && isAdmin && (
         <div className="glass-card p-6 border-red-500/20 space-y-4">
           <h2 className="text-base font-semibold text-red-400 flex items-center gap-2">
             <AlertTriangle className="w-5 h-5" /> Zona de Perigo

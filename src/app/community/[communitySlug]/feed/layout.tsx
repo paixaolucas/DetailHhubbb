@@ -61,7 +61,7 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
       .then((r) => r.json())
       .then((d) => {
         if (d.success) {
-          const found = (d.data as Community[]).find((c) => c.slug === communitySlug);
+          const found = (d.communities as Community[]).find((c) => c.slug === communitySlug);
           if (found) {
             setCommunity(found);
             return fetch(`/api/communities/${found.id}/spaces`, { headers })

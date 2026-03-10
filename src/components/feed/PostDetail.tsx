@@ -5,8 +5,8 @@
 // Fetches GET /api/posts/${postId}, handles reactions and comment submission
 // =============================================================================
 
-import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Trash2, MessageCircle, Hash } from "lucide-react";
 import Link from "next/link";
 import ReactionBar from "@/components/feed/ReactionBar";
@@ -98,10 +98,13 @@ function PostSkeleton() {
 
 export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const commentRef = useRef<HTMLTextAreaElement>(null);
   const [post, setPost] = useState<FullPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [isOwner, setIsOwner] = useState(false);
 
   // Reaction state
   const [reactions, setReactions] = useState<Record<string, number>>({});
@@ -127,6 +130,7 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
     try {
       const token = localStorage.getItem("detailhub_access_token");
       const uid = localStorage.getItem("detailhub_user_id");
+      const role = localStorage.getItem("detailhub_user_role");
       setCurrentUserId(uid);
 
       const res = await fetch(`/api/posts/${postId}`, {
@@ -141,6 +145,22 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
       const p: FullPost = json.data;
       setPost(p);
       setComments(p.comments ?? []);
+
+      // Check ownership: SUPER_ADMIN always owner; influencer checks their communities
+      if (role === "SUPER_ADMIN") {
+        setIsOwner(true);
+      } else if (role === "INFLUENCER_ADMIN") {
+        try {
+          const mineRes = await fetch("/api/communities/mine", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const mineJson = await mineRes.json();
+          if (mineJson.success && Array.isArray(mineJson.data)) {
+            const owns = mineJson.data.some((c: { slug: string }) => c.slug === communitySlug);
+            if (owns) setIsOwner(true);
+          }
+        } catch { /* non-critical */ }
+      }
 
       // Build reaction counts from reactions array
       const counts: Record<string, number> = {};
@@ -165,6 +185,17 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
   useEffect(() => {
     fetchPost();
   }, [fetchPost]);
+
+  // Auto-focus comment textarea when ?focus=comment is in the URL
+  useEffect(() => {
+    if (loading) return;
+    if (searchParams.get("focus") === "comment" && commentRef.current) {
+      setTimeout(() => {
+        commentRef.current?.focus();
+        commentRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 150);
+    }
+  }, [loading, searchParams]);
 
   // ---- Reaction toggle -----------------------------------------------------
 
@@ -386,6 +417,7 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
         {!post.isLocked && (
           <form onSubmit={handleComment} className="mb-6 flex flex-col gap-2">
             <textarea
+              ref={commentRef}
               value={commentBody}
               onChange={(e) => setCommentBody(e.target.value)}
               placeholder="Escreva um comentário..."
@@ -434,6 +466,7 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
                 comment={comment}
                 postId={postId}
                 currentUserId={currentUserId ?? undefined}
+                isOwner={isOwner}
                 onDelete={(id) =>
                   setComments((prev) => prev.filter((c) => c.id !== id))
                 }

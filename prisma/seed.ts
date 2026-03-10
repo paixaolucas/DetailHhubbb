@@ -58,48 +58,72 @@ async function main() {
   // =============================================================================
   // INFLUENCERS
   // =============================================================================
-  const inf1User = await db.user.create({
+  const barbaUser = await db.user.create({
     data: {
-      email: "joao@comunidade.com",
+      email: "barba@comunidade.com",
       passwordHash: await bcrypt.hash("Influencer@123!", saltRounds),
-      firstName: "João",
-      lastName: "Mendes",
+      firstName: "Barba",
+      lastName: "Oficial",
       role: UserRole.INFLUENCER_ADMIN,
-      referralCode: "JOAO001",
+      referralCode: "BARBA001",
     },
   });
 
-  const inf2User = await db.user.create({
+  const corujaoUser = await db.user.create({
     data: {
-      email: "ana@comunidade.com",
+      email: "corujao@comunidade.com",
       passwordHash: await bcrypt.hash("Influencer@123!", saltRounds),
-      firstName: "Ana",
-      lastName: "Costa",
+      firstName: "Corujão",
+      lastName: "ZK",
       role: UserRole.INFLUENCER_ADMIN,
-      referralCode: "ANA001",
+      referralCode: "CORUJAO001",
     },
   });
 
-  const influencer1 = await db.influencer.create({
+  const netoUser = await db.user.create({
     data: {
-      userId: inf1User.id,
-      displayName: "João Mendes",
-      bio: "Especialista em marketing digital e growth hacking. Mais de 10 anos no mercado.",
-      websiteUrl: "https://joaomendes.com",
+      email: "neto@comunidade.com",
+      passwordHash: await bcrypt.hash("Influencer@123!", saltRounds),
+      firstName: "Neto",
+      lastName: "NoMel",
+      role: UserRole.INFLUENCER_ADMIN,
+      referralCode: "NETO001",
+    },
+  });
+
+  const influencerBarba = await db.influencer.create({
+    data: {
+      userId: barbaUser.id,
+      displayName: "Barba",
+      bio: "Força de transformação na indústria de estética automotiva. Queimando mitos e trazendo clareza sem enrolação.",
       socialLinks: {
-        instagram: "@joaomendes",
-        youtube: "JoaoMendesOficial",
-        linkedin: "joao-mendes",
+        instagram: "@barba",
+        youtube: "BarbaOficial",
       },
       isVerified: true,
     },
   });
 
-  const influencer2 = await db.influencer.create({
+  const influencerCorujao = await db.influencer.create({
     data: {
-      userId: inf2User.id,
-      displayName: "Ana Costa",
-      bio: "Mentora de negócios digitais e criadora de conteúdo sobre empreendedorismo feminino.",
+      userId: corujaoUser.id,
+      displayName: "Corujão",
+      bio: "Representa a rua. Nunca esquecer da origem e sempre respeitar quem veio de baixo. Não é estúdio, é zika!",
+      socialLinks: {
+        instagram: "@corujaozk",
+      },
+      isVerified: true,
+    },
+  });
+
+  const influencerNeto = await db.influencer.create({
+    data: {
+      userId: netoUser.id,
+      displayName: "Neto",
+      bio: "Educação em estética automotiva de qualidade. Comunidade no Mel — aprenda do zero ao avançado.",
+      socialLinks: {
+        instagram: "@neto",
+      },
       isVerified: true,
     },
   });
@@ -109,132 +133,300 @@ async function main() {
   // =============================================================================
   // COMMUNITIES
   // =============================================================================
-  const community1 = await db.community.create({
+  const communityBarba = await db.community.create({
     data: {
-      influencerId: influencer1.id,
-      name: "Marketing Digital Pro",
-      slug: "marketing-digital-pro",
+      influencerId: influencerBarba.id,
+      name: "Barba",
+      slug: "barba",
       description:
-        "A comunidade definitiva para profissionais e aspirantes do marketing digital. Aqui você aprende, pratica e cresce.",
-      shortDescription: "Aprenda marketing digital do zero ao avançado",
-      primaryColor: "#6366f1",
-      secondaryColor: "#4f46e5",
-      accentColor: "#818ef8",
+        "A comunidade do Barba — força de transformação na estética automotiva. Aqui a gente queima mitos, fala a verdade e evolui junto. Sem pink lemonade.",
+      shortDescription: "Estética automotiva sem enrolação. Queimando mitos.",
+      primaryColor: "#FA4616",
+      secondaryColor: "#000000",
+      accentColor: "#FFFFFF",
+      bannerUrl: "/photos/barba-thumb.png",
       isPublished: true,
       isPrivate: false,
       memberCount: 0,
       welcomeMessage:
-        "Bem-vindo à melhor comunidade de marketing digital do Brasil! Aqui você vai encontrar conteúdo exclusivo, mentorias e uma rede incrível.",
+        "Bem-vindo à comunidade do Barba! Aqui a gente não aceita pink lemonade. É conteúdo de verdade, técnica de verdade, resultado de verdade. Bora queimar os mitos!",
       rules:
-        "1. Seja respeitoso\n2. Compartilhe conhecimento\n3. Sem spam ou autopromoção\n4. Contribua ativamente",
-      tags: ["marketing", "digital", "growth", "seo", "ads"],
+        "1. Sem pink lemonade — só conteúdo real\n2. Respeite todos os membros\n3. Compartilhe seus resultados\n4. Sem spam ou autopromação\n5. Dúvidas? Pergunta sem medo",
+      tags: ["estetica-automotiva", "polimento", "detailing", "barba", "queimando-mitos"],
     },
   });
 
-  const community2 = await db.community.create({
+  const communityCorujao = await db.community.create({
     data: {
-      influencerId: influencer2.id,
-      name: "Empreendedoras Digitais",
-      slug: "empreendedoras-digitais",
+      influencerId: influencerCorujao.id,
+      name: "Corujão",
+      slug: "corujao",
       description:
-        "Comunidade exclusiva para mulheres empreendedoras que querem escalar seus negócios digitais.",
-      shortDescription: "Negócios digitais para mulheres que querem mais",
-      primaryColor: "#ec4899",
-      secondaryColor: "#db2777",
+        "A comunidade do Corujão representa a rua. Não é estúdio, não é estética, não é detail. É zika! Nunca vamos esquecer da nossa origem.",
+      shortDescription: "Não é estúdio, não é detail. É zika! @corujaozk",
+      primaryColor: "#F7941D",
+      secondaryColor: "#000000",
+      accentColor: "#FFFFFF",
+      bannerUrl: "/photos/corujao-thumb.png",
       isPublished: true,
+      isPrivate: false,
       memberCount: 0,
-      tags: ["empreendedorismo", "mulheres", "negócios", "digital"],
+      welcomeMessage:
+        "Fala, rapaziada! Seja bem-vindo à comunidade do Corujão. Aqui a gente representa a rua, nunca esquece da origem e respeita quem veio de baixo. É zika!",
+      rules:
+        "1. Represente a rua com respeito\n2. Nunca esqueça da origem\n3. Compartilhe o que sabe\n4. Sem frescura, sem ego\n5. A comunidade é de todos",
+      tags: ["detailing", "estetica", "rua", "zika", "corujao", "corujaozk"],
+    },
+  });
+
+  const communityNoMel = await db.community.create({
+    data: {
+      influencerId: influencerNeto.id,
+      name: "Comunidade no Mel",
+      slug: "no-mel",
+      description:
+        "A Comunidade no Mel do Neto é a plataforma de educação em estética automotiva mais completa. Do básico ao avançado, aprenda com quem faz.",
+      shortDescription: "Educação em estética automotiva do zero ao avançado.",
+      primaryColor: "#FCB749",
+      secondaryColor: "#4B92F9",
+      accentColor: "#221F20",
+      bannerUrl: "/photos/neto-thumb.png",
+      isPublished: true,
+      isPrivate: false,
+      memberCount: 0,
+      welcomeMessage:
+        "Bem-vindo à Comunidade no Mel! Aqui você vai encontrar aulas, técnicas e uma galera apaixonada por estética automotiva. Bora aprender!",
+      rules:
+        "1. Respeite todos os membros\n2. Compartilhe suas dúvidas e resultados\n3. Sem spam ou conteúdo off-topic\n4. Ajude quem está começando\n5. Aproveite o conteúdo ao máximo",
+      tags: ["estetica-automotiva", "aulas", "detailing", "polimento", "no-mel", "neto"],
     },
   });
 
   console.log("✅ Communities created");
 
   // =============================================================================
-  // SUBSCRIPTION PLANS
+  // SPACES
   // =============================================================================
-  const plan1Basic = await db.subscriptionPlan.create({
-    data: {
-      communityId: community1.id,
-      name: "Básico",
-      description: "Acesso a conteúdo fundamental e comunidade",
-      price: 97,
-      currency: "brl",
-      interval: "month",
-      intervalCount: 1,
-      isDefault: true,
-      features: [
-        "Acesso ao conteúdo básico",
-        "Participação na comunidade",
-        "Newsletter exclusiva",
-        "1 live por mês",
-      ],
-    },
+
+  // Barba spaces — laranja fogo, vibrante e direto
+  await db.space.createMany({
+    data: [
+      {
+        communityId: communityBarba.id,
+        name: "Feed Geral",
+        slug: "feed",
+        description: "O coração da comunidade. Compartilhe, discuta e evolua.",
+        icon: "🔥",
+        type: "DISCUSSION",
+        sortOrder: 1,
+        isDefault: true,
+      },
+      {
+        communityId: communityBarba.id,
+        name: "Queimando Mitos",
+        slug: "queimando-mitos",
+        description: "Desmistificando as maiores mentiras da estética automotiva.",
+        icon: "💥",
+        type: "DISCUSSION",
+        sortOrder: 2,
+      },
+      {
+        communityId: communityBarba.id,
+        name: "Técnicas & Processos",
+        slug: "tecnicas-processos",
+        description: "Polimento, PPF, vitrificação, lavagem — técnica de verdade.",
+        icon: "🛠️",
+        type: "DISCUSSION",
+        sortOrder: 3,
+      },
+      {
+        communityId: communityBarba.id,
+        name: "Produtos Testados",
+        slug: "produtos-testados",
+        description: "Reviews honestos de produtos. Sem patrocínio disfarçado.",
+        icon: "🧴",
+        type: "SHOWCASE",
+        sortOrder: 4,
+      },
+      {
+        communityId: communityBarba.id,
+        name: "Tira-Dúvidas",
+        slug: "tira-duvidas",
+        description: "Pergunta sem medo. A comunidade responde.",
+        icon: "❓",
+        type: "QA",
+        sortOrder: 5,
+      },
+      {
+        communityId: communityBarba.id,
+        name: "Avisos",
+        slug: "avisos",
+        description: "Comunicados oficiais do Barba.",
+        icon: "📢",
+        type: "ANNOUNCEMENT",
+        sortOrder: 6,
+      },
+    ],
   });
 
-  const plan1Pro = await db.subscriptionPlan.create({
-    data: {
-      communityId: community1.id,
-      name: "Pro",
-      description: "Acesso completo + mentoria em grupo",
-      price: 197,
-      currency: "brl",
-      interval: "month",
-      intervalCount: 1,
-      features: [
-        "Tudo do plano Básico",
-        "Conteúdo avançado",
-        "Mentoria em grupo mensal",
-        "Acesso a todos os lives",
-        "Templates exclusivos",
-        "Suporte prioritário",
-      ],
-    },
+  // Corujão spaces — laranja da rua, estilo urbano
+  await db.space.createMany({
+    data: [
+      {
+        communityId: communityCorujao.id,
+        name: "Feed",
+        slug: "feed",
+        description: "Tudo rola aqui. A rua fala.",
+        icon: "🦉",
+        type: "DISCUSSION",
+        sortOrder: 1,
+        isDefault: true,
+      },
+      {
+        communityId: communityCorujao.id,
+        name: "É Zika!",
+        slug: "e-zika",
+        description: "Conteúdo que é zika mesmo. Sem frescura.",
+        icon: "⚡",
+        type: "DISCUSSION",
+        sortOrder: 2,
+      },
+      {
+        communityId: communityCorujao.id,
+        name: "Técnicas da Rua",
+        slug: "tecnicas-da-rua",
+        description: "Técnicas e processos que a rua ensina. Do jeito certo.",
+        icon: "🔧",
+        type: "DISCUSSION",
+        sortOrder: 3,
+      },
+      {
+        communityId: communityCorujao.id,
+        name: "Showcase",
+        slug: "showcase",
+        description: "Mostra o seu trampo. A galera quer ver.",
+        icon: "🚗",
+        type: "SHOWCASE",
+        sortOrder: 4,
+      },
+      {
+        communityId: communityCorujao.id,
+        name: "Tira-Dúvidas",
+        slug: "tira-duvidas",
+        description: "Pergunta à comunidade. Sem julgamento.",
+        icon: "❓",
+        type: "QA",
+        sortOrder: 5,
+      },
+      {
+        communityId: communityCorujao.id,
+        name: "Avisos",
+        slug: "avisos",
+        description: "Comunicados do Corujão.",
+        icon: "📢",
+        type: "ANNOUNCEMENT",
+        sortOrder: 6,
+      },
+    ],
   });
 
-  await db.subscriptionPlan.create({
-    data: {
-      communityId: community2.id,
-      name: "Starter",
-      description: "Comece sua jornada empreendedora",
-      price: 147,
-      currency: "brl",
-      interval: "month",
-      intervalCount: 1,
-      isDefault: true,
-      features: [
-        "Acesso ao conteúdo",
-        "Comunidade de suporte",
-        "2 lives por mês",
-      ],
-    },
+  // Comunidade no Mel spaces — âmbar e azul, educacional
+  await db.space.createMany({
+    data: [
+      {
+        communityId: communityNoMel.id,
+        name: "Feed",
+        slug: "feed",
+        description: "Atualizações, posts e novidades da comunidade.",
+        icon: "🍯",
+        type: "DISCUSSION",
+        sortOrder: 1,
+        isDefault: true,
+      },
+      {
+        communityId: communityNoMel.id,
+        name: "Aulas & Conteúdo",
+        slug: "aulas",
+        description: "Discussões sobre as aulas e conteúdos do Neto.",
+        icon: "🎓",
+        type: "DISCUSSION",
+        sortOrder: 2,
+      },
+      {
+        communityId: communityNoMel.id,
+        name: "Técnicas Avançadas",
+        slug: "tecnicas-avancadas",
+        description: "Polimento, PPF, ceramic coat e mais — nível avançado.",
+        icon: "✨",
+        type: "DISCUSSION",
+        sortOrder: 3,
+      },
+      {
+        communityId: communityNoMel.id,
+        name: "Tira-Dúvidas",
+        slug: "tira-duvidas",
+        description: "Sua dúvida tem resposta aqui.",
+        icon: "❓",
+        type: "QA",
+        sortOrder: 4,
+      },
+      {
+        communityId: communityNoMel.id,
+        name: "Showcase",
+        slug: "showcase",
+        description: "Mostre seus trabalhos e resultados.",
+        icon: "🏆",
+        type: "SHOWCASE",
+        sortOrder: 5,
+      },
+      {
+        communityId: communityNoMel.id,
+        name: "Avisos",
+        slug: "avisos",
+        description: "Comunicados oficiais.",
+        icon: "📢",
+        type: "ANNOUNCEMENT",
+        sortOrder: 6,
+      },
+    ],
   });
 
-  console.log("✅ Subscription plans created");
+  console.log("✅ Spaces created");
+
 
   // =============================================================================
   // COMMISSION RULES
   // =============================================================================
-  await db.commissionRule.create({
-    data: {
-      communityId: community1.id,
-      name: "Comissão padrão",
-      description: "70% para o influenciador, 10% de taxa de plataforma",
-      type: CommissionType.PERCENTAGE,
-      rate: 0.7,
-      platformFee: 0.1,
-      isActive: true,
-    },
-  });
-
-  await db.commissionRule.create({
-    data: {
-      communityId: community2.id,
-      name: "Comissão padrão",
-      type: CommissionType.PERCENTAGE,
-      rate: 0.75,
-      platformFee: 0.1,
-      isActive: true,
-    },
+  await db.commissionRule.createMany({
+    data: [
+      {
+        communityId: communityBarba.id,
+        name: "Comissão padrão",
+        description: "70% para o Barba, 10% de taxa de plataforma",
+        type: CommissionType.PERCENTAGE,
+        rate: 0.7,
+        platformFee: 0.1,
+        isActive: true,
+      },
+      {
+        communityId: communityCorujao.id,
+        name: "Comissão padrão",
+        description: "70% para o Corujão, 10% de taxa de plataforma",
+        type: CommissionType.PERCENTAGE,
+        rate: 0.7,
+        platformFee: 0.1,
+        isActive: true,
+      },
+      {
+        communityId: communityNoMel.id,
+        name: "Comissão padrão",
+        description: "75% para o Neto, 10% de taxa de plataforma",
+        type: CommissionType.PERCENTAGE,
+        rate: 0.75,
+        platformFee: 0.1,
+        isActive: true,
+      },
+    ],
   });
 
   console.log("✅ Commission rules created");
@@ -242,21 +434,23 @@ async function main() {
   // =============================================================================
   // CONTENT MODULES & LESSONS
   // =============================================================================
-  const module1 = await db.contentModule.create({
+
+  // Barba — módulos de estética automotiva
+  const moduloBarba1 = await db.contentModule.create({
     data: {
-      communityId: community1.id,
-      title: "Fundamentos do Marketing Digital",
-      description: "Os pilares essenciais para entender o marketing digital moderno",
+      communityId: communityBarba.id,
+      title: "Fundamentos da Estética Automotiva",
+      description: "Os pilares que todo detailer precisa dominar antes de qualquer coisa",
       sortOrder: 1,
       isPublished: true,
     },
   });
 
-  const module2 = await db.contentModule.create({
+  const moduloBarba2 = await db.contentModule.create({
     data: {
-      communityId: community1.id,
-      title: "SEO Avançado",
-      description: "Técnicas avançadas de otimização para mecanismos de busca",
+      communityId: communityBarba.id,
+      title: "Polimento Profissional",
+      description: "Técnicas de correção de pintura do básico ao avançado",
       sortOrder: 2,
       isPublished: true,
       unlockAfterDays: 7,
@@ -266,49 +460,121 @@ async function main() {
   await db.contentLesson.createMany({
     data: [
       {
-        moduleId: module1.id,
-        title: "O que é marketing digital?",
-        description: "Introdução completa ao universo do marketing digital",
+        moduleId: moduloBarba1.id,
+        title: "O que é estética automotiva de verdade?",
+        description: "Separando o que importa do pink lemonade",
         type: "VIDEO",
-        videoUrl: "https://example.com/video1",
         videoDuration: 1800,
         sortOrder: 1,
         isPublished: true,
         isFree: true,
       },
       {
-        moduleId: module1.id,
-        title: "Funil de vendas digital",
-        description: "Como criar e otimizar seu funil de conversão",
+        moduleId: moduloBarba1.id,
+        title: "Entendendo a tinta do carro",
+        description: "Camadas, tipos e como cada uma reage ao polimento",
         type: "VIDEO",
         videoDuration: 2400,
         sortOrder: 2,
         isPublished: true,
       },
       {
-        moduleId: module1.id,
-        title: "Persona e público-alvo",
-        description: "Defina quem é seu cliente ideal",
+        moduleId: moduloBarba1.id,
+        title: "Guia de produtos essenciais",
+        description: "O que você precisa ter (e o que é enganação)",
         type: "TEXT",
-        content: "Conteúdo completo sobre personas e público-alvo...",
+        content: "Guia completo de produtos para iniciar na estética automotiva...",
         sortOrder: 3,
         isPublished: true,
       },
       {
-        moduleId: module2.id,
-        title: "Keyword Research",
-        description: "Como encontrar as melhores palavras-chave",
+        moduleId: moduloBarba2.id,
+        title: "Máquinas de polimento — qual escolher?",
+        description: "Roto-orbital, dual action, elétrica ou pneumática",
         type: "VIDEO",
-        videoDuration: 3600,
+        videoDuration: 3200,
         sortOrder: 1,
         isPublished: true,
       },
       {
-        moduleId: module2.id,
-        title: "Link Building em 2024",
-        description: "Estratégias modernas de construção de links",
+        moduleId: moduloBarba2.id,
+        title: "Correção de pintura passo a passo",
+        description: "Do clay bar ao polish final",
+        type: "VIDEO",
+        videoDuration: 4500,
+        sortOrder: 2,
+        isPublished: true,
+      },
+    ],
+  });
+
+  // Comunidade no Mel — módulos educacionais do Neto
+  const moduloNeto1 = await db.contentModule.create({
+    data: {
+      communityId: communityNoMel.id,
+      title: "Fundamentos",
+      description: "Estética automotiva do zero. Base sólida para quem está começando.",
+      sortOrder: 1,
+      isPublished: true,
+    },
+  });
+
+  const moduloNeto2 = await db.contentModule.create({
+    data: {
+      communityId: communityNoMel.id,
+      title: "Técnicas Intermediárias",
+      description: "Suba de nível. Polimento, vitrificação e proteção.",
+      sortOrder: 2,
+      isPublished: true,
+      unlockAfterDays: 14,
+    },
+  });
+
+  await db.contentLesson.createMany({
+    data: [
+      {
+        moduleId: moduloNeto1.id,
+        title: "Aula 01 — O que é estética automotiva?",
+        description: "Introdução completa: conceitos, mercado e oportunidades",
+        type: "VIDEO",
+        videoDuration: 2100,
+        sortOrder: 1,
+        isPublished: true,
+        isFree: true,
+      },
+      {
+        moduleId: moduloNeto1.id,
+        title: "Aula 02 — Lavagem e descontaminação",
+        description: "Como lavar certo e preparar a superfície",
         type: "VIDEO",
         videoDuration: 2700,
+        sortOrder: 2,
+        isPublished: true,
+      },
+      {
+        moduleId: moduloNeto1.id,
+        title: "Aula 03 — Produtos e ferramentas básicas",
+        description: "Kit inicial: o que comprar e por quê",
+        type: "VIDEO",
+        videoDuration: 1900,
+        sortOrder: 3,
+        isPublished: true,
+      },
+      {
+        moduleId: moduloNeto2.id,
+        title: "Aula 04 — Polimento: correção de pintura",
+        description: "Técnica de polimento completa com máquina dual action",
+        type: "VIDEO",
+        videoDuration: 5400,
+        sortOrder: 1,
+        isPublished: true,
+      },
+      {
+        moduleId: moduloNeto2.id,
+        title: "Aula 05 — Vitrificação e proteção",
+        description: "Cerâmica, cera e PPF — quando usar cada um",
+        type: "VIDEO",
+        videoDuration: 3600,
         sortOrder: 2,
         isPublished: true,
       },
@@ -320,31 +586,48 @@ async function main() {
   // =============================================================================
   // LIVE SESSIONS
   // =============================================================================
-  await db.liveSession.create({
-    data: {
-      communityId: community1.id,
-      hostId: inf1User.id,
-      title: "Masterclass: Google Ads 2024",
-      description: "Aprenda a criar campanhas lucrativas no Google Ads",
-      status: "SCHEDULED",
-      scheduledAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-      isRecorded: true,
-    },
-  });
-
-  await db.liveSession.create({
-    data: {
-      communityId: community1.id,
-      hostId: inf1User.id,
-      title: "Sessão de Q&A — Tire suas dúvidas",
-      description: "Sessão aberta para perguntas e respostas",
-      status: "ENDED",
-      scheduledAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-      startedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-      endedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000 + 90 * 60 * 1000),
-      actualAttendees: 142,
-      isRecorded: true,
-    },
+  await db.liveSession.createMany({
+    data: [
+      {
+        communityId: communityBarba.id,
+        hostId: barbaUser.id,
+        title: "Queimando Mitos: Os maiores erros no polimento",
+        description: "Ao vivo com o Barba desmontando os mitos mais perigosos da estética automotiva",
+        status: "SCHEDULED",
+        scheduledAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+        isRecorded: true,
+      },
+      {
+        communityId: communityBarba.id,
+        hostId: barbaUser.id,
+        title: "Tira-Dúvidas ao Vivo — Polimento e Proteção",
+        description: "Sessão aberta: manda sua dúvida que o Barba responde",
+        status: "ENDED",
+        scheduledAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+        startedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+        endedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000 + 90 * 60 * 1000),
+        actualAttendees: 318,
+        isRecorded: true,
+      },
+      {
+        communityId: communityCorujao.id,
+        hostId: corujaoUser.id,
+        title: "É Zika! — Live da Rua",
+        description: "Corujão ao vivo direto da rua. Conteúdo real, sem script.",
+        status: "SCHEDULED",
+        scheduledAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+        isRecorded: true,
+      },
+      {
+        communityId: communityNoMel.id,
+        hostId: netoUser.id,
+        title: "Aula ao Vivo: Correção de Pintura na Prática",
+        description: "O Neto demonstrando correção de pintura em tempo real",
+        status: "SCHEDULED",
+        scheduledAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+        isRecorded: true,
+      },
+    ],
   });
 
   console.log("✅ Live sessions created");
@@ -424,41 +707,59 @@ async function main() {
   await db.marketplaceListing.createMany({
     data: [
       {
-        sellerId: inf1User.id,
-        title: "Pack de Templates para Instagram",
-        slug: "pack-templates-instagram",
-        description: "50 templates profissionais para Instagram Stories e Feed. Editáveis no Canva.",
-        shortDesc: "50 templates profissionais para Instagram",
-        type: "TEMPLATE",
+        sellerId: barbaUser.id,
+        title: "Guia Definitivo de Polimento — Barba",
+        slug: "guia-polimento-barba",
+        description: "O guia completo do Barba para polimento profissional. Sem pink lemonade, só técnica real.",
+        shortDesc: "Técnica de polimento sem enrolação",
+        type: "EBOOK",
         status: "ACTIVE",
-        price: 47,
+        price: 67,
         currency: "brl",
         coverImageUrl: null,
-        tags: ["instagram", "templates", "canva", "design"],
-        categories: ["design", "marketing"],
-        features: ["50 templates Stories", "30 templates Feed", "Editável no Canva", "Suporte por 30 dias"],
+        tags: ["polimento", "estetica", "barba", "detailing"],
+        categories: ["estetica-automotiva", "tecnica"],
+        features: ["120 páginas", "Técnicas passo a passo", "Lista de produtos recomendados", "Acesso vitalício"],
         isFeatured: true,
-        totalSales: 127,
-        averageRating: 4.8,
-        reviewCount: 43,
+        totalSales: 245,
+        averageRating: 4.9,
+        reviewCount: 87,
       },
       {
-        sellerId: inf2User.id,
-        title: "Ebook: De 0 a 10k Seguidores em 90 dias",
-        slug: "ebook-0-a-10k-seguidores",
-        description: "Estratégia completa e comprovada para crescer organicamente no Instagram sem gastar com ads.",
-        shortDesc: "Guia completo para crescimento orgânico",
-        type: "EBOOK",
+        sellerId: netoUser.id,
+        title: "Pack de Aulas Bônus — Comunidade no Mel",
+        slug: "pack-aulas-bonus-no-mel",
+        description: "Módulo extra com 10 aulas avançadas do Neto sobre cerâmica, PPF e cuidados premium.",
+        shortDesc: "10 aulas avançadas de estética automotiva",
+        type: "COURSE",
+        status: "ACTIVE",
+        price: 197,
+        currency: "brl",
+        tags: ["aulas", "ceramica", "ppf", "estetica", "neto"],
+        categories: ["estetica-automotiva", "educacao"],
+        features: ["10 aulas em vídeo", "Material de apoio", "Certificado", "Acesso vitalício"],
+        isFeatured: true,
+        totalSales: 132,
+        averageRating: 4.8,
+        reviewCount: 54,
+      },
+      {
+        sellerId: corujaoUser.id,
+        title: "Checklist Zika — Processo Completo",
+        slug: "checklist-zika-corujao",
+        description: "O checklist do Corujão para não errar em nenhum passo do processo. Direto da rua.",
+        shortDesc: "Checklist completo do processo de detailing",
+        type: "TEMPLATE",
         status: "ACTIVE",
         price: 27,
         currency: "brl",
-        tags: ["instagram", "seguidores", "crescimento", "organic"],
-        categories: ["marketing", "redes-sociais"],
-        features: ["150 páginas", "Exercícios práticos", "Templates bônus", "Acesso vitalício"],
+        tags: ["checklist", "processo", "detailing", "corujao"],
+        categories: ["estetica-automotiva", "produtividade"],
+        features: ["Checklist imprimível", "Versão digital editável", "Suporte por 30 dias"],
         isFeatured: false,
-        totalSales: 89,
-        averageRating: 4.6,
-        reviewCount: 31,
+        totalSales: 198,
+        averageRating: 4.7,
+        reviewCount: 63,
       },
     ],
   });
@@ -490,33 +791,10 @@ async function main() {
     },
   });
 
-  // Create memberships (simulating active subscriptions)
-  await db.communityMembership.createMany({
-    data: [
-      {
-        userId: member1.id,
-        communityId: community1.id,
-        planId: plan1Pro.id,
-        status: "ACTIVE",
-        subscriptionStatus: "ACTIVE",
-        currentPeriodStart: new Date(),
-        currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-      },
-      {
-        userId: member2.id,
-        communityId: community1.id,
-        planId: plan1Basic.id,
-        status: "ACTIVE",
-        subscriptionStatus: "ACTIVE",
-        currentPeriodStart: new Date(),
-        currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-      },
-    ],
-  });
 
   // Sync member counts
   await db.community.update({
-    where: { id: community1.id },
+    where: { id: communityBarba.id },
     data: { memberCount: 2 },
   });
 
@@ -557,9 +835,9 @@ async function main() {
   console.log("✅ Payment history created");
 
   // =============================================================================
-  // PLATFORM PLAN
+  // PLATFORM PLAN + MEMBERSHIPS para membros de teste
   // =============================================================================
-  await db.platformPlan.create({
+  const platformPlan = await db.platformPlan.create({
     data: {
       name: "DetailHub Anual",
       description: "Acesso completo a todas as comunidades automotivas da plataforma.",
@@ -580,7 +858,27 @@ async function main() {
     },
   });
 
-  console.log("✅ Platform plan created");
+  // Membros de teste já têm assinatura ativa da plataforma
+  await db.platformMembership.createMany({
+    data: [
+      {
+        userId: member1.id,
+        planId: platformPlan.id,
+        status: "ACTIVE",
+        currentPeriodStart: new Date(),
+        currentPeriodEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+      },
+      {
+        userId: member2.id,
+        planId: platformPlan.id,
+        status: "ACTIVE",
+        currentPeriodStart: new Date(),
+        currentPeriodEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+      },
+    ],
+  });
+
+  console.log("✅ Platform plan + memberships created");
 
   console.log(`
 ╔═══════════════════════════════════════════════╗
@@ -589,9 +887,15 @@ async function main() {
 ║ SuperAdmin    admin@comunidadehub.com          ║
 ║ Password      Admin@123456!                    ║
 ╠═══════════════════════════════════════════════╣
-║ Influencer 1  joao@comunidade.com              ║
-║ Influencer 2  ana@comunidade.com               ║
+║ Barba         barba@comunidade.com             ║
+║ Corujão       corujao@comunidade.com           ║
+║ Neto          neto@comunidade.com              ║
 ║ Password      Influencer@123!                  ║
+╠═══════════════════════════════════════════════╣
+║ Communities:                                   ║
+║   /community/barba                             ║
+║   /community/corujao                           ║
+║   /community/no-mel                            ║
 ╠═══════════════════════════════════════════════╣
 ║ Member 1      membro1@email.com                ║
 ║ Member 2      membro2@email.com                ║

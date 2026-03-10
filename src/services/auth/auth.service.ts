@@ -133,7 +133,7 @@ export async function loginUser(
 
   if (user.isBanned) {
     throw new AppError(
-      `Account suspended: ${user.bannedReason ?? "Contact support"}`,
+      "Conta suspensa. Entre em contato com o suporte.",
       403,
       "ACCOUNT_BANNED"
     );

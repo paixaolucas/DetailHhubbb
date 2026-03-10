@@ -33,8 +33,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Per-email rate limit to prevent targeted abuse (3 per 10 minutes)
-    const emailAllowed = checkRateLimit(`forgot-pwd-email:${email.toLowerCase()}`, 10 * 60 * 1000, 3);
-    if (emailAllowed) {
+    const emailLimited = checkRateLimit(`forgot-pwd-email:${email.toLowerCase()}`, 10 * 60 * 1000, 3);
+    if (emailLimited) {
       // Return same success message to avoid enumeration
       return NextResponse.json({
         success: true,

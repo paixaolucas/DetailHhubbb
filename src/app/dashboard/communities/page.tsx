@@ -141,10 +141,9 @@ export default function CommunitiesPage() {
                   {/* Actions */}
                   <div className="flex items-center gap-1">
                     <Link
-                      href={`/community/${community.slug}`}
-                      target="_blank"
+                      href={`/community/${community.slug}/feed`}
                       className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-                      title="Ver comunidade"
+                      title="Acessar feed"
                     >
                       <ExternalLink className="w-4 h-4" />
                     </Link>

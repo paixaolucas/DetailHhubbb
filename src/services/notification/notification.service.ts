@@ -50,15 +50,20 @@ export async function notifyNewComment(params: {
   postTitle: string;
   postId: string;
   communitySlug: string;
+  commentBody?: string;
 }) {
   if (params.postAuthorId === params.actorId) return null;
+
+  const preview = params.commentBody
+    ? params.commentBody.slice(0, 120)
+    : params.postTitle || "Ver comentário";
 
   return createNotification({
     recipientId: params.postAuthorId,
     actorId: params.actorId,
     type: NotificationType.NEW_COMMENT,
     title: `${params.actorName} comentou no seu post`,
-    body: params.postTitle || "Ver comentário",
+    body: preview,
     link: `/community/${params.communitySlug}/posts/${params.postId}`,
   });
 }
@@ -73,15 +78,20 @@ export async function notifyNewReply(params: {
   actorName: string;
   postId: string;
   communitySlug: string;
+  commentBody?: string;
 }) {
   if (params.commentAuthorId === params.actorId) return null;
+
+  const preview = params.commentBody
+    ? params.commentBody.slice(0, 120)
+    : "Ver resposta";
 
   return createNotification({
     recipientId: params.commentAuthorId,
     actorId: params.actorId,
     type: NotificationType.NEW_REPLY,
     title: `${params.actorName} respondeu ao seu comentário`,
-    body: "Ver resposta",
+    body: preview,
     link: `/community/${params.communitySlug}/posts/${params.postId}`,
   });
 }

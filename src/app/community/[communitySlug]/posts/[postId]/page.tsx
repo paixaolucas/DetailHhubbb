@@ -5,7 +5,7 @@
 // Route: /community/[communitySlug]/posts/[postId]
 // =============================================================================
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import PostDetail from "@/components/feed/PostDetail";
 
@@ -39,7 +39,9 @@ export default function PostDetailPage() {
 
   return (
     <div className="min-h-screen bg-[#F8F7FF]">
-      <PostDetail postId={postId} communitySlug={communitySlug} />
+      <Suspense>
+        <PostDetail postId={postId} communitySlug={communitySlug} />
+      </Suspense>
     </div>
   );
 }

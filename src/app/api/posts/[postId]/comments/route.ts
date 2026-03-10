@@ -4,8 +4,19 @@
 // =============================================================================
 
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { withAuth, verifyMembership } from "@/middleware/auth.middleware";
 import { db } from "@/lib/db";
+import { notifyNewComment, notifyNewReply } from "@/services/notification/notification.service";
+
+const commentSchema = z.object({
+  body: z
+    .string()
+    .min(1, "Comentário não pode estar vazio")
+    .max(5000, "Máximo 5000 caracteres")
+    .trim(),
+  parentId: z.string().optional(),
+});
 
 const AUTHOR_SELECT = {
   id: true,
@@ -73,7 +84,13 @@ export const POST = withAuth(async (req, { session, params }) => {
 
     const post = await db.post.findUnique({
       where: { id: postId },
-      select: { communityId: true, isLocked: true },
+      select: {
+        communityId: true,
+        isLocked: true,
+        authorId: true,
+        title: true,
+        community: { select: { slug: true } },
+      },
     });
     if (!post) {
       return NextResponse.json({ success: false, error: "Post not found" }, { status: 404 });
@@ -91,20 +108,21 @@ export const POST = withAuth(async (req, { session, params }) => {
       return NextResponse.json({ success: false, error: "Membership required" }, { status: 403 });
     }
 
-    const body = await req.json();
-    const { body: commentBody, parentId } = body;
-
-    if (!commentBody) {
+    const rawBody = await req.json();
+    const parsed = commentSchema.safeParse(rawBody);
+    if (!parsed.success) {
       return NextResponse.json(
-        { success: false, error: "Comment body is required" },
+        { success: false, error: parsed.error.errors[0].message },
         { status: 400 }
       );
     }
+    const { body: commentBody, parentId } = parsed.data;
 
+    let parentAuthorId: string | null = null;
     if (parentId) {
       const parent = await db.comment.findUnique({
         where: { id: parentId },
-        select: { id: true },
+        select: { id: true, authorId: true },
       });
       if (!parent) {
         return NextResponse.json(
@@ -112,6 +130,7 @@ export const POST = withAuth(async (req, { session, params }) => {
           { status: 404 }
         );
       }
+      parentAuthorId = parent.authorId;
     }
 
     const [comment] = await db.$transaction([
@@ -131,6 +150,31 @@ export const POST = withAuth(async (req, { session, params }) => {
         data: { commentCount: { increment: 1 } },
       }),
     ]);
+
+    // Fire notifications asynchronously (non-blocking)
+    const actorName = `${comment.author.firstName} ${comment.author.lastName}`;
+    const communitySlug = post.community?.slug ?? "";
+
+    if (parentId && parentAuthorId) {
+      notifyNewReply({
+        commentAuthorId: parentAuthorId,
+        actorId: session.userId,
+        actorName,
+        postId,
+        communitySlug,
+        commentBody,
+      }).catch(() => {});
+    } else {
+      notifyNewComment({
+        postAuthorId: post.authorId,
+        actorId: session.userId,
+        actorName,
+        postTitle: post.title ?? "",
+        postId,
+        communitySlug,
+        commentBody,
+      }).catch(() => {});
+    }
 
     return NextResponse.json({ success: true, data: comment }, { status: 201 });
   } catch {

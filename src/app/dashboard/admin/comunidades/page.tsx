@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Globe, Search, Users, CheckCircle, Archive, UserCheck, X } from "lucide-react";
+import Link from "next/link";
+import { Globe, Search, Users, CheckCircle, Archive, UserCheck, X, ExternalLink } from "lucide-react";
 
 interface Community {
   id: string;
@@ -254,6 +255,13 @@ export default function AdminComunidadesPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
+                        <Link
+                          href={`/community/${community.slug}/feed`}
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 transition-colors"
+                          title="Ver comunidade"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </Link>
                         <button
                           onClick={() => { setChangeInfluencerModal({ communityId: community.id, communityName: community.name }); setModalSelectedUser(null); setModalSearch(""); }}
                           className="p-1.5 rounded-lg text-gray-400 hover:text-violet-500 hover:bg-violet-50 transition-colors"

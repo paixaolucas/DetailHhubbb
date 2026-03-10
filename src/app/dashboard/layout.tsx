@@ -18,6 +18,7 @@ import {
   ChevronDown,
   Menu,
   Shield,
+  Flag,
   GraduationCap,
   Package,
   TrendingUp,
@@ -70,9 +71,9 @@ const ADMIN_NAV: NavEntry[] = [
     label: "Gestão",
     icon: Shield,
     items: [
-      { href: "/dashboard/communities", label: "Comunidades", icon: Users },
+      { href: "/dashboard/admin/comunidades", label: "Comunidades", icon: Globe },
       { href: "/dashboard/usuarios", label: "Usuários", icon: Shield },
-      { href: "/dashboard/admin/comunidades", label: "Admin Comunidades", icon: Globe },
+      { href: "/dashboard/admin/denuncias", label: "Denúncias", icon: Flag },
       { href: "/dashboard/admin/plataforma", label: "Plataforma", icon: Server },
       { href: "/dashboard/admin/financeiro", label: "Financeiro", icon: DollarSign },
       { href: "/dashboard/admin/ferramentas", label: "Ferramentas", icon: Wrench },
@@ -569,7 +570,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         {/* Page content */}
-        <div className="flex-1 p-6">
+        <div className="flex-1 p-4 sm:p-6">
           {children}
         </div>
       </main>

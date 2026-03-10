@@ -22,8 +22,8 @@ export async function POST(req: NextRequest) {
     // Per-email brute force protection (5 attempts per 15 minutes)
     const emailRaw = body?.email?.toLowerCase?.() ?? "";
     if (emailRaw) {
-      const emailAllowed = checkRateLimit(`login-email:${emailRaw}`, 15 * 60 * 1000, 5);
-      if (emailAllowed) {
+      const emailLimited = checkRateLimit(`login-email:${emailRaw}`, 15 * 60 * 1000, 5);
+      if (emailLimited) {
         return NextResponse.json(
           { success: false, error: "Muitas tentativas de login. Aguarde 15 minutos." },
           { status: 429 }

@@ -7,6 +7,7 @@
 
 import { useState } from "react";
 import { ThumbsUp, Trash2, CornerDownRight } from "lucide-react";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -33,6 +34,7 @@ interface CommentItemProps {
   comment: CommentData;
   postId: string;
   currentUserId?: string;
+  isOwner?: boolean;
   onDelete?: (id: string) => void;
   isReply?: boolean;
 }
@@ -61,6 +63,7 @@ export default function CommentItem({
   comment,
   postId,
   currentUserId,
+  isOwner = false,
   onDelete,
   isReply = false,
 }: CommentItemProps) {
@@ -70,6 +73,7 @@ export default function CommentItem({
   const [liked, setLiked] = useState(false);
   const [likeLoading, setLikeLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const [showReplyBox, setShowReplyBox] = useState(false);
   const [replyBody, setReplyBody] = useState("");
@@ -81,7 +85,7 @@ export default function CommentItem({
 
   const authorName = `${comment.author.firstName} ${comment.author.lastName}`;
   const initials = `${comment.author.firstName[0] ?? ""}${comment.author.lastName[0] ?? ""}`.toUpperCase();
-  const canDelete = currentUserId === comment.author.id;
+  const canDelete = currentUserId === comment.author.id || isOwner;
 
   // ---- Like ----------------------------------------------------------------
 
@@ -113,8 +117,8 @@ export default function CommentItem({
   // ---- Delete --------------------------------------------------------------
 
   async function handleDelete() {
-    if (!window.confirm("Excluir este comentário?")) return;
     setDeleting(true);
+    setConfirmDelete(false);
     try {
       const token = localStorage.getItem("detailhub_access_token");
       const res = await fetch(`/api/comments/${comment.id}`, {
@@ -219,9 +223,9 @@ export default function CommentItem({
 
             {canDelete && (
               <button
-                onClick={handleDelete}
+                onClick={() => setConfirmDelete(true)}
                 disabled={deleting}
-                className="inline-flex items-center gap-1 text-xs text-gray-700 hover:text-red-400 transition-colors ml-auto"
+                className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-red-400 transition-colors ml-auto"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 {deleting ? "Excluindo..." : "Excluir"}
@@ -271,6 +275,7 @@ export default function CommentItem({
                   comment={reply}
                   postId={postId}
                   currentUserId={currentUserId}
+                  isOwner={isOwner}
                   onDelete={(id) =>
                     setLocalReplies((prev) => prev.filter((r) => r.id !== id))
                   }
@@ -281,6 +286,16 @@ export default function CommentItem({
           )}
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={confirmDelete}
+        title="Excluir comentário"
+        description="Tem certeza que deseja excluir este comentário? Esta ação não pode ser desfeita."
+        confirmLabel="Excluir"
+        variant="danger"
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmDelete(false)}
+      />
     </div>
   );
 }
