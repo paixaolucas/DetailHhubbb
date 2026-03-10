@@ -226,3 +226,19 @@ After seeding:
 - **AI**: Add request queuing with BullMQ to handle concurrency spikes.
 - **Storage**: S3 multipart upload pre-signed URLs for files >5MB.
 - **Auth**: Redis-backed token blacklist for instant revocation at scale.
+
+## Regras para trabalhar com Claude Code
+
+### "Atualiza o projeto pro Git"
+
+Quando alguém pedir para **atualizar o projeto pro Git**, o Claude executa:
+
+```bash
+git add .
+git commit -m "descrição do que mudou"
+git push origin master
+```
+
+- `git add .` → seleciona todos os arquivos modificados da pasta atual
+- `git commit` → salva um snapshot com descrição
+- `git push` → envia para o repositório remoto (GitHub)
