@@ -234,11 +234,20 @@ After seeding:
 Quando alguém pedir para **atualizar o projeto pro Git**, o Claude executa:
 
 ```bash
-git add .
+git add -A
 git commit -m "descrição do que mudou"
 git push origin master
 ```
 
-- `git add .` → seleciona todos os arquivos modificados da pasta atual
+**REGRA OBRIGATÓRIA:** Sempre usar `git add -A` — isso inclui **ABSOLUTAMENTE TUDO**:
+- Código fonte (`.tsx`, `.ts`, `.css`, etc.)
+- Documentação (`README.md`, `CLAUDE.md`, etc.)
+- Arquivos de cache (`tsconfig.tsbuildinfo`, etc.)
+- Arquivos de configuração
+- Qualquer outro arquivo modificado ou novo
+
+**Nunca deixar nenhum arquivo de fora.** O objetivo é que o repositório no GitHub seja sempre uma cópia 100% fiel do projeto local, sem exceções.
+
+- `git add -A` → seleciona **todos** os arquivos (novos, modificados e deletados)
 - `git commit` → salva um snapshot com descrição
 - `git push` → envia para o repositório remoto (GitHub)
