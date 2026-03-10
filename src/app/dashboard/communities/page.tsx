@@ -25,9 +25,12 @@ interface Community {
 export default function CommunitiesPage() {
   const [communities, setCommunities] = useState<Community[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("detailhub_access_token");
+    const role = localStorage.getItem("detailhub_user_role");
+    setIsAdmin(role === "SUPER_ADMIN");
     fetch("/api/communities/mine", { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.json())
       .then((d) => d.success && setCommunities(d.data ?? []))
@@ -63,6 +66,15 @@ export default function CommunitiesPage() {
           <h1 className="text-2xl font-bold text-gray-900">Comunidades</h1>
           <p className="text-gray-400 text-sm mt-1">Gerencie suas comunidades automotivas</p>
         </div>
+        {isAdmin && (
+          <Link
+            href="/dashboard/communities/new"
+            className="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-purple-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-violet-500/30"
+          >
+            <Plus className="w-4 h-4" />
+            Nova comunidade
+          </Link>
+        )}
       </div>
 
       {communities.length === 0 ? (
