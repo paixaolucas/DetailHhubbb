@@ -11,7 +11,7 @@ export function Logo({ size = "md", className = "" }: LogoProps) {
 
   return (
     <div
-      className={`bg-gradient-to-br from-blue-600 to-blue-500 rounded-xl flex items-center justify-center flex-shrink-0 ${className}`}
+      className={`bg-gradient-to-br from-violet-600 to-violet-500 rounded-xl flex items-center justify-center flex-shrink-0 ${className}`}
       style={{ width: px, height: px }}
     >
       <svg

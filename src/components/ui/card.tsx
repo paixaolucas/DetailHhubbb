@@ -11,9 +11,9 @@ interface CardSectionProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function Card({ variant = "glass", className = "", children, ...props }: CardProps) {
   const variants = {
-    glass: "bg-white/5 backdrop-blur-md border border-white/10",
-    solid: "bg-chrome-800 border border-white/10",
-    glow: "bg-white/5 backdrop-blur-md border border-blue-500/30 shadow-lg shadow-blue-500/10",
+    glass: "bg-white backdrop-blur-md border border-gray-200",
+    solid: "bg-white border border-gray-200",
+    glow: "bg-white backdrop-blur-md border border-violet-500/30 shadow-lg shadow-violet-500/10",
   };
 
   return (
@@ -36,7 +36,7 @@ export function CardHeader({ className = "", children, ...props }: CardSectionPr
 
 export function CardTitle({ className = "", children, ...props }: CardSectionProps) {
   return (
-    <h3 className={`text-lg font-semibold text-white ${className}`} {...props}>
+    <h3 className={`text-lg font-semibold text-gray-900 ${className}`} {...props}>
       {children}
     </h3>
   );

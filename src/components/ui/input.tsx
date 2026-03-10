@@ -25,7 +25,7 @@ export function Input({
       {label && (
         <label
           htmlFor={inputId}
-          className="block text-sm font-medium text-gray-300"
+          className="block text-sm font-medium text-gray-600"
         >
           {label}
         </label>
@@ -39,12 +39,12 @@ export function Input({
         <input
           id={inputId}
           className={`
-            w-full bg-white/5 border rounded-xl px-4 py-3
-            text-white placeholder-gray-500
+            w-full bg-white border rounded-xl px-4 py-3
+            text-gray-900 placeholder-gray-400
             transition-all duration-200
-            focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50
+            focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-400
             disabled:opacity-50 disabled:cursor-not-allowed
-            ${error ? "border-red-500/50 focus:ring-red-500/30" : "border-white/10 hover:border-white/20"}
+            ${error ? "border-red-500/50 focus:ring-red-500/30" : "border-gray-200 hover:border-violet-200"}
             ${leftIcon ? "pl-10" : ""}
             ${rightIcon ? "pr-10" : ""}
             ${className}
@@ -75,18 +75,18 @@ export function Textarea({ label, error, hint, className = "", id, ...props }: T
   return (
     <div className="space-y-1.5">
       {label && (
-        <label htmlFor={inputId} className="block text-sm font-medium text-gray-300">
+        <label htmlFor={inputId} className="block text-sm font-medium text-gray-600">
           {label}
         </label>
       )}
       <textarea
         id={inputId}
         className={`
-          w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3
-          text-white placeholder-gray-500
+          w-full bg-white border border-gray-200 rounded-xl px-4 py-3
+          text-gray-900 placeholder-gray-400
           transition-all duration-200 resize-none
-          focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50
-          hover:border-white/20
+          focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-400
+          hover:border-violet-200
           disabled:opacity-50 disabled:cursor-not-allowed
           ${error ? "border-red-500/50" : ""}
           ${className}
@@ -111,18 +111,18 @@ export function Select({ label, error, className = "", id, children, ...props }:
   return (
     <div className="space-y-1.5">
       {label && (
-        <label htmlFor={inputId} className="block text-sm font-medium text-gray-300">
+        <label htmlFor={inputId} className="block text-sm font-medium text-gray-600">
           {label}
         </label>
       )}
       <select
         id={inputId}
         className={`
-          w-full bg-chrome-800 border border-white/10 rounded-xl px-4 py-3
-          text-white
+          w-full bg-white border border-gray-200 rounded-xl px-4 py-3
+          text-gray-900
           transition-all duration-200
-          focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50
-          hover:border-white/20
+          focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-400
+          hover:border-violet-200
           ${error ? "border-red-500/50" : ""}
           ${className}
         `}

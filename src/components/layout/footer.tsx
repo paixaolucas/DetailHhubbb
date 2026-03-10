@@ -6,14 +6,14 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-chrome-950 border-t border-white/10">
+    <footer className="bg-[#F0EEFF] border-t border-gray-200">
       <div className="container mx-auto px-4 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-4">
               <Logo size="md" />
-              <span className="text-white font-bold text-lg">DetailHub</span>
+              <span className="text-gray-900 font-bold text-lg">DetailHub</span>
             </Link>
             <p className="text-gray-400 text-sm leading-relaxed max-w-xs">
               A plataforma premium para comunidades automotivas. Conecte-se com
@@ -30,7 +30,7 @@ export function Footer() {
                   key={label}
                   href={href}
                   aria-label={label}
-                  className="w-9 h-9 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-lg flex items-center justify-center text-gray-400 hover:text-white transition-all"
+                  className="w-9 h-9 bg-white hover:bg-violet-50 border border-gray-200 hover:border-violet-200 rounded-lg flex items-center justify-center text-gray-500 hover:text-violet-600 transition-all"
                 >
                   <Icon className="w-4 h-4" />
                 </a>
@@ -40,7 +40,7 @@ export function Footer() {
 
           {/* Platform */}
           <div>
-            <h3 className="text-white font-semibold text-sm mb-4">Plataforma</h3>
+            <h3 className="text-gray-900 font-semibold text-sm mb-4">Plataforma</h3>
             <ul className="space-y-3">
               {[
                 { label: "Comunidades", href: "/communities" },
@@ -51,7 +51,7 @@ export function Footer() {
                 <li key={label}>
                   <Link
                     href={href}
-                    className="text-gray-400 hover:text-white text-sm transition-colors"
+                    className="text-gray-500 hover:text-gray-900 text-sm transition-colors"
                   >
                     {label}
                   </Link>
@@ -62,7 +62,7 @@ export function Footer() {
 
           {/* Para Criadores */}
           <div>
-            <h3 className="text-white font-semibold text-sm mb-4">Para Criadores</h3>
+            <h3 className="text-gray-900 font-semibold text-sm mb-4">Para Criadores</h3>
             <ul className="space-y-3">
               {[
                 { label: "Criar comunidade", href: "/register" },
@@ -73,7 +73,7 @@ export function Footer() {
                 <li key={label}>
                   <Link
                     href={href}
-                    className="text-gray-400 hover:text-white text-sm transition-colors"
+                    className="text-gray-500 hover:text-gray-900 text-sm transition-colors"
                   >
                     {label}
                   </Link>
@@ -84,7 +84,7 @@ export function Footer() {
 
           {/* Empresa */}
           <div>
-            <h3 className="text-white font-semibold text-sm mb-4">Empresa</h3>
+            <h3 className="text-gray-900 font-semibold text-sm mb-4">Empresa</h3>
             <ul className="space-y-3">
               {[
                 { label: "Sobre nós", href: "#" },
@@ -97,7 +97,7 @@ export function Footer() {
                 <li key={label}>
                   <Link
                     href={href}
-                    className="text-gray-400 hover:text-white text-sm transition-colors"
+                    className="text-gray-500 hover:text-gray-900 text-sm transition-colors"
                   >
                     {label}
                   </Link>
@@ -108,7 +108,7 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="border-t border-gray-200 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-gray-500 text-sm">
             © {currentYear} DetailHub. Todos os direitos reservados.
           </p>

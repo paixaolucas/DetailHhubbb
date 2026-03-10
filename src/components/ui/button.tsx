@@ -12,15 +12,15 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variants: Record<ButtonVariant, string> = {
   default:
-    "bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-cyan-500 text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40",
+    "bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-purple-500 text-white shadow-lg shadow-violet-500/20 hover:shadow-violet-500/40",
   ghost:
-    "bg-transparent text-gray-300 hover:text-white hover:bg-white/10",
+    "bg-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100",
   outline:
-    "border border-white/20 text-gray-300 hover:text-white hover:border-white/40 hover:bg-white/10 bg-transparent",
+    "border border-gray-200 text-gray-600 hover:text-gray-900 hover:border-gray-300 hover:bg-gray-100 bg-transparent",
   destructive:
     "bg-red-600/20 border border-red-500/30 text-red-400 hover:bg-red-600/30 hover:text-red-300",
   chrome:
-    "bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 hover:to-gray-500 text-white border border-white/10",
+    "bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 hover:to-gray-500 text-white border border-gray-200",
   success:
     "bg-green-600/20 border border-green-500/30 text-green-400 hover:bg-green-600/30 hover:text-green-300",
 };

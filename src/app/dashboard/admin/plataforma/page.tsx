@@ -139,7 +139,7 @@ export default function PlataformaPage() {
             <Server className="w-5 h-5 text-cyan-400" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white">Configurações da Plataforma</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Configurações da Plataforma</h1>
             <p className="text-gray-400 text-sm">Controle global do DetailHub</p>
           </div>
         </div>
@@ -149,7 +149,7 @@ export default function PlataformaPage() {
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all disabled:opacity-70 ${
             saved
               ? "bg-green-600 text-white"
-              : "bg-blue-600 hover:bg-blue-500 text-white hover:shadow-lg hover:shadow-blue-500/30"
+              : "bg-violet-600 hover:bg-violet-500 text-white hover:shadow-lg hover:shadow-violet-500/30"
           }`}
         >
           <Save className="w-4 h-4" />
@@ -159,16 +159,16 @@ export default function PlataformaPage() {
 
       {/* Feature Flags */}
       <div className="glass-card p-6">
-        <h2 className="text-base font-semibold text-white mb-5">Feature Flags</h2>
+        <h2 className="text-base font-semibold text-gray-900 mb-5">Feature Flags</h2>
         <div className="space-y-4">
           {(Object.keys(flags) as (keyof FeatureFlags)[]).map((key) => {
             const { label, desc } = FLAG_LABELS[key];
             const isOn = flags[key];
             const isDanger = key === "manutencao";
             return (
-              <div key={key} className="flex items-center justify-between py-3 border-b border-white/5 last:border-0">
+              <div key={key} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
                 <div className="flex-1 pr-4">
-                  <p className={`text-sm font-medium ${isDanger && isOn ? "text-red-400" : "text-white"}`}>
+                  <p className={`text-sm font-medium ${isDanger && isOn ? "text-red-400" : "text-gray-900"}`}>
                     {label}
                     {isDanger && isOn && (
                       <span className="ml-2 text-xs bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full">
@@ -182,8 +182,8 @@ export default function PlataformaPage() {
                   onClick={() => toggleFlag(key)}
                   className={`relative w-12 h-6 rounded-full transition-all duration-300 flex-shrink-0 ${
                     isOn
-                      ? isDanger ? "bg-red-500" : "bg-blue-600"
-                      : "bg-white/10"
+                      ? isDanger ? "bg-red-500" : "bg-violet-600"
+                      : "bg-gray-50"
                   }`}
                 >
                   <span
@@ -200,28 +200,28 @@ export default function PlataformaPage() {
 
       {/* Platform Config */}
       <div className="glass-card p-6">
-        <h2 className="text-base font-semibold text-white mb-5">Configurações Gerais</h2>
+        <h2 className="text-base font-semibold text-gray-900 mb-5">Configurações Gerais</h2>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Nome da Plataforma</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1.5">Nome da Plataforma</label>
             <input
               type="text"
               value={config.nomePlataforma}
               onChange={(e) => setConfig((c) => ({ ...c, nomePlataforma: e.target.value }))}
-              className="w-full bg-white/5 border border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-xl px-4 py-3 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all"
+              className="w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Email de Suporte</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1.5">Email de Suporte</label>
             <input
               type="email"
               value={config.emailSuporte}
               onChange={(e) => setConfig((c) => ({ ...c, emailSuporte: e.target.value }))}
-              className="w-full bg-white/5 border border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-xl px-4 py-3 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all"
+              className="w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">
+            <label className="block text-sm font-medium text-gray-600 mb-1.5">
               Comissão da Plataforma (%)
             </label>
             <input
@@ -231,7 +231,7 @@ export default function PlataformaPage() {
               step="0.5"
               value={config.comissao}
               onChange={(e) => setConfig((c) => ({ ...c, comissao: e.target.value }))}
-              className="w-full bg-white/5 border border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-xl px-4 py-3 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all"
+              className="w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all"
             />
             <p className="text-xs text-gray-500 mt-1.5">
               Percentual retido pela plataforma em cada transação
@@ -247,28 +247,28 @@ export default function PlataformaPage() {
           <h2 className="text-base font-semibold text-red-400">Zona de Perigo</h2>
         </div>
         <div className="space-y-3">
-          <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5">
+          <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-gray-100">
             <div>
-              <p className="text-sm font-medium text-white">Exportar dados</p>
+              <p className="text-sm font-medium text-gray-900">Exportar dados</p>
               <p className="text-xs text-gray-500 mt-0.5">Exportar todos os dados da plataforma em CSV</p>
             </div>
             <button
               onClick={exportConfig}
-              className="flex items-center gap-2 px-4 py-2 border border-white/20 hover:border-white/40 text-gray-300 hover:text-white rounded-xl text-sm transition-all hover:bg-white/5"
+              className="flex items-center gap-2 px-4 py-2 border border-gray-200 hover:border-gray-300 text-gray-600 hover:text-gray-900 rounded-xl text-sm transition-all hover:bg-violet-50"
             >
               <Download className="w-4 h-4" />
               Exportar
             </button>
           </div>
-          <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5">
+          <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-gray-100">
             <div>
-              <p className="text-sm font-medium text-white">Limpar Cache</p>
+              <p className="text-sm font-medium text-gray-900">Limpar Cache</p>
               <p className="text-xs text-gray-500 mt-0.5">Reinicializa o cache da aplicação</p>
             </div>
             <button
               onClick={resetCache}
               disabled={resetting}
-              className="flex items-center gap-2 px-4 py-2 border border-white/20 hover:border-white/40 text-gray-300 hover:text-white rounded-xl text-sm transition-all hover:bg-white/5 disabled:opacity-70"
+              className="flex items-center gap-2 px-4 py-2 border border-gray-200 hover:border-gray-300 text-gray-600 hover:text-gray-900 rounded-xl text-sm transition-all hover:bg-violet-50 disabled:opacity-70"
             >
               <RefreshCw className={`w-4 h-4 ${resetting ? "animate-spin" : ""}`} />
               {resetting ? "Resetando..." : "Resetar Cache"}

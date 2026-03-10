@@ -19,8 +19,8 @@ function BadgeCard({ badge, earned }: { badge: Badge; earned: boolean }) {
       title={`${badge.name}${earned ? "" : " (não conquistado)"}\n${badge.description}`}
       className={`flex flex-col items-center gap-2 p-4 rounded-xl border transition-all cursor-default select-none ${
         earned
-          ? "bg-white/5 border-white/15 hover:bg-white/10"
-          : "bg-white/[0.02] border-white/5"
+          ? "bg-white border-white/15 hover:bg-gray-100"
+          : "bg-white/[0.02] border-gray-100"
       }`}
     >
       {/* Icon circle */}
@@ -39,7 +39,7 @@ function BadgeCard({ badge, earned }: { badge: Badge; earned: boolean }) {
       {/* Name */}
       <p
         className={`text-xs font-semibold text-center leading-tight ${
-          earned ? "text-white" : "text-gray-600"
+          earned ? "text-gray-900" : "text-gray-600"
         }`}
       >
         {badge.name}

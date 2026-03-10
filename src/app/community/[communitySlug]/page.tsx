@@ -121,24 +121,24 @@ export default async function CommunityPage({
   return (
     <div className="min-h-screen bg-[#0a0f1a]">
       {/* Navbar */}
-      <header className="border-b border-white/10 bg-[#111827]/80 backdrop-blur-xl sticky top-0 z-10">
+      <header className="border-b border-gray-200 bg-[#F8F7FF]/80 backdrop-blur-xl sticky top-0 z-10">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link
             href="/"
-            className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+            className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-900 transition-colors"
           >
-            <span className="text-blue-400">←</span> DetailHub
+            <span className="text-violet-400">←</span> DetailHub
           </Link>
           <div className="flex items-center gap-3">
             <Link
               href="/login"
-              className="text-sm text-gray-400 hover:text-white transition-colors"
+              className="text-sm text-gray-400 hover:text-gray-900 transition-colors"
             >
               Entrar
             </Link>
             <Link
               href="/register"
-              className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all hover:shadow-lg hover:shadow-blue-500/25"
+              className="bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all hover:shadow-lg hover:shadow-violet-500/25"
             >
               Criar conta
             </Link>
@@ -175,7 +175,7 @@ export default async function CommunityPage({
             <img
               src={community.logoUrl}
               alt={community.name}
-              className="w-24 h-24 rounded-2xl mx-auto mb-6 object-cover border-2 border-white/20 shadow-2xl"
+              className="w-24 h-24 rounded-2xl mx-auto mb-6 object-cover border-2 border-gray-200 shadow-2xl"
             />
           ) : (
             <div
@@ -186,7 +186,7 @@ export default async function CommunityPage({
             </div>
           )}
 
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight">
+          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-4 leading-tight">
             {community.name}
           </h1>
           {community.shortDescription && (
@@ -196,24 +196,24 @@ export default async function CommunityPage({
           )}
 
           {/* Stats bar */}
-          <div className="inline-flex items-center gap-6 bg-white/5 border border-white/10 rounded-2xl px-8 py-4 text-sm">
-            <div className="flex items-center gap-2 text-gray-300">
-              <Users className="w-4 h-4 text-blue-400" />
-              <span className="font-semibold text-white">
+          <div className="inline-flex items-center gap-6 bg-white border border-gray-200 rounded-2xl px-8 py-4 text-sm">
+            <div className="flex items-center gap-2 text-gray-600">
+              <Users className="w-4 h-4 text-violet-400" />
+              <span className="font-semibold text-gray-900">
                 {community.memberCount.toLocaleString("pt-BR")}
               </span>
               <span className="text-gray-500">membros</span>
             </div>
-            <div className="w-px h-4 bg-white/10" />
-            <div className="flex items-center gap-2 text-gray-300">
+            <div className="w-px h-4 bg-gray-50" />
+            <div className="flex items-center gap-2 text-gray-600">
               <BookOpen className="w-4 h-4 text-purple-400" />
-              <span className="font-semibold text-white">{community._count.contentModules}</span>
+              <span className="font-semibold text-gray-900">{community._count.contentModules}</span>
               <span className="text-gray-500">módulos</span>
             </div>
-            <div className="w-px h-4 bg-white/10" />
-            <div className="flex items-center gap-2 text-gray-300">
+            <div className="w-px h-4 bg-gray-50" />
+            <div className="flex items-center gap-2 text-gray-600">
               <Video className="w-4 h-4 text-red-400" />
-              <span className="font-semibold text-white">{community._count.liveSessions}</span>
+              <span className="font-semibold text-gray-900">{community._count.liveSessions}</span>
               <span className="text-gray-500">lives</span>
             </div>
           </div>
@@ -225,8 +225,8 @@ export default async function CommunityPage({
         <div className="max-w-3xl mx-auto space-y-6">
           {/* About */}
           {community.description && (
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
-              <h2 className="text-xl font-bold text-white mb-4">Sobre a comunidade</h2>
+            <div className="bg-white border border-gray-200 rounded-2xl p-8">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Sobre a comunidade</h2>
               <p className="text-gray-400 leading-relaxed whitespace-pre-wrap">
                 {community.description}
               </p>
@@ -235,7 +235,7 @@ export default async function CommunityPage({
 
           {/* Tags */}
           {(community.tags as string[]).length > 0 && (
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+            <div className="bg-white border border-gray-200 rounded-2xl p-6">
               <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
                 Tópicos
               </h2>
@@ -257,25 +257,25 @@ export default async function CommunityPage({
           )}
 
           {/* Host */}
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
-            <h2 className="text-xl font-bold text-white mb-5">Seu mentor</h2>
+          <div className="bg-white border border-gray-200 rounded-2xl p-8">
+            <h2 className="text-xl font-bold text-gray-900 mb-5">Seu mentor</h2>
             <div className="flex items-start gap-5">
               {influencer.user.avatarUrl ? (
                 <img
                   src={influencer.user.avatarUrl}
                   alt={hostName}
-                  className="w-16 h-16 rounded-2xl object-cover flex-shrink-0 shadow-lg border border-white/10"
+                  className="w-16 h-16 rounded-2xl object-cover flex-shrink-0 shadow-lg border border-gray-200"
                 />
               ) : (
                 <div
-                  className="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-xl font-bold flex-shrink-0 shadow-lg"
+                  className="w-16 h-16 rounded-2xl flex items-center justify-center text-gray-900 text-xl font-bold flex-shrink-0 shadow-lg"
                   style={{ backgroundColor: community.primaryColor }}
                 >
                   {hostName.charAt(0)}
                 </div>
               )}
               <div>
-                <p className="font-semibold text-white text-lg">{hostName}</p>
+                <p className="font-semibold text-gray-900 text-lg">{hostName}</p>
                 <p className="text-sm text-gray-400 mb-3">{influencer.displayName}</p>
                 {influencer.bio && (
                   <p className="text-sm text-gray-400 leading-relaxed">{influencer.bio}</p>
@@ -286,8 +286,8 @@ export default async function CommunityPage({
 
           {/* Rules */}
           {community.rules && (
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
-              <h2 className="text-xl font-bold text-white mb-4">Regras da comunidade</h2>
+            <div className="bg-white border border-gray-200 rounded-2xl p-8">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Regras da comunidade</h2>
               <p className="text-gray-400 leading-relaxed whitespace-pre-wrap text-sm">
                 {community.rules}
               </p>
@@ -296,22 +296,22 @@ export default async function CommunityPage({
 
           {/* O que você vai aprender — Content Modules */}
           {hasModules && (
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
-              <h2 className="text-xl font-bold text-white mb-6">O que você vai aprender</h2>
+            <div className="bg-white border border-gray-200 rounded-2xl p-8">
+              <h2 className="text-xl font-bold text-gray-900 mb-6">O que você vai aprender</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {community.contentModules.map((module, idx) => (
                   <div
                     key={module.id}
-                    className="flex items-start gap-3 p-4 bg-white/5 border border-white/10 rounded-xl hover:border-white/20 transition-colors"
+                    className="flex items-start gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-violet-200 transition-colors"
                   >
                     <div
-                      className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold text-gray-900 flex-shrink-0"
                       style={{ backgroundColor: `${community.primaryColor}30`, color: community.primaryColor }}
                     >
                       {idx + 1}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-white leading-tight">{module.title}</p>
+                      <p className="text-sm font-semibold text-gray-900 leading-tight">{module.title}</p>
                       {module.description && (
                         <p className="text-xs text-gray-500 mt-1 leading-relaxed line-clamp-2">
                           {module.description}
@@ -331,15 +331,15 @@ export default async function CommunityPage({
           {/* Depoimentos — Testimonials */}
           {hasTestimonials && (
             <div>
-              <h2 className="text-xl font-bold text-white mb-5 px-1">Depoimentos</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-5 px-1">Depoimentos</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {community.testimonials.map((t) => (
                   <div
                     key={t.id}
-                    className="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col gap-3"
+                    className="bg-white border border-gray-200 rounded-2xl p-6 flex flex-col gap-3"
                   >
                     <StarRating rating={t.rating} />
-                    <p className="text-gray-300 text-sm leading-relaxed flex-1">
+                    <p className="text-gray-600 text-sm leading-relaxed flex-1">
                       &ldquo;{t.body}&rdquo;
                     </p>
                     <div className="flex items-center gap-3 mt-1">
@@ -347,18 +347,18 @@ export default async function CommunityPage({
                         <img
                           src={t.avatarUrl}
                           alt={t.authorName}
-                          className="w-9 h-9 rounded-full object-cover border border-white/10 flex-shrink-0"
+                          className="w-9 h-9 rounded-full object-cover border border-gray-200 flex-shrink-0"
                         />
                       ) : (
                         <div
-                          className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
+                          className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-gray-900 flex-shrink-0"
                           style={{ backgroundColor: `${community.primaryColor}40` }}
                         >
                           {t.authorName.charAt(0)}
                         </div>
                       )}
                       <div>
-                        <p className="text-sm font-semibold text-white">{t.authorName}</p>
+                        <p className="text-sm font-semibold text-gray-900">{t.authorName}</p>
                         {t.authorTitle && (
                           <p className="text-xs text-gray-500">{t.authorTitle}</p>
                         )}
@@ -372,9 +372,9 @@ export default async function CommunityPage({
 
           {/* FAQ */}
           {hasFaqs && (
-            <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+            <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
               <div className="px-8 pt-8 pb-4">
-                <h2 className="text-xl font-bold text-white">Perguntas frequentes</h2>
+                <h2 className="text-xl font-bold text-gray-900">Perguntas frequentes</h2>
               </div>
               <div className="divide-y divide-white/5">
                 {community.faqs.map((faq) => (
@@ -383,7 +383,7 @@ export default async function CommunityPage({
                     className="group px-8 py-0"
                   >
                     <summary className="flex items-center justify-between gap-4 py-5 cursor-pointer list-none select-none">
-                      <span className="text-sm font-semibold text-white group-open:text-blue-400 transition-colors">
+                      <span className="text-sm font-semibold text-gray-900 group-open:text-violet-400 transition-colors">
                         {faq.question}
                       </span>
                       <ChevronDown className="w-4 h-4 text-gray-500 flex-shrink-0 transition-transform group-open:rotate-180" />
@@ -421,21 +421,21 @@ export default async function CommunityPage({
               background: `linear-gradient(135deg, ${community.primaryColor}20 0%, transparent 100%)`,
             }}
           >
-            <div className="absolute inset-0 border border-white/10 rounded-2xl pointer-events-none" />
+            <div className="absolute inset-0 border border-gray-200 rounded-2xl pointer-events-none" />
             <div
-              className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold"
+              className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center text-gray-900 text-2xl font-bold"
               style={{ backgroundColor: community.primaryColor }}
             >
               {community.name.charAt(0)}
             </div>
-            <h3 className="text-2xl font-bold text-white mb-2">Quer fazer parte?</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">Quer fazer parte?</h3>
             <p className="text-gray-400 mb-6 max-w-md mx-auto">
               Crie sua conta gratuitamente e solicite acesso à comunidade{" "}
-              <strong className="text-white">{community.name}</strong>.
+              <strong className="text-gray-900">{community.name}</strong>.
             </p>
             <Link
               href={`/register?community=${community.slug}`}
-              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-xl font-semibold transition-all hover:shadow-lg hover:shadow-blue-500/30"
+              className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white px-8 py-3 rounded-xl font-semibold transition-all hover:shadow-lg hover:shadow-violet-500/30"
             >
               Criar conta grátis <ArrowRight className="w-4 h-4" />
             </Link>

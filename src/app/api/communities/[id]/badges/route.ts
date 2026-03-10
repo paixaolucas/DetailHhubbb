@@ -77,7 +77,7 @@ export const POST = withAuth(async (req: NextRequest, { session, params }) => {
         name: parsed.data.name,
         description: parsed.data.description,
         icon: parsed.data.icon,
-        color: parsed.data.color ?? "#3B82F6",
+        color: parsed.data.color ?? "#8B5CF6",
         requirement: (parsed.data.requirement ?? {}) as Record<string, string>,
       },
     });

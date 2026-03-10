@@ -8,7 +8,7 @@ import { ArrowLeft, Save, Info } from "lucide-react";
 const COLORS = [
   "#6366f1", "#8b5cf6", "#ec4899", "#ef4444",
   "#f97316", "#eab308", "#22c55e", "#06b6d4",
-  "#3b82f6", "#64748b",
+  "#8b5cf6", "#64748b",
 ];
 
 function slugify(text: string) {
@@ -24,7 +24,7 @@ function slugify(text: string) {
 }
 
 function fieldClass() {
-  return "w-full bg-white/5 border border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all text-sm";
+  return "w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm";
 }
 
 export default function NewCommunityPage() {
@@ -33,7 +33,7 @@ export default function NewCommunityPage() {
   const [error, setError] = useState("");
   const [form, setForm] = useState({
     name: "", slug: "", shortDescription: "", description: "",
-    primaryColor: "#3b82f6", isPrivate: false, tags: "",
+    primaryColor: "#8b5cf6", isPrivate: false, tags: "",
     welcomeMessage: "", rules: "",
   });
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
@@ -72,11 +72,11 @@ export default function NewCommunityPage() {
   return (
     <div className="max-w-2xl">
       <div className="flex items-center gap-3 mb-6">
-        <Link href="/dashboard/communities" className="p-2 text-gray-500 hover:text-white hover:bg-white/10 rounded-xl transition-all">
+        <Link href="/dashboard/communities" className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all">
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-white">Nova Comunidade</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Nova Comunidade</h1>
           <p className="text-gray-400 text-sm mt-0.5">Configure sua comunidade e comece a crescer</p>
         </div>
       </div>
@@ -88,10 +88,10 @@ export default function NewCommunityPage() {
 
         {/* Informações básicas */}
         <div className="glass-card p-6 space-y-4">
-          <h2 className="text-base font-semibold text-white">Informações Básicas</h2>
+          <h2 className="text-base font-semibold text-gray-900">Informações Básicas</h2>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">
+            <label className="block text-sm font-medium text-gray-600 mb-1.5">
               Nome da comunidade <span className="text-red-400">*</span>
             </label>
             <input
@@ -102,18 +102,18 @@ export default function NewCommunityPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">
+            <label className="block text-sm font-medium text-gray-600 mb-1.5">
               URL da comunidade <span className="text-red-400">*</span>
             </label>
-            <div className="flex items-center bg-white/5 border border-white/10 hover:border-white/20 focus-within:border-blue-500/50 focus-within:ring-2 focus-within:ring-blue-500/30 rounded-xl overflow-hidden transition-all">
-              <span className="bg-white/5 px-4 py-3 text-sm text-gray-500 border-r border-white/10 shrink-0">
+            <div className="flex items-center bg-white border border-gray-200 hover:border-violet-200 focus-within:border-violet-500/50 focus-within:ring-2 focus-within:ring-violet-500/30 rounded-xl overflow-hidden transition-all">
+              <span className="bg-white px-4 py-3 text-sm text-gray-500 border-r border-gray-200 shrink-0">
                 detailhub.com/
               </span>
               <input
                 type="text" value={form.slug}
                 onChange={(e) => { setSlugManuallyEdited(true); setForm((p) => ({ ...p, slug: slugify(e.target.value) })); }}
                 placeholder="minha-comunidade"
-                className="flex-1 px-4 py-3 text-sm text-white placeholder-gray-500 bg-transparent focus:outline-none"
+                className="flex-1 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none"
                 required minLength={3} maxLength={60}
               />
             </div>
@@ -124,7 +124,7 @@ export default function NewCommunityPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Descrição curta</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1.5">Descrição curta</label>
             <input
               type="text" value={form.shortDescription}
               onChange={(e) => setForm((p) => ({ ...p, shortDescription: e.target.value }))}
@@ -135,7 +135,7 @@ export default function NewCommunityPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Descrição completa</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1.5">Descrição completa</label>
             <textarea
               value={form.description}
               onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
@@ -147,9 +147,9 @@ export default function NewCommunityPage() {
 
         {/* Aparência */}
         <div className="glass-card p-6 space-y-4">
-          <h2 className="text-base font-semibold text-white">Aparência</h2>
+          <h2 className="text-base font-semibold text-gray-900">Aparência</h2>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-3">Cor principal</label>
+            <label className="block text-sm font-medium text-gray-600 mb-3">Cor principal</label>
             <div className="flex flex-wrap gap-2">
               {COLORS.map((color) => (
                 <button
@@ -167,23 +167,23 @@ export default function NewCommunityPage() {
 
         {/* Configurações */}
         <div className="glass-card p-6 space-y-4">
-          <h2 className="text-base font-semibold text-white">Configurações</h2>
+          <h2 className="text-base font-semibold text-gray-900">Configurações</h2>
 
           <label className="flex items-center gap-3 cursor-pointer group">
             <div
               onClick={() => setForm((p) => ({ ...p, isPrivate: !p.isPrivate }))}
-              className={`w-11 h-6 rounded-full transition-colors relative flex-shrink-0 ${form.isPrivate ? "bg-blue-600" : "bg-white/10"}`}
+              className={`w-11 h-6 rounded-full transition-colors relative flex-shrink-0 ${form.isPrivate ? "bg-violet-600" : "bg-gray-50"}`}
             >
               <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-transform ${form.isPrivate ? "translate-x-5" : "translate-x-0.5"}`} />
             </div>
             <div>
-              <p className="text-sm font-medium text-white">Comunidade privada</p>
+              <p className="text-sm font-medium text-gray-900">Comunidade privada</p>
               <p className="text-xs text-gray-500">Somente membros podem ver o conteúdo</p>
             </div>
           </label>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Tags</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1.5">Tags</label>
             <input
               type="text" value={form.tags}
               onChange={(e) => setForm((p) => ({ ...p, tags: e.target.value }))}
@@ -195,10 +195,10 @@ export default function NewCommunityPage() {
 
         {/* Conteúdo inicial */}
         <div className="glass-card p-6 space-y-4">
-          <h2 className="text-base font-semibold text-white">Conteúdo Inicial</h2>
+          <h2 className="text-base font-semibold text-gray-900">Conteúdo Inicial</h2>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Mensagem de boas-vindas</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1.5">Mensagem de boas-vindas</label>
             <textarea
               value={form.welcomeMessage}
               onChange={(e) => setForm((p) => ({ ...p, welcomeMessage: e.target.value }))}
@@ -208,7 +208,7 @@ export default function NewCommunityPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Regras da comunidade</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1.5">Regras da comunidade</label>
             <textarea
               value={form.rules}
               onChange={(e) => setForm((p) => ({ ...p, rules: e.target.value }))}
@@ -221,21 +221,21 @@ export default function NewCommunityPage() {
         {/* Preview */}
         {form.name && (
           <div className="glass-card p-6">
-            <h2 className="text-base font-semibold text-white mb-4">Preview do Card</h2>
-            <div className="border border-white/10 rounded-xl overflow-hidden max-w-xs">
+            <h2 className="text-base font-semibold text-gray-900 mb-4">Preview do Card</h2>
+            <div className="border border-gray-200 rounded-xl overflow-hidden max-w-xs">
               <div className="h-20 relative" style={{ backgroundColor: form.primaryColor }}>
                 <div className="absolute inset-0 grid-pattern opacity-20" />
               </div>
-              <div className="p-4 bg-white/5">
+              <div className="p-4 bg-white">
                 <div className="flex items-center gap-3">
                   <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-lg -mt-6 border-2 border-gray-900"
+                    className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-900 font-bold text-lg -mt-6 border-2 border-gray-900"
                     style={{ backgroundColor: form.primaryColor }}
                   >
                     {form.name.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <p className="font-semibold text-sm text-white">{form.name}</p>
+                    <p className="font-semibold text-sm text-gray-900">{form.name}</p>
                     {form.shortDescription && (
                       <p className="text-xs text-gray-500 truncate">{form.shortDescription}</p>
                     )}
@@ -247,13 +247,13 @@ export default function NewCommunityPage() {
         )}
 
         <div className="flex gap-3">
-          <Link href="/dashboard/communities" className="px-5 py-2.5 border border-white/20 hover:border-white/40 rounded-xl text-sm font-medium text-gray-300 hover:text-white transition-all">
+          <Link href="/dashboard/communities" className="px-5 py-2.5 border border-gray-200 hover:border-gray-300 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-900 transition-all">
             Cancelar
           </Link>
           <button
             type="submit"
             disabled={isLoading || !form.name || !form.slug}
-            className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-cyan-500 disabled:opacity-50 text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-blue-500/30"
+            className="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-purple-500 disabled:opacity-50 text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-violet-500/30"
           >
             {isLoading ? (
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

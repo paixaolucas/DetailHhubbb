@@ -19,7 +19,7 @@ type RsvpStatus = "GOING" | "MAYBE" | "NOT_GOING";
 type RsvpMap = Record<string, RsvpStatus | null>;
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-  SCHEDULED: { label: "Agendada", color: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
+  SCHEDULED: { label: "Agendada", color: "bg-violet-500/10 text-violet-400 border-violet-500/20" },
   LIVE: { label: "Ao Vivo", color: "bg-red-500/10 text-red-400 border-red-500/20" },
   ENDED: { label: "Encerrada", color: "bg-gray-500/10 text-gray-400 border-gray-500/20" },
   CANCELED: { label: "Cancelada", color: "bg-orange-500/10 text-orange-400 border-orange-500/20" },
@@ -33,9 +33,9 @@ const FILTERS = [
 ];
 
 const RSVP_OPTIONS: { value: RsvpStatus; label: string; icon: React.ElementType; active: string; inactive: string }[] = [
-  { value: "GOING",     label: "Vou",      icon: Check,       active: "bg-green-600 text-white border-green-500",       inactive: "border-white/10 text-gray-400 hover:border-green-500/50 hover:text-green-400" },
-  { value: "MAYBE",     label: "Talvez",   icon: HelpCircle,  active: "bg-yellow-600 text-white border-yellow-500",     inactive: "border-white/10 text-gray-400 hover:border-yellow-500/50 hover:text-yellow-400" },
-  { value: "NOT_GOING", label: "Não vou",  icon: XIcon,       active: "bg-red-700 text-white border-red-600",           inactive: "border-white/10 text-gray-400 hover:border-red-500/50 hover:text-red-400" },
+  { value: "GOING",     label: "Vou",      icon: Check,       active: "bg-green-600 text-gray-900 border-green-500",       inactive: "border-gray-200 text-gray-400 hover:border-green-500/50 hover:text-green-400" },
+  { value: "MAYBE",     label: "Talvez",   icon: HelpCircle,  active: "bg-yellow-600 text-gray-900 border-yellow-500",     inactive: "border-gray-200 text-gray-400 hover:border-yellow-500/50 hover:text-yellow-400" },
+  { value: "NOT_GOING", label: "Não vou",  icon: XIcon,       active: "bg-red-700 text-white border-red-600",           inactive: "border-gray-200 text-gray-400 hover:border-red-500/50 hover:text-red-400" },
 ];
 
 export default function LivesPage() {
@@ -108,7 +108,7 @@ export default function LivesPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-[3px] border-blue-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-[3px] border-violet-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -119,7 +119,7 @@ export default function LivesPage() {
   return (
     <div className="space-y-6 max-w-4xl">
       <div>
-        <h1 className="text-2xl font-bold text-white">Lives</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Lives</h1>
         <p className="text-gray-400 text-sm mt-1">Sessões ao vivo das suas comunidades</p>
       </div>
 
@@ -132,9 +132,9 @@ export default function LivesPage() {
           </div>
           <div className="space-y-3">
             {liveNow.map((session) => (
-              <div key={session.id} className="flex items-center justify-between bg-white/5 rounded-xl px-4 py-3 border border-red-500/20">
+              <div key={session.id} className="flex items-center justify-between bg-white rounded-xl px-4 py-3 border border-red-500/20">
                 <div>
-                  <p className="font-semibold text-white text-sm">{session.title}</p>
+                  <p className="font-semibold text-gray-900 text-sm">{session.title}</p>
                   <p className="text-xs text-gray-500 mt-0.5">{session.community?.name}</p>
                 </div>
                 {session.streamUrl ? (
@@ -168,8 +168,8 @@ export default function LivesPage() {
             onClick={() => setFilter(value)}
             className={`px-4 py-1.5 rounded-xl text-sm font-medium transition-all ${
               filter === value
-                ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
-                : "glass-card hover:border-white/20 text-gray-400 hover:text-white"
+                ? "bg-violet-600 text-white shadow-lg shadow-violet-500/20"
+                : "glass-card hover:border-violet-200 text-gray-400 hover:text-gray-900"
             }`}
           >
             {label}
@@ -183,7 +183,7 @@ export default function LivesPage() {
           <div className="w-20 h-20 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Video className="w-10 h-10 text-red-400" />
           </div>
-          <h3 className="text-xl font-semibold text-white mb-2">Nenhuma live encontrada</h3>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">Nenhuma live encontrada</h3>
           <p className="text-gray-400 text-sm">Nenhuma live disponível no momento.</p>
         </div>
       ) : (
@@ -191,7 +191,7 @@ export default function LivesPage() {
           {filtered.map((session) => {
             const statusConf = STATUS_CONFIG[session.status] ?? { label: session.status, color: "bg-gray-500/10 text-gray-400 border-gray-500/20" };
             return (
-              <div key={session.id} className={`glass-card p-5 hover:border-white/20 transition-all ${session.status === "LIVE" ? "border-red-500/30" : ""}`}>
+              <div key={session.id} className={`glass-card p-5 hover:border-violet-200 transition-all ${session.status === "LIVE" ? "border-red-500/30" : ""}`}>
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-red-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
                     <Video className="w-6 h-6 text-red-400" />
@@ -204,7 +204,7 @@ export default function LivesPage() {
                       </span>
                       <span className="text-xs text-gray-500">{session.community?.name}</span>
                     </div>
-                    <h3 className="font-semibold text-white">{session.title}</h3>
+                    <h3 className="font-semibold text-gray-900">{session.title}</h3>
                     {session.description && (
                       <p className="text-sm text-gray-400 mt-1 line-clamp-1">{session.description}</p>
                     )}
@@ -244,7 +244,7 @@ export default function LivesPage() {
                         href={session.replayUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1.5 glass-card hover:border-white/20 text-gray-300 hover:text-white px-3 py-2 rounded-xl text-sm font-medium transition-all"
+                        className="flex items-center gap-1.5 glass-card hover:border-violet-200 text-gray-600 hover:text-gray-900 px-3 py-2 rounded-xl text-sm font-medium transition-all"
                       >
                         <PlayCircle className="w-4 h-4" />
                         Replay

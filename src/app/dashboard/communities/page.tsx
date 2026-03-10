@@ -38,16 +38,16 @@ export default function CommunitiesPage() {
     return (
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <div className="h-8 bg-white/5 rounded w-40 animate-pulse" />
-          <div className="h-9 bg-white/5 rounded-xl w-36 animate-pulse" />
+          <div className="h-8 bg-white rounded w-40 animate-pulse" />
+          <div className="h-9 bg-white rounded-xl w-36 animate-pulse" />
         </div>
         {Array.from({ length: 3 }).map((_, i) => (
           <div key={i} className="glass-card p-6 animate-pulse">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-white/5 rounded-xl" />
+              <div className="w-12 h-12 bg-white rounded-xl" />
               <div className="flex-1 space-y-2">
-                <div className="h-5 bg-white/5 rounded w-1/3" />
-                <div className="h-4 bg-white/5 rounded w-1/2" />
+                <div className="h-5 bg-white rounded w-1/3" />
+                <div className="h-4 bg-white rounded w-1/2" />
               </div>
             </div>
           </div>
@@ -60,12 +60,12 @@ export default function CommunitiesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Comunidades</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Comunidades</h1>
           <p className="text-gray-400 text-sm mt-1">Gerencie suas comunidades automotivas</p>
         </div>
         <Link
           href="/dashboard/communities/new"
-          className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-cyan-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-blue-500/30"
+          className="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-purple-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-violet-500/30"
         >
           <Plus className="w-4 h-4" />
           Nova comunidade
@@ -74,10 +74,10 @@ export default function CommunitiesPage() {
 
       {communities.length === 0 ? (
         <div className="glass-card p-16 text-center">
-          <div className="w-20 h-20 bg-blue-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <Users className="w-10 h-10 text-blue-400" />
+          <div className="w-20 h-20 bg-violet-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <Users className="w-10 h-10 text-violet-400" />
           </div>
-          <h3 className="text-xl font-semibold text-white mb-2">
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
             Nenhuma comunidade ainda
           </h3>
           <p className="text-gray-400 text-sm mb-8 max-w-sm mx-auto">
@@ -85,7 +85,7 @@ export default function CommunitiesPage() {
           </p>
           <Link
             href="/dashboard/communities/new"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-cyan-500 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-blue-500/30"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-purple-500 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-violet-500/30"
           >
             <Plus className="w-4 h-4" />
             Criar comunidade
@@ -96,13 +96,13 @@ export default function CommunitiesPage() {
           {communities.map((community) => (
             <div
               key={community.id}
-              className="glass-card p-6 hover:border-white/20 transition-all group"
+              className="glass-card p-6 hover:border-violet-200 transition-all group"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-4 min-w-0">
                   {/* Logo */}
                   <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg flex-shrink-0"
+                    className="w-12 h-12 rounded-xl flex items-center justify-center text-gray-900 font-bold text-lg flex-shrink-0"
                     style={{ backgroundColor: community.primaryColor }}
                   >
                     {community.name.charAt(0)}
@@ -111,7 +111,7 @@ export default function CommunitiesPage() {
                   {/* Info */}
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-semibold text-white group-hover:text-blue-300 transition-colors">
+                      <h3 className="font-semibold text-gray-900 group-hover:text-violet-300 transition-colors">
                         {community.name}
                       </h3>
                       <span
@@ -136,7 +136,7 @@ export default function CommunitiesPage() {
                 <div className="flex items-center gap-4 flex-shrink-0">
                   {/* Member count */}
                   <div className="text-right hidden sm:block">
-                    <p className="text-xl font-bold text-white">{community.memberCount}</p>
+                    <p className="text-xl font-bold text-gray-900">{community.memberCount}</p>
                     <p className="text-xs text-gray-500">membros</p>
                   </div>
 
@@ -145,21 +145,21 @@ export default function CommunitiesPage() {
                     <Link
                       href={`/community/${community.slug}`}
                       target="_blank"
-                      className="p-2 text-gray-500 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                      className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
                       title="Ver comunidade"
                     >
                       <ExternalLink className="w-4 h-4" />
                     </Link>
                     <Link
                       href={`/dashboard/analytics?communityId=${community.id}`}
-                      className="p-2 text-gray-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
+                      className="p-2 text-gray-500 hover:text-violet-400 hover:bg-violet-500/10 rounded-lg transition-colors"
                       title="Analytics"
                     >
                       <BarChart2 className="w-4 h-4" />
                     </Link>
                     <Link
                       href={`/dashboard/communities/${community.id}/settings`}
-                      className="p-2 text-gray-500 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                      className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
                       title="Configurações"
                     >
                       <Settings className="w-4 h-4" />

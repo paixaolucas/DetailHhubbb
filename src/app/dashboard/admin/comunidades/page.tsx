@@ -81,7 +81,7 @@ export default function AdminComunidadesPage() {
   );
 
   const statCards = [
-    { label: "Total", value: stats.total, color: "text-blue-400 bg-blue-500/10" },
+    { label: "Total", value: stats.total, color: "text-violet-400 bg-violet-500/10" },
     { label: "Publicadas", value: stats.published, color: "text-green-400 bg-green-500/10" },
     { label: "Rascunhos", value: stats.drafts, color: "text-yellow-400 bg-yellow-500/10" },
     { label: "Privadas", value: stats.private, color: "text-purple-400 bg-purple-500/10" },
@@ -90,16 +90,16 @@ export default function AdminComunidadesPage() {
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-8 bg-white/10 rounded-xl w-48" />
+        <div className="h-8 bg-gray-50 rounded-xl w-48" />
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="glass-card p-5 space-y-3">
-              <div className="h-6 bg-white/10 rounded w-12" />
-              <div className="h-3 bg-white/10 rounded w-20" />
+              <div className="h-6 bg-gray-50 rounded w-12" />
+              <div className="h-3 bg-gray-50 rounded w-20" />
             </div>
           ))}
         </div>
-        <div className="glass-card p-6 h-64 bg-white/5" />
+        <div className="glass-card p-6 h-64 bg-white" />
       </div>
     );
   }
@@ -107,11 +107,11 @@ export default function AdminComunidadesPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center">
-          <Globe className="w-5 h-5 text-blue-400" />
+        <div className="w-10 h-10 bg-violet-500/10 rounded-xl flex items-center justify-center">
+          <Globe className="w-5 h-5 text-violet-400" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-white">Comunidades (Admin)</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Comunidades (Admin)</h1>
           <p className="text-gray-400 text-sm">Gerencie todas as comunidades da plataforma</p>
         </div>
       </div>
@@ -120,7 +120,7 @@ export default function AdminComunidadesPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         {statCards.map(({ label, value, color }) => (
           <div key={label} className="glass-card p-5">
-            <p className="text-xl font-bold text-white">{value}</p>
+            <p className="text-xl font-bold text-gray-900">{value}</p>
             <p className={`text-sm font-medium mt-1 ${color.split(" ")[0]}`}>{label}</p>
           </div>
         ))}
@@ -135,20 +135,20 @@ export default function AdminComunidadesPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar por nome ou slug..."
-            className="w-full bg-white/5 border border-white/10 focus:border-blue-500/50 rounded-xl pl-10 pr-4 py-2.5 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all"
+            className="w-full bg-white border border-gray-200 focus:border-violet-400 rounded-xl pl-10 pr-4 py-2.5 text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all"
           />
         </div>
       </div>
 
       {/* Table */}
       <div className="glass-card overflow-hidden">
-        <div className="p-4 border-b border-white/10">
-          <h2 className="text-sm font-semibold text-white">{filtered.length} comunidade(s)</h2>
+        <div className="p-4 border-b border-gray-200">
+          <h2 className="text-sm font-semibold text-gray-900">{filtered.length} comunidade(s)</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/5">
+              <tr className="border-b border-gray-100">
                 <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-4 py-3">Comunidade</th>
                 <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-4 py-3 hidden md:table-cell">Influencer</th>
                 <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-4 py-3 hidden sm:table-cell">Membros</th>
@@ -163,10 +163,10 @@ export default function AdminComunidadesPage() {
                   community.influencer.displayName ||
                   `${community.influencer.user.firstName} ${community.influencer.user.lastName}`;
                 return (
-                  <tr key={community.id} className="hover:bg-white/5 transition-colors">
+                  <tr key={community.id} className="hover:bg-violet-50 transition-colors">
                     <td className="px-4 py-3">
                       <div>
-                        <p className="text-sm font-medium text-white">{community.name}</p>
+                        <p className="text-sm font-medium text-gray-900">{community.name}</p>
                         <p className="text-xs text-gray-500">/{community.slug}</p>
                       </div>
                     </td>
@@ -195,7 +195,7 @@ export default function AdminComunidadesPage() {
                     </td>
                     <td className="px-4 py-3">
                       {actionLoading === community.id ? (
-                        <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                        <div className="w-4 h-4 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
                       ) : (
                         <button
                           onClick={() => togglePublish(community.id, community.isPublished)}

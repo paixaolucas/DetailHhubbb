@@ -57,7 +57,7 @@ export function BuyButton({ listingId, price, title }: BuyButtonProps) {
       <button
         onClick={handleBuy}
         disabled={isLoading}
-        className="bg-blue-600 hover:bg-blue-500 disabled:opacity-60 disabled:cursor-not-allowed text-white px-4 py-2 rounded-xl text-xs font-semibold transition-all hover:shadow-lg hover:shadow-blue-500/30 active:scale-95 flex items-center gap-1.5"
+        className="bg-violet-600 hover:bg-violet-500 disabled:opacity-60 disabled:cursor-not-allowed text-white px-4 py-2 rounded-xl text-xs font-semibold transition-all hover:shadow-lg hover:shadow-violet-500/30 active:scale-95 flex items-center gap-1.5"
       >
         {isLoading ? (
           <>

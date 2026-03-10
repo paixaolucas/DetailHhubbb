@@ -15,7 +15,7 @@ import {
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 const STATUS_COLORS: Record<string, string> = {
-  SCHEDULED: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  SCHEDULED: "bg-violet-500/10 text-violet-400 border-violet-500/20",
   LIVE: "bg-red-500/10 text-red-400 border-red-500/20",
   ENDED: "bg-gray-500/10 text-gray-400 border-gray-500/20",
   CANCELED: "bg-orange-500/10 text-orange-400 border-orange-500/20",
@@ -47,7 +47,7 @@ interface Community {
 }
 
 function fieldClass() {
-  return "w-full bg-white/5 border border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all text-sm";
+  return "w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm";
 }
 
 export default function LivePage() {
@@ -205,7 +205,7 @@ export default function LivePage() {
     return (
       <div className="space-y-4 animate-pulse max-w-4xl">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="bg-white/5 border border-white/10 rounded-2xl h-24" />
+          <div key={i} className="bg-white border border-gray-200 rounded-2xl h-24" />
         ))}
       </div>
     );
@@ -219,12 +219,12 @@ export default function LivePage() {
     <div className="space-y-6 max-w-4xl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Lives</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Lives</h1>
           <p className="text-gray-400 text-sm mt-1">Agende e gerencie suas sessões ao vivo</p>
         </div>
         <button
           onClick={() => { setEditingSession(null); setShowNewForm(!showNewForm); if (!form.scheduledAt) setForm((p) => ({ ...p, scheduledAt: getDefaultDateTime() })); }}
-          className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-cyan-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-blue-500/30"
+          className="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-purple-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-violet-500/30"
         >
           <Plus className="w-4 h-4" />
           Agendar Live
@@ -234,13 +234,13 @@ export default function LivePage() {
       {/* New form */}
       {showNewForm && (
         <form onSubmit={editingSession ? handleUpdate : handleCreate} className="glass-card p-6 space-y-4">
-          <h2 className="text-base font-semibold text-white">{editingSession ? "Editar Live" : "Nova Sessão ao Vivo"}</h2>
+          <h2 className="text-base font-semibold text-gray-900">{editingSession ? "Editar Live" : "Nova Sessão ao Vivo"}</h2>
           {error && <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-xl">{error}</div>}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {communities.length > 1 && (
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">Comunidade</label>
+                <label className="block text-sm font-medium text-gray-600 mb-1.5">Comunidade</label>
                 <select value={form.communityId} onChange={(e) => setForm((p) => ({ ...p, communityId: e.target.value }))} className={fieldClass()} required>
                   {communities.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
@@ -248,22 +248,22 @@ export default function LivePage() {
             )}
 
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Título da live *</label>
+              <label className="block text-sm font-medium text-gray-600 mb-1.5">Título da live *</label>
               <input type="text" value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} placeholder="Ex: Masterclass: Diagnóstico OBD2" className={fieldClass()} required />
             </div>
 
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Descrição</label>
+              <label className="block text-sm font-medium text-gray-600 mb-1.5">Descrição</label>
               <textarea value={form.description} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} placeholder="O que será abordado..." rows={2} className={`${fieldClass()} resize-none`} />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Data e hora *</label>
+              <label className="block text-sm font-medium text-gray-600 mb-1.5">Data e hora *</label>
               <input type="datetime-local" value={form.scheduledAt} onChange={(e) => setForm((p) => ({ ...p, scheduledAt: e.target.value }))} className={fieldClass()} required />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Limite de participantes</label>
+              <label className="block text-sm font-medium text-gray-600 mb-1.5">Limite de participantes</label>
               <input type="number" value={form.maxAttendees} onChange={(e) => setForm((p) => ({ ...p, maxAttendees: e.target.value }))} placeholder="Ilimitado" min="1" className={fieldClass()} />
             </div>
           </div>
@@ -273,12 +273,12 @@ export default function LivePage() {
               { key: "isRecorded", label: "Gravar sessão" },
               { key: "isPublic", label: "Sessão pública" },
             ].map(({ key, label }) => (
-              <label key={key} className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+              <label key={key} className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={form[key as keyof typeof form] as boolean}
                   onChange={(e) => setForm((p) => ({ ...p, [key]: e.target.checked }))}
-                  className="w-4 h-4 rounded border-white/20 bg-white/5"
+                  className="w-4 h-4 rounded border-gray-200 bg-white"
                 />
                 {label}
               </label>
@@ -286,10 +286,10 @@ export default function LivePage() {
           </div>
 
           <div className="flex gap-3">
-            <button type="submit" disabled={saving} className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
+            <button type="submit" disabled={saving} className="bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
               {saving ? "Salvando..." : editingSession ? "Salvar Alterações" : "Agendar Live"}
             </button>
-            <button type="button" onClick={() => { setShowNewForm(false); setEditingSession(null); }} className="px-5 py-2.5 border border-white/20 hover:border-white/40 rounded-xl text-sm text-gray-300 hover:text-white transition-all">
+            <button type="button" onClick={() => { setShowNewForm(false); setEditingSession(null); }} className="px-5 py-2.5 border border-gray-200 hover:border-gray-300 rounded-xl text-sm text-gray-600 hover:text-gray-900 transition-all">
               Cancelar
             </button>
           </div>
@@ -334,9 +334,9 @@ export default function LivePage() {
           <div className="w-20 h-20 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Video className="w-10 h-10 text-red-400" />
           </div>
-          <h3 className="text-xl font-semibold text-white mb-2">Nenhuma live agendada</h3>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">Nenhuma live agendada</h3>
           <p className="text-gray-400 text-sm mb-6">Agende sua primeira sessão ao vivo para engajar sua audiência.</p>
-          <button onClick={() => setShowNewForm(true)} className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
+          <button onClick={() => setShowNewForm(true)} className="bg-violet-600 hover:bg-violet-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
             Agendar Live
           </button>
         </div>
@@ -364,7 +364,7 @@ function SessionCard({ session, onStatusChange, onDelete, onEdit, formatDate }: 
 }) {
   const statusClass = STATUS_COLORS[session.status] ?? "bg-gray-500/10 text-gray-400 border-gray-500/20";
   return (
-    <div className={`glass-card p-5 hover:border-white/20 transition-all ${session.status === "LIVE" ? "border-red-500/30" : ""}`}>
+    <div className={`glass-card p-5 hover:border-violet-200 transition-all ${session.status === "LIVE" ? "border-red-500/30" : ""}`}>
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -376,7 +376,7 @@ function SessionCard({ session, onStatusChange, onDelete, onEdit, formatDate }: 
               <span className="text-xs text-gray-500">{session.community.name}</span>
             )}
           </div>
-          <h3 className="font-semibold text-white">{session.title}</h3>
+          <h3 className="font-semibold text-gray-900">{session.title}</h3>
           {session.description && <p className="text-sm text-gray-400 mt-1 line-clamp-1">{session.description}</p>}
           <div className="flex items-center gap-4 mt-2">
             <span className="flex items-center gap-1 text-xs text-gray-500">
@@ -393,7 +393,7 @@ function SessionCard({ session, onStatusChange, onDelete, onEdit, formatDate }: 
         <div className="flex items-center gap-1 flex-shrink-0">
           {session.status === "SCHEDULED" && (
             <>
-              <button onClick={() => onEdit(session)} className="flex items-center gap-1.5 text-xs bg-white/5 text-gray-300 hover:bg-white/10 border border-white/10 px-2.5 py-1.5 rounded-xl font-medium transition-colors">
+              <button onClick={() => onEdit(session)} className="flex items-center gap-1.5 text-xs bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 px-2.5 py-1.5 rounded-xl font-medium transition-colors">
                 <Pencil className="w-3.5 h-3.5" />
                 Editar
               </button>

@@ -20,7 +20,7 @@ const chartStyle = {
   axis: { tick: { fontSize: 11, fill: "#6b7280" }, tickLine: false, axisLine: false },
   tooltip: {
     contentStyle: {
-      backgroundColor: "#1f2937",
+      backgroundColor: "#16152A",
       border: "1px solid rgba(255,255,255,0.1)",
       borderRadius: "12px",
       color: "#f9fafb",
@@ -36,12 +36,12 @@ function KpiCard({
   icon: React.ElementType; trend?: string; trendPositive?: boolean;
 }) {
   return (
-    <div className="glass-card p-5 hover:border-white/20 transition-all group">
+    <div className="glass-card p-5 hover:border-violet-200 transition-all group">
       <div className="flex items-center justify-between mb-3">
         <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</p>
-        <Icon className="w-4 h-4 text-blue-400" />
+        <Icon className="w-4 h-4 text-violet-400" />
       </div>
-      <p className="text-2xl font-bold text-white mb-1">{value}</p>
+      <p className="text-2xl font-bold text-gray-900 mb-1">{value}</p>
       <div className="flex items-center gap-1">
         {trend && (
           <span className={`text-xs font-medium flex items-center gap-0.5 ${trendPositive ? "text-green-400" : "text-red-400"}`}>
@@ -107,20 +107,20 @@ export default function AnalyticsPage() {
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-8 bg-white/10 rounded-xl w-32" />
+        <div className="h-8 bg-gray-50 rounded-xl w-32" />
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="glass-card p-5 space-y-3">
               <div className="flex justify-between">
-                <div className="h-3 bg-white/10 rounded w-20" />
-                <div className="w-4 h-4 bg-white/10 rounded" />
+                <div className="h-3 bg-gray-50 rounded w-20" />
+                <div className="w-4 h-4 bg-gray-50 rounded" />
               </div>
-              <div className="h-7 bg-white/10 rounded w-28" />
-              <div className="h-3 bg-white/10 rounded w-24" />
+              <div className="h-7 bg-gray-50 rounded w-28" />
+              <div className="h-3 bg-gray-50 rounded w-24" />
             </div>
           ))}
         </div>
-        <div className="glass-card p-6 h-64 bg-white/5" />
+        <div className="glass-card p-6 h-64 bg-white" />
       </div>
     );
   }
@@ -148,11 +148,11 @@ export default function AnalyticsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-white">Analytics</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
           <p className="text-gray-400 text-sm mt-1">
             Métricas da sua plataforma automotiva
             {communityId && data?.communities && (
-              <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400">
+              <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400">
                 {data.communities.find((c: any) => c.id === communityId)?.name ?? "Comunidade"}
               </span>
             )}
@@ -165,14 +165,14 @@ export default function AnalyticsPage() {
                 key={p}
                 onClick={() => setPeriod(p)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                  period === p ? "bg-blue-600 text-white" : "text-gray-400 hover:text-white"
+                  period === p ? "bg-violet-600 text-white" : "text-gray-400 hover:text-gray-900"
                 }`}
               >
                 {PERIOD_LABELS[p]}
               </button>
             ))}
           </div>
-          <button onClick={exportCSV} className="flex items-center gap-2 px-4 py-2 glass-card hover:border-white/20 text-gray-300 hover:text-white text-sm font-medium transition-all rounded-xl">
+          <button onClick={exportCSV} className="flex items-center gap-2 px-4 py-2 glass-card hover:border-violet-200 text-gray-600 hover:text-gray-900 text-sm font-medium transition-all rounded-xl">
             <Download className="w-4 h-4" />
             Exportar CSV
           </button>
@@ -216,13 +216,13 @@ export default function AnalyticsPage() {
 
       {/* Revenue chart */}
       <div className="glass-card p-6">
-        <h2 className="text-base font-semibold text-white mb-6">Receita & Assinaturas (30 dias)</h2>
+        <h2 className="text-base font-semibold text-gray-900 mb-6">Receita & Assinaturas (30 dias)</h2>
         <ResponsiveContainer width="100%" height={300}>
           <AreaChart data={timeSeries}>
             <defs>
               <linearGradient id="revGrad2" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid {...chartStyle.grid} />
@@ -238,7 +238,7 @@ export default function AnalyticsPage() {
               yAxisId="revenue"
               type="monotone"
               dataKey="revenue"
-              stroke="#3b82f6"
+              stroke="#8b5cf6"
               fill="url(#revGrad2)"
               strokeWidth={2}
               name="Receita (R$)"
@@ -251,34 +251,34 @@ export default function AnalyticsPage() {
       {/* Analytics Events widget (admin only) */}
       {role === "SUPER_ADMIN" && (
         <div className="glass-card overflow-hidden">
-          <div className="p-5 border-b border-white/10 flex items-center justify-between flex-wrap gap-3">
+          <div className="p-5 border-b border-gray-200 flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-2">
               <Zap className="w-4 h-4 text-yellow-400" />
-              <h2 className="text-base font-semibold text-white">Eventos Recentes</h2>
+              <h2 className="text-base font-semibold text-gray-900">Eventos Recentes</h2>
             </div>
             <div className="flex items-center gap-2">
               <select
                 value={eventFilter}
                 onChange={(e) => setEventFilter(e.target.value)}
-                className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500/50"
+                className="bg-white border border-gray-200 rounded-xl px-3 py-1.5 text-sm text-gray-900 focus:outline-none focus:border-violet-400"
               >
-                <option value="" className="bg-gray-900">Todos os tipos</option>
+                <option value="" className="bg-white">Todos os tipos</option>
                 {events.map((e) => (
-                  <option key={e.type} value={e.type} className="bg-gray-900">{e.type} ({e.count})</option>
+                  <option key={e.type} value={e.type} className="bg-white">{e.type} ({e.count})</option>
                 ))}
               </select>
             </div>
           </div>
           {events.length > 0 && (
-            <div className="p-4 border-b border-white/5 flex flex-wrap gap-2">
+            <div className="p-4 border-b border-gray-100 flex flex-wrap gap-2">
               {events.slice(0, 8).map((e) => (
                 <span
                   key={e.type}
                   onClick={() => setEventFilter(eventFilter === e.type ? "" : e.type)}
                   className={`text-xs px-2.5 py-1 rounded-full border cursor-pointer transition-colors ${
                     eventFilter === e.type
-                      ? "bg-blue-600/30 border-blue-500/50 text-blue-300"
-                      : "bg-white/5 border-white/10 text-gray-400 hover:border-white/20 hover:text-white"
+                      ? "bg-violet-600/30 border-violet-500/50 text-violet-300"
+                      : "bg-white border-gray-200 text-gray-400 hover:border-violet-200 hover:text-gray-900"
                   }`}
                 >
                   {e.type} · {e.count}
@@ -288,7 +288,7 @@ export default function AnalyticsPage() {
           )}
           {eventsLoading ? (
             <div className="p-8 text-center">
-              <div className="w-6 h-6 border-[3px] border-blue-500 border-t-transparent rounded-full animate-spin mx-auto" />
+              <div className="w-6 h-6 border-[3px] border-violet-500 border-t-transparent rounded-full animate-spin mx-auto" />
             </div>
           ) : (
             <div className="divide-y divide-white/5">
@@ -296,13 +296,13 @@ export default function AnalyticsPage() {
                 .filter((e) => !eventFilter || e.type === eventFilter)
                 .slice(0, 15)
                 .map((e) => (
-                  <div key={e.id} className="flex items-center gap-3 px-5 py-3 hover:bg-white/5 transition-colors">
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 font-medium flex-shrink-0">
+                  <div key={e.id} className="flex items-center gap-3 px-5 py-3 hover:bg-violet-50 transition-colors">
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 font-medium flex-shrink-0">
                       {e.type}
                     </span>
                     <div className="flex-1 min-w-0">
                       {e.user && (
-                        <span className="text-sm text-gray-300">
+                        <span className="text-sm text-gray-600">
                           {e.user.firstName} {e.user.lastName}
                           <span className="text-gray-500 text-xs ml-1">({e.user.email})</span>
                         </span>
@@ -327,13 +327,13 @@ export default function AnalyticsPage() {
       {/* Influencer stats table (admin only) */}
       {role === "SUPER_ADMIN" && (
         <div className="glass-card overflow-hidden">
-          <div className="p-6 border-b border-white/10">
-            <h2 className="text-base font-semibold text-white">Receita por Influenciador</h2>
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-base font-semibold text-gray-900">Receita por Influenciador</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-white/5">
+                <tr className="bg-white">
                   {["Influenciador", "Comunidade", "MRR", "Membros", "Comissão"].map((h) => (
                     <th
                       key={h}
@@ -355,10 +355,10 @@ export default function AnalyticsPage() {
                   </tr>
                 ) : (
                   influencerStats.map((inf: any, i: number) => (
-                    <tr key={i} className="hover:bg-white/5 transition-colors">
-                      <td className="px-6 py-4 font-medium text-white">{inf.displayName}</td>
+                    <tr key={i} className="hover:bg-violet-50 transition-colors">
+                      <td className="px-6 py-4 font-medium text-gray-900">{inf.displayName}</td>
                       <td className="px-6 py-4 text-gray-400">{inf.communityName}</td>
-                      <td className="px-6 py-4 text-right font-semibold text-white">
+                      <td className="px-6 py-4 text-right font-semibold text-gray-900">
                         R$ {inf.mrr.toLocaleString("pt-BR")}
                       </td>
                       <td className="px-6 py-4 text-right text-gray-400">

@@ -27,7 +27,7 @@ interface EventCardProps {
 const STATUS_CONFIG: Record<string, { label: string; classes: string; dot?: boolean }> = {
   SCHEDULED: {
     label: "Agendada",
-    classes: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    classes: "bg-violet-500/10 text-violet-400 border-violet-500/20",
   },
   LIVE: {
     label: "Ao Vivo",
@@ -49,19 +49,19 @@ const RSVP_OPTIONS: { value: string; label: string; active: string; inactive: st
     value: "GOING",
     label: "Vou",
     active: "bg-green-600/40 border-green-500/60 text-green-300",
-    inactive: "bg-white/5 border-white/10 text-gray-500 hover:text-gray-300 hover:border-white/20",
+    inactive: "bg-white border-gray-200 text-gray-500 hover:text-gray-600 hover:border-violet-200",
   },
   {
     value: "MAYBE",
     label: "Talvez",
     active: "bg-yellow-600/30 border-yellow-500/50 text-yellow-300",
-    inactive: "bg-white/5 border-white/10 text-gray-500 hover:text-gray-300 hover:border-white/20",
+    inactive: "bg-white border-gray-200 text-gray-500 hover:text-gray-600 hover:border-violet-200",
   },
   {
     value: "NOT_GOING",
     label: "Não vou",
     active: "bg-red-600/30 border-red-500/50 text-red-300",
-    inactive: "bg-white/5 border-white/10 text-gray-500 hover:text-gray-300 hover:border-white/20",
+    inactive: "bg-white border-gray-200 text-gray-500 hover:text-gray-600 hover:border-violet-200",
   },
 ];
 
@@ -85,8 +85,8 @@ export function EventCard({ session, userRsvp, onRsvp }: EventCardProps) {
 
   return (
     <div
-      className={`bg-white/5 border rounded-2xl p-4 transition-all ${
-        isLive ? "border-red-500/30" : "border-white/10 hover:border-white/20"
+      className={`bg-white border rounded-2xl p-4 transition-all ${
+        isLive ? "border-red-500/30" : "border-gray-200 hover:border-violet-200"
       }`}
     >
       {/* Status + Title */}
@@ -102,7 +102,7 @@ export function EventCard({ session, userRsvp, onRsvp }: EventCardProps) {
               {statusConf.label}
             </span>
           </div>
-          <h3 className="text-sm font-semibold text-white leading-snug">
+          <h3 className="text-sm font-semibold text-gray-900 leading-snug">
             {session.title}
           </h3>
           {session.description && (
@@ -131,7 +131,7 @@ export function EventCard({ session, userRsvp, onRsvp }: EventCardProps) {
 
       {/* RSVP buttons — only show for future / live sessions */}
       {!isPast && (
-        <div className="flex gap-2 border-t border-white/10 pt-3">
+        <div className="flex gap-2 border-t border-gray-200 pt-3">
           {RSVP_OPTIONS.map((opt) => {
             const isActive = userRsvp === opt.value;
             return (

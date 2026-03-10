@@ -22,7 +22,7 @@ export default function SearchResults({ results, query, onClose }: SearchResults
     return (
       <div className="px-4 py-8 text-center">
         <p className="text-sm text-gray-400">
-          Nenhum resultado para <span className="text-white font-medium">"{query}"</span>
+          Nenhum resultado para <span className="text-gray-900 font-medium">"{query}"</span>
         </p>
       </div>
     );
@@ -97,9 +97,9 @@ export default function SearchResults({ results, query, onClose }: SearchResults
         </section>
       )}
 
-      <div className="border-t border-white/10 px-4 py-2">
+      <div className="border-t border-gray-200 px-4 py-2">
         <button
-          className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+          className="text-xs text-violet-400 hover:text-violet-300 transition-colors"
           onClick={() => {
             router.push(`/dashboard/search?q=${encodeURIComponent(query)}`);
             onClose();

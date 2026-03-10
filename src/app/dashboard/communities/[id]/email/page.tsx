@@ -27,7 +27,7 @@ const TRIGGER_LABELS: Record<TriggerType, string> = {
 
 const TRIGGER_COLORS: Record<TriggerType, string> = {
   ON_JOIN: "bg-green-500/20 text-green-400 border-green-500/20",
-  ON_SUBSCRIPTION: "bg-blue-500/20 text-blue-400 border-blue-500/20",
+  ON_SUBSCRIPTION: "bg-violet-500/20 text-violet-400 border-violet-500/20",
   ON_LESSON_COMPLETE: "bg-purple-500/20 text-purple-400 border-purple-500/20",
   MANUAL: "bg-gray-500/20 text-gray-400 border-gray-500/20",
 };
@@ -39,15 +39,15 @@ interface SequenceWithMeta extends EmailSequence {
 
 function SkeletonCard() {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-5 animate-pulse space-y-3">
+    <div className="bg-white border border-gray-200 rounded-2xl p-5 animate-pulse space-y-3">
       <div className="flex items-center justify-between">
-        <div className="h-4 bg-white/10 rounded w-1/3" />
-        <div className="h-5 bg-white/10 rounded w-16" />
+        <div className="h-4 bg-gray-50 rounded w-1/3" />
+        <div className="h-5 bg-gray-50 rounded w-16" />
       </div>
-      <div className="h-3 bg-white/10 rounded w-1/4" />
+      <div className="h-3 bg-gray-50 rounded w-1/4" />
       <div className="flex gap-2">
-        <div className="h-7 bg-white/10 rounded w-20" />
-        <div className="h-7 bg-white/10 rounded w-20" />
+        <div className="h-7 bg-gray-50 rounded w-20" />
+        <div className="h-7 bg-gray-50 rounded w-20" />
       </div>
     </div>
   );
@@ -167,26 +167,26 @@ export default function EmailSequencesPage() {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#111827" }}>
+    <div className="min-h-screen" style={{ backgroundColor: "#09090E" }}>
       <div className="max-w-3xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <Link
               href={`/dashboard/communities/${communityId}/settings`}
-              className="p-2 hover:bg-white/10 rounded-lg transition-colors text-gray-400 hover:text-white"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-400 hover:text-gray-900"
             >
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-2">
-              <Mail className="w-5 h-5 text-blue-400" />
-              <h1 className="text-xl font-semibold text-white">Email Marketing</h1>
+              <Mail className="w-5 h-5 text-violet-400" />
+              <h1 className="text-xl font-semibold text-gray-900">Email Marketing</h1>
             </div>
           </div>
           {!showEditor && (
             <button
               onClick={openNew}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-xl transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-violet-500 hover:bg-violet-600 text-white text-sm font-medium rounded-xl transition-colors"
             >
               <Plus className="w-4 h-4" />
               Nova Sequência
@@ -220,7 +220,7 @@ export default function EmailSequencesPage() {
             ))}
           </div>
         ) : sequences.length === 0 && !showEditor ? (
-          <div className="text-center py-16 bg-white/5 border border-dashed border-white/10 rounded-2xl">
+          <div className="text-center py-16 bg-white border border-dashed border-gray-200 rounded-2xl">
             <Mail className="w-12 h-12 text-gray-600 mx-auto mb-3" />
             <p className="text-gray-400 mb-1">Nenhuma sequência criada</p>
             <p className="text-gray-600 text-sm mb-5">
@@ -228,7 +228,7 @@ export default function EmailSequencesPage() {
             </p>
             <button
               onClick={openNew}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-xl transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-violet-500 hover:bg-violet-600 text-white text-sm font-medium rounded-xl transition-colors"
             >
               <Plus className="w-4 h-4" />
               Criar primeira sequência
@@ -244,12 +244,12 @@ export default function EmailSequencesPage() {
               return (
                 <div
                   key={seq.id}
-                  className="bg-white/5 border border-white/10 hover:border-white/20 rounded-2xl p-5 transition-colors"
+                  className="bg-white border border-gray-200 hover:border-violet-200 rounded-2xl p-5 transition-colors"
                 >
                   <div className="flex items-start gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-2">
-                        <h3 className="text-sm font-semibold text-white truncate">
+                        <h3 className="text-sm font-semibold text-gray-900 truncate">
                           {seq.name}
                         </h3>
                         <span
@@ -279,7 +279,7 @@ export default function EmailSequencesPage() {
                       onClick={() => handleToggleActive(seq)}
                       disabled={togglingId === seq.id}
                       className={`relative w-9 h-5 rounded-full transition-colors flex-shrink-0 ${
-                        seq.isActive ? "bg-blue-500" : "bg-white/10"
+                        seq.isActive ? "bg-violet-500" : "bg-gray-50"
                       } disabled:opacity-50`}
                     >
                       <span
@@ -294,7 +294,7 @@ export default function EmailSequencesPage() {
                   <div className="flex items-center gap-2 mt-4">
                     <button
                       onClick={() => openEdit(seq)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-400 hover:text-gray-900 bg-white hover:bg-gray-100 border border-gray-200 rounded-lg transition-colors"
                     >
                       <Pencil className="w-3 h-3" />
                       Editar

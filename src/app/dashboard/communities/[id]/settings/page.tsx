@@ -22,7 +22,7 @@ const TABS = [
 
 const COLORS = [
   "#6366f1", "#8b5cf6", "#ec4899", "#ef4444",
-  "#f97316", "#eab308", "#22c55e", "#06b6d4", "#3b82f6", "#64748b",
+  "#f97316", "#eab308", "#22c55e", "#06b6d4", "#8b5cf6", "#64748b",
 ];
 
 
@@ -56,7 +56,7 @@ interface Testimonial {
 }
 
 function fieldClass() {
-  return "w-full bg-white/5 border border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all text-sm";
+  return "w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm";
 }
 
 export default function CommunitySettingsPage() {
@@ -83,7 +83,7 @@ export default function CommunitySettingsPage() {
   });
 
   const [appearanceForm, setAppearanceForm] = useState({
-    primaryColor: "#3b82f6", logoUrl: "", bannerUrl: "",
+    primaryColor: "#8b5cf6", logoUrl: "", bannerUrl: "",
   });
 
   // Points allocation modal
@@ -133,7 +133,7 @@ export default function CommunitySettingsPage() {
           isPrivate: c.isPrivate ?? false,
         });
         setAppearanceForm({
-          primaryColor: c.primaryColor ?? "#3b82f6",
+          primaryColor: c.primaryColor ?? "#8b5cf6",
           logoUrl: c.logoUrl ?? "", bannerUrl: (c as any).bannerUrl ?? "",
         });
       }
@@ -390,7 +390,7 @@ export default function CommunitySettingsPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-[3px] border-blue-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-[3px] border-violet-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -399,7 +399,7 @@ export default function CommunitySettingsPage() {
     return (
       <div className="glass-card p-8 text-center">
         <p className="text-gray-400">Comunidade não encontrada.</p>
-        <Link href="/dashboard/communities" className="text-blue-400 hover:text-blue-300 text-sm mt-2 inline-block">← Voltar</Link>
+        <Link href="/dashboard/communities" className="text-violet-400 hover:text-violet-300 text-sm mt-2 inline-block">← Voltar</Link>
       </div>
     );
   }
@@ -407,11 +407,11 @@ export default function CommunitySettingsPage() {
   return (
     <div className="max-w-3xl">
       <div className="flex items-center gap-3 mb-6">
-        <Link href="/dashboard/communities" className="p-2 text-gray-500 hover:text-white hover:bg-white/10 rounded-xl transition-all">
+        <Link href="/dashboard/communities" className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all">
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-white">Configurações</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Configurações</h1>
           <p className="text-gray-400 text-sm mt-0.5">{community.name}</p>
         </div>
       </div>
@@ -429,8 +429,8 @@ export default function CommunitySettingsPage() {
           }}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 ${
               activeTab === id
-                ? id === "danger" ? "bg-red-600 text-white" : "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
-                : id === "danger" ? "text-red-400 hover:text-red-300 hover:bg-red-500/10" : "text-gray-400 hover:text-white hover:bg-white/10"
+                ? id === "danger" ? "bg-red-600 text-white" : "bg-violet-600 text-white shadow-lg shadow-violet-500/20"
+                : id === "danger" ? "text-red-400 hover:text-red-300 hover:bg-red-500/10" : "text-gray-400 hover:text-gray-900 hover:bg-gray-100"
             }`}
           >
             <Icon className="w-4 h-4" />
@@ -453,46 +453,46 @@ export default function CommunitySettingsPage() {
             <OnboardingChecklist community={community} />
           )}
         <div className="glass-card p-6 space-y-4">
-          <h2 className="text-base font-semibold text-white">Informações Gerais</h2>
+          <h2 className="text-base font-semibold text-gray-900">Informações Gerais</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Nome *</label>
+              <label className="block text-sm font-medium text-gray-600 mb-1.5">Nome *</label>
               <input type="text" value={generalForm.name} onChange={(e) => setGeneralForm((p) => ({ ...p, name: e.target.value }))} className={fieldClass()} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Slug (URL)</label>
+              <label className="block text-sm font-medium text-gray-600 mb-1.5">Slug (URL)</label>
               <input type="text" value={generalForm.slug} onChange={(e) => setGeneralForm((p) => ({ ...p, slug: e.target.value }))} className={fieldClass()} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Tags</label>
+              <label className="block text-sm font-medium text-gray-600 mb-1.5">Tags</label>
               <input type="text" value={generalForm.tags} onChange={(e) => setGeneralForm((p) => ({ ...p, tags: e.target.value }))} placeholder="tuning, racing" className={fieldClass()} />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Descrição curta</label>
+              <label className="block text-sm font-medium text-gray-600 mb-1.5">Descrição curta</label>
               <input type="text" value={generalForm.shortDescription} onChange={(e) => setGeneralForm((p) => ({ ...p, shortDescription: e.target.value }))} className={fieldClass()} maxLength={160} />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Descrição completa</label>
+              <label className="block text-sm font-medium text-gray-600 mb-1.5">Descrição completa</label>
               <textarea value={generalForm.description} onChange={(e) => setGeneralForm((p) => ({ ...p, description: e.target.value }))} rows={4} className={`${fieldClass()} resize-none`} />
             </div>
             <div className="flex items-center gap-3 pt-6">
               <label className="flex items-center gap-2 cursor-pointer">
-                <div onClick={() => setGeneralForm((p) => ({ ...p, isPrivate: !p.isPrivate }))} className={`w-11 h-6 rounded-full transition-colors relative ${generalForm.isPrivate ? "bg-blue-600" : "bg-white/10"}`}>
+                <div onClick={() => setGeneralForm((p) => ({ ...p, isPrivate: !p.isPrivate }))} className={`w-11 h-6 rounded-full transition-colors relative ${generalForm.isPrivate ? "bg-violet-600" : "bg-gray-50"}`}>
                   <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${generalForm.isPrivate ? "translate-x-5" : "translate-x-0.5"}`} />
                 </div>
-                <span className="text-sm text-gray-300">Privada</span>
+                <span className="text-sm text-gray-600">Privada</span>
               </label>
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Mensagem de boas-vindas</label>
+              <label className="block text-sm font-medium text-gray-600 mb-1.5">Mensagem de boas-vindas</label>
               <textarea value={generalForm.welcomeMessage} onChange={(e) => setGeneralForm((p) => ({ ...p, welcomeMessage: e.target.value }))} rows={3} className={`${fieldClass()} resize-none`} />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Regras</label>
+              <label className="block text-sm font-medium text-gray-600 mb-1.5">Regras</label>
               <textarea value={generalForm.rules} onChange={(e) => setGeneralForm((p) => ({ ...p, rules: e.target.value }))} rows={3} className={`${fieldClass()} resize-none`} />
             </div>
           </div>
-          <button onClick={() => save({ name: generalForm.name, slug: generalForm.slug, description: generalForm.description || undefined, shortDescription: generalForm.shortDescription || undefined, tags: generalForm.tags ? generalForm.tags.split(",").map((t) => t.trim()).filter(Boolean) : [], welcomeMessage: generalForm.welcomeMessage || undefined, rules: generalForm.rules || undefined, isPrivate: generalForm.isPrivate })} disabled={saving} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
+          <button onClick={() => save({ name: generalForm.name, slug: generalForm.slug, description: generalForm.description || undefined, shortDescription: generalForm.shortDescription || undefined, tags: generalForm.tags ? generalForm.tags.split(",").map((t) => t.trim()).filter(Boolean) : [], welcomeMessage: generalForm.welcomeMessage || undefined, rules: generalForm.rules || undefined, isPrivate: generalForm.isPrivate })} disabled={saving} className="flex items-center gap-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
             {saving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Save className="w-4 h-4" />}
             {saving ? "Salvando..." : "Salvar"}
           </button>
@@ -503,9 +503,9 @@ export default function CommunitySettingsPage() {
       {/* APPEARANCE */}
       {activeTab === "appearance" && (
         <div className="glass-card p-6 space-y-5">
-          <h2 className="text-base font-semibold text-white">Aparência</h2>
+          <h2 className="text-base font-semibold text-gray-900">Aparência</h2>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-3">Cor principal</label>
+            <label className="block text-sm font-medium text-gray-600 mb-3">Cor principal</label>
             <div className="flex flex-wrap gap-2">
               {COLORS.map((color) => (
                 <button key={color} type="button" onClick={() => setAppearanceForm((p) => ({ ...p, primaryColor: color }))}
@@ -517,33 +517,33 @@ export default function CommunitySettingsPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">URL do Logo</label>
+              <label className="block text-sm font-medium text-gray-600 mb-1.5">URL do Logo</label>
               <input type="url" value={appearanceForm.logoUrl} onChange={(e) => setAppearanceForm((p) => ({ ...p, logoUrl: e.target.value }))} placeholder="https://..." className={fieldClass()} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">URL da Capa</label>
+              <label className="block text-sm font-medium text-gray-600 mb-1.5">URL da Capa</label>
               <input type="url" value={appearanceForm.bannerUrl} onChange={(e) => setAppearanceForm((p) => ({ ...p, bannerUrl: e.target.value }))} placeholder="https://..." className={fieldClass()} />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-3">Preview</label>
-            <div className="border border-white/10 rounded-xl overflow-hidden max-w-xs">
+            <label className="block text-sm font-medium text-gray-600 mb-3">Preview</label>
+            <div className="border border-gray-200 rounded-xl overflow-hidden max-w-xs">
               {appearanceForm.bannerUrl ? (
                 <img src={appearanceForm.bannerUrl} alt="cover" className="h-20 w-full object-cover" />
               ) : (
                 <div className="h-20 relative grid-pattern opacity-20" style={{ backgroundColor: appearanceForm.primaryColor }} />
               )}
-              <div className="p-4 bg-white/5">
+              <div className="p-4 bg-white">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold -mt-6 border-2 border-gray-900" style={{ backgroundColor: appearanceForm.primaryColor }}>
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-900 font-bold -mt-6 border-2 border-gray-900" style={{ backgroundColor: appearanceForm.primaryColor }}>
                     {community.name.charAt(0)}
                   </div>
-                  <p className="font-semibold text-sm text-white">{community.name}</p>
+                  <p className="font-semibold text-sm text-gray-900">{community.name}</p>
                 </div>
               </div>
             </div>
           </div>
-          <button onClick={() => save({ primaryColor: appearanceForm.primaryColor, logoUrl: appearanceForm.logoUrl || undefined, bannerUrl: appearanceForm.bannerUrl || undefined })} disabled={saving} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
+          <button onClick={() => save({ primaryColor: appearanceForm.primaryColor, logoUrl: appearanceForm.logoUrl || undefined, bannerUrl: appearanceForm.bannerUrl || undefined })} disabled={saving} className="flex items-center gap-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
             {saving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Save className="w-4 h-4" />}
             {saving ? "Salvando..." : "Salvar"}
           </button>
@@ -554,45 +554,45 @@ export default function CommunitySettingsPage() {
       {activeTab === "plans" && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-white">Planos de Assinatura</h2>
-            <button onClick={() => setShowNewPlan(true)} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all">
+            <h2 className="text-base font-semibold text-gray-900">Planos de Assinatura</h2>
+            <button onClick={() => setShowNewPlan(true)} className="flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all">
               <Plus className="w-4 h-4" /> Novo Plano
             </button>
           </div>
 
           {showNewPlan && (
             <div className="glass-card p-6 space-y-4">
-              <h3 className="text-sm font-semibold text-white">Novo Plano</h3>
+              <h3 className="text-sm font-semibold text-gray-900">Novo Plano</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">Nome *</label>
+                  <label className="block text-sm font-medium text-gray-600 mb-1.5">Nome *</label>
                   <input type="text" value={planForm.name} onChange={(e) => setPlanForm((p) => ({ ...p, name: e.target.value }))} placeholder="Membro Premium" className={fieldClass()} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">Preço (R$) *</label>
+                  <label className="block text-sm font-medium text-gray-600 mb-1.5">Preço (R$) *</label>
                   <input type="number" value={planForm.price} onChange={(e) => setPlanForm((p) => ({ ...p, price: e.target.value }))} placeholder="97.00" min="0.01" step="0.01" className={fieldClass()} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">Intervalo</label>
-                  <select value={planForm.interval} onChange={(e) => setPlanForm((p) => ({ ...p, interval: e.target.value }))} className={`${fieldClass()} bg-[#111827]`}>
+                  <label className="block text-sm font-medium text-gray-600 mb-1.5">Intervalo</label>
+                  <select value={planForm.interval} onChange={(e) => setPlanForm((p) => ({ ...p, interval: e.target.value }))} className={`${fieldClass()} bg-[#F8F7FF]`}>
                     <option value="month">Mensal</option>
                     <option value="year">Anual</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">Dias de Trial</label>
+                  <label className="block text-sm font-medium text-gray-600 mb-1.5">Dias de Trial</label>
                   <input type="number" value={planForm.trialDays} onChange={(e) => setPlanForm((p) => ({ ...p, trialDays: e.target.value }))} min="0" className={fieldClass()} />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">Benefícios (um por linha)</label>
+                  <label className="block text-sm font-medium text-gray-600 mb-1.5">Benefícios (um por linha)</label>
                   <textarea value={planForm.features} onChange={(e) => setPlanForm((p) => ({ ...p, features: e.target.value }))} placeholder={"Acesso a todos os módulos\nLives ao vivo"} rows={3} className={`${fieldClass()} resize-none`} />
                 </div>
               </div>
               <div className="flex gap-3">
-                <button onClick={createPlan} disabled={saving || !planForm.name || !planForm.price} className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
+                <button onClick={createPlan} disabled={saving || !planForm.name || !planForm.price} className="bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
                   {saving ? "Criando..." : "Criar Plano"}
                 </button>
-                <button onClick={() => setShowNewPlan(false)} className="px-5 py-2.5 border border-white/20 hover:border-white/40 rounded-xl text-sm text-gray-300 hover:text-white transition-all">
+                <button onClick={() => setShowNewPlan(false)} className="px-5 py-2.5 border border-gray-200 hover:border-gray-300 rounded-xl text-sm text-gray-600 hover:text-gray-900 transition-all">
                   Cancelar
                 </button>
               </div>
@@ -607,14 +607,14 @@ export default function CommunitySettingsPage() {
           ) : (
             <div className="space-y-3">
               {plans.map((plan) => (
-                <div key={plan.id} className={`glass-card p-5 ${plan.isDefault ? "border-blue-500/40" : ""}`}>
+                <div key={plan.id} className={`glass-card p-5 ${plan.isDefault ? "border-violet-500/40" : ""}`}>
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-white">{plan.name}</h3>
-                        {plan.isDefault && <span className="text-xs bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-full">Padrão</span>}
+                        <h3 className="font-semibold text-gray-900">{plan.name}</h3>
+                        {plan.isDefault && <span className="text-xs bg-violet-500/10 text-violet-400 border border-violet-500/20 px-2 py-0.5 rounded-full">Padrão</span>}
                       </div>
-                      <p className="text-xl font-bold text-white">
+                      <p className="text-xl font-bold text-gray-900">
                         R$ {Number(plan.price).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                         <span className="text-sm font-normal text-gray-400">/{plan.interval === "month" ? "mês" : "ano"}</span>
                       </p>
@@ -638,7 +638,7 @@ export default function CommunitySettingsPage() {
       {/* MEMBERS */}
       {activeTab === "members" && (
         <div className="space-y-4">
-          <h2 className="text-base font-semibold text-white">Membros ({members.length})</h2>
+          <h2 className="text-base font-semibold text-gray-900">Membros ({members.length})</h2>
           {members.length === 0 ? (
             <div className="glass-card p-12 text-center">
               <Users className="w-10 h-10 text-gray-500 mx-auto mb-3" />
@@ -648,12 +648,12 @@ export default function CommunitySettingsPage() {
             <div className="glass-card overflow-hidden">
               <div className="divide-y divide-white/5">
                 {members.map((member) => (
-                  <div key={member.id} className="flex items-center gap-3 p-4 hover:bg-white/5 transition-colors">
-                    <div className="w-9 h-9 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400 font-semibold text-sm flex-shrink-0">
+                  <div key={member.id} className="flex items-center gap-3 p-4 hover:bg-violet-50 transition-colors">
+                    <div className="w-9 h-9 bg-violet-500/20 rounded-xl flex items-center justify-center text-violet-400 font-semibold text-sm flex-shrink-0">
                       {member.user.firstName.charAt(0)}{member.user.lastName.charAt(0)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-white">{member.user.firstName} {member.user.lastName}</p>
+                      <p className="text-sm font-medium text-gray-900">{member.user.firstName} {member.user.lastName}</p>
                       <p className="text-xs text-gray-500">{member.user.email}</p>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
@@ -693,10 +693,10 @@ export default function CommunitySettingsPage() {
       {activeTab === "faq" && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-white">Perguntas Frequentes</h2>
+            <h2 className="text-base font-semibold text-gray-900">Perguntas Frequentes</h2>
             <button
               onClick={() => { setShowNewFaq(true); setEditingFaq(null); setFaqForm({ question: "", answer: "", sortOrder: "0" }); }}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all"
+              className="flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all"
             >
               <Plus className="w-4 h-4" /> Nova Pergunta
             </button>
@@ -704,9 +704,9 @@ export default function CommunitySettingsPage() {
 
           {(showNewFaq || editingFaq) && (
             <div className="glass-card p-6 space-y-4">
-              <h3 className="text-sm font-semibold text-white">{editingFaq ? "Editar Pergunta" : "Nova Pergunta"}</h3>
+              <h3 className="text-sm font-semibold text-gray-900">{editingFaq ? "Editar Pergunta" : "Nova Pergunta"}</h3>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">Pergunta *</label>
+                <label className="block text-sm font-medium text-gray-600 mb-1.5">Pergunta *</label>
                 <input
                   type="text"
                   value={faqForm.question}
@@ -716,7 +716,7 @@ export default function CommunitySettingsPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">Resposta *</label>
+                <label className="block text-sm font-medium text-gray-600 mb-1.5">Resposta *</label>
                 <textarea
                   value={faqForm.answer}
                   onChange={(e) => setFaqForm((p) => ({ ...p, answer: e.target.value }))}
@@ -726,7 +726,7 @@ export default function CommunitySettingsPage() {
                 />
               </div>
               <div className="w-32">
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">Ordem</label>
+                <label className="block text-sm font-medium text-gray-600 mb-1.5">Ordem</label>
                 <input
                   type="number"
                   value={faqForm.sortOrder}
@@ -739,13 +739,13 @@ export default function CommunitySettingsPage() {
                 <button
                   onClick={() => (editingFaq ? updateFaq(editingFaq) : createFaq())}
                   disabled={saving || !faqForm.question || !faqForm.answer}
-                  className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all"
+                  className="bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all"
                 >
                   {saving ? "Salvando..." : editingFaq ? "Atualizar" : "Adicionar"}
                 </button>
                 <button
                   onClick={() => { setShowNewFaq(false); setEditingFaq(null); setFaqForm({ question: "", answer: "", sortOrder: "0" }); }}
-                  className="px-5 py-2.5 border border-white/20 hover:border-white/40 rounded-xl text-sm text-gray-300 hover:text-white transition-all"
+                  className="px-5 py-2.5 border border-gray-200 hover:border-gray-300 rounded-xl text-sm text-gray-600 hover:text-gray-900 transition-all"
                 >
                   Cancelar
                 </button>
@@ -764,7 +764,7 @@ export default function CommunitySettingsPage() {
                 <div key={faq.id} className="glass-card p-5">
                   <div className="flex items-start gap-3">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-white mb-1">{faq.question}</p>
+                      <p className="text-sm font-semibold text-gray-900 mb-1">{faq.question}</p>
                       <p className="text-xs text-gray-400 leading-relaxed">{faq.answer}</p>
                     </div>
                     <div className="flex items-center gap-1 flex-shrink-0">
@@ -774,7 +774,7 @@ export default function CommunitySettingsPage() {
                           setShowNewFaq(false);
                           setFaqForm({ question: faq.question, answer: faq.answer, sortOrder: String(faq.sortOrder) });
                         }}
-                        className="p-1.5 text-gray-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
+                        className="p-1.5 text-gray-500 hover:text-violet-400 hover:bg-violet-500/10 rounded-lg transition-colors"
                       >
                         <Pencil className="w-4 h-4" />
                       </button>
@@ -797,10 +797,10 @@ export default function CommunitySettingsPage() {
       {activeTab === "testimonials" && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-white">Depoimentos</h2>
+            <h2 className="text-base font-semibold text-gray-900">Depoimentos</h2>
             <button
               onClick={() => { setShowNewTestimonial(true); setEditingTestimonial(null); setTestimonialForm({ authorName: "", authorTitle: "", avatarUrl: "", body: "", rating: "5", sortOrder: "0" }); }}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all"
+              className="flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all"
             >
               <Plus className="w-4 h-4" /> Novo Depoimento
             </button>
@@ -808,10 +808,10 @@ export default function CommunitySettingsPage() {
 
           {(showNewTestimonial || editingTestimonial) && (
             <div className="glass-card p-6 space-y-4">
-              <h3 className="text-sm font-semibold text-white">{editingTestimonial ? "Editar Depoimento" : "Novo Depoimento"}</h3>
+              <h3 className="text-sm font-semibold text-gray-900">{editingTestimonial ? "Editar Depoimento" : "Novo Depoimento"}</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">Nome do autor *</label>
+                  <label className="block text-sm font-medium text-gray-600 mb-1.5">Nome do autor *</label>
                   <input
                     type="text"
                     value={testimonialForm.authorName}
@@ -821,7 +821,7 @@ export default function CommunitySettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">Cargo / Título</label>
+                  <label className="block text-sm font-medium text-gray-600 mb-1.5">Cargo / Título</label>
                   <input
                     type="text"
                     value={testimonialForm.authorTitle}
@@ -831,7 +831,7 @@ export default function CommunitySettingsPage() {
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">URL do Avatar</label>
+                  <label className="block text-sm font-medium text-gray-600 mb-1.5">URL do Avatar</label>
                   <input
                     type="url"
                     value={testimonialForm.avatarUrl}
@@ -841,7 +841,7 @@ export default function CommunitySettingsPage() {
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">Depoimento *</label>
+                  <label className="block text-sm font-medium text-gray-600 mb-1.5">Depoimento *</label>
                   <textarea
                     value={testimonialForm.body}
                     onChange={(e) => setTestimonialForm((p) => ({ ...p, body: e.target.value }))}
@@ -851,11 +851,11 @@ export default function CommunitySettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">Avaliação (1–5)</label>
+                  <label className="block text-sm font-medium text-gray-600 mb-1.5">Avaliação (1–5)</label>
                   <select
                     value={testimonialForm.rating}
                     onChange={(e) => setTestimonialForm((p) => ({ ...p, rating: e.target.value }))}
-                    className={`${fieldClass()} bg-[#111827]`}
+                    className={`${fieldClass()} bg-[#F8F7FF]`}
                   >
                     {[5, 4, 3, 2, 1].map((r) => (
                       <option key={r} value={r}>{"★".repeat(r)} ({r})</option>
@@ -863,7 +863,7 @@ export default function CommunitySettingsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">Ordem</label>
+                  <label className="block text-sm font-medium text-gray-600 mb-1.5">Ordem</label>
                   <input
                     type="number"
                     value={testimonialForm.sortOrder}
@@ -877,13 +877,13 @@ export default function CommunitySettingsPage() {
                 <button
                   onClick={() => (editingTestimonial ? updateTestimonial(editingTestimonial) : createTestimonial())}
                   disabled={saving || !testimonialForm.authorName || !testimonialForm.body}
-                  className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all"
+                  className="bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all"
                 >
                   {saving ? "Salvando..." : editingTestimonial ? "Atualizar" : "Adicionar"}
                 </button>
                 <button
                   onClick={() => { setShowNewTestimonial(false); setEditingTestimonial(null); setTestimonialForm({ authorName: "", authorTitle: "", avatarUrl: "", body: "", rating: "5", sortOrder: "0" }); }}
-                  className="px-5 py-2.5 border border-white/20 hover:border-white/40 rounded-xl text-sm text-gray-300 hover:text-white transition-all"
+                  className="px-5 py-2.5 border border-gray-200 hover:border-gray-300 rounded-xl text-sm text-gray-600 hover:text-gray-900 transition-all"
                 >
                   Cancelar
                 </button>
@@ -903,7 +903,7 @@ export default function CommunitySettingsPage() {
                   <div className="flex items-start gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <p className="text-sm font-semibold text-white">{t.authorName}</p>
+                        <p className="text-sm font-semibold text-gray-900">{t.authorName}</p>
                         {t.authorTitle && <span className="text-xs text-gray-500">{t.authorTitle}</span>}
                         {t.rating && (
                           <span className="text-xs text-yellow-400 flex items-center gap-0.5">
@@ -930,7 +930,7 @@ export default function CommunitySettingsPage() {
                             sortOrder: String(t.sortOrder),
                           });
                         }}
-                        className="p-1.5 text-gray-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
+                        className="p-1.5 text-gray-500 hover:text-violet-400 hover:bg-violet-500/10 rounded-lg transition-colors"
                       >
                         <Pencil className="w-4 h-4" />
                       </button>
@@ -957,7 +957,7 @@ export default function CommunitySettingsPage() {
           </h2>
           <div className="flex items-start justify-between gap-4 p-4 bg-red-500/5 border border-red-500/20 rounded-xl">
             <div>
-              <h3 className="text-sm font-semibold text-white">Arquivar comunidade</h3>
+              <h3 className="text-sm font-semibold text-gray-900">Arquivar comunidade</h3>
               <p className="text-xs text-gray-400 mt-0.5">A comunidade ficará invisível para novos membros.</p>
             </div>
             <button
@@ -974,7 +974,7 @@ export default function CommunitySettingsPage() {
           </div>
           <div className="flex items-start justify-between gap-4 p-4 bg-red-500/5 border border-red-500/20 rounded-xl">
             <div>
-              <h3 className="text-sm font-semibold text-white">Excluir comunidade</h3>
+              <h3 className="text-sm font-semibold text-gray-900">Excluir comunidade</h3>
               <p className="text-xs text-gray-400 mt-0.5">Ação irreversível. Todos os dados serão perdidos.</p>
             </div>
             <button
@@ -1012,11 +1012,11 @@ export default function CommunitySettingsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="glass-card w-full max-w-sm p-6 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-semibold text-white flex items-center gap-2">
+              <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
                 <Zap className="w-4 h-4 text-yellow-400" />
                 Dar Pontos — {pointsModal.userName}
               </h3>
-              <button onClick={() => setPointsModal({ open: false, userId: "", userName: "" })} className="text-gray-500 hover:text-white transition-colors">
+              <button onClick={() => setPointsModal({ open: false, userId: "", userName: "" })} className="text-gray-500 hover:text-gray-900 transition-colors">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -1029,7 +1029,7 @@ export default function CommunitySettingsPage() {
                   value={pointsForm.amount}
                   onChange={(e) => setPointsForm((p) => ({ ...p, amount: e.target.value }))}
                   placeholder="Ex: 50"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                  className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30"
                 />
               </div>
               <div>
@@ -1037,11 +1037,11 @@ export default function CommunitySettingsPage() {
                 <select
                   value={pointsForm.type}
                   onChange={(e) => setPointsForm((p) => ({ ...p, type: e.target.value }))}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none"
+                  className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 text-sm focus:outline-none"
                 >
-                  <option value="EARNED" className="bg-gray-900">Ganho (+)</option>
-                  <option value="SPENT" className="bg-gray-900">Gasto (−)</option>
-                  <option value="ADJUSTED" className="bg-gray-900">Ajuste manual</option>
+                  <option value="EARNED" className="bg-white">Ganho (+)</option>
+                  <option value="SPENT" className="bg-white">Gasto (−)</option>
+                  <option value="ADJUSTED" className="bg-white">Ajuste manual</option>
                 </select>
               </div>
               <div>
@@ -1051,14 +1051,14 @@ export default function CommunitySettingsPage() {
                   value={pointsForm.reason}
                   onChange={(e) => setPointsForm((p) => ({ ...p, reason: e.target.value }))}
                   placeholder="Ex: Participação em desafio"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                  className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30"
                 />
               </div>
               <div className="flex gap-2 pt-1">
-                <button type="button" onClick={() => setPointsModal({ open: false, userId: "", userName: "" })} className="flex-1 px-4 py-2.5 text-sm text-gray-400 border border-white/10 rounded-xl hover:bg-white/5 transition-colors">
+                <button type="button" onClick={() => setPointsModal({ open: false, userId: "", userName: "" })} className="flex-1 px-4 py-2.5 text-sm text-gray-400 border border-gray-200 rounded-xl hover:bg-violet-50 transition-colors">
                   Cancelar
                 </button>
-                <button type="submit" disabled={pointsSaving} className="flex-1 flex items-center justify-center gap-2 bg-yellow-600 hover:bg-yellow-500 disabled:opacity-50 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all">
+                <button type="submit" disabled={pointsSaving} className="flex-1 flex items-center justify-center gap-2 bg-yellow-600 hover:bg-yellow-500 disabled:opacity-50 text-gray-900 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all">
                   {pointsSaving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Zap className="w-4 h-4" />}
                   {pointsSaving ? "Salvando..." : "Confirmar"}
                 </button>

@@ -16,7 +16,7 @@ const ROLE_LABELS: Record<string, string> = {
 const ROLE_COLORS: Record<string, string> = {
   SUPER_ADMIN: "bg-red-500/10 text-red-400 border-red-500/20",
   INFLUENCER_ADMIN: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-  COMMUNITY_MEMBER: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  COMMUNITY_MEMBER: "bg-violet-500/10 text-violet-400 border-violet-500/20",
   MARKETPLACE_PARTNER: "bg-orange-500/10 text-orange-400 border-orange-500/20",
 };
 
@@ -137,28 +137,28 @@ export default function UsuariosPage() {
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-8 bg-white/10 rounded-xl w-32" />
+        <div className="h-8 bg-gray-50 rounded-xl w-32" />
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="glass-card p-5 space-y-3">
-              <div className="w-9 h-9 bg-white/10 rounded-xl" />
-              <div className="h-6 bg-white/10 rounded w-16" />
-              <div className="h-3 bg-white/10 rounded w-20" />
+              <div className="w-9 h-9 bg-gray-50 rounded-xl" />
+              <div className="h-6 bg-gray-50 rounded w-16" />
+              <div className="h-3 bg-gray-50 rounded w-20" />
             </div>
           ))}
         </div>
         <div className="glass-card overflow-hidden">
-          <div className="p-4 border-b border-white/10 h-12 bg-white/5" />
+          <div className="p-4 border-b border-gray-200 h-12 bg-white" />
           <div className="divide-y divide-white/5">
             {[...Array(5)].map((_, i) => (
               <div key={i} className="flex items-center gap-4 px-4 py-3">
-                <div className="w-8 h-8 bg-white/10 rounded-xl flex-shrink-0" />
+                <div className="w-8 h-8 bg-gray-50 rounded-xl flex-shrink-0" />
                 <div className="flex-1 space-y-1.5">
-                  <div className="h-3.5 bg-white/10 rounded w-36" />
-                  <div className="h-3 bg-white/10 rounded w-48" />
+                  <div className="h-3.5 bg-gray-50 rounded w-36" />
+                  <div className="h-3 bg-gray-50 rounded w-48" />
                 </div>
-                <div className="h-6 bg-white/10 rounded-full w-20 hidden sm:block" />
-                <div className="h-6 bg-white/10 rounded-full w-16 hidden md:block" />
+                <div className="h-6 bg-gray-50 rounded-full w-20 hidden sm:block" />
+                <div className="h-6 bg-gray-50 rounded-full w-16 hidden md:block" />
               </div>
             ))}
           </div>
@@ -170,14 +170,14 @@ export default function UsuariosPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Usuários</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Usuários</h1>
         <p className="text-gray-400 text-sm mt-1">Gerencie todos os usuários da plataforma</p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "Total", value: stats.total, icon: Users, color: "text-blue-400 bg-blue-500/10" },
+          { label: "Total", value: stats.total, icon: Users, color: "text-violet-400 bg-violet-500/10" },
           { label: "Ativos", value: stats.active, icon: CheckCircle, color: "text-green-400 bg-green-500/10" },
           { label: "Banidos", value: stats.banned, icon: Ban, color: "text-red-400 bg-red-500/10" },
           { label: "Influencers", value: stats.influencers, icon: ShieldCheck, color: "text-purple-400 bg-purple-500/10" },
@@ -186,7 +186,7 @@ export default function UsuariosPage() {
             <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-3 ${color.split(" ")[1]}`}>
               <Icon className={`w-4 h-4 ${color.split(" ")[0]}`} />
             </div>
-            <p className="text-xl font-bold text-white">{value}</p>
+            <p className="text-xl font-bold text-gray-900">{value}</p>
             <p className="text-xs text-gray-500 mt-0.5">{label}</p>
           </div>
         ))}
@@ -202,13 +202,13 @@ export default function UsuariosPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Buscar por nome ou email..."
-              className="w-full bg-white/5 border border-white/10 focus:border-blue-500/50 rounded-xl pl-10 pr-4 py-2.5 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all"
+              className="w-full bg-white border border-gray-200 focus:border-violet-400 rounded-xl pl-10 pr-4 py-2.5 text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all"
             />
           </div>
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="bg-white/5 border border-white/10 hover:border-white/20 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+            className="bg-white border border-gray-200 hover:border-violet-200 rounded-xl px-4 py-2.5 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400/30"
           >
             <option value="ALL">Todos os roles</option>
             <option value="SUPER_ADMIN">Super Admin</option>
@@ -219,7 +219,7 @@ export default function UsuariosPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-white/5 border border-white/10 hover:border-white/20 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+            className="bg-white border border-gray-200 hover:border-violet-200 rounded-xl px-4 py-2.5 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400/30"
           >
             <option value="ALL">Todos os status</option>
             <option value="ACTIVE">Ativos</option>
@@ -237,15 +237,15 @@ export default function UsuariosPage() {
         </div>
       ) : (
         <div className="glass-card overflow-hidden">
-          <div className="p-4 border-b border-white/10 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-white">
+          <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-gray-900">
               {filtered.length} usuário(s)
             </h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/5">
+                <tr className="border-b border-gray-100">
                   <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-4 py-3">Usuário</th>
                   <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-4 py-3 hidden sm:table-cell">Role</th>
                   <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-4 py-3 hidden md:table-cell">Status</th>
@@ -257,14 +257,14 @@ export default function UsuariosPage() {
               </thead>
               <tbody className="divide-y divide-white/5">
                 {filtered.map((user) => (
-                  <tr key={user.id} className="hover:bg-white/5 transition-colors">
+                  <tr key={user.id} className="hover:bg-violet-50 transition-colors">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400 font-semibold text-xs flex-shrink-0">
+                        <div className="w-8 h-8 bg-violet-500/20 rounded-xl flex items-center justify-center text-violet-400 font-semibold text-xs flex-shrink-0">
                           {user.firstName.charAt(0)}{user.lastName.charAt(0)}
                         </div>
                         <div className="min-w-0">
-                          <p className="text-sm font-medium text-white truncate">
+                          <p className="text-sm font-medium text-gray-900 truncate">
                             {user.firstName} {user.lastName}
                             {user.isBanned && <span className="ml-2 text-xs text-red-400">[banido]</span>}
                           </p>
@@ -290,16 +290,16 @@ export default function UsuariosPage() {
                     <td className="px-4 py-3 text-xs text-gray-500 hidden lg:table-cell">{formatDate(user.lastLoginAt)}</td>
                     <td className="px-4 py-3 hidden xl:table-cell">
                       {roleLoading === user.id ? (
-                        <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                        <div className="w-4 h-4 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
                       ) : (
                         <select
                           value={user.role}
                           disabled={user.id === currentUserId}
                           onChange={(e) => updateRole(user.id, e.target.value)}
-                          className="bg-white/5 border border-white/10 hover:border-white/20 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/30 disabled:opacity-40 disabled:cursor-not-allowed"
+                          className="bg-white border border-gray-200 hover:border-violet-200 rounded-lg px-2 py-1 text-gray-900 text-xs focus:outline-none focus:ring-2 focus:ring-violet-400/30 disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                           {ALL_ROLES.map((r) => (
-                            <option key={r} value={r} className="bg-gray-800">{ROLE_LABELS[r]}</option>
+                            <option key={r} value={r} className="bg-white">{ROLE_LABELS[r]}</option>
                           ))}
                         </select>
                       )}
@@ -307,7 +307,7 @@ export default function UsuariosPage() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1 justify-end">
                         {actionLoading === user.id ? (
-                          <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                          <div className="w-4 h-4 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
                         ) : (
                           <>
                             {!user.isBanned ? (

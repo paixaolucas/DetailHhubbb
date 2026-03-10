@@ -10,6 +10,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { MessageCircle, ThumbsUp, Pin, MoreHorizontal, EyeOff, Eye } from "lucide-react";
+import ReactionBar from "@/components/feed/ReactionBar";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -41,6 +42,8 @@ export interface PostCardProps {
     isHidden?: boolean;
     attachments?: string[];
     reactions?: PostReaction[];
+    reactionCounts?: Record<string, number>;
+    userReactions?: string[];
     _count?: { reactions?: number; comments?: number };
   };
   communitySlug: string;
@@ -48,6 +51,7 @@ export interface PostCardProps {
   currentUserId?: string;
   isOwner?: boolean;
   onPostUpdate?: (updated: { id: string; isPinned?: boolean; isHidden?: boolean }) => void;
+  onReact?: (type: string) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -83,7 +87,7 @@ function ImageGrid({ urls }: { urls: string[] }) {
       <img
         src={urls[0]}
         alt=""
-        className="w-full max-h-72 object-cover rounded-lg mt-3 border border-white/10"
+        className="w-full max-h-72 object-cover rounded-lg mt-3 border border-gray-200"
       />
     );
   }
@@ -91,7 +95,7 @@ function ImageGrid({ urls }: { urls: string[] }) {
     return (
       <div className="grid grid-cols-2 gap-1 mt-3">
         {urls.map((url, i) => (
-          <img key={i} src={url} alt="" className="w-full h-36 object-cover rounded-lg border border-white/10" />
+          <img key={i} src={url} alt="" className="w-full h-36 object-cover rounded-lg border border-gray-200" />
         ))}
       </div>
     );
@@ -103,10 +107,10 @@ function ImageGrid({ urls }: { urls: string[] }) {
     <div className="grid grid-cols-2 gap-1 mt-3">
       {shown.map((url, i) => (
         <div key={i} className="relative">
-          <img src={url} alt="" className="w-full h-36 object-cover rounded-lg border border-white/10" />
+          <img src={url} alt="" className="w-full h-36 object-cover rounded-lg border border-gray-200" />
           {i === 3 && extra > 0 && (
             <div className="absolute inset-0 bg-black/60 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">+{extra}</span>
+              <span className="text-gray-900 font-bold text-lg">+{extra}</span>
             </div>
           )}
         </div>
@@ -126,6 +130,7 @@ export default function PostCard({
   currentUserId,
   isOwner,
   onPostUpdate,
+  onReact,
 }: PostCardProps) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -184,7 +189,7 @@ export default function PostCard({
       tabIndex={0}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      className="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/40 relative"
+      className="bg-white border border-gray-200 rounded-xl p-4 hover:bg-gray-100 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-400/30 relative"
     >
       {/* Pinned badge */}
       {post.isPinned && (
@@ -200,15 +205,15 @@ export default function PostCard({
           <img
             src={post.author.avatarUrl}
             alt={authorName}
-            className="w-8 h-8 rounded-full object-cover flex-shrink-0 border border-white/10"
+            className="w-8 h-8 rounded-full object-cover flex-shrink-0 border border-gray-200"
           />
         ) : (
-          <div className="w-8 h-8 rounded-full bg-blue-600/70 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-violet-600/70 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
             {initials}
           </div>
         )}
         <div className="flex flex-col min-w-0">
-          <span className="text-sm font-semibold text-gray-200 leading-tight">
+          <span className="text-sm font-semibold text-gray-700 leading-tight">
             {authorName}
           </span>
           <span className="text-xs text-gray-500">{timeAgo(post.createdAt)}</span>
@@ -225,16 +230,16 @@ export default function PostCard({
               type="button"
               disabled={actionLoading}
               onClick={() => setMenuOpen((v) => !v)}
-              className="p-1.5 text-gray-600 hover:text-gray-300 hover:bg-white/10 rounded-lg transition-colors disabled:opacity-40"
+              className="p-1.5 text-gray-600 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-40"
             >
               <MoreHorizontal className="w-4 h-4" />
             </button>
             {menuOpen && (
-              <div className="absolute right-0 top-8 w-44 bg-[#1f2937] border border-white/10 rounded-xl shadow-xl z-20 py-1 overflow-hidden">
+              <div className="absolute right-0 top-8 w-44 bg-white border border-gray-200 rounded-xl shadow-xl z-20 py-1 overflow-hidden">
                 <button
                   type="button"
                   onClick={() => handleModAction("isPinned", !post.isPinned)}
-                  className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
+                  className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
                 >
                   <Pin className="w-4 h-4" />
                   {post.isPinned ? "Desafixar" : "Fixar post"}
@@ -242,7 +247,7 @@ export default function PostCard({
                 <button
                   type="button"
                   onClick={() => handleModAction("isHidden", !post.isHidden)}
-                  className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
+                  className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
                 >
                   {post.isHidden ? (
                     <><Eye className="w-4 h-4" /> Mostrar</>
@@ -258,7 +263,7 @@ export default function PostCard({
 
       {/* Title */}
       {post.title && (
-        <h2 className="text-base font-semibold text-white mb-1.5 leading-snug">
+        <h2 className="text-base font-semibold text-gray-900 mb-1.5 leading-snug">
           {post.title}
         </h2>
       )}
@@ -275,13 +280,25 @@ export default function PostCard({
         <ImageGrid urls={post.attachments} />
       )}
 
-      {/* Footer: counts */}
-      <div className="flex items-center gap-4 mt-4 pt-3 border-t border-white/5">
-        <span className="flex items-center gap-1.5 text-xs text-gray-500">
-          <ThumbsUp className="w-3.5 h-3.5" />
-          {likeCount}
-        </span>
-        <span className="flex items-center gap-1.5 text-xs text-gray-500">
+      {/* Footer: reactions + comments */}
+      <div
+        className="flex items-center gap-3 mt-4 pt-3 border-t border-gray-100"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {post.reactionCounts && onReact ? (
+          <ReactionBar
+            postId={post.id}
+            reactions={post.reactionCounts}
+            userReactions={post.userReactions ?? []}
+            onReact={onReact}
+          />
+        ) : (
+          <span className="flex items-center gap-1.5 text-xs text-gray-500">
+            <ThumbsUp className="w-3.5 h-3.5" />
+            {likeCount}
+          </span>
+        )}
+        <span className="flex items-center gap-1.5 text-xs text-gray-500 ml-auto">
           <MessageCircle className="w-3.5 h-3.5" />
           {commentCount}
         </span>

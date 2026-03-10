@@ -274,7 +274,7 @@ export default function SettingsPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-[3px] border-blue-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-[3px] border-violet-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -298,14 +298,14 @@ export default function SettingsPage() {
   function InputField({ label, value, onChange, type = "text", disabled = false, placeholder = "" }: any) {
     return (
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-1.5">{label}</label>
+        <label className="block text-sm font-medium text-gray-600 mb-1.5">{label}</label>
         <input
           type={type}
           value={value}
           onChange={onChange}
           disabled={disabled}
           placeholder={placeholder}
-          className="w-full bg-white/5 border border-white/10 hover:border-white/20 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all text-sm"
+          className="w-full bg-white border border-gray-200 hover:border-violet-200 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 focus:border-violet-400 transition-all text-sm"
         />
       </div>
     );
@@ -327,34 +327,34 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6 max-w-2xl">
       <div>
-        <h1 className="text-2xl font-bold text-white">Configurações</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Configurações</h1>
         <p className="text-gray-400 text-sm mt-1">Gerencie seu perfil e preferências</p>
       </div>
 
       {/* Profile card */}
       <div className="glass-card p-5 flex items-center gap-4">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-500 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
           {user.avatarUrl ? (
             <img src={user.avatarUrl} alt={user.firstName} className="w-full h-full rounded-2xl object-cover" />
           ) : initials}
         </div>
         <div>
-          <p className="font-semibold text-white">{user.firstName} {user.lastName}</p>
+          <p className="font-semibold text-gray-900">{user.firstName} {user.lastName}</p>
           <p className="text-sm text-gray-400 mb-1">{user.email}</p>
           <RoleBadge role={user.role} />
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-white/5 border border-white/10 p-1 rounded-xl">
+      <div className="flex gap-1 bg-white border border-gray-200 p-1 rounded-xl">
         {tabs.map(({ key, label, icon: Icon }) => (
           <button
             key={key}
             onClick={() => setActiveTab(key)}
             className={`flex items-center gap-1.5 flex-1 justify-center px-3 py-2 rounded-lg text-xs font-medium transition-all ${
               activeTab === key
-                ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
-                : "text-gray-400 hover:text-white"
+                ? "bg-violet-600 text-white shadow-lg shadow-violet-500/20"
+                : "text-gray-400 hover:text-gray-900"
             }`}
           >
             <Icon className="w-3.5 h-3.5" />
@@ -366,7 +366,7 @@ export default function SettingsPage() {
       {/* Profile tab */}
       {activeTab === "profile" && (
         <form onSubmit={saveProfile} className="glass-card p-6 space-y-4">
-          <h2 className="text-base font-semibold text-white">Informações do Perfil</h2>
+          <h2 className="text-base font-semibold text-gray-900">Informações do Perfil</h2>
           {profileMsg && <AlertBanner msg={profileMsg} />}
           <div className="grid grid-cols-2 gap-4">
             <InputField
@@ -390,9 +390,9 @@ export default function SettingsPage() {
             placeholder="+55 11 99999-9999"
           />
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Foto de perfil</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1.5">Foto de perfil</label>
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center text-white text-xl font-bold flex-shrink-0 overflow-hidden">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-500 flex items-center justify-center text-white text-xl font-bold flex-shrink-0 overflow-hidden">
                 {(avatarPreview || profileForm.avatarUrl) ? (
                   <img src={avatarPreview || profileForm.avatarUrl} alt="" className="w-full h-full object-cover" />
                 ) : initials}
@@ -402,7 +402,7 @@ export default function SettingsPage() {
                   type="button"
                   onClick={() => avatarInputRef.current?.click()}
                   disabled={avatarUploading}
-                  className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/10 hover:border-white/20 rounded-xl text-sm text-gray-300 hover:text-white transition-all disabled:opacity-50"
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-violet-50 border border-gray-200 hover:border-violet-200 rounded-xl text-sm text-gray-600 hover:text-gray-900 transition-all disabled:opacity-50"
                 >
                   <Camera className="w-4 h-4" />
                   {avatarUploading ? "Enviando..." : "Trocar foto"}
@@ -422,7 +422,7 @@ export default function SettingsPage() {
             <button
               type="submit"
               disabled={isSaving}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-blue-500/30"
+              className="flex items-center gap-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-violet-500/30"
             >
               {isSaving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Save className="w-4 h-4" />}
               {isSaving ? "Salvando..." : "Salvar Alterações"}
@@ -434,7 +434,7 @@ export default function SettingsPage() {
       {/* Security tab */}
       {activeTab === "security" && (
         <form onSubmit={changePassword} className="glass-card p-6 space-y-4">
-          <h2 className="text-base font-semibold text-white">Alterar Senha</h2>
+          <h2 className="text-base font-semibold text-gray-900">Alterar Senha</h2>
           {passwordMsg && <AlertBanner msg={passwordMsg} />}
           <InputField
             label="Senha atual"
@@ -459,7 +459,7 @@ export default function SettingsPage() {
             <button
               type="submit"
               disabled={isSaving}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-blue-500/30"
+              className="flex items-center gap-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-violet-500/30"
             >
               {isSaving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Lock className="w-4 h-4" />}
               {isSaving ? "Alterando..." : "Alterar Senha"}
@@ -471,21 +471,21 @@ export default function SettingsPage() {
       {/* Notifications tab */}
       {activeTab === "notifications" && (
         <div className="glass-card p-6 space-y-4">
-          <h2 className="text-base font-semibold text-white">Notificações</h2>
+          <h2 className="text-base font-semibold text-gray-900">Notificações</h2>
           <div className="space-y-3">
             {NOTIF_KEYS.map(({ key, label, desc }) => {
               const isOn = notifPrefs[key] !== false;
               return (
-                <div key={key} className="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+                <div key={key} className="flex items-center justify-between p-4 bg-white rounded-xl">
                   <div>
-                    <p className="text-white text-sm font-medium">{label}</p>
+                    <p className="text-gray-900 text-sm font-medium">{label}</p>
                     <p className="text-gray-500 text-xs">{desc}</p>
                   </div>
                   <button
                     type="button"
                     onClick={() => toggleNotif(key)}
                     className={`w-10 h-6 rounded-full relative flex-shrink-0 transition-colors ${
-                      isOn ? "bg-blue-600" : "bg-white/20"
+                      isOn ? "bg-violet-600" : "bg-white/20"
                     }`}
                     aria-checked={isOn}
                     role="switch"
@@ -506,28 +506,28 @@ export default function SettingsPage() {
       {/* Referral tab */}
       {activeTab === "referral" && (
         <div className="glass-card p-6 space-y-4">
-          <h2 className="text-base font-semibold text-white">Programa de Referral</h2>
+          <h2 className="text-base font-semibold text-gray-900">Programa de Referral</h2>
           <p className="text-gray-400 text-sm">
             Indique amigos e ganhe comissões recorrentes quando eles se cadastrarem na plataforma.
           </p>
           {user.referralCode ? (
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">Seu código de referral</label>
+                <label className="block text-sm font-medium text-gray-600 mb-1.5">Seu código de referral</label>
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
                     value={user.referralCode}
                     readOnly
-                    className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white font-mono text-sm"
+                    className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 font-mono text-sm"
                   />
                   <button
                     type="button"
                     onClick={copyReferral}
                     className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
                       copied
-                        ? "bg-green-600 text-white"
-                        : "bg-white/10 hover:bg-white/20 text-gray-300 border border-white/10"
+                        ? "bg-green-600 text-gray-900"
+                        : "bg-gray-50 hover:bg-violet-50 text-gray-600 border border-gray-200"
                     }`}
                   >
                     {copied ? <CheckCircle2 className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
@@ -536,13 +536,13 @@ export default function SettingsPage() {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4 pt-2">
-                <div className="bg-white/5 rounded-xl p-4 text-center">
-                  <p className="text-2xl font-bold text-white">—</p>
+                <div className="bg-white rounded-xl p-4 text-center">
+                  <p className="text-2xl font-bold text-gray-900">—</p>
                   <p className="text-xs text-gray-500 mt-1">Indicações</p>
                   <p className="text-xs text-gray-600 mt-0.5">Em breve</p>
                 </div>
-                <div className="bg-white/5 rounded-xl p-4 text-center">
-                  <p className="text-2xl font-bold text-white">—</p>
+                <div className="bg-white rounded-xl p-4 text-center">
+                  <p className="text-2xl font-bold text-gray-900">—</p>
                   <p className="text-xs text-gray-500 mt-1">Comissões ganhas</p>
                   <p className="text-xs text-gray-600 mt-0.5">Em breve</p>
                 </div>
@@ -560,8 +560,8 @@ export default function SettingsPage() {
       {activeTab === "influencer" && (
         <form onSubmit={saveInfluencer} className="glass-card p-6 space-y-4">
           <div className="flex items-center gap-2 mb-1">
-            <Globe className="w-4 h-4 text-blue-400" />
-            <h2 className="text-base font-semibold text-white">Perfil Público</h2>
+            <Globe className="w-4 h-4 text-violet-400" />
+            <h2 className="text-base font-semibold text-gray-900">Perfil Público</h2>
           </div>
           <p className="text-gray-400 text-xs -mt-2">
             Estas informações aparecem na página pública das suas comunidades.
@@ -574,13 +574,13 @@ export default function SettingsPage() {
             placeholder="Como você quer ser conhecido"
           />
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Bio</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1.5">Bio</label>
             <textarea
               value={influencerForm.bio}
               onChange={(e) => setInfluencerForm((p) => ({ ...p, bio: e.target.value }))}
               rows={3}
               placeholder="Conte um pouco sobre você..."
-              className="w-full bg-white/5 border border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all text-sm resize-none"
+              className="w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm resize-none"
             />
           </div>
           <InputField
@@ -591,7 +591,7 @@ export default function SettingsPage() {
             placeholder="https://seusite.com.br"
           />
           <div className="space-y-3">
-            <label className="block text-sm font-medium text-gray-300">Redes sociais</label>
+            <label className="block text-sm font-medium text-gray-600">Redes sociais</label>
             {[
               { key: "instagram" as const, label: "Instagram", placeholder: "https://instagram.com/seu_perfil" },
               { key: "youtube" as const, label: "YouTube", placeholder: "https://youtube.com/@seu_canal" },
@@ -605,7 +605,7 @@ export default function SettingsPage() {
                   value={influencerForm[key]}
                   onChange={(e) => setInfluencerForm((p) => ({ ...p, [key]: e.target.value }))}
                   placeholder={placeholder}
-                  className="w-full bg-white/5 border border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all text-sm"
+                  className="w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-2.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm"
                 />
               </div>
             ))}
@@ -614,7 +614,7 @@ export default function SettingsPage() {
             <button
               type="submit"
               disabled={influencerSaving}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-blue-500/30"
+              className="flex items-center gap-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-violet-500/30"
             >
               {influencerSaving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Save className="w-4 h-4" />}
               {influencerSaving ? "Salvando..." : "Salvar Perfil Público"}
@@ -625,11 +625,11 @@ export default function SettingsPage() {
 
       {/* Account info */}
       <div className="glass-card p-5">
-        <h2 className="text-sm font-semibold text-white mb-3">Informações da Conta</h2>
+        <h2 className="text-sm font-semibold text-gray-900 mb-3">Informações da Conta</h2>
         <dl className="space-y-2">
           <div className="flex justify-between text-sm">
             <dt className="text-gray-500">Membro desde</dt>
-            <dd className="text-gray-300 font-medium">
+            <dd className="text-gray-600 font-medium">
               {new Date(user.createdAt).toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}
             </dd>
           </div>

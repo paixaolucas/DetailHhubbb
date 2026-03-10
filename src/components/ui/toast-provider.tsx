@@ -73,24 +73,24 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
   const icons: Record<ToastVariant, React.ReactNode> = {
     success: <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />,
     error: <XCircle className="w-4 h-4 text-red-400 flex-shrink-0" />,
-    info: <Info className="w-4 h-4 text-blue-400 flex-shrink-0" />,
+    info: <Info className="w-4 h-4 text-violet-400 flex-shrink-0" />,
   };
 
   const borders: Record<ToastVariant, string> = {
     success: "border-green-500/30",
     error: "border-red-500/30",
-    info: "border-blue-500/30",
+    info: "border-violet-500/30",
   };
 
   return (
     <div
-      className={`pointer-events-auto flex items-center gap-3 bg-white/10 backdrop-blur-md border ${borders[toast.variant]} rounded-xl px-4 py-3 shadow-xl max-w-xs w-full animate-slide-up`}
+      className={`pointer-events-auto flex items-center gap-3 bg-white backdrop-blur-md border ${borders[toast.variant]} rounded-xl px-4 py-3 shadow-xl max-w-xs w-full animate-slide-up`}
     >
       {icons[toast.variant]}
-      <span className="text-white text-sm flex-1">{toast.message}</span>
+      <span className="text-gray-900 text-sm flex-1">{toast.message}</span>
       <button
         onClick={onClose}
-        className="text-gray-400 hover:text-white transition-colors"
+        className="text-gray-500 hover:text-gray-900 transition-colors"
         aria-label="Fechar notificação"
       >
         <X className="w-4 h-4" />

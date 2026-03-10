@@ -29,7 +29,7 @@ interface SequenceEditorProps {
 }
 
 function inputClass() {
-  return "w-full bg-white/5 border border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all text-sm";
+  return "w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm";
 }
 
 export default function SequenceEditor({
@@ -133,16 +133,16 @@ export default function SequenceEditor({
   };
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-6">
+    <div className="bg-white border border-gray-200 rounded-2xl p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold text-white">
+        <h3 className="text-base font-semibold text-gray-900">
           {isEdit ? "Editar Sequência" : "Nova Sequência"}
         </h3>
         <button
           type="button"
           onClick={onCancel}
-          className="p-1.5 hover:bg-white/10 rounded-lg transition-colors text-gray-400 hover:text-white"
+          className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors text-gray-400 hover:text-gray-900"
         >
           <X className="w-4 h-4" />
         </button>
@@ -175,7 +175,7 @@ export default function SequenceEditor({
           className={`${inputClass()} cursor-pointer`}
         >
           {(Object.keys(TRIGGER_LABELS) as TriggerType[]).map((key) => (
-            <option key={key} value={key} className="bg-gray-900 text-white">
+            <option key={key} value={key} className="bg-gray-900 text-gray-900">
               {TRIGGER_LABELS[key]}
             </option>
           ))}
@@ -190,7 +190,7 @@ export default function SequenceEditor({
           aria-checked={isActive}
           onClick={() => setIsActive((v) => !v)}
           className={`relative w-10 h-5 rounded-full transition-colors ${
-            isActive ? "bg-blue-500" : "bg-white/10"
+            isActive ? "bg-violet-500" : "bg-gray-50"
           }`}
         >
           <span
@@ -199,7 +199,7 @@ export default function SequenceEditor({
             }`}
           />
         </button>
-        <span className="text-sm text-gray-300">
+        <span className="text-sm text-gray-600">
           {isActive ? "Sequência ativa" : "Sequência inativa"}
         </span>
       </div>
@@ -213,7 +213,7 @@ export default function SequenceEditor({
           <button
             type="button"
             onClick={addStep}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-400 hover:text-blue-300 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-violet-400 hover:text-violet-300 bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/20 rounded-lg transition-colors"
           >
             <Plus className="w-3.5 h-3.5" />
             Adicionar Passo
@@ -221,7 +221,7 @@ export default function SequenceEditor({
         </div>
 
         {steps.length === 0 && (
-          <p className="text-sm text-gray-500 text-center py-4 border border-dashed border-white/10 rounded-xl">
+          <p className="text-sm text-gray-500 text-center py-4 border border-dashed border-gray-200 rounded-xl">
             Nenhum passo adicionado ainda. Clique em "Adicionar Passo" para começar.
           </p>
         )}
@@ -243,7 +243,7 @@ export default function SequenceEditor({
           type="button"
           onClick={handleSave}
           disabled={isSaving}
-          className="flex items-center gap-2 px-5 py-2.5 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-xl transition-colors"
+          className="flex items-center gap-2 px-5 py-2.5 bg-violet-500 hover:bg-violet-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-xl transition-colors"
         >
           {isSaving ? (
             <div className="w-4 h-4 border-[2px] border-white border-t-transparent rounded-full animate-spin" />
@@ -255,7 +255,7 @@ export default function SequenceEditor({
         <button
           type="button"
           onClick={onCancel}
-          className="px-5 py-2.5 text-sm text-gray-400 hover:text-white transition-colors"
+          className="px-5 py-2.5 text-sm text-gray-400 hover:text-gray-900 transition-colors"
         >
           Cancelar
         </button>

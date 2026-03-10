@@ -17,7 +17,7 @@ function Initials({ name, className }: { name: string; className?: string }) {
     : name.slice(0, 2);
   return (
     <div
-      className={`flex items-center justify-center rounded-lg bg-blue-500/20 text-blue-400 font-semibold text-xs uppercase ${className ?? ""}`}
+      className={`flex items-center justify-center rounded-lg bg-violet-500/20 text-violet-400 font-semibold text-xs uppercase ${className ?? ""}`}
     >
       {letters.toUpperCase()}
     </div>
@@ -26,7 +26,7 @@ function Initials({ name, className }: { name: string; className?: string }) {
 
 export default function SearchResultItem({ type, item, onClick }: SearchResultItemProps) {
   const baseClass =
-    "flex items-center gap-3 p-3 hover:bg-white/10 rounded-lg cursor-pointer transition-colors w-full text-left";
+    "flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors w-full text-left";
 
   if (type === "community") {
     return (
@@ -39,7 +39,7 @@ export default function SearchResultItem({ type, item, onClick }: SearchResultIt
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-white truncate">{item.name}</p>
+          <p className="text-sm font-medium text-gray-900 truncate">{item.name}</p>
           {item.shortDescription && (
             <p className="text-xs text-gray-400 truncate">{item.shortDescription}</p>
           )}
@@ -63,11 +63,11 @@ export default function SearchResultItem({ type, item, onClick }: SearchResultIt
 
     return (
       <button className={baseClass} onClick={onClick}>
-        <div className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+        <div className="w-9 h-9 rounded-lg bg-white border border-gray-200 flex items-center justify-center flex-shrink-0">
           <FileText className="w-4 h-4 text-gray-400" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-white truncate">{item.title}</p>
+          <p className="text-sm font-medium text-gray-900 truncate">{item.title}</p>
           <p className="text-xs text-gray-400 truncate">
             {authorName}
             {spaceName && ` · ${spaceName}`}
@@ -100,7 +100,7 @@ export default function SearchResultItem({ type, item, onClick }: SearchResultIt
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-white truncate">{fullName || "Usuário"}</p>
+          <p className="text-sm font-medium text-gray-900 truncate">{fullName || "Usuário"}</p>
           <p className="text-xs text-gray-400">{roleLabel[item.role] ?? item.role}</p>
         </div>
         <User className="w-4 h-4 text-gray-600 flex-shrink-0" />

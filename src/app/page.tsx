@@ -26,8 +26,8 @@ const features = [
     icon: Users,
     title: "Comunidades Exclusivas",
     desc: "Acesse comunidades automotivas premium com total isolamento de membros, conteúdo e pagamentos.",
-    color: "text-blue-400",
-    bg: "bg-blue-500/10",
+    color: "text-violet-400",
+    bg: "bg-violet-500/10",
   },
   {
     icon: BookOpen,
@@ -120,29 +120,29 @@ const pricingFeatures = [
 
 function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-chrome-900 pt-24 pb-32">
+    <section className="relative overflow-hidden bg-[#F8F7FF] pt-24 pb-32">
       {/* Background grid */}
       <div className="absolute inset-0 grid-pattern opacity-50" />
 
       {/* Gradient orbs — no animate-pulse to avoid paint storm */}
-      <div className="absolute top-20 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl" />
+      <div className="absolute top-20 left-1/4 w-96 h-96 bg-violet-600/20 rounded-full blur-3xl" />
       <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-cyan-600/15 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-4 text-center relative">
         {/* Badge */}
-        <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/30 rounded-full px-4 py-1.5 text-sm text-blue-300 mb-8">
+        <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/30 rounded-full px-4 py-1.5 text-sm text-violet-600 mb-8">
           <Car className="w-4 h-4" />
           A plataforma premium para comunidades automotivas
         </div>
 
         {/* Headline */}
         <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-[1.1] tracking-tight">
-          <span className="text-white">Sua comunidade </span>
+          <span className="text-gray-900">Sua comunidade </span>
           <br />
-          <span className="bg-gradient-to-r from-blue-400 via-blue-300 to-cyan-300 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-violet-400 via-violet-300 to-purple-300 bg-clip-text text-transparent">
             automotiva
           </span>
-          <span className="text-white">, premium.</span>
+          <span className="text-gray-900">, premium.</span>
         </h1>
 
         <p className="text-gray-400 text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
@@ -154,13 +154,13 @@ function HeroSection() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="/register"
-            className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-cyan-500 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:shadow-xl hover:shadow-blue-500/30 active:scale-95 w-full sm:w-auto justify-center"
+            className="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-purple-500 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:shadow-xl hover:shadow-violet-500/30 active:scale-95 w-full sm:w-auto justify-center"
           >
             Começar agora <ArrowRight className="w-5 h-5" />
           </Link>
           <Link
             href="#preco"
-            className="flex items-center gap-2 border border-white/20 hover:border-white/40 text-gray-300 hover:text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:bg-white/5 w-full sm:w-auto justify-center"
+            className="flex items-center gap-2 border border-gray-200 hover:border-gray-300 text-gray-600 hover:text-gray-900 px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:bg-violet-50 w-full sm:w-auto justify-center"
           >
             Ver planos
           </Link>
@@ -182,12 +182,12 @@ function HeroSection() {
 
 function StatsBar() {
   return (
-    <section className="bg-chrome-950 border-y border-white/10 py-12">
+    <section className="bg-[#F0EEFF] border-y border-gray-200 py-12">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
           {stats.map(({ value, label, growth }) => (
             <div key={label} className="text-center">
-              <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1">{value}</div>
+              <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-1">{value}</div>
               <div className="text-gray-500 text-sm">{label}</div>
               <div className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-medium">
                 {growth}
@@ -202,14 +202,14 @@ function StatsBar() {
 
 function FeaturesSection() {
   return (
-    <section id="features" className="bg-chrome-900 py-24">
+    <section id="features" className="bg-[#F8F7FF] py-24">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-3 py-1 text-xs text-blue-400 mb-4">
+          <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/20 rounded-full px-3 py-1 text-xs text-violet-400 mb-4">
             <Gauge className="w-3 h-3" />
             Funcionalidades
           </div>
-          <h2 className="text-4xl font-bold text-white mb-4">
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
             Tudo que sua comunidade precisa
           </h2>
           <p className="text-gray-400 text-lg max-w-xl mx-auto">
@@ -221,12 +221,12 @@ function FeaturesSection() {
           {features.map(({ icon: Icon, title, desc, color, bg }) => (
             <div
               key={title}
-              className="glass-card p-8 hover:border-white/20 transition-all duration-300 group"
+              className="glass-card p-8 hover:border-violet-200 transition-all duration-300 group"
             >
               <div className={`w-12 h-12 ${bg} rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
                 <Icon className={`w-6 h-6 ${color}`} />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">{title}</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">{title}</h3>
               <p className="text-gray-400 leading-relaxed">{desc}</p>
             </div>
           ))}
@@ -238,21 +238,21 @@ function FeaturesSection() {
 
 function HowItWorksSection() {
   return (
-    <section id="como-funciona" className="bg-chrome-950 py-24">
+    <section id="como-funciona" className="bg-[#F0EEFF] py-24">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-white mb-4">Como funciona</h2>
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">Como funciona</h2>
           <p className="text-gray-400 text-lg">Simples, direto e sem fricção.</p>
         </div>
 
         <div className="grid sm:grid-cols-3 gap-8 max-w-3xl mx-auto">
           {steps.map(({ step, title, desc, icon: Icon }) => (
             <div key={step} className="text-center">
-              <div className="w-14 h-14 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Icon className="w-6 h-6 text-blue-400" />
+              <div className="w-14 h-14 bg-violet-500/10 border border-violet-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Icon className="w-6 h-6 text-violet-400" />
               </div>
-              <div className="text-blue-400 text-xs font-bold mb-2 tracking-widest">{step}</div>
-              <h4 className="text-white font-semibold mb-2">{title}</h4>
+              <div className="text-violet-400 text-xs font-bold mb-2 tracking-widest">{step}</div>
+              <h4 className="text-gray-900 font-semibold mb-2">{title}</h4>
               <p className="text-gray-400 text-sm leading-relaxed">{desc}</p>
             </div>
           ))}
@@ -264,27 +264,27 @@ function HowItWorksSection() {
 
 function PricingSection() {
   return (
-    <section id="preco" className="bg-chrome-900 py-24">
+    <section id="preco" className="bg-[#F8F7FF] py-24">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-white mb-4">Um plano. Acesso a tudo.</h2>
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">Um plano. Acesso a tudo.</h2>
           <p className="text-gray-400 text-lg">Sem tiers confusos. Sem surpresas.</p>
         </div>
 
         <div className="max-w-md mx-auto">
-          <div className="glass-card p-8 border-blue-500/30 relative overflow-hidden">
+          <div className="glass-card p-8 border-violet-500/30 relative overflow-hidden">
             {/* Glow */}
-            <div className="absolute inset-0 bg-gradient-to-b from-blue-600/5 to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-b from-violet-600/5 to-transparent pointer-events-none" />
 
             <div className="relative">
               <div className="text-center mb-8">
-                <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-3 py-1 text-xs text-blue-400 mb-4">
+                <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/20 rounded-full px-3 py-1 text-xs text-violet-400 mb-4">
                   <Car className="w-3 h-3" />
                   DetailHub Anual
                 </div>
                 <div className="flex items-end justify-center gap-1">
                   <span className="text-gray-400 text-xl">R$</span>
-                  <span className="text-6xl font-bold text-white">600</span>
+                  <span className="text-6xl font-bold text-gray-900">600</span>
                   <span className="text-gray-400 text-xl mb-2">/ano</span>
                 </div>
                 <p className="text-gray-500 text-sm mt-2">Menos de R$50 por mês</p>
@@ -292,7 +292,7 @@ function PricingSection() {
 
               <ul className="space-y-3 mb-8">
                 {pricingFeatures.map((feature) => (
-                  <li key={feature} className="flex items-center gap-3 text-sm text-gray-300">
+                  <li key={feature} className="flex items-center gap-3 text-sm text-gray-600">
                     <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
                     {feature}
                   </li>
@@ -318,10 +318,10 @@ function PricingSection() {
 
 function TestimonialsSection() {
   return (
-    <section className="bg-chrome-950 py-24">
+    <section className="bg-[#F0EEFF] py-24">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-white mb-4">
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
             O que dizem nossos usuários
           </h2>
           <p className="text-gray-400 text-lg">Milhares de criadores e membros satisfeitos.</p>
@@ -336,18 +336,18 @@ function TestimonialsSection() {
                 ))}
               </div>
 
-              <p className="text-gray-300 text-sm leading-relaxed mb-6">"{text}"</p>
+              <p className="text-gray-600 text-sm leading-relaxed mb-6">"{text}"</p>
 
               <div className="flex items-center gap-3">
                 <img
                   src={avatarUrl}
                   alt={name}
-                  className="w-12 h-12 rounded-full object-cover flex-shrink-0 border border-white/10"
+                  className="w-12 h-12 rounded-full object-cover flex-shrink-0 border border-gray-200"
                 />
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <p className="text-white font-semibold text-sm">{name}</p>
-                    <BadgeCheck className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                    <p className="text-gray-900 font-semibold text-sm">{name}</p>
+                    <BadgeCheck className="w-4 h-4 text-violet-400 flex-shrink-0" />
                   </div>
                   <p className="text-gray-400 text-xs">{role}</p>
                   <p className="text-gray-600 text-xs">{company}</p>
@@ -363,10 +363,10 @@ function TestimonialsSection() {
 
 function CTASection() {
   return (
-    <section className="bg-chrome-900 py-24">
+    <section className="bg-[#F8F7FF] py-24">
       <div className="container mx-auto px-4">
         <div className="relative rounded-3xl overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-600" />
+          <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-purple-600" />
           <div className="absolute inset-0 grid-pattern opacity-20" />
           <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
 
@@ -380,20 +380,20 @@ function CTASection() {
               R$600/ano. Acesso a tudo. Cancele quando quiser.
             </h2>
 
-            <p className="text-blue-100 text-lg mb-10 max-w-xl mx-auto">
+            <p className="text-violet-100 text-lg mb-10 max-w-xl mx-auto">
               Junte-se a milhares de apaixonados por automóveis que já fazem parte da plataforma.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 href="/register"
-                className="flex items-center gap-2 bg-white text-blue-600 hover:bg-blue-50 px-8 py-4 rounded-xl font-bold text-lg transition-all hover:shadow-xl active:scale-95 w-full sm:w-auto justify-center"
+                className="flex items-center gap-2 bg-white text-violet-600 hover:bg-violet-50 px-8 py-4 rounded-xl font-bold text-lg transition-all hover:shadow-xl active:scale-95 w-full sm:w-auto justify-center"
               >
                 Começar agora <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
 
-            <p className="text-blue-200 text-sm mt-6">
+            <p className="text-violet-200 text-sm mt-6">
               Pagamento seguro via Stripe. Sem cartão para testar.
             </p>
           </div>
@@ -407,7 +407,7 @@ function CTASection() {
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-chrome-900">
+    <div className="min-h-screen bg-[#F8F7FF]">
       <NavBar />
       <HeroSection />
       <StatsBar />

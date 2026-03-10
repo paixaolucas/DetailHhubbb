@@ -35,7 +35,7 @@ export default function SpaceSidebar({
   activeSpaceSlug,
 }: SpaceSidebarProps) {
   return (
-    <aside className="bg-white/5 border border-white/10 rounded-xl p-3 flex flex-col gap-1 min-w-[180px]">
+    <aside className="bg-white border border-gray-200 rounded-xl p-3 flex flex-col gap-1 min-w-[180px]">
       <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 px-2 py-1 mb-1">
         Canais
       </p>
@@ -53,8 +53,8 @@ export default function SpaceSidebar({
             className={[
               "flex items-center gap-2 px-2 py-2 rounded-lg text-sm transition-all group",
               isActive
-                ? "bg-blue-500/20 text-blue-300 font-medium"
-                : "text-gray-400 hover:bg-white/5 hover:text-gray-200",
+                ? "bg-violet-500/20 text-violet-300 font-medium"
+                : "text-gray-400 hover:bg-violet-50 hover:text-gray-700",
             ].join(" ")}
             title={space.type ? SPACE_TYPE_LABELS[space.type] ?? space.type : undefined}
           >
@@ -66,7 +66,7 @@ export default function SpaceSidebar({
               <Hash
                 className={[
                   "w-4 h-4 flex-shrink-0",
-                  isActive ? "text-blue-400" : "text-gray-600 group-hover:text-gray-400",
+                  isActive ? "text-violet-400" : "text-gray-600 group-hover:text-gray-400",
                 ].join(" ")}
               />
             )}
@@ -76,8 +76,8 @@ export default function SpaceSidebar({
                 className={[
                   "ml-auto text-[10px] rounded px-1 py-0.5 flex-shrink-0 hidden sm:block",
                   isActive
-                    ? "bg-blue-500/20 text-blue-300"
-                    : "bg-white/5 text-gray-600",
+                    ? "bg-violet-500/20 text-violet-300"
+                    : "bg-white text-gray-600",
                 ].join(" ")}
               >
                 {SPACE_TYPE_LABELS[space.type]}

@@ -33,7 +33,7 @@ function getProgressToNextLevel(points: number, level: number): number {
 const LEVEL_COLORS: Record<number, string> = {
   1: "from-gray-500 to-gray-400",
   2: "from-green-600 to-green-400",
-  3: "from-blue-600 to-blue-400",
+  3: "from-violet-600 to-violet-400",
   4: "from-purple-600 to-purple-400",
   5: "from-yellow-600 to-yellow-400",
   6: "from-orange-600 to-orange-400",
@@ -56,17 +56,17 @@ export function LevelProgress({ points, level, totalEarned }: LevelProgressProps
   const levelColor = getLevelColor(level);
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
+    <div className="bg-white border border-gray-200 rounded-2xl p-5 space-y-4">
       {/* Level display */}
       <div className="flex items-center gap-4">
         <div
           className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${levelColor} flex items-center justify-center flex-shrink-0 shadow-lg`}
         >
-          <span className="text-white font-bold text-lg">{level}</span>
+          <span className="text-gray-900 font-bold text-lg">{level}</span>
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-2">
-            <p className="text-white font-bold text-lg">Nível {level}</p>
+            <p className="text-gray-900 font-bold text-lg">Nível {level}</p>
             <span className="text-xs text-gray-500">→ Nível {level + 1}</span>
           </div>
           <p className="text-sm text-gray-400 mt-0.5">
@@ -74,14 +74,14 @@ export function LevelProgress({ points, level, totalEarned }: LevelProgressProps
           </p>
         </div>
         <div className="text-right flex-shrink-0">
-          <p className="text-sm font-bold text-white">{progress}%</p>
+          <p className="text-sm font-bold text-gray-900">{progress}%</p>
           <p className="text-xs text-gray-500">progresso</p>
         </div>
       </div>
 
       {/* Progress bar */}
       <div className="space-y-1.5">
-        <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+        <div className="h-2 bg-gray-50 rounded-full overflow-hidden">
           <div
             className={`h-full rounded-full bg-gradient-to-r ${levelColor} transition-all duration-700`}
             style={{ width: `${progress}%` }}
@@ -94,9 +94,9 @@ export function LevelProgress({ points, level, totalEarned }: LevelProgressProps
       </div>
 
       {/* Total earned */}
-      <div className="flex items-center justify-between border-t border-white/10 pt-3">
+      <div className="flex items-center justify-between border-t border-gray-200 pt-3">
         <p className="text-xs text-gray-500">Total ganho</p>
-        <p className="text-sm font-semibold text-blue-400">
+        <p className="text-sm font-semibold text-violet-400">
           +{totalEarned.toLocaleString("pt-BR")} pts
         </p>
       </div>

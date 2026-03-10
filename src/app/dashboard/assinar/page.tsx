@@ -73,31 +73,31 @@ export default function AssinarPage() {
   return (
     <div className="max-w-lg mx-auto py-12 px-4">
       <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/30 rounded-full px-4 py-1.5 text-sm text-blue-300 mb-4">
+        <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/30 rounded-full px-4 py-1.5 text-sm text-violet-300 mb-4">
           <Car className="w-4 h-4" />
           Assinatura Única
         </div>
-        <h1 className="text-3xl font-bold text-white mb-3">DetailHub</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-3">DetailHub</h1>
         <p className="text-gray-400">Acesso completo à plataforma. Sem limites.</p>
       </div>
 
       {loading ? (
         <div className="glass-card p-8 animate-pulse space-y-4">
-          <div className="h-12 bg-white/10 rounded w-40 mx-auto" />
-          <div className="h-4 bg-white/10 rounded w-64 mx-auto" />
+          <div className="h-12 bg-gray-50 rounded w-40 mx-auto" />
+          <div className="h-4 bg-gray-50 rounded w-64 mx-auto" />
           <div className="space-y-3 mt-6">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-4 bg-white/10 rounded" />
+              <div key={i} className="h-4 bg-gray-50 rounded" />
             ))}
           </div>
         </div>
       ) : (
-        <div className="glass-card p-8 border-blue-500/30">
+        <div className="glass-card p-8 border-violet-500/30">
           {/* Price */}
           <div className="text-center mb-8">
             <div className="flex items-end justify-center gap-1 mb-2">
               <span className="text-gray-400 text-lg">R$</span>
-              <span className="text-5xl font-bold text-white">
+              <span className="text-5xl font-bold text-gray-900">
                 {plan ? Number(plan.price).toLocaleString("pt-BR") : "600"}
               </span>
               <span className="text-gray-400 text-lg mb-1">/ano</span>
@@ -110,7 +110,7 @@ export default function AssinarPage() {
           {/* Features */}
           <ul className="space-y-3 mb-8">
             {FEATURES.map((feature) => (
-              <li key={feature} className="flex items-start gap-3 text-sm text-gray-300">
+              <li key={feature} className="flex items-start gap-3 text-sm text-gray-600">
                 <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
                 {feature}
               </li>

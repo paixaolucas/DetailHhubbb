@@ -76,18 +76,18 @@ export default function MinhasComunidadesPage() {
       <div
         className={`relative rounded-2xl p-6 border transition-all duration-300 group cursor-pointer ${
           hasAccess
-            ? "bg-white/5 border-white/10 hover:border-white/25"
-            : "bg-white/[0.02] border-white/5 hover:border-blue-500/30"
+            ? "bg-white border-gray-200 hover:border-white/25"
+            : "bg-white/[0.02] border-gray-100 hover:border-violet-500/30"
         }`}
       >
         {/* Lock overlay for no-access */}
         {!hasAccess && (
-          <div className="absolute inset-0 rounded-2xl bg-[#111827]/40 backdrop-blur-[1px] flex items-center justify-center z-10 group-hover:bg-[#111827]/20 transition-colors">
+          <div className="absolute inset-0 rounded-2xl bg-[#F8F7FF]/40 backdrop-blur-[1px] flex items-center justify-center z-10 group-hover:bg-[#F8F7FF]/20 transition-colors">
             <div className="flex flex-col items-center gap-2">
-              <div className="w-10 h-10 bg-white/10 border border-white/20 rounded-full flex items-center justify-center group-hover:border-blue-500/40 transition-colors">
-                <Lock className="w-5 h-5 text-gray-400 group-hover:text-blue-400 transition-colors" />
+              <div className="w-10 h-10 bg-gray-50 border border-gray-200 rounded-full flex items-center justify-center group-hover:border-violet-500/40 transition-colors">
+                <Lock className="w-5 h-5 text-gray-400 group-hover:text-violet-400 transition-colors" />
               </div>
-              <span className="text-xs text-gray-500 font-medium group-hover:text-blue-400 transition-colors">Ver planos</span>
+              <span className="text-xs text-gray-500 font-medium group-hover:text-violet-400 transition-colors">Ver planos</span>
             </div>
           </div>
         )}
@@ -111,14 +111,14 @@ export default function MinhasComunidadesPage() {
             />
           ) : (
             <div
-              className={`w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg flex-shrink-0 ${!hasAccess ? "opacity-40 grayscale" : ""}`}
+              className={`w-12 h-12 rounded-xl flex items-center justify-center text-gray-900 font-bold text-lg flex-shrink-0 ${!hasAccess ? "opacity-40 grayscale" : ""}`}
               style={{ backgroundColor: community.primaryColor }}
             >
               {community.name.charAt(0)}
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <h3 className={`font-semibold text-lg leading-tight truncate ${hasAccess ? "text-white group-hover:text-blue-400 transition-colors" : "text-gray-500"}`}>
+            <h3 className={`font-semibold text-lg leading-tight truncate ${hasAccess ? "text-gray-900 group-hover:text-violet-400 transition-colors" : "text-gray-500"}`}>
               {community.name}
             </h3>
             <p className={`text-xs mt-0.5 truncate ${hasAccess ? "text-gray-500" : "text-gray-600"}`}>
@@ -156,13 +156,13 @@ export default function MinhasComunidadesPage() {
         )}
 
         {/* Footer */}
-        <div className={`flex items-center justify-between text-xs pt-4 border-t ${hasAccess ? "border-white/5 text-gray-500" : "border-white/[0.03] text-gray-600"}`}>
+        <div className={`flex items-center justify-between text-xs pt-4 border-t ${hasAccess ? "border-gray-100 text-gray-500" : "border-white/[0.03] text-gray-600"}`}>
           <div className="flex items-center gap-1.5">
             <Users className="w-3.5 h-3.5" />
             {community.memberCount.toLocaleString("pt-BR")} membros
           </div>
           {hasAccess && (
-            <span className="text-blue-400 font-medium">
+            <span className="text-violet-400 font-medium">
               Entrar na comunidade →
             </span>
           )}
@@ -178,7 +178,7 @@ export default function MinhasComunidadesPage() {
         {hasAccess && (
           <Link
             href="/dashboard/meu-aprendizado"
-            className="flex items-center justify-center gap-1.5 text-xs text-gray-500 hover:text-gray-300 transition-colors py-1"
+            className="flex items-center justify-center gap-1.5 text-xs text-gray-500 hover:text-gray-600 transition-colors py-1"
           >
             <BookOpen className="w-3 h-3" />
             Meu Aprendizado
@@ -192,7 +192,7 @@ export default function MinhasComunidadesPage() {
     <div className="max-w-6xl mx-auto space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white mb-1">Minhas Comunidades</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">Minhas Comunidades</h1>
         <p className="text-gray-400 text-sm">
           Comunidades com acesso ativo aparecem em destaque. As demais estão disponíveis para solicitar acesso.
         </p>
@@ -206,18 +206,18 @@ export default function MinhasComunidadesPage() {
               <CheckCircle className="w-5 h-5 text-green-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">{myCommunityIds.length}</p>
+              <p className="text-2xl font-bold text-gray-900">{myCommunityIds.length}</p>
               <p className="text-xs text-gray-500">Com acesso</p>
             </div>
           </div>
         </div>
         <div className="glass-card p-5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center">
-              <Users className="w-5 h-5 text-blue-400" />
+            <div className="w-10 h-10 bg-violet-500/10 rounded-xl flex items-center justify-center">
+              <Users className="w-5 h-5 text-violet-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">{communities.length}</p>
+              <p className="text-2xl font-bold text-gray-900">{communities.length}</p>
               <p className="text-xs text-gray-500">Total disponíveis</p>
             </div>
           </div>
@@ -228,7 +228,7 @@ export default function MinhasComunidadesPage() {
               <Lock className="w-5 h-5 text-gray-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">{communities.length - myCommunityIds.length}</p>
+              <p className="text-2xl font-bold text-gray-900">{communities.length - myCommunityIds.length}</p>
               <p className="text-xs text-gray-500">Sem acesso</p>
             </div>
           </div>
@@ -243,7 +243,7 @@ export default function MinhasComunidadesPage() {
           placeholder="Buscar comunidades..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-3 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-blue-500/50 focus:bg-white/8 transition-all md:w-80"
+          className="w-full bg-white border border-gray-200 rounded-xl pl-11 pr-4 py-3 text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:border-violet-400 focus:bg-white/8 transition-all md:w-80"
         />
       </div>
 
@@ -252,15 +252,15 @@ export default function MinhasComunidadesPage() {
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="glass-card p-6 h-52 animate-pulse">
               <div className="flex gap-4 mb-4">
-                <div className="w-12 h-12 bg-white/10 rounded-xl" />
+                <div className="w-12 h-12 bg-gray-50 rounded-xl" />
                 <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-white/10 rounded w-3/4" />
-                  <div className="h-3 bg-white/5 rounded w-1/2" />
+                  <div className="h-4 bg-gray-50 rounded w-3/4" />
+                  <div className="h-3 bg-white rounded w-1/2" />
                 </div>
               </div>
               <div className="space-y-2">
-                <div className="h-3 bg-white/5 rounded" />
-                <div className="h-3 bg-white/5 rounded w-4/5" />
+                <div className="h-3 bg-white rounded" />
+                <div className="h-3 bg-white rounded w-4/5" />
               </div>
             </div>
           ))}

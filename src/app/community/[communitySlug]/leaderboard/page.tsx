@@ -113,12 +113,12 @@ export default function LeaderboardPage({
   // Loading skeleton
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#111827]">
+      <div className="min-h-screen bg-[#F8F7FF]">
         <div className="container mx-auto px-4 py-12 max-w-2xl space-y-4">
-          <div className="h-8 bg-white/10 rounded-xl animate-pulse w-48" />
-          <div className="h-4 bg-white/5 rounded-xl animate-pulse w-64" />
+          <div className="h-8 bg-gray-50 rounded-xl animate-pulse w-48" />
+          <div className="h-4 bg-white rounded-xl animate-pulse w-64" />
           {Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className="h-14 bg-white/5 rounded-xl animate-pulse" />
+            <div key={i} className="h-14 bg-white rounded-xl animate-pulse" />
           ))}
         </div>
       </div>
@@ -127,10 +127,10 @@ export default function LeaderboardPage({
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#111827] flex items-center justify-center">
+      <div className="min-h-screen bg-[#F8F7FF] flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-400 text-sm mb-4">{error}</p>
-          <Link href="/communities" className="text-blue-400 text-sm hover:underline">
+          <Link href="/communities" className="text-violet-400 text-sm hover:underline">
             Voltar para comunidades
           </Link>
         </div>
@@ -139,15 +139,15 @@ export default function LeaderboardPage({
   }
 
   return (
-    <div className="min-h-screen bg-[#111827]">
+    <div className="min-h-screen bg-[#F8F7FF]">
       {/* Header */}
-      <header className="border-b border-white/10 bg-[#111827]/80 backdrop-blur-xl sticky top-0 z-10">
+      <header className="border-b border-gray-200 bg-[#F8F7FF]/80 backdrop-blur-xl sticky top-0 z-10">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link
             href={`/community/${communitySlug}`}
-            className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+            className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-900 transition-colors"
           >
-            <span className="text-blue-400">←</span>
+            <span className="text-violet-400">←</span>
             {community?.name ?? communitySlug}
           </Link>
         </div>
@@ -160,7 +160,7 @@ export default function LeaderboardPage({
             <Trophy className="w-5 h-5 text-yellow-400" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white">Ranking</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Ranking</h1>
             <p className="text-gray-400 text-sm mt-0.5">
               {community?.name} — pontuação acumulada
             </p>
@@ -175,8 +175,8 @@ export default function LeaderboardPage({
               onClick={() => setPeriod(value)}
               className={`px-4 py-1.5 rounded-xl text-sm font-medium transition-all ${
                 period === value
-                  ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
-                  : "bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:border-white/20"
+                  ? "bg-violet-600 text-white shadow-lg shadow-violet-500/20"
+                  : "bg-white border border-gray-200 text-gray-400 hover:text-gray-900 hover:border-violet-200"
               }`}
             >
               {label}
@@ -188,14 +188,14 @@ export default function LeaderboardPage({
         <div className="space-y-2">
           {isLeaderboardLoading ? (
             Array.from({ length: 10 }).map((_, i) => (
-              <div key={i} className="h-14 bg-white/5 rounded-xl animate-pulse" />
+              <div key={i} className="h-14 bg-white rounded-xl animate-pulse" />
             ))
           ) : leaderboard.length === 0 ? (
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-16 text-center">
+            <div className="bg-white border border-gray-200 rounded-2xl p-16 text-center">
               <div className="w-16 h-16 bg-yellow-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Medal className="w-8 h-8 text-yellow-400" />
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Nenhum ranking ainda
               </h3>
               <p className="text-sm text-gray-500">
@@ -223,10 +223,10 @@ export default function LeaderboardPage({
         {badges.length > 0 && (
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <Star className="w-4 h-4 text-blue-400" />
-              <h2 className="text-lg font-bold text-white">Badges da comunidade</h2>
+              <Star className="w-4 h-4 text-violet-400" />
+              <h2 className="text-lg font-bold text-gray-900">Badges da comunidade</h2>
             </div>
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
+            <div className="bg-white border border-gray-200 rounded-2xl p-5">
               <BadgeGrid badges={badges} earnedBadgeIds={[]} />
             </div>
           </div>

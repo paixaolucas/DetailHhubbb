@@ -17,7 +17,7 @@ async function getTools() {
 }
 
 const CATEGORY_LABELS: Record<string, { label: string; color: string }> = {
-  PRODUCTIVITY: { label: "Produtividade", color: "text-blue-400 bg-blue-500/10 border-blue-500/20" },
+  PRODUCTIVITY: { label: "Produtividade", color: "text-violet-400 bg-violet-500/10 border-violet-500/20" },
   MARKETING: { label: "Marketing", color: "text-purple-400 bg-purple-500/10 border-purple-500/20" },
   ANALYTICS: { label: "Analytics", color: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20" },
   DESIGN: { label: "Design", color: "text-pink-400 bg-pink-500/10 border-pink-500/20" },
@@ -25,7 +25,7 @@ const CATEGORY_LABELS: Record<string, { label: string; color: string }> = {
   FINANCE: { label: "Financeiro", color: "text-yellow-400 bg-yellow-500/10 border-yellow-500/20" },
   COMMUNICATION: { label: "Comunicação", color: "text-orange-400 bg-orange-500/10 border-orange-500/20" },
   DIAGNOSTIC: { label: "Diagnóstico", color: "text-red-400 bg-red-500/10 border-red-500/20" },
-  AUTOMOTIVE: { label: "Automotivo", color: "text-blue-400 bg-blue-500/10 border-blue-500/20" },
+  AUTOMOTIVE: { label: "Automotivo", color: "text-violet-400 bg-violet-500/10 border-violet-500/20" },
 };
 
 export default async function ToolsPage() {
@@ -46,7 +46,7 @@ export default async function ToolsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-white">Ferramentas</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Ferramentas</h1>
         <p className="text-gray-400 text-sm mt-1">
           Ferramentas automotivas e de gestão para alavancar seu negócio
         </p>
@@ -55,7 +55,7 @@ export default async function ToolsPage() {
       {/* Featured */}
       {featured.length > 0 && (
         <div>
-          <h2 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
+          <h2 className="text-sm font-semibold text-gray-600 uppercase tracking-wider mb-4">
             Em destaque
           </h2>
           <div className="grid md:grid-cols-3 gap-4">
@@ -88,10 +88,10 @@ export default async function ToolsPage() {
 
       {tools.length === 0 && (
         <div className="glass-card p-16 text-center">
-          <div className="w-20 h-20 bg-blue-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Wrench className="w-10 h-10 text-blue-400" />
+          <div className="w-20 h-20 bg-violet-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Wrench className="w-10 h-10 text-violet-400" />
           </div>
-          <h3 className="text-xl font-semibold text-white mb-2">Nenhuma ferramenta disponível</h3>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">Nenhuma ferramenta disponível</h3>
           <p className="text-gray-400 text-sm">As ferramentas serão adicionadas em breve.</p>
         </div>
       )}
@@ -104,8 +104,8 @@ function ToolCard({ tool, featured = false }: { tool: any; featured?: boolean })
 
   return (
     <div
-      className={`glass-card p-5 hover:border-white/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-500/10 group ${
-        featured ? "border-blue-500/30" : ""
+      className={`glass-card p-5 hover:border-violet-200 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-violet-500/10 group ${
+        featured ? "border-violet-500/30" : ""
       }`}
     >
       <div className="flex items-start justify-between mb-4">
@@ -117,12 +117,12 @@ function ToolCard({ tool, featured = false }: { tool: any; featured?: boolean })
               className="w-10 h-10 rounded-xl object-cover"
             />
           ) : (
-            <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-400 font-bold text-lg">
+            <div className="w-10 h-10 bg-violet-500/10 rounded-xl flex items-center justify-center text-violet-400 font-bold text-lg">
               {tool.name.charAt(0)}
             </div>
           )}
           <div>
-            <h3 className="font-semibold text-white text-sm group-hover:text-blue-300 transition-colors">
+            <h3 className="font-semibold text-gray-900 text-sm group-hover:text-violet-300 transition-colors">
               {tool.name}
             </h3>
             <span className={`text-xs border px-1.5 py-0.5 rounded-full ${catInfo.color}`}>
@@ -146,7 +146,7 @@ function ToolCard({ tool, featured = false }: { tool: any; featured?: boolean })
         href={tool.affiliateUrl ?? tool.websiteUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center justify-center gap-2 w-full py-2.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 hover:text-blue-300 border border-blue-500/20 rounded-xl text-xs font-semibold transition-all"
+        className="flex items-center justify-center gap-2 w-full py-2.5 bg-violet-600/20 hover:bg-violet-600/30 text-violet-400 hover:text-violet-300 border border-violet-500/20 rounded-xl text-xs font-semibold transition-all"
       >
         Acessar ferramenta <ExternalLink className="w-3 h-3" />
       </a>

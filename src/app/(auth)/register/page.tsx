@@ -116,11 +116,11 @@ function RegisterFormContent() {
   ];
 
   return (
-    <div className="min-h-screen bg-chrome-900 flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen bg-[#F8F7FF] flex flex-col items-center justify-center p-6">
       {/* Logo */}
       <Link href="/" className="flex items-center gap-2.5 mb-8">
         <Logo size="md" />
-        <span className="text-white font-bold text-lg">DetailHub</span>
+        <span className="text-gray-900 font-bold text-lg">DetailHub</span>
       </Link>
 
       <div className="w-full max-w-2xl">
@@ -133,13 +133,13 @@ function RegisterFormContent() {
                   step > s
                     ? "bg-green-500 text-white"
                     : step === s
-                    ? "bg-blue-600 text-white"
-                    : "bg-white/10 text-gray-500"
+                    ? "bg-violet-600 text-white"
+                    : "bg-gray-50 text-gray-500"
                 }`}
               >
                 {step > s ? <CheckCircle className="w-4 h-4" /> : s}
               </div>
-              {s < 2 && <div className={`h-px w-16 ${step > s ? "bg-blue-500" : "bg-white/10"}`} />}
+              {s < 2 && <div className={`h-px w-16 ${step > s ? "bg-violet-500" : "bg-gray-200"}`} />}
             </div>
           ))}
         </div>
@@ -149,7 +149,7 @@ function RegisterFormContent() {
             /* Step 1: Role selection */
             <div className="p-8">
               <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold text-white mb-2">Como você vai usar o DetailHub?</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Como você vai usar o DetailHub?</h2>
                 <p className="text-gray-400">Escolha seu perfil para personalizar sua experiência.</p>
               </div>
 
@@ -161,21 +161,21 @@ function RegisterFormContent() {
                     onClick={() => setSelectedRole(id)}
                     className={`text-left p-6 rounded-xl border-2 transition-all ${
                       selectedRole === id
-                        ? "border-blue-500 bg-blue-500/10"
-                        : "border-white/10 hover:border-white/20 hover:bg-white/5"
+                        ? "border-violet-500 bg-violet-500/10"
+                        : "border-gray-200 hover:border-violet-200 hover:bg-violet-50"
                     }`}
                   >
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${
-                      selectedRole === id ? "bg-blue-500/20" : "bg-white/5"
+                      selectedRole === id ? "bg-violet-500/20" : "bg-gray-50"
                     }`}>
-                      <Icon className={`w-6 h-6 ${selectedRole === id ? "text-blue-400" : "text-gray-400"}`} />
+                      <Icon className={`w-6 h-6 ${selectedRole === id ? "text-violet-400" : "text-gray-500"}`} />
                     </div>
-                    <h3 className="text-white font-semibold text-lg mb-1">{label}</h3>
+                    <h3 className="text-gray-900 font-semibold text-lg mb-1">{label}</h3>
                     <p className="text-gray-400 text-sm mb-4">{desc}</p>
                     <ul className="space-y-2">
                       {features.map((f) => (
-                        <li key={f} className="flex items-center gap-2 text-sm text-gray-300">
-                          <CheckCircle className={`w-3.5 h-3.5 flex-shrink-0 ${selectedRole === id ? "text-blue-400" : "text-gray-600"}`} />
+                        <li key={f} className="flex items-center gap-2 text-sm text-gray-600">
+                          <CheckCircle className={`w-3.5 h-3.5 flex-shrink-0 ${selectedRole === id ? "text-violet-400" : "text-gray-400"}`} />
                           {f}
                         </li>
                       ))}
@@ -188,7 +188,7 @@ function RegisterFormContent() {
                 type="button"
                 disabled={!selectedRole}
                 onClick={() => setStep(2)}
-                className="w-full mt-6 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-cyan-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl transition-all hover:shadow-lg hover:shadow-blue-500/30"
+                className="w-full mt-6 bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-purple-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl transition-all hover:shadow-lg hover:shadow-violet-500/30"
               >
                 Continuar
               </button>
@@ -197,7 +197,7 @@ function RegisterFormContent() {
             /* Step 2: Form */
             <div className="p-8">
               <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold text-white mb-2">Criar sua conta</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Criar sua conta</h2>
                 <p className="text-gray-400">
                   {selectedRole === "INFLUENCER_ADMIN" ? "Conta de Criador de Conteúdo" : "Conta de Membro"}
                 </p>
@@ -212,14 +212,14 @@ function RegisterFormContent() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1.5">Nome</label>
+                    <label className="block text-sm font-medium text-gray-600 mb-1.5">Nome</label>
                     <input
                       type="text"
                       required
                       value={form.firstName}
                       onChange={(e) => setForm((f) => ({ ...f, firstName: e.target.value }))}
-                      className={`w-full bg-white/5 border rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all ${
-                        fieldErrors.firstName ? "border-red-500/50" : "border-white/10 hover:border-white/20"
+                      className={`w-full bg-white border rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all ${
+                        fieldErrors.firstName ? "border-red-500/50" : "border-gray-200 hover:border-violet-200"
                       }`}
                       placeholder="João"
                       autoComplete="given-name"
@@ -227,14 +227,14 @@ function RegisterFormContent() {
                     {fieldErrors.firstName && <p className="mt-1 text-xs text-red-400">{fieldErrors.firstName}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1.5">Sobrenome</label>
+                    <label className="block text-sm font-medium text-gray-600 mb-1.5">Sobrenome</label>
                     <input
                       type="text"
                       required
                       value={form.lastName}
                       onChange={(e) => setForm((f) => ({ ...f, lastName: e.target.value }))}
-                      className={`w-full bg-white/5 border rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all ${
-                        fieldErrors.lastName ? "border-red-500/50" : "border-white/10 hover:border-white/20"
+                      className={`w-full bg-white border rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all ${
+                        fieldErrors.lastName ? "border-red-500/50" : "border-gray-200 hover:border-violet-200"
                       }`}
                       placeholder="Silva"
                       autoComplete="family-name"
@@ -245,7 +245,7 @@ function RegisterFormContent() {
 
                 {(["email", "password", "confirmPassword"] as const).map((field) => (
                   <div key={field}>
-                    <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                    <label className="block text-sm font-medium text-gray-600 mb-1.5">
                       {field === "email" ? "Email" : field === "password" ? "Senha" : "Confirmar senha"}
                     </label>
                     <input
@@ -253,8 +253,8 @@ function RegisterFormContent() {
                       required
                       value={form[field]}
                       onChange={(e) => setForm((f) => ({ ...f, [field]: e.target.value }))}
-                      className={`w-full bg-white/5 border rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all ${
-                        fieldErrors[field] ? "border-red-500/50" : "border-white/10 hover:border-white/20"
+                      className={`w-full bg-white border rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all ${
+                        fieldErrors[field] ? "border-red-500/50" : "border-gray-200 hover:border-violet-200"
                       }`}
                       placeholder={field === "email" ? "seu@email.com" : "••••••••"}
                       autoComplete={field === "email" ? "email" : "new-password"}
@@ -268,7 +268,7 @@ function RegisterFormContent() {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-blue-500/30 active:scale-[0.98]"
+                    className="w-full bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-violet-500/30 active:scale-[0.98]"
                   >
                     {isLoading ? (
                       <>
@@ -282,7 +282,7 @@ function RegisterFormContent() {
                   <button
                     type="button"
                     onClick={() => setStep(1)}
-                    className="text-gray-400 hover:text-white text-sm transition-colors"
+                    className="text-gray-500 hover:text-gray-900 text-sm transition-colors"
                   >
                     ← Voltar
                   </button>
@@ -292,9 +292,9 @@ function RegisterFormContent() {
           )}
         </div>
 
-        <p className="text-center text-gray-400 text-sm mt-6">
+        <p className="text-center text-gray-500 text-sm mt-6">
           Já tem conta?{" "}
-          <Link href="/login" className="text-blue-400 hover:text-blue-300 font-medium transition-colors">
+          <Link href="/login" className="text-violet-400 hover:text-violet-300 font-medium transition-colors">
             Entrar
           </Link>
         </p>

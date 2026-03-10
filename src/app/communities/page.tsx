@@ -64,21 +64,21 @@ export default function CommunitiesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-chrome-900">
+    <div className="min-h-screen bg-[#F8F7FF]">
       {/* Header */}
-      <header className="bg-chrome-950 border-b border-white/10 backdrop-blur-md sticky top-0 z-50">
+      <header className="bg-white border-b border-gray-200 backdrop-blur-md sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 font-bold text-lg">
             <Logo size="md" />
-            <span className="text-white">DetailHub</span>
+            <span className="text-gray-900">DetailHub</span>
           </Link>
           <div className="flex items-center gap-3">
-            <Link href="/login" className="text-gray-400 hover:text-white text-sm transition-colors">
+            <Link href="/login" className="text-gray-500 hover:text-gray-900 text-sm transition-colors">
               Entrar
             </Link>
             <Link
               href="/register"
-              className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-blue-500/30"
+              className="bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-violet-500/30"
             >
               Criar conta
             </Link>
@@ -87,13 +87,13 @@ export default function CommunitiesPage() {
       </header>
 
       {/* Hero */}
-      <div className="bg-chrome-950 border-b border-white/10 py-16">
+      <div className="bg-[#F0EEFF] border-b border-gray-200 py-16">
         <div className="container mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-3 py-1 text-xs text-blue-400 mb-4">
+          <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/20 rounded-full px-3 py-1 text-xs text-violet-400 mb-4">
             <Car className="w-3 h-3" />
             Comunidades automotivas
           </div>
-          <h1 className="text-4xl font-bold text-white mb-3">
+          <h1 className="text-4xl font-bold text-gray-900 mb-3">
             Explore as comunidades
           </h1>
           <p className="text-gray-400 mb-8">
@@ -109,12 +109,12 @@ export default function CommunitiesPage() {
                 placeholder="Buscar comunidades..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 hover:border-white/20 rounded-xl pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all"
+                className="w-full bg-white border border-gray-200 hover:border-violet-200 rounded-xl pl-10 pr-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 focus:border-violet-400 transition-all"
               />
             </div>
             <button
               type="submit"
-              className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-xl font-semibold transition-all hover:shadow-lg hover:shadow-blue-500/30"
+              className="bg-violet-600 hover:bg-violet-500 text-white px-5 py-3 rounded-xl font-semibold transition-all hover:shadow-lg hover:shadow-violet-500/30"
             >
               Buscar
             </button>
@@ -128,8 +128,8 @@ export default function CommunitiesPage() {
                 onClick={() => { setCategory(value); setQuery(""); }}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
                   category === value
-                    ? "bg-blue-600 text-white"
-                    : "bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:border-white/20"
+                    ? "bg-violet-600 text-white"
+                    : "bg-white border border-gray-200 text-gray-500 hover:text-gray-900 hover:border-violet-200"
                 }`}
               >
                 {label}
@@ -145,19 +145,19 @@ export default function CommunitiesPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="glass-card overflow-hidden animate-pulse">
-                <div className="h-32 bg-white/5" />
+                <div className="h-32 bg-gray-100" />
                 <div className="p-5 space-y-3">
-                  <div className="h-5 bg-white/5 rounded w-3/4" />
-                  <div className="h-4 bg-white/5 rounded w-1/2" />
-                  <div className="h-4 bg-white/5 rounded w-full" />
-                  <div className="h-4 bg-white/5 rounded w-4/5" />
+                  <div className="h-5 bg-gray-200 rounded w-3/4" />
+                  <div className="h-4 bg-gray-200 rounded w-1/2" />
+                  <div className="h-4 bg-gray-200 rounded w-full" />
+                  <div className="h-4 bg-gray-200 rounded w-4/5" />
                 </div>
               </div>
             ))}
           </div>
         ) : communities.length === 0 ? (
           <div className="text-center py-20">
-            <div className="w-20 h-20 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <Users className="w-10 h-10 text-gray-600" />
             </div>
             <h3 className="text-xl font-semibold text-gray-400 mb-2">
@@ -168,7 +168,7 @@ export default function CommunitiesPage() {
             </p>
             <Link
               href="/register"
-              className="inline-block mt-6 bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-semibold transition-all"
+              className="inline-block mt-6 bg-violet-600 hover:bg-violet-500 text-white px-6 py-3 rounded-xl font-semibold transition-all"
             >
               Criar minha comunidade
             </Link>
@@ -199,19 +199,19 @@ function CommunityCard({ community }: { community: Community }) {
   return (
     <Link
       href={`/community/${community.slug}`}
-      className="group glass-card overflow-hidden hover:border-white/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/10 block"
+      className="group glass-card overflow-hidden hover:border-violet-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-violet-200/30 block"
     >
       {/* Banner */}
       <div
         className="h-28 relative"
         style={{
-          background: `linear-gradient(135deg, ${community.primaryColor}40, ${community.primaryColor}20), #1f2937`,
+          background: `linear-gradient(135deg, ${community.primaryColor}40, ${community.primaryColor}20), #F0EEFF`,
         }}
       >
         <div className="absolute inset-0 grid-pattern opacity-20" />
         <div className="absolute bottom-0 left-5 translate-y-1/2">
           <div
-            className="w-14 h-14 rounded-xl border-2 border-chrome-900 flex items-center justify-center text-white font-bold text-xl shadow-lg"
+            className="w-14 h-14 rounded-xl border-2 border-white flex items-center justify-center text-white font-bold text-xl shadow-lg"
             style={{ backgroundColor: community.primaryColor }}
           >
             {community.name.charAt(0)}
@@ -220,7 +220,7 @@ function CommunityCard({ community }: { community: Community }) {
       </div>
 
       <div className="pt-10 px-5 pb-5">
-        <h3 className="font-bold text-white text-lg leading-tight group-hover:text-blue-300 transition-colors">
+        <h3 className="font-bold text-gray-900 text-lg leading-tight group-hover:text-violet-600 transition-colors">
           {community.name}
         </h3>
         <p className="text-sm text-gray-500 mt-0.5 mb-3">
@@ -238,7 +238,7 @@ function CommunityCard({ community }: { community: Community }) {
             {community.tags.slice(0, 3).map((tag) => (
               <span
                 key={tag}
-                className="text-xs px-2.5 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full"
+                className="text-xs px-2.5 py-0.5 bg-violet-500/10 text-violet-400 border border-violet-500/20 rounded-full"
               >
                 #{tag}
               </span>
@@ -246,13 +246,13 @@ function CommunityCard({ community }: { community: Community }) {
           </div>
         )}
 
-        <div className="flex items-center justify-between pt-3 border-t border-white/10">
+        <div className="flex items-center justify-between pt-3 border-t border-gray-200">
           <div className="flex items-center gap-1.5 text-sm text-gray-500">
             <Users className="w-4 h-4" />
             <span>{community.memberCount.toLocaleString("pt-BR")} membros</span>
           </div>
           {defaultPlan && (
-            <span className="text-sm font-semibold text-blue-400">
+            <span className="text-sm font-semibold text-violet-400">
               R$ {Number(defaultPlan.price).toLocaleString("pt-BR")}/mês
             </span>
           )}

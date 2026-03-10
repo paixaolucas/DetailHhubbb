@@ -21,7 +21,7 @@ export function StatsCard({
   prefix = "",
   suffix = "",
   icon: Icon,
-  iconColor = "text-blue-400",
+  iconColor = "text-violet-400",
   description,
   loading = false,
 }: StatsCardProps) {
@@ -31,26 +31,26 @@ export function StatsCard({
     return (
       <div className="glass-card p-6 space-y-3 animate-pulse">
         <div className="flex justify-between">
-          <div className="h-4 bg-white/10 rounded w-24" />
-          <div className="w-10 h-10 bg-white/10 rounded-xl" />
+          <div className="h-4 bg-gray-50 rounded w-24" />
+          <div className="w-10 h-10 bg-gray-50 rounded-xl" />
         </div>
-        <div className="h-8 bg-white/10 rounded w-20" />
-        <div className="h-3 bg-white/10 rounded w-16" />
+        <div className="h-8 bg-gray-50 rounded w-20" />
+        <div className="h-3 bg-gray-50 rounded w-16" />
       </div>
     );
   }
 
   return (
-    <div className="glass-card p-6 hover:border-white/20 transition-all duration-300 group">
+    <div className="glass-card p-6 hover:border-violet-200 transition-all duration-300 group">
       <div className="flex items-start justify-between mb-4">
         <p className="text-sm font-medium text-gray-400">{title}</p>
-        <div className={`w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform ${iconColor.replace("text-", "bg-").replace("-400", "-500/20")}`}>
+        <div className={`w-10 h-10 bg-white rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform ${iconColor.replace("text-", "bg-").replace("-400", "-500/20")}`}>
           <Icon className={`w-5 h-5 ${iconColor}`} />
         </div>
       </div>
 
       <div className="flex items-end justify-between">
-        <p className="text-2xl font-bold text-white">
+        <p className="text-2xl font-bold text-gray-900">
           {prefix}
           {typeof value === "number" ? value.toLocaleString("pt-BR") : value}
           {suffix}

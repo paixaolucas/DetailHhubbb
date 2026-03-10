@@ -47,10 +47,10 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-chrome-900 flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen bg-[#F8F7FF] flex flex-col items-center justify-center p-6">
       <Link href="/" className="flex items-center gap-2.5 mb-8">
         <Logo size="md" />
-        <span className="text-white font-bold text-lg">DetailHub</span>
+        <span className="text-gray-900 font-bold text-lg">DetailHub</span>
       </Link>
 
       <div className="w-full max-w-md glass-card p-8">
@@ -59,13 +59,13 @@ export default function ResetPasswordPage() {
             <div className="w-16 h-16 bg-green-500/10 rounded-2xl flex items-center justify-center mx-auto">
               <CheckCircle className="w-8 h-8 text-green-400" />
             </div>
-            <h2 className="text-2xl font-bold text-white">Senha redefinida!</h2>
+            <h2 className="text-2xl font-bold text-gray-900">Senha redefinida!</h2>
             <p className="text-gray-400">
               Sua senha foi atualizada com sucesso. Você já pode fazer login.
             </p>
             <Link
               href="/login"
-              className="inline-block w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-cyan-500 text-white font-semibold py-3.5 rounded-xl text-center transition-all hover:shadow-lg hover:shadow-blue-500/30"
+              className="inline-block w-full bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-purple-500 text-white font-semibold py-3.5 rounded-xl text-center transition-all hover:shadow-lg hover:shadow-violet-500/30"
             >
               Ir para o login
             </Link>
@@ -73,10 +73,10 @@ export default function ResetPasswordPage() {
         ) : (
           <>
             <div className="mb-8">
-              <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mb-4">
-                <Lock className="w-6 h-6 text-blue-400" />
+              <div className="w-12 h-12 bg-violet-500/10 rounded-xl flex items-center justify-center mb-4">
+                <Lock className="w-6 h-6 text-violet-400" />
               </div>
-              <h2 className="text-2xl font-bold text-white mb-2">Nova senha</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Nova senha</h2>
               <p className="text-gray-400 text-sm">
                 Escolha uma senha forte com no mínimo 8 caracteres.
               </p>
@@ -91,7 +91,7 @@ export default function ResetPasswordPage() {
             <form onSubmit={handleSubmit} className="space-y-5">
               {(["password", "confirmPassword"] as const).map((field) => (
                 <div key={field}>
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                  <label className="block text-sm font-medium text-gray-600 mb-1.5">
                     {field === "password" ? "Nova senha" : "Confirmar nova senha"}
                   </label>
                   <div className="relative">
@@ -100,7 +100,7 @@ export default function ResetPasswordPage() {
                       required
                       value={form[field]}
                       onChange={(e) => setForm((f) => ({ ...f, [field]: e.target.value }))}
-                      className="w-full bg-white/5 border border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-xl px-4 py-3 pr-12 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all"
+                      className="w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 pr-12 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all"
                       placeholder="••••••••"
                       autoComplete="new-password"
                     />
@@ -108,7 +108,7 @@ export default function ResetPasswordPage() {
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-600 transition-colors"
                       >
                         {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                       </button>
@@ -120,7 +120,7 @@ export default function ResetPasswordPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-blue-500/30"
+                className="w-full bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-violet-500/30"
               >
                 {isLoading ? (
                   <>

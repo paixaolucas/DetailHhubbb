@@ -31,7 +31,7 @@ const CATEGORIES = [
 ];
 
 const CATEGORY_COLOR: Record<string, string> = {
-  PRODUCTIVITY: "text-blue-400 bg-blue-500/10 border-blue-500/20",
+  PRODUCTIVITY: "text-violet-400 bg-violet-500/10 border-violet-500/20",
   MARKETING: "text-purple-400 bg-purple-500/10 border-purple-500/20",
   ANALYTICS: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20",
   DESIGN: "text-pink-400 bg-pink-500/10 border-pink-500/20",
@@ -147,7 +147,7 @@ export default function AdminFerramentasPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-[3px] border-blue-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-[3px] border-violet-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -156,12 +156,12 @@ export default function AdminFerramentasPage() {
     <div className="space-y-6 max-w-5xl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Ferramentas SaaS</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Ferramentas SaaS</h1>
           <p className="text-gray-400 text-sm mt-1">Gerencie as ferramentas exibidas no marketplace</p>
         </div>
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
+          className="flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
         >
           <Plus className="w-4 h-4" />
           Nova Ferramenta
@@ -170,18 +170,18 @@ export default function AdminFerramentasPage() {
 
       {tools.length === 0 ? (
         <div className="glass-card p-16 text-center">
-          <div className="w-20 h-20 bg-blue-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Wrench className="w-10 h-10 text-blue-400" />
+          <div className="w-20 h-20 bg-violet-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Wrench className="w-10 h-10 text-violet-400" />
           </div>
-          <h3 className="text-xl font-semibold text-white mb-2">Nenhuma ferramenta cadastrada</h3>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">Nenhuma ferramenta cadastrada</h3>
           <p className="text-gray-400 text-sm mb-6">Adicione ferramentas para exibir no marketplace.</p>
-          <button onClick={openCreate} className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
+          <button onClick={openCreate} className="bg-violet-600 hover:bg-violet-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
             Adicionar primeira ferramenta
           </button>
         </div>
       ) : (
         <div className="glass-card overflow-hidden">
-          <div className="p-5 border-b border-white/10">
+          <div className="p-5 border-b border-gray-200">
             <span className="text-sm text-gray-400">{tools.length} ferramenta(s) cadastrada(s)</span>
           </div>
           <div className="divide-y divide-white/5">
@@ -189,17 +189,17 @@ export default function AdminFerramentasPage() {
               const catColor = CATEGORY_COLOR[tool.category] ?? "text-gray-400 bg-gray-500/10 border-gray-500/20";
               const catLabel = CATEGORIES.find((c) => c.value === tool.category)?.label ?? tool.category;
               return (
-                <div key={tool.id} className="flex items-center gap-4 px-5 py-4 hover:bg-white/5 transition-colors">
-                  <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                <div key={tool.id} className="flex items-center gap-4 px-5 py-4 hover:bg-violet-50 transition-colors">
+                  <div className="w-10 h-10 bg-violet-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
                     {tool.logoUrl ? (
                       <img src={tool.logoUrl} alt={tool.name} className="w-10 h-10 rounded-xl object-cover" />
                     ) : (
-                      <span className="text-blue-400 font-bold">{tool.name.charAt(0)}</span>
+                      <span className="text-violet-400 font-bold">{tool.name.charAt(0)}</span>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
-                      <p className="font-medium text-white text-sm">{tool.name}</p>
+                      <p className="font-medium text-gray-900 text-sm">{tool.name}</p>
                       {tool.isFeatured && <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />}
                     </div>
                     <div className="flex items-center gap-2">
@@ -212,7 +212,7 @@ export default function AdminFerramentasPage() {
                       href={tool.websiteUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-2 text-gray-500 hover:text-blue-400 transition-colors"
+                      className="p-2 text-gray-500 hover:text-violet-400 transition-colors"
                       title="Abrir site"
                     >
                       <ExternalLink className="w-4 h-4" />
@@ -228,7 +228,7 @@ export default function AdminFerramentasPage() {
                     </button>
                     <button
                       onClick={() => openEdit(tool)}
-                      className="p-2 text-gray-500 hover:text-white transition-colors"
+                      className="p-2 text-gray-500 hover:text-gray-900 transition-colors"
                       title="Editar"
                     >
                       <Pencil className="w-4 h-4" />
@@ -252,8 +252,8 @@ export default function AdminFerramentasPage() {
       {showModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="glass-card w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-white/10">
-              <h2 className="text-lg font-semibold text-white">{editing ? "Editar Ferramenta" : "Nova Ferramenta"}</h2>
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">{editing ? "Editar Ferramenta" : "Nova Ferramenta"}</h2>
             </div>
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -262,7 +262,7 @@ export default function AdminFerramentasPage() {
                   <input
                     value={form.name}
                     onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500/50 placeholder-gray-600"
+                    className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 text-sm focus:outline-none focus:border-violet-400 placeholder-gray-600"
                     placeholder="Ex: HubSpot CRM"
                   />
                 </div>
@@ -271,7 +271,7 @@ export default function AdminFerramentasPage() {
                   <input
                     value={form.shortDesc}
                     onChange={(e) => setForm((f) => ({ ...f, shortDesc: e.target.value }))}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500/50 placeholder-gray-600"
+                    className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 text-sm focus:outline-none focus:border-violet-400 placeholder-gray-600"
                     placeholder="Resumo em até 200 caracteres"
                     maxLength={200}
                   />
@@ -282,7 +282,7 @@ export default function AdminFerramentasPage() {
                     value={form.description}
                     onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                     rows={3}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500/50 placeholder-gray-600 resize-none"
+                    className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 text-sm focus:outline-none focus:border-violet-400 placeholder-gray-600 resize-none"
                     placeholder="Descrição detalhada da ferramenta"
                   />
                 </div>
@@ -291,10 +291,10 @@ export default function AdminFerramentasPage() {
                   <select
                     value={form.category}
                     onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500/50"
+                    className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 text-sm focus:outline-none focus:border-violet-400"
                   >
                     {CATEGORIES.map((c) => (
-                      <option key={c.value} value={c.value} className="bg-gray-900">{c.label}</option>
+                      <option key={c.value} value={c.value} className="bg-white">{c.label}</option>
                     ))}
                   </select>
                 </div>
@@ -307,7 +307,7 @@ export default function AdminFerramentasPage() {
                     step={0.1}
                     value={form.rating}
                     onChange={(e) => setForm((f) => ({ ...f, rating: e.target.value }))}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500/50 placeholder-gray-600"
+                    className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 text-sm focus:outline-none focus:border-violet-400 placeholder-gray-600"
                     placeholder="Ex: 4.5"
                   />
                 </div>
@@ -316,7 +316,7 @@ export default function AdminFerramentasPage() {
                   <input
                     value={form.websiteUrl}
                     onChange={(e) => setForm((f) => ({ ...f, websiteUrl: e.target.value }))}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500/50 placeholder-gray-600"
+                    className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 text-sm focus:outline-none focus:border-violet-400 placeholder-gray-600"
                     placeholder="https://exemplo.com"
                   />
                 </div>
@@ -325,7 +325,7 @@ export default function AdminFerramentasPage() {
                   <input
                     value={form.affiliateUrl}
                     onChange={(e) => setForm((f) => ({ ...f, affiliateUrl: e.target.value }))}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500/50 placeholder-gray-600"
+                    className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 text-sm focus:outline-none focus:border-violet-400 placeholder-gray-600"
                     placeholder="https://ref.exemplo.com/?ref=detailhub"
                   />
                 </div>
@@ -334,7 +334,7 @@ export default function AdminFerramentasPage() {
                   <input
                     value={form.logoUrl}
                     onChange={(e) => setForm((f) => ({ ...f, logoUrl: e.target.value }))}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500/50 placeholder-gray-600"
+                    className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 text-sm focus:outline-none focus:border-violet-400 placeholder-gray-600"
                     placeholder="https://cdn.exemplo.com/logo.png"
                   />
                 </div>
@@ -344,7 +344,7 @@ export default function AdminFerramentasPage() {
                     type="number"
                     value={form.sortOrder}
                     onChange={(e) => setForm((f) => ({ ...f, sortOrder: parseInt(e.target.value) || 0 }))}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500/50"
+                    className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 text-sm focus:outline-none focus:border-violet-400"
                   />
                 </div>
                 <div className="flex flex-col gap-3 justify-end">
@@ -353,9 +353,9 @@ export default function AdminFerramentasPage() {
                       type="checkbox"
                       checked={form.isActive}
                       onChange={(e) => setForm((f) => ({ ...f, isActive: e.target.checked }))}
-                      className="w-4 h-4 accent-blue-500"
+                      className="w-4 h-4 accent-violet-500"
                     />
-                    <span className="text-sm text-gray-300">Ativo</span>
+                    <span className="text-sm text-gray-600">Ativo</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -364,22 +364,22 @@ export default function AdminFerramentasPage() {
                       onChange={(e) => setForm((f) => ({ ...f, isFeatured: e.target.checked }))}
                       className="w-4 h-4 accent-yellow-500"
                     />
-                    <span className="text-sm text-gray-300">Destaque</span>
+                    <span className="text-sm text-gray-600">Destaque</span>
                   </label>
                 </div>
               </div>
             </div>
-            <div className="p-6 border-t border-white/10 flex justify-end gap-3">
+            <div className="p-6 border-t border-gray-200 flex justify-end gap-3">
               <button
                 onClick={() => setShowModal(false)}
-                className="px-4 py-2.5 glass-card hover:border-white/20 text-gray-300 text-sm font-medium rounded-xl transition-all"
+                className="px-4 py-2.5 glass-card hover:border-violet-200 text-gray-600 text-sm font-medium rounded-xl transition-all"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-all"
+                className="px-4 py-2.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-all"
               >
                 {saving ? "Salvando…" : editing ? "Salvar alterações" : "Criar ferramenta"}
               </button>

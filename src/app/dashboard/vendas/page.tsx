@@ -12,7 +12,7 @@ const chartStyle = {
   axis: { tick: { fontSize: 11, fill: "#6b7280" }, tickLine: false, axisLine: false },
   tooltip: {
     contentStyle: {
-      backgroundColor: "#1f2937",
+      backgroundColor: "#16152A",
       border: "1px solid rgba(255,255,255,0.1)",
       borderRadius: "12px",
       color: "#f9fafb",
@@ -112,7 +112,7 @@ export default function VendasPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-[3px] border-blue-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-[3px] border-violet-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -121,10 +121,10 @@ export default function VendasPage() {
     <div className="space-y-6 max-w-4xl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Vendas</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Vendas</h1>
           <p className="text-gray-400 text-sm mt-1">Acompanhe suas vendas no marketplace</p>
         </div>
-        <button onClick={exportCSV} className="flex items-center gap-2 px-4 py-2.5 glass-card hover:border-white/20 text-gray-300 hover:text-white text-sm font-medium transition-all rounded-xl">
+        <button onClick={exportCSV} className="flex items-center gap-2 px-4 py-2.5 glass-card hover:border-violet-200 text-gray-600 hover:text-gray-900 text-sm font-medium transition-all rounded-xl">
           <Download className="w-4 h-4" />
           Exportar CSV
         </button>
@@ -138,20 +138,20 @@ export default function VendasPage() {
             label: "Receita Este Mês",
             value: fmt(stats.thisMonthRevenue),
             icon: TrendingUp,
-            color: "text-blue-400 bg-blue-500/10",
+            color: "text-violet-400 bg-violet-500/10",
             growth,
           },
           { label: "Total de Vendas", value: stats.totalSales.toString(), icon: ShoppingBag, color: "text-purple-400 bg-purple-500/10" },
           { label: "Ticket Médio", value: stats.totalSales > 0 ? fmt(stats.totalRevenue / stats.totalSales) : "R$ 0", icon: Package, color: "text-orange-400 bg-orange-500/10" },
         ].map(({ label, value, icon: Icon, color, growth: g }) => (
-          <div key={label} className="glass-card p-5 hover:border-white/20 transition-all group">
+          <div key={label} className="glass-card p-5 hover:border-violet-200 transition-all group">
             <div className="flex items-center justify-between mb-3">
               <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</p>
               <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${color.split(" ")[1]}`}>
                 <Icon className={`w-4 h-4 ${color.split(" ")[0]}`} />
               </div>
             </div>
-            <p className="text-xl font-bold text-white">{value}</p>
+            <p className="text-xl font-bold text-gray-900">{value}</p>
             {g !== undefined && (
               <div className={`flex items-center gap-1 text-xs font-medium mt-1 ${g >= 0 ? "text-green-400" : "text-red-400"}`}>
                 {g >= 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
@@ -164,7 +164,7 @@ export default function VendasPage() {
 
       {/* Chart */}
       <div className="glass-card p-6">
-        <h2 className="text-base font-semibold text-white mb-4">Receita — Últimos 30 dias</h2>
+        <h2 className="text-base font-semibold text-gray-900 mb-4">Receita — Últimos 30 dias</h2>
         <ResponsiveContainer width="100%" height={250}>
           <AreaChart data={chartData}>
             <defs>
@@ -188,16 +188,16 @@ export default function VendasPage() {
           <div className="w-20 h-20 bg-green-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <ShoppingBag className="w-10 h-10 text-green-400" />
           </div>
-          <h3 className="text-xl font-semibold text-white mb-2">Nenhuma venda ainda</h3>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">Nenhuma venda ainda</h3>
           <p className="text-gray-400 text-sm mb-6">Crie e publique seus produtos para começar a vender.</p>
-          <a href="/dashboard/meus-produtos" className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all inline-block">
+          <a href="/dashboard/meus-produtos" className="bg-violet-600 hover:bg-violet-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all inline-block">
             Gerenciar produtos
           </a>
         </div>
       ) : (
         <div className="glass-card overflow-hidden">
-          <div className="p-5 border-b border-white/10 flex items-center justify-between">
-            <h2 className="text-base font-semibold text-white">Vendas Recentes</h2>
+          <div className="p-5 border-b border-gray-200 flex items-center justify-between">
+            <h2 className="text-base font-semibold text-gray-900">Vendas Recentes</h2>
             {purchasesTotal > 0 && (
               <span className="text-xs text-gray-500">{purchasesTotal} venda(s) no total</span>
             )}
@@ -208,7 +208,7 @@ export default function VendasPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-white/5">
+                  <tr className="border-b border-gray-100">
                     <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-5 py-3">Produto</th>
                     <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-5 py-3">Comprador</th>
                     <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-5 py-3">Valor</th>
@@ -217,14 +217,14 @@ export default function VendasPage() {
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {purchases.map((p) => (
-                    <tr key={p.id} className="hover:bg-white/5 transition-colors">
+                    <tr key={p.id} className="hover:bg-violet-50 transition-colors">
                       <td className="px-5 py-3.5">
                         <div>
-                          <p className="text-white font-medium truncate max-w-[180px]">{p.listing.title}</p>
+                          <p className="text-gray-900 font-medium truncate max-w-[180px]">{p.listing.title}</p>
                           <span className="text-xs text-gray-500">{LISTING_TYPE_LABEL[p.listing.type] ?? p.listing.type}</span>
                         </div>
                       </td>
-                      <td className="px-5 py-3.5 text-gray-300">
+                      <td className="px-5 py-3.5 text-gray-600">
                         {p.buyer.firstName} {p.buyer.lastName}
                       </td>
                       <td className="px-5 py-3.5 text-green-400 font-medium">

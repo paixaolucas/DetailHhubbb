@@ -18,7 +18,7 @@ interface StepEditorProps {
 }
 
 function inputClass() {
-  return "w-full bg-white/5 border border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all text-sm";
+  return "w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm";
 }
 
 export default function StepEditor({ step, index, onChange, onRemove }: StepEditorProps) {
@@ -26,10 +26,10 @@ export default function StepEditor({ step, index, onChange, onRemove }: StepEdit
     onChange({ ...step, [field]: value });
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-4">
+    <div className="bg-white border border-gray-200 rounded-2xl p-4 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold text-white">
+        <span className="text-sm font-semibold text-gray-900">
           Passo {index + 1}
         </span>
         <button

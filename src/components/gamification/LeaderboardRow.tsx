@@ -16,7 +16,7 @@ interface LeaderboardRowProps {
 
 const RANK_STYLES: Record<number, { bg: string; text: string; label: string }> = {
   1: { bg: "bg-yellow-500/20 border-yellow-500/40", text: "text-yellow-400", label: "🥇" },
-  2: { bg: "bg-gray-400/15 border-gray-400/30", text: "text-gray-300", label: "🥈" },
+  2: { bg: "bg-gray-400/15 border-gray-400/30", text: "text-gray-600", label: "🥈" },
   3: { bg: "bg-orange-600/20 border-orange-600/40", text: "text-orange-400", label: "🥉" },
 };
 
@@ -27,8 +27,8 @@ export function LeaderboardRow({ rank, user, points, level }: LeaderboardRowProp
 
   return (
     <div
-      className={`flex items-center gap-3 p-3 rounded-xl transition-all hover:bg-white/10 ${
-        rankStyle ? `bg-white/5 border ${rankStyle.bg}` : "bg-white/5 border border-white/5"
+      className={`flex items-center gap-3 p-3 rounded-xl transition-all hover:bg-gray-100 ${
+        rankStyle ? `bg-white border ${rankStyle.bg}` : "bg-white border border-gray-100"
       }`}
     >
       {/* Rank */}
@@ -49,7 +49,7 @@ export function LeaderboardRow({ rank, user, points, level }: LeaderboardRowProp
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full bg-blue-600/40 flex items-center justify-center text-xs font-bold text-blue-300">
+          <div className="w-full h-full bg-violet-600/40 flex items-center justify-center text-xs font-bold text-violet-300">
             {initials}
           </div>
         )}
@@ -57,19 +57,19 @@ export function LeaderboardRow({ rank, user, points, level }: LeaderboardRowProp
 
       {/* Name */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-white truncate">{fullName}</p>
+        <p className="text-sm font-semibold text-gray-900 truncate">{fullName}</p>
       </div>
 
       {/* Level badge */}
       <div className="flex-shrink-0">
-        <span className="text-xs bg-blue-500/15 text-blue-400 border border-blue-500/25 px-2 py-0.5 rounded-full font-medium">
+        <span className="text-xs bg-violet-500/15 text-violet-400 border border-violet-500/25 px-2 py-0.5 rounded-full font-medium">
           Nv. {level}
         </span>
       </div>
 
       {/* Points */}
       <div className="flex-shrink-0 text-right min-w-[64px]">
-        <p className={`text-sm font-bold ${rankStyle ? rankStyle.text : "text-gray-300"}`}>
+        <p className={`text-sm font-bold ${rankStyle ? rankStyle.text : "text-gray-600"}`}>
           {points.toLocaleString("pt-BR")}
         </p>
         <p className="text-[10px] text-gray-600 leading-none">pts</p>

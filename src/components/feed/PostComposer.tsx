@@ -111,7 +111,7 @@ export default function PostComposer({ spaceId, onPost }: PostComposerProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-3"
+      className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col gap-3"
     >
       {showTitle && (
         <input
@@ -120,7 +120,7 @@ export default function PostComposer({ spaceId, onPost }: PostComposerProps) {
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Título (opcional)"
           maxLength={200}
-          className="w-full bg-white/5 border border-white/10 hover:border-white/20 focus:border-blue-500/50 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-sm transition-all"
+          className="w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 text-sm transition-all"
         />
       )}
 
@@ -129,7 +129,7 @@ export default function PostComposer({ spaceId, onPost }: PostComposerProps) {
         onChange={(e) => setBody(e.target.value)}
         placeholder="Compartilhe algo com a comunidade..."
         rows={3}
-        className="w-full bg-transparent text-gray-200 placeholder-gray-600 focus:outline-none resize-none text-sm leading-relaxed"
+        className="w-full bg-transparent text-gray-700 placeholder-gray-600 focus:outline-none resize-none text-sm leading-relaxed"
       />
 
       {/* Image previews */}
@@ -140,14 +140,14 @@ export default function PostComposer({ spaceId, onPost }: PostComposerProps) {
               <img
                 src={url}
                 alt=""
-                className="w-20 h-20 object-cover rounded-lg border border-white/10"
+                className="w-20 h-20 object-cover rounded-lg border border-gray-200"
               />
               <button
                 type="button"
                 onClick={() => removeImage(idx)}
                 className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
               >
-                <X className="w-3 h-3 text-white" />
+                <X className="w-3 h-3 text-gray-900" />
               </button>
             </div>
           ))}
@@ -160,7 +160,7 @@ export default function PostComposer({ spaceId, onPost }: PostComposerProps) {
         </p>
       )}
 
-      <div className="flex items-center justify-between gap-3 border-t border-white/10 pt-3">
+      <div className="flex items-center justify-between gap-3 border-t border-gray-200 pt-3">
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -168,7 +168,7 @@ export default function PostComposer({ spaceId, onPost }: PostComposerProps) {
               setShowTitle((v) => !v);
               if (showTitle) setTitle("");
             }}
-            className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-300 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-600 transition-colors"
           >
             {showTitle ? (
               <>
@@ -185,12 +185,12 @@ export default function PostComposer({ spaceId, onPost }: PostComposerProps) {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={selectedFiles.length >= 10}
-            className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-blue-400 transition-colors disabled:opacity-40"
+            className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-violet-400 transition-colors disabled:opacity-40"
           >
             <ImageIcon className="w-3.5 h-3.5" />
             Foto
             {selectedFiles.length > 0 && (
-              <span className="text-blue-400">({selectedFiles.length})</span>
+              <span className="text-violet-400">({selectedFiles.length})</span>
             )}
           </button>
           <input
@@ -206,7 +206,7 @@ export default function PostComposer({ spaceId, onPost }: PostComposerProps) {
         <button
           type="submit"
           disabled={busy || (!body.trim() && selectedFiles.length === 0)}
-          className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-4 py-2 rounded-lg transition-all"
+          className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-4 py-2 rounded-lg transition-all"
         >
           {busy ? (
             <>

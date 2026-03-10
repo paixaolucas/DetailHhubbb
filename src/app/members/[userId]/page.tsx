@@ -75,7 +75,7 @@ const ROLE_LABELS: Record<string, string> = {
 const ROLE_COLORS: Record<string, string> = {
   SUPER_ADMIN: "bg-red-500/10 text-red-400 border-red-500/20",
   INFLUENCER_ADMIN: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-  COMMUNITY_MEMBER: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  COMMUNITY_MEMBER: "bg-violet-500/10 text-violet-400 border-violet-500/20",
   MARKETPLACE_PARTNER: "bg-orange-500/10 text-orange-400 border-orange-500/20",
 };
 
@@ -110,13 +110,13 @@ function ProfileSkeleton() {
   return (
     <div className="max-w-2xl mx-auto space-y-6 animate-pulse">
       {/* Header card */}
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+      <div className="bg-white border border-gray-200 rounded-2xl p-6">
         <div className="flex items-start gap-4">
-          <div className="w-20 h-20 bg-white/10 rounded-2xl flex-shrink-0" />
+          <div className="w-20 h-20 bg-gray-50 rounded-2xl flex-shrink-0" />
           <div className="flex-1 space-y-3 pt-1">
-            <div className="h-6 bg-white/10 rounded w-48" />
-            <div className="h-4 bg-white/10 rounded w-24" />
-            <div className="h-4 bg-white/10 rounded w-64" />
+            <div className="h-6 bg-gray-50 rounded w-48" />
+            <div className="h-4 bg-gray-50 rounded w-24" />
+            <div className="h-4 bg-gray-50 rounded w-64" />
           </div>
         </div>
       </div>
@@ -125,11 +125,11 @@ function ProfileSkeleton() {
         {Array.from({ length: 3 }).map((_, i) => (
           <div
             key={i}
-            className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-2"
+            className="bg-white border border-gray-200 rounded-2xl p-4 space-y-2"
           >
-            <div className="h-4 bg-white/10 rounded w-3/4" />
-            <div className="h-3 bg-white/10 rounded w-full" />
-            <div className="h-3 bg-white/10 rounded w-2/3" />
+            <div className="h-4 bg-gray-50 rounded w-3/4" />
+            <div className="h-3 bg-gray-50 rounded w-full" />
+            <div className="h-3 bg-gray-50 rounded w-2/3" />
           </div>
         ))}
       </div>
@@ -194,12 +194,12 @@ export default function MemberProfilePage() {
 
   if (notFound) {
     return (
-      <div className="min-h-screen bg-chrome-900 flex items-center justify-center">
+      <div className="min-h-screen bg-[#F8F7FF] flex items-center justify-center">
         <div className="text-center space-y-3">
-          <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto">
             <Lock className="w-8 h-8 text-gray-600" />
           </div>
-          <p className="text-white font-semibold text-lg">
+          <p className="text-gray-900 font-semibold text-lg">
             Perfil não encontrado
           </p>
           <p className="text-gray-500 text-sm">
@@ -207,7 +207,7 @@ export default function MemberProfilePage() {
           </p>
           <Link
             href="/"
-            className="inline-block mt-4 px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl transition-colors"
+            className="inline-block mt-4 px-5 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium rounded-xl transition-colors"
           >
             Voltar ao início
           </Link>
@@ -219,12 +219,12 @@ export default function MemberProfilePage() {
   // Private profile
   if (profile && !profile.isPublic) {
     return (
-      <div className="min-h-screen bg-chrome-900 flex items-center justify-center">
+      <div className="min-h-screen bg-[#F8F7FF] flex items-center justify-center">
         <div className="text-center space-y-3">
-          <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto">
             <Lock className="w-8 h-8 text-gray-600" />
           </div>
-          <p className="text-white font-semibold text-lg">
+          <p className="text-gray-900 font-semibold text-lg">
             Este perfil é privado
           </p>
           <p className="text-gray-500 text-sm">
@@ -232,7 +232,7 @@ export default function MemberProfilePage() {
           </p>
           <Link
             href="/"
-            className="inline-block mt-4 px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl transition-colors"
+            className="inline-block mt-4 px-5 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium rounded-xl transition-colors"
           >
             Voltar ao início
           </Link>
@@ -256,10 +256,10 @@ export default function MemberProfilePage() {
   );
 
   return (
-    <div className="min-h-screen bg-chrome-900 py-10 px-4">
+    <div className="min-h-screen bg-[#F8F7FF] py-10 px-4">
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Profile card */}
-        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 animate-fade-in">
+        <div className="bg-white backdrop-blur-md border border-gray-200 rounded-2xl p-6 animate-fade-in">
           <div className="flex items-start gap-5">
             {/* Avatar */}
             {user.avatarUrl ? (
@@ -269,7 +269,7 @@ export default function MemberProfilePage() {
                 className="w-20 h-20 rounded-2xl object-cover flex-shrink-0"
               />
             ) : (
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold flex-shrink-0">
+              <div className="w-20 h-20 bg-gradient-to-br from-violet-600 to-purple-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold flex-shrink-0">
                 {initials}
               </div>
             )}
@@ -277,7 +277,7 @@ export default function MemberProfilePage() {
             {/* Info */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-white font-bold text-xl leading-tight">
+                <h1 className="text-gray-900 font-bold text-xl leading-tight">
                   {fullName}
                 </h1>
                 <span
@@ -291,7 +291,7 @@ export default function MemberProfilePage() {
               {isLoggedIn && (
                 <Link
                   href="/dashboard/messages"
-                  className="inline-flex items-center gap-1.5 mt-2 px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 text-blue-400 hover:text-blue-300 text-xs font-medium rounded-xl transition-colors"
+                  className="inline-flex items-center gap-1.5 mt-2 px-3 py-1.5 bg-violet-600/20 hover:bg-violet-600/30 border border-violet-500/30 text-violet-400 hover:text-violet-300 text-xs font-medium rounded-xl transition-colors"
                 >
                   <MessageSquare className="w-3.5 h-3.5" />
                   Enviar mensagem
@@ -314,7 +314,7 @@ export default function MemberProfilePage() {
 
               {/* Bio */}
               {profile.bio && (
-                <p className="text-gray-300 text-sm mt-3 leading-relaxed">
+                <p className="text-gray-600 text-sm mt-3 leading-relaxed">
                   {profile.bio}
                 </p>
               )}
@@ -323,11 +323,11 @@ export default function MemberProfilePage() {
 
           {/* Car / Garage */}
           {hasCar && (
-            <div className="mt-4 pt-4 border-t border-white/10">
+            <div className="mt-4 pt-4 border-t border-gray-200">
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
                 <Car className="w-3.5 h-3.5" /> Garagem
               </p>
-              <div className="flex items-center gap-2 text-sm text-gray-200 font-medium mb-2">
+              <div className="flex items-center gap-2 text-sm text-gray-700 font-medium mb-2">
                 <span>
                   {[profile.carBrand, profile.carModel, profile.carYear]
                     .filter(Boolean)
@@ -337,17 +337,17 @@ export default function MemberProfilePage() {
               {(profile.metadata?.carColor || profile.metadata?.carFuel || profile.metadata?.carPower) && (
                 <div className="flex flex-wrap gap-2 mb-3">
                   {profile.metadata?.carColor && (
-                    <span className="text-xs bg-white/5 border border-white/10 rounded-full px-2.5 py-0.5 text-gray-400">
+                    <span className="text-xs bg-white border border-gray-200 rounded-full px-2.5 py-0.5 text-gray-400">
                       {profile.metadata.carColor}
                     </span>
                   )}
                   {profile.metadata?.carFuel && (
-                    <span className="text-xs bg-white/5 border border-white/10 rounded-full px-2.5 py-0.5 text-gray-400">
+                    <span className="text-xs bg-white border border-gray-200 rounded-full px-2.5 py-0.5 text-gray-400">
                       {profile.metadata.carFuel}
                     </span>
                   )}
                   {profile.metadata?.carPower && (
-                    <span className="text-xs bg-white/5 border border-white/10 rounded-full px-2.5 py-0.5 text-gray-400">
+                    <span className="text-xs bg-white border border-gray-200 rounded-full px-2.5 py-0.5 text-gray-400">
                       {profile.metadata.carPower}
                     </span>
                   )}
@@ -360,7 +360,7 @@ export default function MemberProfilePage() {
                       <img
                         src={url}
                         alt=""
-                        className="w-full h-20 object-cover rounded-lg border border-white/10 hover:opacity-90 transition-opacity"
+                        className="w-full h-20 object-cover rounded-lg border border-gray-200 hover:opacity-90 transition-opacity"
                       />
                     </a>
                   ))}
@@ -375,7 +375,7 @@ export default function MemberProfilePage() {
               {profile.interests.map((interest) => (
                 <span
                   key={interest}
-                  className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs text-gray-300"
+                  className="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600"
                 >
                   {interest}
                 </span>
@@ -385,14 +385,14 @@ export default function MemberProfilePage() {
 
           {/* Social links */}
           {socialEntries.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-white/10 flex flex-wrap gap-3">
+            <div className="mt-4 pt-4 border-t border-gray-200 flex flex-wrap gap-3">
               {socialEntries.map(([platform, url]) => (
                 <a
                   key={platform}
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-gray-300 hover:text-white text-xs transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-gray-100 border border-gray-200 rounded-xl text-gray-600 hover:text-gray-900 text-xs transition-colors"
                 >
                   <SocialIcon platform={platform} />
                   {platform}
@@ -405,12 +405,12 @@ export default function MemberProfilePage() {
 
         {/* Posts section */}
         <div>
-          <h2 className="text-white font-semibold text-lg mb-4">
+          <h2 className="text-gray-900 font-semibold text-lg mb-4">
             Posts recentes
           </h2>
 
           {posts.length === 0 ? (
-            <div className="bg-white/5 border border-white/10 rounded-2xl flex flex-col items-center justify-center py-12 gap-2">
+            <div className="bg-white border border-gray-200 rounded-2xl flex flex-col items-center justify-center py-12 gap-2">
               <MessageSquare className="w-8 h-8 text-gray-600" />
               <p className="text-gray-500 text-sm">Nenhum post publicado ainda.</p>
             </div>
@@ -419,13 +419,13 @@ export default function MemberProfilePage() {
               {posts.map((post) => (
                 <div
                   key={post.id}
-                  className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 hover:bg-white/[0.07] transition-colors"
+                  className="bg-white backdrop-blur-md border border-gray-200 rounded-2xl p-4 hover:bg-white/[0.07] transition-colors"
                 >
                   {/* Community / space breadcrumb */}
                   <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-2">
                     <Link
                       href={`/community/${post.space.community.slug}`}
-                      className="hover:text-blue-400 transition-colors"
+                      className="hover:text-violet-400 transition-colors"
                     >
                       {post.space.community.name}
                     </Link>
@@ -435,7 +435,7 @@ export default function MemberProfilePage() {
 
                   {/* Title */}
                   {post.title && (
-                    <p className="text-white font-medium text-sm leading-snug mb-1">
+                    <p className="text-gray-900 font-medium text-sm leading-snug mb-1">
                       {post.title}
                     </p>
                   )}

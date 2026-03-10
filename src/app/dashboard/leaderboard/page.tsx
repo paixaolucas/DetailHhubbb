@@ -30,7 +30,7 @@ const PERIOD_LABELS: Record<Period, string> = {
 
 function RankIcon({ rank }: { rank: number }) {
   if (rank === 1) return <Crown className="w-4 h-4 text-yellow-400" />;
-  if (rank === 2) return <Medal className="w-4 h-4 text-gray-300" />;
+  if (rank === 2) return <Medal className="w-4 h-4 text-gray-600" />;
   if (rank === 3) return <Medal className="w-4 h-4 text-orange-400" />;
   return <span className="text-sm font-bold text-gray-500 w-4 text-center">{rank}</span>;
 }
@@ -42,7 +42,7 @@ function Avatar({ user, size = "md" }: { user: LeaderEntry["user"]; size?: "sm" 
     return <img src={user.avatarUrl} alt={initials} className={`${cls} rounded-full object-cover`} />;
   }
   return (
-    <div className={`${cls} rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center text-white font-bold flex-shrink-0`}>
+    <div className={`${cls} rounded-full bg-gradient-to-br from-violet-600 to-purple-500 flex items-center justify-center text-white font-bold flex-shrink-0`}>
       {initials}
     </div>
   );
@@ -52,14 +52,14 @@ function Skeleton() {
   return (
     <div className="glass-card overflow-hidden animate-pulse">
       {[...Array(5)].map((_, i) => (
-        <div key={i} className="flex items-center gap-4 px-5 py-4 border-b border-white/5">
-          <div className="w-4 h-4 bg-white/10 rounded" />
-          <div className="w-10 h-10 rounded-full bg-white/10" />
+        <div key={i} className="flex items-center gap-4 px-5 py-4 border-b border-gray-100">
+          <div className="w-4 h-4 bg-gray-50 rounded" />
+          <div className="w-10 h-10 rounded-full bg-gray-50" />
           <div className="flex-1 space-y-1.5">
-            <div className="h-4 bg-white/10 rounded w-32" />
-            <div className="h-3 bg-white/10 rounded w-20" />
+            <div className="h-4 bg-gray-50 rounded w-32" />
+            <div className="h-3 bg-gray-50 rounded w-20" />
           </div>
-          <div className="h-5 bg-white/10 rounded w-16" />
+          <div className="h-5 bg-gray-50 rounded w-16" />
         </div>
       ))}
     </div>
@@ -121,7 +121,7 @@ export default function LeaderboardPage() {
           <Trophy className="w-5 h-5 text-yellow-400" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-white">Leaderboard</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Leaderboard</h1>
           <p className="text-gray-400 text-sm mt-0.5">Ranking de pontos nas suas comunidades</p>
         </div>
       </div>
@@ -133,11 +133,11 @@ export default function LeaderboardPage() {
           value={selectedId}
           onChange={(e) => setSelectedId(e.target.value)}
           disabled={commLoading}
-          className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500/50 disabled:opacity-50"
+          className="flex-1 bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-gray-900 text-sm focus:outline-none focus:ring-1 focus:ring-violet-500/50 disabled:opacity-50"
         >
           {commLoading && <option>Carregando...</option>}
           {communities.map((c) => (
-            <option key={c.id} value={c.id} className="bg-gray-900">{c.name}</option>
+            <option key={c.id} value={c.id} className="bg-white">{c.name}</option>
           ))}
           {!commLoading && communities.length === 0 && (
             <option disabled>Nenhuma comunidade encontrada</option>
@@ -145,15 +145,15 @@ export default function LeaderboardPage() {
         </select>
 
         {/* Period tabs */}
-        <div className="flex bg-white/5 border border-white/10 rounded-xl p-1 gap-1">
+        <div className="flex bg-white border border-gray-200 rounded-xl p-1 gap-1">
           {(["week", "month", "all"] as Period[]).map((p) => (
             <button
               key={p}
               onClick={() => setPeriod(p)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                 period === p
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-400 hover:text-white"
+                  ? "bg-violet-600 text-white"
+                  : "text-gray-400 hover:text-gray-900"
               }`}
             >
               {PERIOD_LABELS[p]}
@@ -164,19 +164,19 @@ export default function LeaderboardPage() {
 
       {/* My position highlight */}
       {myRank && (
-        <div className="glass-card p-4 border-blue-500/30 bg-blue-500/5">
-          <p className="text-xs text-blue-400 font-medium mb-2 uppercase tracking-wide">Sua posição</p>
+        <div className="glass-card p-4 border-violet-500/30 bg-violet-500/5">
+          <p className="text-xs text-violet-400 font-medium mb-2 uppercase tracking-wide">Sua posição</p>
           <div className="flex items-center gap-4">
             <div className="w-8 h-8 flex items-center justify-center">
               <RankIcon rank={myRank.rank} />
             </div>
             <Avatar user={myRank.user} />
             <div className="flex-1">
-              <p className="text-sm font-semibold text-white">{myRank.user.firstName} {myRank.user.lastName}</p>
+              <p className="text-sm font-semibold text-gray-900">{myRank.user.firstName} {myRank.user.lastName}</p>
               <p className="text-xs text-gray-500">Nível {myRank.level}</p>
             </div>
             <div className="text-right">
-              <p className="text-sm font-bold text-blue-400">{(myRank.points ?? myRank.totalPoints ?? 0).toLocaleString("pt-BR")}</p>
+              <p className="text-sm font-bold text-violet-400">{(myRank.points ?? myRank.totalPoints ?? 0).toLocaleString("pt-BR")}</p>
               <p className="text-xs text-gray-500">pontos</p>
             </div>
           </div>
@@ -197,8 +197,8 @@ export default function LeaderboardPage() {
         </div>
       ) : (
         <div className="glass-card overflow-hidden">
-          <div className="px-5 py-3 border-b border-white/10 flex items-center justify-between">
-            <span className="text-sm font-semibold text-white">
+          <div className="px-5 py-3 border-b border-gray-200 flex items-center justify-between">
+            <span className="text-sm font-semibold text-gray-900">
               {selectedComm?.name ?? "Comunidade"}
             </span>
             <span className="text-xs text-gray-500">{PERIOD_LABELS[period]}</span>
@@ -211,7 +211,7 @@ export default function LeaderboardPage() {
                 <div
                   key={entry.userId}
                   className={`flex items-center gap-4 px-5 py-3.5 transition-colors ${
-                    isMe ? "bg-blue-500/10" : "hover:bg-white/5"
+                    isMe ? "bg-violet-500/10" : "hover:bg-violet-50"
                   }`}
                 >
                   <div className="w-5 flex items-center justify-center flex-shrink-0">
@@ -219,14 +219,14 @@ export default function LeaderboardPage() {
                   </div>
                   <Avatar user={entry.user} size="sm" />
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm font-medium truncate ${isMe ? "text-blue-300" : "text-white"}`}>
+                    <p className={`text-sm font-medium truncate ${isMe ? "text-violet-300" : "text-gray-900"}`}>
                       {entry.user.firstName} {entry.user.lastName}
-                      {isMe && <span className="ml-1 text-xs text-blue-400">(você)</span>}
+                      {isMe && <span className="ml-1 text-xs text-violet-400">(você)</span>}
                     </p>
                     <p className="text-xs text-gray-500">Nível {entry.level}</p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className={`text-sm font-bold ${isMe ? "text-blue-400" : "text-gray-200"}`}>{pts}</p>
+                    <p className={`text-sm font-bold ${isMe ? "text-violet-400" : "text-gray-700"}`}>{pts}</p>
                     <p className="text-xs text-gray-600">pts</p>
                   </div>
                 </div>

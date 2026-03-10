@@ -18,14 +18,15 @@ interface MemberUser {
   profile?: {
     bio?: string | null;
   } | null;
-  badges?: { badge: { name: string; icon: string } }[];
-  points?: { points: number }[];
+  badges?: { badge: { name: string; icon: string; color: string } }[];
+  points?: { points: number; level: number }[];
 }
 
 interface Member {
   id: string;
   role: string;
   status: string;
+  joinedAt: string;
   user: MemberUser;
 }
 
@@ -39,11 +40,11 @@ interface Community {
 
 function MemberCardSkeleton() {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-xl p-4 animate-pulse flex items-center gap-4">
-      <div className="w-12 h-12 bg-white/10 rounded-full flex-shrink-0" />
+    <div className="bg-white border border-gray-200 rounded-xl p-4 animate-pulse flex items-center gap-4">
+      <div className="w-12 h-12 bg-gray-50 rounded-full flex-shrink-0" />
       <div className="flex-1 space-y-2">
-        <div className="h-4 bg-white/10 rounded w-32" />
-        <div className="h-3 bg-white/10 rounded w-48" />
+        <div className="h-4 bg-gray-50 rounded w-32" />
+        <div className="h-3 bg-gray-50 rounded w-48" />
       </div>
     </div>
   );
@@ -71,7 +72,7 @@ export default function CommunityMembersPage() {
       const json = await res.json();
       if (json.success) {
         setMembers(json.data ?? []);
-        setTotalPages(Math.ceil((json.total ?? 0) / 20) || 1);
+        setTotalPages(json.pagination?.totalPages ?? 1);
       }
     },
     []
@@ -135,13 +136,13 @@ export default function CommunityMembersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#111827] text-white">
+    <div className="min-h-screen bg-[#F8F7FF] text-gray-900">
       {/* Header */}
-      <header className="border-b border-white/10 bg-[#111827]/80 backdrop-blur-xl sticky top-0 z-10">
+      <header className="border-b border-gray-200 bg-[#F8F7FF]/80 backdrop-blur-xl sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 h-14 flex items-center gap-3">
           <Link
             href={`/community/${communitySlug}/feed`}
-            className="p-1.5 text-gray-500 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+            className="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
@@ -149,13 +150,13 @@ export default function CommunityMembersPage() {
             <img src={community.logoUrl} alt={community.name} className="w-7 h-7 rounded-lg object-cover" />
           ) : (
             <div
-              className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-white"
-              style={{ backgroundColor: community?.primaryColor ?? "#3B82F6" }}
+              className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-gray-900"
+              style={{ backgroundColor: community?.primaryColor ?? "#8B5CF6" }}
             >
               {community?.name.charAt(0) ?? "C"}
             </div>
           )}
-          <span className="text-sm font-semibold text-white">{community?.name}</span>
+          <span className="text-sm font-semibold text-gray-900">{community?.name}</span>
           <span className="text-gray-600 text-sm">/</span>
           <span className="text-sm text-gray-400">Membros</span>
         </div>
@@ -165,8 +166,8 @@ export default function CommunityMembersPage() {
         {/* Title + search */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-              <Users className="w-6 h-6 text-blue-400" />
+            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <Users className="w-6 h-6 text-violet-400" />
               Membros
             </h1>
             <p className="text-gray-500 text-sm mt-1">
@@ -180,7 +181,7 @@ export default function CommunityMembersPage() {
               placeholder="Buscar membro..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-blue-500/50 w-64 transition-all"
+              className="bg-white border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:border-violet-400 w-64 transition-all"
             />
           </div>
         </div>
@@ -196,7 +197,7 @@ export default function CommunityMembersPage() {
             {Array.from({ length: 8 }).map((_, i) => <MemberCardSkeleton key={i} />)}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="bg-white/5 border border-white/10 rounded-xl p-16 text-center">
+          <div className="bg-white border border-gray-200 rounded-xl p-16 text-center">
             <Users className="w-10 h-10 text-gray-600 mx-auto mb-3" />
             <p className="text-gray-400">
               {search ? "Nenhum membro encontrado." : "Nenhum membro ativo ainda."}
@@ -209,46 +210,70 @@ export default function CommunityMembersPage() {
                 const fullName = `${member.user.firstName} ${member.user.lastName}`;
                 const initials = `${member.user.firstName?.[0] ?? ""}${member.user.lastName?.[0] ?? ""}`.toUpperCase();
                 const totalPoints = member.user.points?.reduce((acc, p) => acc + p.points, 0) ?? 0;
+                const level = member.user.points?.[0]?.level;
                 const badges = member.user.badges?.slice(0, 3) ?? [];
+                const joinedDays = member.joinedAt
+                  ? Math.floor((Date.now() - new Date(member.joinedAt).getTime()) / (1000 * 60 * 60 * 24))
+                  : null;
+                const roleLabel = member.role === "ADMIN" ? "Admin" : member.role === "MODERATOR" ? "Mod" : null;
 
                 return (
                   <Link
                     key={member.id}
                     href={`/members/${member.user.id}`}
-                    className="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center gap-4 hover:bg-white/10 hover:border-white/20 transition-all group"
+                    className="bg-white border border-gray-200 rounded-xl p-4 flex items-center gap-4 hover:bg-gray-100 hover:border-violet-200 transition-all group"
                   >
                     {/* Avatar */}
                     {member.user.avatarUrl ? (
                       <img
                         src={member.user.avatarUrl}
                         alt={fullName}
-                        className="w-12 h-12 rounded-full object-cover flex-shrink-0 border border-white/10"
+                        className="w-12 h-12 rounded-full object-cover flex-shrink-0 border border-gray-200"
                       />
                     ) : (
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-violet-600 to-purple-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                         {initials}
                       </div>
                     )}
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-white font-semibold group-hover:text-blue-400 transition-colors truncate">
-                        {fullName}
-                      </p>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="text-gray-900 font-semibold group-hover:text-violet-400 transition-colors truncate">
+                          {fullName}
+                        </p>
+                        {roleLabel && (
+                          <span className="text-[10px] px-1.5 py-0.5 bg-violet-500/20 text-violet-300 rounded-full font-medium flex-shrink-0">
+                            {roleLabel}
+                          </span>
+                        )}
+                        {level != null && (
+                          <span className="text-[10px] px-1.5 py-0.5 bg-amber-500/20 text-amber-300 rounded-full font-medium flex-shrink-0">
+                            Nível {level}
+                          </span>
+                        )}
+                      </div>
                       {member.user.profile?.bio && (
                         <p className="text-gray-500 text-xs mt-0.5 truncate">
                           {member.user.profile.bio}
                         </p>
                       )}
-                      {badges.length > 0 && (
-                        <div className="flex items-center gap-1.5 mt-1.5">
-                          {badges.map((b, i) => (
-                            <span key={i} className="text-sm" title={b.badge.name}>
-                              {b.badge.icon}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+                      <div className="flex items-center gap-3 mt-1">
+                        {joinedDays != null && (
+                          <span className="text-[10px] text-gray-600">
+                            Membro há {joinedDays === 0 ? "menos de 1 dia" : `${joinedDays} dia${joinedDays !== 1 ? "s" : ""}`}
+                          </span>
+                        )}
+                        {badges.length > 0 && (
+                          <div className="flex items-center gap-1">
+                            {badges.map((b, i) => (
+                              <span key={i} className="text-sm" title={b.badge.name}>
+                                {b.badge.icon}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     {/* Points */}
@@ -269,7 +294,7 @@ export default function CommunityMembersPage() {
                 <button
                   disabled={page === 1}
                   onClick={() => changePage(page - 1)}
-                  className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-gray-400 hover:bg-white/10 disabled:opacity-40 transition-all"
+                  className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-400 hover:bg-gray-100 disabled:opacity-40 transition-all"
                 >
                   ← Anterior
                 </button>
@@ -279,7 +304,7 @@ export default function CommunityMembersPage() {
                 <button
                   disabled={page === totalPages}
                   onClick={() => changePage(page + 1)}
-                  className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-gray-400 hover:bg-white/10 disabled:opacity-40 transition-all"
+                  className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-400 hover:bg-gray-100 disabled:opacity-40 transition-all"
                 >
                   Próxima →
                 </button>

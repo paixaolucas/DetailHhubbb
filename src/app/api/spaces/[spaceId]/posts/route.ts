@@ -44,7 +44,7 @@ export const GET = withAuth(async (req, { session, params }) => {
     const rawLimit = parseInt(searchParams.get("limit") ?? "20", 10);
     const limit = Math.min(isNaN(rawLimit) ? 20 : rawLimit, 50);
 
-    const posts = await db.post.findMany({
+    const rawPosts = await db.post.findMany({
       where: { spaceId, isHidden: false },
       orderBy: [{ isPinned: "desc" }, { createdAt: "desc" }],
       take: limit + 1,
@@ -53,12 +53,25 @@ export const GET = withAuth(async (req, { session, params }) => {
       include: {
         author: { select: AUTHOR_SELECT },
         _count: { select: { reactions: true, comments: true } },
+        reactions: { select: { type: true, userId: true } },
       },
     });
 
-    const hasMore = posts.length > limit;
-    const page = hasMore ? posts.slice(0, limit) : posts;
-    const nextCursor = hasMore ? page[page.length - 1].id : null;
+    const hasMore = rawPosts.length > limit;
+    const raw = hasMore ? rawPosts.slice(0, limit) : rawPosts;
+    const nextCursor = hasMore ? raw[raw.length - 1].id : null;
+
+    const REACTION_TYPES = ["like", "fire", "clap", "heart", "rocket"];
+    const page = raw.map(({ reactions, ...post }) => {
+      const reactionCounts: Record<string, number> = {};
+      for (const type of REACTION_TYPES) {
+        reactionCounts[type] = reactions.filter((r) => r.type === type).length;
+      }
+      const userReactions = reactions
+        .filter((r) => r.userId === session.userId)
+        .map((r) => r.type);
+      return { ...post, reactionCounts, userReactions };
+    });
 
     return NextResponse.json({
       success: true,

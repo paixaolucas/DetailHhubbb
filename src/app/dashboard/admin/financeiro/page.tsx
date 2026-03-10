@@ -28,7 +28,7 @@ const chartStyle = {
   axis: { tick: { fontSize: 11, fill: "#6b7280" }, tickLine: false, axisLine: false },
   tooltip: {
     contentStyle: {
-      backgroundColor: "#1f2937",
+      backgroundColor: "#16152A",
       border: "1px solid rgba(255,255,255,0.1)",
       borderRadius: "12px",
       color: "#f9fafb",
@@ -39,7 +39,7 @@ const chartStyle = {
 
 const STATUS_LABEL: Record<string, { label: string; color: string }> = {
   PENDING:   { label: "Pendente",   color: "text-yellow-400 bg-yellow-500/10" },
-  CONFIRMED: { label: "Confirmado", color: "text-blue-400 bg-blue-500/10" },
+  CONFIRMED: { label: "Confirmado", color: "text-violet-400 bg-violet-500/10" },
   PAID_OUT:  { label: "Pago",       color: "text-green-400 bg-green-500/10" },
   REVERSED:  { label: "Estornado",  color: "text-red-400 bg-red-500/10" },
 };
@@ -169,8 +169,8 @@ export default function FinanceiroPage() {
       label: "MRR",
       value: `R$ ${mrr.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
       icon: TrendingUp,
-      color: "text-blue-400",
-      bg: "bg-blue-500/10",
+      color: "text-violet-400",
+      bg: "bg-violet-500/10",
     },
     {
       label: "Pago a Influencers",
@@ -191,19 +191,19 @@ export default function FinanceiroPage() {
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-8 bg-white/10 rounded-xl w-36" />
+        <div className="h-8 bg-gray-50 rounded-xl w-36" />
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="glass-card p-5 space-y-3">
               <div className="flex justify-between">
-                <div className="h-3 bg-white/10 rounded w-24" />
-                <div className="w-9 h-9 bg-white/10 rounded-xl" />
+                <div className="h-3 bg-gray-50 rounded w-24" />
+                <div className="w-9 h-9 bg-gray-50 rounded-xl" />
               </div>
-              <div className="h-7 bg-white/10 rounded w-32" />
+              <div className="h-7 bg-gray-50 rounded w-32" />
             </div>
           ))}
         </div>
-        <div className="glass-card p-6 h-72 bg-white/5" />
+        <div className="glass-card p-6 h-72 bg-white" />
       </div>
     );
   }
@@ -215,7 +215,7 @@ export default function FinanceiroPage() {
           <DollarSign className="w-5 h-5 text-green-400" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-white">Financeiro</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Financeiro</h1>
           <p className="text-gray-400 text-sm">Visão financeira da plataforma DetailHub</p>
         </div>
       </div>
@@ -223,14 +223,14 @@ export default function FinanceiroPage() {
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         {kpis.map(({ label, value, icon: Icon, color, bg }) => (
-          <div key={label} className="glass-card p-5 hover:border-white/20 transition-all group">
+          <div key={label} className="glass-card p-5 hover:border-violet-200 transition-all group">
             <div className="flex items-center justify-between mb-3">
               <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</p>
               <div className={`w-9 h-9 ${bg} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
                 <Icon className={`w-4 h-4 ${color}`} />
               </div>
             </div>
-            <p className="text-xl font-bold text-white">{value}</p>
+            <p className="text-xl font-bold text-gray-900">{value}</p>
           </div>
         ))}
       </div>
@@ -238,7 +238,7 @@ export default function FinanceiroPage() {
       {/* Revenue Chart */}
       {timeSeries.length > 0 && (
         <div className="glass-card p-6">
-          <h2 className="text-base font-semibold text-white mb-6">Receita (últimos 30 dias)</h2>
+          <h2 className="text-base font-semibold text-gray-900 mb-6">Receita (últimos 30 dias)</h2>
           <div className="overflow-x-auto">
             <ResponsiveContainer width="100%" height={280}>
               <AreaChart data={timeSeries}>
@@ -280,13 +280,13 @@ export default function FinanceiroPage() {
       {/* Top Influencers */}
       {influencers.length > 0 && (
         <div className="glass-card overflow-hidden">
-          <div className="p-5 border-b border-white/10">
-            <h2 className="text-base font-semibold text-white">Top Influencers por Receita</h2>
+          <div className="p-5 border-b border-gray-200">
+            <h2 className="text-base font-semibold text-gray-900">Top Influencers por Receita</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/5">
+                <tr className="border-b border-gray-100">
                   <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-5 py-3">#</th>
                   <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-5 py-3">Influencer</th>
                   <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-5 py-3 hidden sm:table-cell">Membros</th>
@@ -301,14 +301,14 @@ export default function FinanceiroPage() {
                   const rev = inf.totalRevenue ?? 0;
                   const comm = rev * comissao;
                   return (
-                    <tr key={inf.influencerId ?? i} className="hover:bg-white/5 transition-colors">
+                    <tr key={inf.influencerId ?? i} className="hover:bg-violet-50 transition-colors">
                       <td className="px-5 py-3 text-sm text-gray-500 font-mono">#{i + 1}</td>
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-xl flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                          <div className="w-8 h-8 bg-gradient-to-br from-violet-600 to-purple-500 rounded-xl flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                             {(inf.displayName ?? inf.name ?? "?").charAt(0).toUpperCase()}
                           </div>
-                          <span className="text-sm font-medium text-white">
+                          <span className="text-sm font-medium text-gray-900">
                             {inf.displayName ?? inf.name ?? "—"}
                           </span>
                         </div>
@@ -338,46 +338,46 @@ export default function FinanceiroPage() {
 
       {/* Commission Rules */}
       <div className="glass-card overflow-hidden">
-        <div className="p-5 border-b border-white/10 flex flex-wrap items-center gap-3">
-          <h2 className="text-base font-semibold text-white flex-1">Regras de Comissão</h2>
+        <div className="p-5 border-b border-gray-200 flex flex-wrap items-center gap-3">
+          <h2 className="text-base font-semibold text-gray-900 flex-1">Regras de Comissão</h2>
           {communities.length > 0 && (
             <select
               value={selectedCommunity}
               onChange={(e) => { setSelectedCommunity(e.target.value); loadRules(e.target.value); }}
-              className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-white text-xs focus:outline-none"
+              className="bg-white border border-gray-200 rounded-xl px-3 py-1.5 text-gray-900 text-xs focus:outline-none"
             >
               {communities.map((c: any) => (
-                <option key={c.id} value={c.id} className="bg-gray-900">{c.name}</option>
+                <option key={c.id} value={c.id} className="bg-white">{c.name}</option>
               ))}
             </select>
           )}
           <button
             onClick={() => { setShowRuleForm(true); setEditingRule(null); setRuleForm({ name: "", type: "PERCENTAGE", rate: "", isActive: true }); if (selectedCommunity) loadRules(selectedCommunity); }}
-            className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
+            className="flex items-center gap-1.5 bg-violet-600 hover:bg-violet-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
           >
             <Plus className="w-3.5 h-3.5" /> Nova Regra
           </button>
         </div>
 
         {showRuleForm && (
-          <form onSubmit={saveRule} className="p-5 border-b border-white/10 space-y-3 bg-white/[0.02]">
-            <h3 className="text-sm font-semibold text-white">{editingRule ? "Editar Regra" : "Nova Regra"}</h3>
+          <form onSubmit={saveRule} className="p-5 border-b border-gray-200 space-y-3 bg-white/[0.02]">
+            <h3 className="text-sm font-semibold text-gray-900">{editingRule ? "Editar Regra" : "Nova Regra"}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <input
                 required
                 placeholder="Nome da regra"
                 value={ruleForm.name}
                 onChange={(e) => setRuleForm((p) => ({ ...p, name: e.target.value }))}
-                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                className="bg-white border border-gray-200 rounded-xl px-3 py-2 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-violet-500/50"
               />
               <select
                 value={ruleForm.type}
                 onChange={(e) => setRuleForm((p) => ({ ...p, type: e.target.value }))}
-                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm focus:outline-none"
+                className="bg-white border border-gray-200 rounded-xl px-3 py-2 text-gray-900 text-sm focus:outline-none"
               >
-                <option value="PERCENTAGE" className="bg-gray-900">Percentual (%)</option>
-                <option value="FLAT_FEE" className="bg-gray-900">Valor Fixo (R$)</option>
-                <option value="TIERED" className="bg-gray-900">Escalonado</option>
+                <option value="PERCENTAGE" className="bg-white">Percentual (%)</option>
+                <option value="FLAT_FEE" className="bg-white">Valor Fixo (R$)</option>
+                <option value="TIERED" className="bg-white">Escalonado</option>
               </select>
               <input
                 required
@@ -386,11 +386,11 @@ export default function FinanceiroPage() {
                 placeholder={ruleForm.type === "PERCENTAGE" ? "Ex: 15 (para 15%)" : "Ex: 50 (R$)"}
                 value={ruleForm.rate}
                 onChange={(e) => setRuleForm((p) => ({ ...p, rate: e.target.value }))}
-                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                className="bg-white border border-gray-200 rounded-xl px-3 py-2 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-violet-500/50"
               />
             </div>
             <div className="flex items-center gap-3">
-              <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+              <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={ruleForm.isActive}
@@ -400,10 +400,10 @@ export default function FinanceiroPage() {
                 Regra ativa
               </label>
               <div className="flex gap-2 ml-auto">
-                <button type="button" onClick={() => { setShowRuleForm(false); setEditingRule(null); }} className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-400 hover:text-white border border-white/10 rounded-xl transition-colors">
+                <button type="button" onClick={() => { setShowRuleForm(false); setEditingRule(null); }} className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-400 hover:text-gray-900 border border-gray-200 rounded-xl transition-colors">
                   <X className="w-3.5 h-3.5" /> Cancelar
                 </button>
-                <button type="submit" disabled={ruleSaving} className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition-all">
+                <button type="submit" disabled={ruleSaving} className="flex items-center gap-1.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition-all">
                   <Check className="w-3.5 h-3.5" /> {ruleSaving ? "Salvando..." : "Salvar"}
                 </button>
               </div>
@@ -420,9 +420,9 @@ export default function FinanceiroPage() {
         ) : (
           <div className="divide-y divide-white/5">
             {commRules.map((rule: any) => (
-              <div key={rule.id} className="flex items-center gap-3 px-5 py-3 hover:bg-white/5 transition-colors">
+              <div key={rule.id} className="flex items-center gap-3 px-5 py-3 hover:bg-violet-50 transition-colors">
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white">{rule.name}</p>
+                  <p className="text-sm font-medium text-gray-900">{rule.name}</p>
                   <p className="text-xs text-gray-500">
                     {COMM_TYPE_LABEL[rule.type] ?? rule.type} · Taxa: {Number(rule.rate)}{rule.type === "PERCENTAGE" ? "%" : " R$"}
                   </p>
@@ -430,7 +430,7 @@ export default function FinanceiroPage() {
                 <span className={`text-xs px-2 py-0.5 rounded-full border ${rule.isActive ? "bg-green-500/10 text-green-400 border-green-500/20" : "bg-gray-500/10 text-gray-400 border-gray-500/20"}`}>
                   {rule.isActive ? "Ativa" : "Inativa"}
                 </span>
-                <button onClick={() => { setEditingRule(rule); setRuleForm({ name: rule.name, type: rule.type, rate: String(rule.rate), isActive: rule.isActive }); setShowRuleForm(true); }} className="p-1.5 text-gray-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors">
+                <button onClick={() => { setEditingRule(rule); setRuleForm({ name: rule.name, type: rule.type, rate: String(rule.rate), isActive: rule.isActive }); setShowRuleForm(true); }} className="p-1.5 text-gray-500 hover:text-violet-400 hover:bg-violet-500/10 rounded-lg transition-colors">
                   <Pencil className="w-3.5 h-3.5" />
                 </button>
                 <button onClick={() => deleteRule(rule.id)} className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
@@ -444,8 +444,8 @@ export default function FinanceiroPage() {
 
       {/* Commission Transactions */}
       <div className="glass-card overflow-hidden">
-        <div className="p-5 border-b border-white/10 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-white">Transações de Comissão</h2>
+        <div className="p-5 border-b border-gray-200 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-gray-900">Transações de Comissão</h2>
           {commTotal > 10 && (
             <span className="text-xs text-gray-500">{commTotal} no total</span>
           )}
@@ -456,7 +456,7 @@ export default function FinanceiroPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-white/5">
+                <tr className="bg-white">
                   {["Comunidade", "Destinatário", "Bruto", "Taxa", "Líquido", "Status"].map((h) => (
                     <th key={h} className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-5 py-3">
                       {h}
@@ -468,12 +468,12 @@ export default function FinanceiroPage() {
                 {commissions.map((tx: any) => {
                   const st = STATUS_LABEL[tx.status] ?? { label: tx.status, color: "text-gray-400" };
                   return (
-                    <tr key={tx.id} className="hover:bg-white/5 transition-colors">
-                      <td className="px-5 py-3 font-medium text-white">{tx.community?.name ?? "—"}</td>
+                    <tr key={tx.id} className="hover:bg-violet-50 transition-colors">
+                      <td className="px-5 py-3 font-medium text-gray-900">{tx.community?.name ?? "—"}</td>
                       <td className="px-5 py-3 text-gray-400">
                         {tx.recipient ? `${tx.recipient.firstName} ${tx.recipient.lastName}` : "—"}
                       </td>
-                      <td className="px-5 py-3 text-gray-300">
+                      <td className="px-5 py-3 text-gray-600">
                         R$ {Number(tx.grossAmount).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                       </td>
                       <td className="px-5 py-3 text-red-400">

@@ -95,8 +95,8 @@ function ActorAvatar({
 }) {
   if (!actor) {
     return (
-      <div className="w-9 h-9 bg-blue-600/20 border border-blue-500/30 rounded-full flex items-center justify-center flex-shrink-0">
-        <Bell className="w-4 h-4 text-blue-400" />
+      <div className="w-9 h-9 bg-violet-600/20 border border-violet-500/30 rounded-full flex items-center justify-center flex-shrink-0">
+        <Bell className="w-4 h-4 text-violet-400" />
       </div>
     );
   }
@@ -115,7 +115,7 @@ function ActorAvatar({
   }
 
   return (
-    <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+    <div className="w-9 h-9 bg-gradient-to-br from-violet-600 to-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
       {initials || "?"}
     </div>
   );
@@ -126,10 +126,10 @@ function ActorAvatar({
 function NotificationSkeleton() {
   return (
     <div className="flex items-start gap-3 px-4 py-3 animate-pulse">
-      <div className="w-9 h-9 bg-white/10 rounded-full flex-shrink-0" />
+      <div className="w-9 h-9 bg-gray-50 rounded-full flex-shrink-0" />
       <div className="flex-1 space-y-2">
-        <div className="h-4 bg-white/10 rounded w-3/4" />
-        <div className="h-3 bg-white/10 rounded w-1/2" />
+        <div className="h-4 bg-gray-50 rounded w-3/4" />
+        <div className="h-3 bg-gray-50 rounded w-1/2" />
       </div>
     </div>
   );
@@ -237,7 +237,7 @@ export default function NotificationsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Notificações</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Notificações</h1>
           {unreadCount > 0 && (
             <p className="text-sm text-gray-400 mt-0.5">
               {unreadCount} não lida{unreadCount !== 1 ? "s" : ""}
@@ -249,7 +249,7 @@ export default function NotificationsPage() {
           <button
             onClick={handleMarkAllRead}
             disabled={markingAll}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 text-blue-400 text-sm font-medium rounded-xl transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 bg-violet-600/20 hover:bg-violet-600/30 border border-violet-500/30 text-violet-400 text-sm font-medium rounded-xl transition-colors disabled:opacity-50"
           >
             <CheckCheck className="w-4 h-4" />
             {markingAll ? "Marcando..." : "Marcar todas como lidas"}
@@ -258,7 +258,7 @@ export default function NotificationsPage() {
       </div>
 
       {/* Content */}
-      <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden">
+      <div className="bg-white backdrop-blur-md border border-gray-200 rounded-2xl overflow-hidden">
         {isLoading ? (
           <div className="divide-y divide-white/5">
             {Array.from({ length: 6 }).map((_, i) => (
@@ -268,10 +268,10 @@ export default function NotificationsPage() {
         ) : notifications.length === 0 ? (
           /* Empty state */
           <div className="flex flex-col items-center justify-center py-20 gap-3">
-            <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center">
+            <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center">
               <Bell className="w-8 h-8 text-gray-600" />
             </div>
-            <p className="text-white font-medium">Nenhuma notificação</p>
+            <p className="text-gray-900 font-medium">Nenhuma notificação</p>
             <p className="text-gray-500 text-sm">
               Você está em dia com tudo!
             </p>
@@ -297,13 +297,13 @@ export default function NotificationsPage() {
                       key={notification.id}
                       className={`flex items-start gap-3 px-4 py-3 group relative transition-colors ${
                         !notification.isRead
-                          ? "bg-blue-500/5 hover:bg-blue-500/10"
-                          : "hover:bg-white/5"
+                          ? "bg-violet-500/5 hover:bg-violet-500/10"
+                          : "hover:bg-violet-50"
                       }`}
                     >
                       {/* Unread dot */}
                       {!notification.isRead && (
-                        <span className="absolute left-1.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-blue-500 rounded-full" />
+                        <span className="absolute left-1.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-violet-500 rounded-full" />
                       )}
 
                       {/* Avatar */}
@@ -317,8 +317,8 @@ export default function NotificationsPage() {
                         <p
                           className={`text-sm leading-snug ${
                             notification.isRead
-                              ? "text-gray-300"
-                              : "text-white font-medium"
+                              ? "text-gray-600"
+                              : "text-gray-900 font-medium"
                           }`}
                         >
                           {notification.title}
