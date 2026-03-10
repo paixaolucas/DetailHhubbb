@@ -52,6 +52,12 @@ export async function createCommunity(
     });
   }
 
+  // Promote user to INFLUENCER_ADMIN if not already
+  await db.user.update({
+    where: { id: ownerUserId },
+    data: { role: "INFLUENCER_ADMIN" as any },
+  });
+
   // Check slug uniqueness
   const existing = await db.community.findUnique({
     where: { slug: input.slug },

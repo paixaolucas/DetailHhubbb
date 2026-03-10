@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Info, ChevronDown } from "lucide-react";
+import { ArrowLeft, Info, Search, X, UserCheck, AlertTriangle } from "lucide-react";
 
 const COLORS = [
   "#6366f1", "#8b5cf6", "#ec4899", "#ef4444",
@@ -27,35 +27,100 @@ function fieldClass() {
   return "w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm";
 }
 
-interface InfluencerUser {
+const ROLE_LABELS: Record<string, string> = {
+  SUPER_ADMIN: "Admin",
+  INFLUENCER_ADMIN: "Influencer",
+  COMMUNITY_MEMBER: "Membro",
+  MARKETPLACE_PARTNER: "Parceiro",
+};
+
+const ROLE_COLORS: Record<string, string> = {
+  SUPER_ADMIN: "bg-red-500/10 text-red-500",
+  INFLUENCER_ADMIN: "bg-violet-500/10 text-violet-600",
+  COMMUNITY_MEMBER: "bg-blue-500/10 text-blue-500",
+  MARKETPLACE_PARTNER: "bg-green-500/10 text-green-600",
+};
+
+interface UserResult {
   id: string;
   firstName: string;
   lastName: string;
   email: string;
+  role: string;
 }
 
 export default function NewCommunityPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [influencers, setInfluencers] = useState<InfluencerUser[]>([]);
+
+  // Influencer search
+  const [userSearch, setUserSearch] = useState("");
+  const [userResults, setUserResults] = useState<UserResult[]>([]);
+  const [userSearchLoading, setUserSearchLoading] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserResult | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Form
   const [form, setForm] = useState({
     name: "", slug: "", shortDescription: "", description: "",
     primaryColor: "#8b5cf6", isPrivate: false, tags: "",
-    welcomeMessage: "", rules: "", influencerUserId: "",
+    welcomeMessage: "", rules: "",
   });
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
 
+  // Close dropdown on outside click
   useEffect(() => {
-    const token = localStorage.getItem("detailhub_access_token");
-    if (!token) return;
-    fetch("/api/users?role=INFLUENCER_ADMIN&pageSize=100", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((r) => r.json())
-      .then((d) => { if (d.success) setInfluencers(d.data ?? []); })
-      .catch(console.error);
+    function handleClick(e: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
   }, []);
+
+  // Debounced user search
+  useEffect(() => {
+    if (!userSearch.trim() || selectedUser) {
+      setUserResults([]);
+      setShowDropdown(false);
+      return;
+    }
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(async () => {
+      setUserSearchLoading(true);
+      try {
+        const token = localStorage.getItem("detailhub_access_token");
+        const res = await fetch(`/api/users?search=${encodeURIComponent(userSearch)}&pageSize=8`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const d = await res.json();
+        if (d.success) {
+          setUserResults(d.data ?? []);
+          setShowDropdown(true);
+        }
+      } catch {
+        // ignore
+      } finally {
+        setUserSearchLoading(false);
+      }
+    }, 300);
+  }, [userSearch, selectedUser]);
+
+  function selectUser(user: UserResult) {
+    setSelectedUser(user);
+    setUserSearch("");
+    setShowDropdown(false);
+    setUserResults([]);
+  }
+
+  function clearUser() {
+    setSelectedUser(null);
+    setUserSearch("");
+  }
 
   function handleNameChange(name: string) {
     setForm((prev) => ({ ...prev, name, ...(!slugManuallyEdited && { slug: slugify(name) }) }));
@@ -63,7 +128,7 @@ export default function NewCommunityPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.influencerUserId) { setError("Selecione um influencer para a comunidade."); return; }
+    if (!selectedUser) { setError("Selecione o influencer responsável pela comunidade."); return; }
     setError("");
     setIsLoading(true);
     try {
@@ -79,7 +144,7 @@ export default function NewCommunityPage() {
           tags: form.tags ? form.tags.split(",").map((t) => t.trim()).filter(Boolean) : [],
           welcomeMessage: form.welcomeMessage || undefined,
           rules: form.rules || undefined,
-          influencerUserId: form.influencerUserId,
+          influencerUserId: selectedUser.id,
         }),
       });
       const data = await res.json();
@@ -107,33 +172,85 @@ export default function NewCommunityPage() {
           <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-xl">{error}</div>
         )}
 
-        {/* Influencer selector */}
+        {/* Influencer search */}
         <div className="glass-card p-6 space-y-4">
           <h2 className="text-base font-semibold text-gray-900">Influencer Responsável</h2>
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1.5">
-              Influencer <span className="text-red-400">*</span>
-            </label>
-            <div className="relative">
-              <select
-                value={form.influencerUserId}
-                onChange={(e) => setForm((p) => ({ ...p, influencerUserId: e.target.value }))}
-                className={fieldClass() + " appearance-none pr-10"}
-                required
-              >
-                <option value="">Selecione um influencer...</option>
-                {influencers.map((u) => (
-                  <option key={u.id} value={u.id}>
-                    {u.firstName} {u.lastName} — {u.email}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+          <p className="text-xs text-gray-400">Pesquise qualquer membro da plataforma. Se não for Influencer, será promovido automaticamente.</p>
+
+          {selectedUser ? (
+            <div className="flex items-center gap-3 p-3 bg-violet-50 border border-violet-200 rounded-xl">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-purple-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                {selectedUser.firstName[0]}{selectedUser.lastName?.[0] ?? ""}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-gray-900">{selectedUser.firstName} {selectedUser.lastName}</p>
+                <p className="text-xs text-gray-500">{selectedUser.email}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                {selectedUser.role !== "INFLUENCER_ADMIN" ? (
+                  <div className="flex items-center gap-1 text-xs text-yellow-600 bg-yellow-500/10 px-2 py-1 rounded-lg">
+                    <AlertTriangle className="w-3 h-3" />
+                    Será promovido a Influencer
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1 text-xs text-violet-600 bg-violet-500/10 px-2 py-1 rounded-lg">
+                    <UserCheck className="w-3 h-3" />
+                    Já é Influencer
+                  </div>
+                )}
+                <button type="button" onClick={clearUser} className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-colors">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
-            {influencers.length === 0 && (
-              <p className="text-xs text-gray-400 mt-1.5">Nenhum usuário com role Influencer encontrado.</p>
-            )}
-          </div>
+          ) : (
+            <div ref={searchRef} className="relative">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  value={userSearch}
+                  onChange={(e) => setUserSearch(e.target.value)}
+                  onFocus={() => userResults.length > 0 && setShowDropdown(true)}
+                  placeholder="Buscar por nome ou email..."
+                  className="w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl pl-10 pr-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm"
+                />
+                {userSearchLoading && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-violet-400 border-t-transparent rounded-full animate-spin" />
+                )}
+              </div>
+
+              {showDropdown && userResults.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-20 overflow-hidden">
+                  {userResults.map((user) => (
+                    <button
+                      key={user.id}
+                      type="button"
+                      onClick={() => selectUser(user)}
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-violet-50 transition-colors text-left border-b border-gray-100 last:border-0"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-purple-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                        {user.firstName[0]}{user.lastName?.[0] ?? ""}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900">{user.firstName} {user.lastName}</p>
+                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                      </div>
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-lg flex-shrink-0 ${ROLE_COLORS[user.role] ?? "bg-gray-100 text-gray-500"}`}>
+                        {ROLE_LABELS[user.role] ?? user.role}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {showDropdown && userSearch && !userSearchLoading && userResults.length === 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-20 px-4 py-3 text-sm text-gray-400">
+                  Nenhum usuário encontrado.
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Informações básicas */}
@@ -141,86 +258,59 @@ export default function NewCommunityPage() {
           <h2 className="text-base font-semibold text-gray-900">Informações Básicas</h2>
 
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1.5">
-              Nome da comunidade <span className="text-red-400">*</span>
-            </label>
-            <input
-              type="text" value={form.name} onChange={(e) => handleNameChange(e.target.value)}
-              placeholder="Ex: DetailHub Racing Pro" className={fieldClass()}
-              required minLength={3} maxLength={80}
-            />
+            <label className="block text-sm font-medium text-gray-600 mb-1.5">Nome da comunidade <span className="text-red-400">*</span></label>
+            <input type="text" value={form.name} onChange={(e) => handleNameChange(e.target.value)}
+              placeholder="Ex: DetailHub Racing Pro" className={fieldClass()} required minLength={3} maxLength={80} />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1.5">
-              URL da comunidade <span className="text-red-400">*</span>
-            </label>
+            <label className="block text-sm font-medium text-gray-600 mb-1.5">URL da comunidade <span className="text-red-400">*</span></label>
             <div className="flex items-center bg-white border border-gray-200 hover:border-violet-200 focus-within:border-violet-500/50 focus-within:ring-2 focus-within:ring-violet-500/30 rounded-xl overflow-hidden transition-all">
-              <span className="bg-white px-4 py-3 text-sm text-gray-500 border-r border-gray-200 shrink-0">
-                detailhub.com/
-              </span>
-              <input
-                type="text" value={form.slug}
+              <span className="bg-white px-4 py-3 text-sm text-gray-500 border-r border-gray-200 shrink-0">detailhub.com/</span>
+              <input type="text" value={form.slug}
                 onChange={(e) => { setSlugManuallyEdited(true); setForm((p) => ({ ...p, slug: slugify(e.target.value) })); }}
                 placeholder="minha-comunidade"
                 className="flex-1 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none"
-                required minLength={3} maxLength={60}
-              />
+                required minLength={3} maxLength={60} />
             </div>
-            <p className="text-xs text-gray-500 mt-1.5 flex items-center gap-1">
-              <Info className="w-3 h-3" />
-              Apenas letras minúsculas, números e hífens
-            </p>
+            <p className="text-xs text-gray-500 mt-1.5 flex items-center gap-1"><Info className="w-3 h-3" />Apenas letras minúsculas, números e hífens</p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-600 mb-1.5">Descrição curta</label>
-            <input
-              type="text" value={form.shortDescription}
+            <input type="text" value={form.shortDescription}
               onChange={(e) => setForm((p) => ({ ...p, shortDescription: e.target.value }))}
-              placeholder="Uma linha sobre a comunidade" className={fieldClass()} maxLength={160}
-            />
+              placeholder="Uma linha sobre a comunidade" className={fieldClass()} maxLength={160} />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-600 mb-1.5">Descrição completa</label>
-            <textarea
-              value={form.description}
+            <textarea value={form.description}
               onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
-              placeholder="Descreva o propósito e benefícios da comunidade..." className={fieldClass()}
-              rows={4} maxLength={2000}
-            />
+              placeholder="Descreva o propósito e benefícios da comunidade..." className={fieldClass()} rows={4} maxLength={2000} />
           </div>
         </div>
 
-        {/* Cor e visibilidade */}
+        {/* Aparência */}
         <div className="glass-card p-6 space-y-4">
           <h2 className="text-base font-semibold text-gray-900">Aparência e Visibilidade</h2>
-
           <div>
             <label className="block text-sm font-medium text-gray-600 mb-2">Cor principal</label>
             <div className="flex gap-2 flex-wrap">
               {COLORS.map((color) => (
-                <button
-                  key={color} type="button"
-                  onClick={() => setForm((p) => ({ ...p, primaryColor: color }))}
+                <button key={color} type="button" onClick={() => setForm((p) => ({ ...p, primaryColor: color }))}
                   className={`w-8 h-8 rounded-lg transition-all ${form.primaryColor === color ? "ring-2 ring-offset-2 ring-violet-400 scale-110" : "hover:scale-105"}`}
-                  style={{ backgroundColor: color }}
-                />
+                  style={{ backgroundColor: color }} />
               ))}
             </div>
           </div>
-
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-900">Comunidade privada</p>
               <p className="text-xs text-gray-400">Apenas membros convidados podem entrar</p>
             </div>
-            <button
-              type="button"
-              onClick={() => setForm((p) => ({ ...p, isPrivate: !p.isPrivate }))}
-              className={`relative w-11 h-6 rounded-full transition-colors ${form.isPrivate ? "bg-violet-500" : "bg-gray-200"}`}
-            >
+            <button type="button" onClick={() => setForm((p) => ({ ...p, isPrivate: !p.isPrivate }))}
+              className={`relative w-11 h-6 rounded-full transition-colors ${form.isPrivate ? "bg-violet-500" : "bg-gray-200"}`}>
               <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${form.isPrivate ? "translate-x-5" : ""}`} />
             </button>
           </div>
@@ -229,21 +319,17 @@ export default function NewCommunityPage() {
         {/* Tags */}
         <div className="glass-card p-6">
           <h2 className="text-base font-semibold text-gray-900 mb-4">Tags</h2>
-          <input
-            type="text" value={form.tags}
+          <input type="text" value={form.tags}
             onChange={(e) => setForm((p) => ({ ...p, tags: e.target.value }))}
-            placeholder="racing, tuning, offroad (separadas por vírgula)" className={fieldClass()}
-          />
+            placeholder="racing, tuning, offroad (separadas por vírgula)" className={fieldClass()} />
         </div>
 
         <div className="flex gap-3 pt-2">
           <Link href="/dashboard/communities" className="flex-1 px-4 py-3 border border-gray-200 text-gray-600 rounded-xl text-sm font-medium text-center hover:bg-gray-50 transition-colors">
             Cancelar
           </Link>
-          <button
-            type="submit" disabled={isLoading}
-            className="flex-1 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-all text-sm"
-          >
+          <button type="submit" disabled={isLoading}
+            className="flex-1 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-all text-sm">
             {isLoading ? "Criando..." : "Criar Comunidade"}
           </button>
         </div>

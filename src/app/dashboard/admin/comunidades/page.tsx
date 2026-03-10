@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Globe, Search, Users, CheckCircle, Archive, Eye, EyeOff } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Globe, Search, Users, CheckCircle, Archive, UserCheck, X } from "lucide-react";
 
 interface Community {
   id: string;
@@ -30,6 +30,15 @@ export default function AdminComunidadesPage() {
   const [search, setSearch] = useState("");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
+  // Change influencer modal
+  const [changeInfluencerModal, setChangeInfluencerModal] = useState<{ communityId: string; communityName: string } | null>(null);
+  const [modalSearch, setModalSearch] = useState("");
+  const [modalResults, setModalResults] = useState<any[]>([]);
+  const [modalSearchLoading, setModalSearchLoading] = useState(false);
+  const [modalSelectedUser, setModalSelectedUser] = useState<any>(null);
+  const [modalSaving, setModalSaving] = useState(false);
+  const modalDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
     const token = localStorage.getItem("detailhub_access_token");
     fetch("/api/communities?admin=true", { headers: { Authorization: `Bearer ${token}` } })
@@ -47,6 +56,30 @@ export default function AdminComunidadesPage() {
       .catch(console.error)
       .finally(() => setIsLoading(false));
   }, []);
+
+  // Modal search debounce
+  useEffect(() => {
+    if (!changeInfluencerModal || !modalSearch.trim()) {
+      setModalResults([]);
+      return;
+    }
+    if (modalDebounceRef.current) clearTimeout(modalDebounceRef.current);
+    modalDebounceRef.current = setTimeout(async () => {
+      setModalSearchLoading(true);
+      try {
+        const token = localStorage.getItem("detailhub_access_token");
+        const res = await fetch(`/api/users?search=${encodeURIComponent(modalSearch)}&pageSize=6`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const d = await res.json();
+        if (d.success) setModalResults(d.data ?? []);
+      } catch {
+        // ignore
+      } finally {
+        setModalSearchLoading(false);
+      }
+    }, 300);
+  }, [modalSearch, changeInfluencerModal]);
 
   async function togglePublish(id: string, currentlyPublished: boolean) {
     setActionLoading(id);
@@ -70,6 +103,32 @@ export default function AdminComunidadesPage() {
       }
     } finally {
       setActionLoading(null);
+    }
+  }
+
+  async function saveInfluencer() {
+    if (!changeInfluencerModal || !modalSelectedUser) return;
+    setModalSaving(true);
+    try {
+      const token = localStorage.getItem("detailhub_access_token");
+      const res = await fetch(`/api/communities/${changeInfluencerModal.communityId}/influencer`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ influencerUserId: modalSelectedUser.id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setCommunities((prev) => prev.map((c) =>
+          c.id === changeInfluencerModal.communityId
+            ? { ...c, influencer: { displayName: `${modalSelectedUser.firstName} ${modalSelectedUser.lastName}`, user: { firstName: modalSelectedUser.firstName, lastName: modalSelectedUser.lastName } } }
+            : c
+        ));
+        setChangeInfluencerModal(null);
+        setModalSearch("");
+        setModalSelectedUser(null);
+      }
+    } finally {
+      setModalSaving(false);
     }
   }
 
@@ -154,7 +213,7 @@ export default function AdminComunidadesPage() {
                 <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-4 py-3 hidden sm:table-cell">Membros</th>
                 <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-4 py-3">Status</th>
                 <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-4 py-3 hidden lg:table-cell">Privada</th>
-                <th className="px-4 py-3 w-10" />
+                <th className="px-4 py-3 w-20" />
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -194,25 +253,34 @@ export default function AdminComunidadesPage() {
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      {actionLoading === community.id ? (
-                        <div className="w-4 h-4 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
-                      ) : (
+                      <div className="flex items-center gap-1">
                         <button
-                          onClick={() => togglePublish(community.id, community.isPublished)}
-                          className={`p-1.5 rounded-lg transition-colors ${
-                            community.isPublished
-                              ? "text-gray-500 hover:text-yellow-400 hover:bg-yellow-500/10"
-                              : "text-gray-500 hover:text-green-400 hover:bg-green-500/10"
-                          }`}
-                          title={community.isPublished ? "Arquivar" : "Publicar"}
+                          onClick={() => { setChangeInfluencerModal({ communityId: community.id, communityName: community.name }); setModalSelectedUser(null); setModalSearch(""); }}
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-violet-500 hover:bg-violet-50 transition-colors"
+                          title="Trocar Influencer"
                         >
-                          {community.isPublished ? (
-                            <Archive className="w-3.5 h-3.5" />
-                          ) : (
-                            <CheckCircle className="w-3.5 h-3.5" />
-                          )}
+                          <UserCheck className="w-4 h-4" />
                         </button>
-                      )}
+                        {actionLoading === community.id ? (
+                          <div className="w-4 h-4 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <button
+                            onClick={() => togglePublish(community.id, community.isPublished)}
+                            className={`p-1.5 rounded-lg transition-colors ${
+                              community.isPublished
+                                ? "text-gray-500 hover:text-yellow-400 hover:bg-yellow-500/10"
+                                : "text-gray-500 hover:text-green-400 hover:bg-green-500/10"
+                            }`}
+                            title={community.isPublished ? "Arquivar" : "Publicar"}
+                          >
+                            {community.isPublished ? (
+                              <Archive className="w-3.5 h-3.5" />
+                            ) : (
+                              <CheckCircle className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );
@@ -228,6 +296,87 @@ export default function AdminComunidadesPage() {
           </table>
         </div>
       </div>
+
+      {/* Change Influencer Modal */}
+      {changeInfluencerModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+            <div className="p-6 border-b border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-900">Trocar Influencer</h3>
+              <p className="text-sm text-gray-400 mt-1">Comunidade: <span className="font-medium text-gray-600">{changeInfluencerModal.communityName}</span></p>
+            </div>
+            <div className="p-6 space-y-4">
+              <p className="text-xs text-gray-400">Pesquise qualquer membro. Se não for Influencer, será promovido automaticamente.</p>
+
+              {modalSelectedUser ? (
+                <div className="flex items-center gap-3 p-3 bg-violet-50 border border-violet-200 rounded-xl">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-purple-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                    {modalSelectedUser.firstName[0]}{modalSelectedUser.lastName?.[0] ?? ""}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-900">{modalSelectedUser.firstName} {modalSelectedUser.lastName}</p>
+                    <p className="text-xs text-gray-500">{modalSelectedUser.email}</p>
+                  </div>
+                  {modalSelectedUser.role !== "INFLUENCER_ADMIN" && (
+                    <span className="text-xs text-yellow-600 bg-yellow-500/10 px-2 py-1 rounded-lg">Será promovido</span>
+                  )}
+                  <button type="button" onClick={() => setModalSelectedUser(null)} className="text-gray-400 hover:text-gray-600 p-1">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    value={modalSearch}
+                    onChange={(e) => setModalSearch(e.target.value)}
+                    placeholder="Buscar por nome ou email..."
+                    className="w-full bg-white border border-gray-200 focus:border-violet-400 rounded-xl pl-10 pr-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all"
+                  />
+                  {modalSearchLoading && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-violet-400 border-t-transparent rounded-full animate-spin" />
+                  )}
+                  {modalResults.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-20 overflow-hidden">
+                      {modalResults.map((user: any) => (
+                        <button key={user.id} type="button" onClick={() => { setModalSelectedUser(user); setModalSearch(""); setModalResults([]); }}
+                          className="w-full flex items-center gap-3 px-4 py-3 hover:bg-violet-50 transition-colors text-left border-b border-gray-100 last:border-0">
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-purple-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                            {user.firstName[0]}{user.lastName?.[0] ?? ""}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900">{user.firstName} {user.lastName}</p>
+                            <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                          </div>
+                          <span className="text-xs px-2 py-0.5 rounded-lg bg-gray-100 text-gray-500 flex-shrink-0">{user.role}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            <div className="p-6 pt-0 flex gap-3">
+              <button
+                type="button"
+                onClick={() => { setChangeInfluencerModal(null); setModalSearch(""); setModalSelectedUser(null); setModalResults([]); }}
+                className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={saveInfluencer}
+                disabled={!modalSelectedUser || modalSaving}
+                className="flex-1 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-xl text-sm transition-all"
+              >
+                {modalSaving ? "Salvando..." : "Confirmar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
