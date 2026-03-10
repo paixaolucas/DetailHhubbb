@@ -13,9 +13,14 @@ import {
   Star,
   Globe,
   Camera,
+  CreditCard,
+  ExternalLink,
+  AlertTriangle,
+  Clock,
 } from "lucide-react";
 import { RoleBadge } from "@/components/ui/badge";
 import { useUploadThing } from "@/utils/uploadthing";
+import { useToast } from "@/components/ui/toast-provider";
 
 interface UserData {
   id: string;
@@ -30,7 +35,36 @@ interface UserData {
   notificationPrefs?: Record<string, boolean>;
 }
 
-type Tab = "profile" | "security" | "notifications" | "referral" | "influencer";
+type Tab = "profile" | "security" | "notifications" | "referral" | "subscription" | "influencer";
+
+interface MembershipPlan {
+  id: string;
+  name: string;
+  price: string;
+  currency: string;
+  interval: string;
+  intervalCount: number;
+}
+
+interface PlatformMembershipData {
+  id: string;
+  status: string;
+  currentPeriodStart: string;
+  currentPeriodEnd: string;
+  cancelAtPeriodEnd: boolean;
+  canceledAt: string | null;
+  plan: MembershipPlan;
+}
+
+interface PaymentItem {
+  id: string;
+  amount: string;
+  currency: string;
+  status: string;
+  stripeInvoiceId: string | null;
+  description: string | null;
+  createdAt: string;
+}
 
 const NOTIF_KEYS = [
   { key: "newLives", label: "Novas lives", desc: "Aviso quando uma live começar" },
@@ -40,6 +74,7 @@ const NOTIF_KEYS = [
 ];
 
 export default function SettingsPage() {
+  const toast = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [user, setUser] = useState<UserData | null>(null);
@@ -67,6 +102,15 @@ export default function SettingsPage() {
     payments: true,
   });
   const notifDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Subscription tab state
+  const [membership, setMembership] = useState<PlatformMembershipData | null | undefined>(undefined);
+  const [membershipLoading, setMembershipLoading] = useState(false);
+  const [payments, setPayments] = useState<PaymentItem[]>([]);
+  const [paymentsLoading, setPaymentsLoading] = useState(false);
+  const [paymentsPage, setPaymentsPage] = useState(1);
+  const [paymentsTotalPages, setPaymentsTotalPages] = useState(1);
+  const [billingPortalLoading, setBillingPortalLoading] = useState(false);
 
   // Avatar upload
   const avatarInputRef = useRef<HTMLInputElement>(null);
@@ -153,6 +197,98 @@ export default function SettingsPage() {
         .catch(() => {});
     }
   }, []);
+
+  // Load membership data when subscription tab is opened
+  useEffect(() => {
+    if (activeTab !== "subscription" || membership !== undefined) return;
+    setMembershipLoading(true);
+    const token = localStorage.getItem("detailhub_access_token");
+    fetch("/api/platform-membership/me", { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success) {
+          setMembership(d.data.membership ?? null);
+        } else {
+          setMembership(null);
+        }
+      })
+      .catch(() => setMembership(null))
+      .finally(() => setMembershipLoading(false));
+  }, [activeTab, membership]);
+
+  // Load payments when subscription tab is open and membership is loaded
+  useEffect(() => {
+    if (activeTab !== "subscription" || membership === undefined) return;
+    setPaymentsLoading(true);
+    const token = localStorage.getItem("detailhub_access_token");
+    fetch(`/api/users/me/payments?page=${paymentsPage}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success) {
+          setPayments(d.data);
+          setPaymentsTotalPages(d.pagination.totalPages);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setPaymentsLoading(false));
+  }, [activeTab, membership, paymentsPage]);
+
+  async function openBillingPortal() {
+    setBillingPortalLoading(true);
+    try {
+      const token = localStorage.getItem("detailhub_access_token");
+      const returnUrl = `${window.location.origin}/dashboard/settings`;
+      const res = await fetch("/api/stripe/billing-portal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ returnUrl }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        toast.error(data.error ?? "Erro ao acessar portal de cobrança");
+        return;
+      }
+      window.open(data.data.url, "_blank", "noopener,noreferrer");
+    } catch {
+      toast.error("Erro ao acessar portal de cobrança");
+    } finally {
+      setBillingPortalLoading(false);
+    }
+  }
+
+  function formatCurrency(amount: string, currency: string) {
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: currency.toUpperCase(),
+    }).format(Number(amount));
+  }
+
+  function formatDate(dateStr: string) {
+    return new Date(dateStr).toLocaleDateString("pt-BR");
+  }
+
+  function getMembershipStatusLabel(status: string): { label: string; className: string } {
+    switch (status) {
+      case "ACTIVE": return { label: "Ativa", className: "bg-green-500/20 text-green-400 border border-green-500/30" };
+      case "TRIALING": return { label: "Período de teste", className: "bg-blue-500/20 text-blue-400 border border-blue-500/30" };
+      case "PAST_DUE": return { label: "Pagamento pendente", className: "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30" };
+      case "CANCELED": return { label: "Cancelada", className: "bg-red-500/20 text-red-400 border border-red-500/30" };
+      case "EXPIRED": return { label: "Expirada", className: "bg-gray-500/20 text-gray-400 border border-gray-500/30" };
+      default: return { label: status, className: "bg-gray-500/20 text-gray-400 border border-gray-500/30" };
+    }
+  }
+
+  function getPaymentStatusLabel(status: string): { label: string; className: string } {
+    switch (status) {
+      case "SUCCEEDED": return { label: "Aprovado", className: "bg-green-500/20 text-green-400" };
+      case "FAILED": return { label: "Falhou", className: "bg-red-500/20 text-red-400" };
+      case "PENDING": return { label: "Pendente", className: "bg-yellow-500/20 text-yellow-400" };
+      case "REFUNDED": return { label: "Reembolsado", className: "bg-blue-500/20 text-blue-400" };
+      default: return { label: status, className: "bg-gray-500/20 text-gray-400" };
+    }
+  }
 
   async function saveProfile(e: React.FormEvent) {
     e.preventDefault();
@@ -290,6 +426,7 @@ export default function SettingsPage() {
     { key: "security", label: "Segurança", icon: Lock },
     { key: "notifications", label: "Notificações", icon: Bell },
     { key: "referral", label: "Referral", icon: Gift },
+    { key: "subscription", label: "Assinatura", icon: CreditCard },
     ...(user.role === "INFLUENCER_ADMIN"
       ? [{ key: "influencer" as Tab, label: "Perfil Público", icon: Star }]
       : []),
@@ -553,6 +690,171 @@ export default function SettingsPage() {
               Código de referral não disponível para o seu plano atual.
             </div>
           )}
+        </div>
+      )}
+
+      {/* Subscription tab */}
+      {activeTab === "subscription" && (
+        <div className="space-y-4">
+          {membershipLoading ? (
+            <div className="glass-card p-6 space-y-4 animate-pulse">
+              <div className="h-5 bg-white/10 rounded w-1/3" />
+              <div className="h-4 bg-white/10 rounded w-1/2" />
+              <div className="h-4 bg-white/10 rounded w-2/3" />
+              <div className="h-10 bg-white/10 rounded" />
+            </div>
+          ) : membership === null ? (
+            <div className="glass-card p-8 text-center space-y-4">
+              <CreditCard className="w-12 h-12 text-gray-500 mx-auto" />
+              <h2 className="text-base font-semibold text-gray-900">Sem assinatura ativa</h2>
+              <p className="text-gray-400 text-sm">
+                Assine a plataforma para acessar todas as comunidades e conteúdos exclusivos.
+              </p>
+              <a
+                href="/dashboard/assinar"
+                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all"
+              >
+                Ver planos
+              </a>
+            </div>
+          ) : membership ? (
+            <>
+              {/* Status card */}
+              <div className="glass-card p-6 space-y-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h2 className="text-base font-semibold text-gray-900">{membership.plan.name}</h2>
+                    <p className="text-sm text-gray-400 mt-0.5">
+                      {formatCurrency(membership.plan.price, membership.plan.currency)}
+                      {" / "}
+                      {membership.plan.intervalCount > 1 ? membership.plan.intervalCount + " " : ""}
+                      {membership.plan.interval === "year" ? "ano" : membership.plan.interval === "month" ? "mês" : membership.plan.interval}
+                    </p>
+                  </div>
+                  {(() => {
+                    const { label, className } = getMembershipStatusLabel(membership.status);
+                    return (
+                      <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${className}`}>
+                        {label}
+                      </span>
+                    );
+                  })()}
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-white/5 rounded-xl p-3">
+                    <p className="text-xs text-gray-400 mb-1">Início do período</p>
+                    <p className="text-sm font-medium text-gray-900">{formatDate(membership.currentPeriodStart)}</p>
+                  </div>
+                  <div className="bg-white/5 rounded-xl p-3">
+                    <p className="text-xs text-gray-400 mb-1">
+                      {membership.cancelAtPeriodEnd ? "Acesso até" : "Próxima renovação"}
+                    </p>
+                    <p className="text-sm font-medium text-gray-900">{formatDate(membership.currentPeriodEnd)}</p>
+                  </div>
+                </div>
+
+                {membership.cancelAtPeriodEnd && (
+                  <div className="flex items-start gap-2 bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3">
+                    <AlertTriangle className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-yellow-400">
+                      Sua assinatura foi cancelada e expirará em {formatDate(membership.currentPeriodEnd)}.
+                    </p>
+                  </div>
+                )}
+
+                {membership.status === "PAST_DUE" && (
+                  <div className="flex items-start gap-2 bg-red-500/10 border border-red-500/30 rounded-xl p-3">
+                    <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-red-400">
+                      Há um problema com seu pagamento. Atualize seu método de pagamento para manter o acesso.
+                    </p>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={openBillingPortal}
+                  disabled={billingPortalLoading}
+                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all"
+                >
+                  {billingPortalLoading
+                    ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    : <ExternalLink className="w-4 h-4" />
+                  }
+                  {billingPortalLoading ? "Abrindo..." : "Gerenciar Assinatura"}
+                </button>
+              </div>
+
+              {/* Payment history */}
+              <div className="glass-card p-6 space-y-4">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-gray-400" />
+                  <h2 className="text-base font-semibold text-gray-900">Histórico de Pagamentos</h2>
+                </div>
+
+                {paymentsLoading ? (
+                  <div className="space-y-2 animate-pulse">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="h-12 bg-white/10 rounded-xl" />
+                    ))}
+                  </div>
+                ) : payments.length === 0 ? (
+                  <p className="text-sm text-gray-400 text-center py-6">Nenhum pagamento encontrado.</p>
+                ) : (
+                  <>
+                    <div className="space-y-2">
+                      {payments.map((p) => {
+                        const { label, className } = getPaymentStatusLabel(p.status);
+                        return (
+                          <div key={p.id} className="flex items-center justify-between bg-white/5 rounded-xl px-4 py-3">
+                            <div>
+                              <p className="text-sm text-gray-900 font-medium">
+                                {p.description ?? "Assinatura da plataforma"}
+                              </p>
+                              <p className="text-xs text-gray-400">{formatDate(p.createdAt)}</p>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${className}`}>
+                                {label}
+                              </span>
+                              <span className="text-sm font-semibold text-gray-900">
+                                {formatCurrency(p.amount, p.currency)}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {paymentsTotalPages > 1 && (
+                      <div className="flex items-center justify-center gap-2 pt-2">
+                        <button
+                          type="button"
+                          disabled={paymentsPage <= 1}
+                          onClick={() => setPaymentsPage((p) => p - 1)}
+                          className="px-3 py-1.5 text-xs bg-white/5 hover:bg-white/10 disabled:opacity-40 rounded-lg text-gray-400 transition-all"
+                        >
+                          Anterior
+                        </button>
+                        <span className="text-xs text-gray-400">
+                          {paymentsPage} / {paymentsTotalPages}
+                        </span>
+                        <button
+                          type="button"
+                          disabled={paymentsPage >= paymentsTotalPages}
+                          onClick={() => setPaymentsPage((p) => p + 1)}
+                          className="px-3 py-1.5 text-xs bg-white/5 hover:bg-white/10 disabled:opacity-40 rounded-lg text-gray-400 transition-all"
+                        >
+                          Próxima
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </>
+          ) : null}
         </div>
       )}
 
