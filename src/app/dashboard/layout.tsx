@@ -15,6 +15,7 @@ import {
   Settings,
   LogOut,
   ChevronLeft,
+  ChevronDown,
   Menu,
   Shield,
   GraduationCap,
@@ -34,74 +35,179 @@ import {
   Calendar,
   HelpCircle,
   Star,
+  Compass,
 } from "lucide-react";
 import { RoleBadge } from "@/components/ui/badge";
 import { Logo } from "@/components/ui/logo";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import SearchBar from "@/components/search/SearchBar";
 
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+interface NavItem {
+  href: string;
+  label: string;
+  icon: React.ElementType;
+  exact?: boolean;
+}
+interface NavGroup {
+  type: "group";
+  label: string;
+  icon: React.ElementType;
+  items: NavItem[];
+}
+interface NavLink extends NavItem {
+  type?: "link";
+}
+type NavEntry = NavLink | NavGroup;
+
 // ─── Navigation config per role ──────────────────────────────────────────────
 
-const ADMIN_NAV = [
-  { href: "/dashboard", label: "Visão Geral", icon: LayoutDashboard, exact: true },
-  { href: "/dashboard/communities", label: "Comunidades", icon: Users },
-  { href: "/dashboard/usuarios", label: "Usuários", icon: Shield },
-  { href: "/dashboard/analytics", label: "Analytics", icon: BarChart2 },
-  { href: "/dashboard/marketplace", label: "Marketplace", icon: ShoppingBag },
-  { href: "/dashboard/events", label: "Eventos", icon: Calendar },
-  { href: "/dashboard/email-sequences", label: "Seq. de Email", icon: Mail },
-  { href: "/dashboard/badges", label: "Badges", icon: Award },
-  { href: "/dashboard/ai", label: "Auto AI", icon: Bot },
-  { href: "/dashboard/faqs", label: "FAQs", icon: HelpCircle },
-  { href: "/dashboard/testimonials", label: "Depoimentos", icon: Star },
-  { href: "/dashboard/admin/comunidades", label: "Comunidades (Admin)", icon: Globe },
-  { href: "/dashboard/admin/ferramentas", label: "Ferramentas (Admin)", icon: Wrench },
-  { href: "/dashboard/admin/plataforma", label: "Plataforma", icon: Server },
-  { href: "/dashboard/admin/financeiro", label: "Financeiro", icon: DollarSign },
-  { href: "/dashboard/settings", label: "Configurações", icon: Settings },
+const ADMIN_NAV: NavEntry[] = [
+  { type: "link", href: "/dashboard", label: "Visão Geral", icon: LayoutDashboard, exact: true },
+  {
+    type: "group",
+    label: "Gestão",
+    icon: Shield,
+    items: [
+      { href: "/dashboard/communities", label: "Comunidades", icon: Users },
+      { href: "/dashboard/usuarios", label: "Usuários", icon: Shield },
+      { href: "/dashboard/admin/comunidades", label: "Admin Comunidades", icon: Globe },
+      { href: "/dashboard/admin/plataforma", label: "Plataforma", icon: Server },
+      { href: "/dashboard/admin/financeiro", label: "Financeiro", icon: DollarSign },
+      { href: "/dashboard/admin/ferramentas", label: "Ferramentas", icon: Wrench },
+    ],
+  },
+  {
+    type: "group",
+    label: "Conteúdo",
+    icon: BookOpen,
+    items: [
+      { href: "/dashboard/events", label: "Eventos", icon: Calendar },
+      { href: "/dashboard/email-sequences", label: "Seq. de Email", icon: Mail },
+      { href: "/dashboard/badges", label: "Badges", icon: Award },
+      { href: "/dashboard/faqs", label: "FAQs", icon: HelpCircle },
+      { href: "/dashboard/testimonials", label: "Depoimentos", icon: Star },
+      { href: "/dashboard/marketplace", label: "Marketplace", icon: ShoppingBag },
+      { href: "/dashboard/ai", label: "Auto AI", icon: Bot },
+    ],
+  },
+  {
+    type: "group",
+    label: "Conta",
+    icon: Settings,
+    items: [
+      { href: "/dashboard/analytics", label: "Analytics", icon: BarChart2 },
+      { href: "/dashboard/settings", label: "Configurações", icon: Settings },
+    ],
+  },
 ];
 
-const INFLUENCER_NAV = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { href: "/dashboard/communities", label: "Minhas Comunidades", icon: Users },
-  { href: "/dashboard/content", label: "Conteúdo", icon: BookOpen },
-  { href: "/dashboard/live", label: "Lives", icon: Video },
-  { href: "/dashboard/events", label: "Eventos", icon: Calendar },
-  { href: "/dashboard/email-sequences", label: "Sequências de Email", icon: Mail },
-  { href: "/dashboard/badges", label: "Badges", icon: Award },
-  { href: "/dashboard/faqs", label: "FAQs", icon: HelpCircle },
-  { href: "/dashboard/testimonials", label: "Depoimentos", icon: Star },
-  { href: "/dashboard/analytics", label: "Analytics", icon: BarChart2 },
-  { href: "/dashboard/marketplace", label: "Marketplace", icon: ShoppingBag },
-  { href: "/dashboard/tools", label: "Ferramentas", icon: Wrench },
-  { href: "/dashboard/ai", label: "Auto AI", icon: Bot },
-  { href: "/dashboard/messages", label: "Mensagens", icon: MessageSquare },
-  { href: "/dashboard/notifications", label: "Notificações", icon: Bell },
-  { href: "/dashboard/settings", label: "Configurações", icon: Settings },
+const INFLUENCER_NAV: NavEntry[] = [
+  { type: "link", href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  {
+    type: "group",
+    label: "Comunidades",
+    icon: Users,
+    items: [
+      { href: "/dashboard/communities", label: "Minhas Comunidades", icon: Users },
+      { href: "/dashboard/content", label: "Conteúdo", icon: BookOpen },
+      { href: "/dashboard/live", label: "Lives", icon: Video },
+      { href: "/dashboard/events", label: "Eventos", icon: Calendar },
+      { href: "/dashboard/email-sequences", label: "Seq. de Email", icon: Mail },
+      { href: "/dashboard/badges", label: "Badges", icon: Award },
+      { href: "/dashboard/faqs", label: "FAQs", icon: HelpCircle },
+      { href: "/dashboard/testimonials", label: "Depoimentos", icon: Star },
+    ],
+  },
+  {
+    type: "group",
+    label: "Crescimento",
+    icon: TrendingUp,
+    items: [
+      { href: "/dashboard/analytics", label: "Analytics", icon: BarChart2 },
+      { href: "/dashboard/marketplace", label: "Marketplace", icon: ShoppingBag },
+      { href: "/dashboard/tools", label: "Ferramentas", icon: Wrench },
+      { href: "/dashboard/ai", label: "Auto AI", icon: Bot },
+    ],
+  },
+  {
+    type: "group",
+    label: "Conta",
+    icon: Settings,
+    items: [
+      { href: "/dashboard/messages", label: "Mensagens", icon: MessageSquare },
+      { href: "/dashboard/notifications", label: "Notificações", icon: Bell },
+      { href: "/dashboard/settings", label: "Configurações", icon: Settings },
+    ],
+  },
 ];
 
-const MEMBER_NAV = [
-  { href: "/dashboard", label: "Início", icon: Home, exact: true },
-  { href: "/dashboard/meu-aprendizado", label: "Meu Aprendizado", icon: GraduationCap },
-  { href: "/dashboard/leaderboard", label: "Leaderboard", icon: Trophy },
-  { href: "/dashboard/lives", label: "Lives", icon: PlayCircle },
-  { href: "/dashboard/marketplace", label: "Marketplace", icon: ShoppingBag },
-  { href: "/dashboard/messages", label: "Mensagens", icon: MessageSquare },
-  { href: "/dashboard/notifications", label: "Notificações", icon: Bell },
-  { href: "/dashboard/ai", label: "Auto AI", icon: Bot },
-  { href: "/dashboard/settings", label: "Configurações", icon: Settings },
+const MEMBER_NAV: NavEntry[] = [
+  { type: "link", href: "/dashboard", label: "Início", icon: Home, exact: true },
+  {
+    type: "group",
+    label: "Aprender",
+    icon: GraduationCap,
+    items: [
+      { href: "/dashboard/meu-aprendizado", label: "Meu Aprendizado", icon: GraduationCap },
+      { href: "/dashboard/lives", label: "Lives", icon: PlayCircle },
+      { href: "/dashboard/leaderboard", label: "Leaderboard", icon: Trophy },
+    ],
+  },
+  {
+    type: "group",
+    label: "Explorar",
+    icon: Compass,
+    items: [
+      { href: "/dashboard/marketplace", label: "Marketplace", icon: ShoppingBag },
+      { href: "/dashboard/ai", label: "Auto AI", icon: Bot },
+    ],
+  },
+  {
+    type: "group",
+    label: "Conta",
+    icon: Settings,
+    items: [
+      { href: "/dashboard/messages", label: "Mensagens", icon: MessageSquare },
+      { href: "/dashboard/notifications", label: "Notificações", icon: Bell },
+      { href: "/dashboard/settings", label: "Configurações", icon: Settings },
+    ],
+  },
 ];
 
-const PARTNER_NAV = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { href: "/dashboard/meus-produtos", label: "Meus Produtos", icon: Package },
-  { href: "/dashboard/vendas", label: "Vendas", icon: TrendingUp },
-  { href: "/dashboard/analytics", label: "Analytics", icon: BarChart2 },
-  { href: "/dashboard/messages", label: "Mensagens", icon: MessageSquare },
-  { href: "/dashboard/settings", label: "Configurações", icon: Settings },
+const PARTNER_NAV: NavEntry[] = [
+  { type: "link", href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  {
+    type: "group",
+    label: "Produtos",
+    icon: Package,
+    items: [
+      { href: "/dashboard/meus-produtos", label: "Meus Produtos", icon: Package },
+      { href: "/dashboard/vendas", label: "Vendas", icon: TrendingUp },
+    ],
+  },
+  {
+    type: "group",
+    label: "Crescimento",
+    icon: TrendingUp,
+    items: [
+      { href: "/dashboard/analytics", label: "Analytics", icon: BarChart2 },
+      { href: "/dashboard/marketplace", label: "Marketplace", icon: ShoppingBag },
+    ],
+  },
+  {
+    type: "group",
+    label: "Conta",
+    icon: Settings,
+    items: [
+      { href: "/dashboard/messages", label: "Mensagens", icon: MessageSquare },
+      { href: "/dashboard/settings", label: "Configurações", icon: Settings },
+    ],
+  },
 ];
 
-function getNavItems(role: string) {
+function getNavItems(role: string): NavEntry[] {
   switch (role) {
     case "SUPER_ADMIN": return ADMIN_NAV;
     case "INFLUENCER_ADMIN": return INFLUENCER_NAV;
@@ -121,6 +227,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [role, setRole] = useState("INFLUENCER_ADMIN");
   const [userName, setUserName] = useState("");
   const [authChecked, setAuthChecked] = useState(false);
+  const [openGroups, setOpenGroups] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const token = localStorage.getItem("detailhub_access_token");
@@ -133,9 +240,34 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     setRole(storedRole);
     setUserName(storedName);
     setAuthChecked(true);
-  }, []);
+  }, [router]);
 
-  const navItems = getNavItems(role);
+  // Auto-expand groups that contain the active route
+  useEffect(() => {
+    const nav = getNavItems(role);
+    const toOpen = new Set<string>();
+    nav.forEach((entry) => {
+      if (entry.type === "group") {
+        const hasActive = entry.items.some(
+          (item) => pathname === item.href || pathname.startsWith(item.href + "/")
+        );
+        if (hasActive) toOpen.add(entry.label);
+      }
+    });
+    setOpenGroups(toOpen);
+  }, [pathname, role]);
+
+  function toggleGroup(label: string) {
+    setOpenGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(label)) {
+        next.delete(label);
+      } else {
+        next.add(label);
+      }
+      return next;
+    });
+  }
 
   async function handleLogout() {
     try {
@@ -210,32 +342,85 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Nav */}
       <nav className="flex-1 py-3 overflow-y-auto space-y-0.5 px-2">
-        {/* Top nav items */}
-        {navItems.map(({ href, label, icon: Icon, exact }) => {
-          const isActive = exact
-            ? pathname === href
-            : pathname === href || pathname.startsWith(href + "/");
+        {(getNavItems(role) as NavEntry[]).map((entry) => {
+          if (!entry.type || entry.type === "link") {
+            const item = entry as NavLink;
+            const isActive = item.exact
+              ? pathname === item.href
+              : pathname === item.href || pathname.startsWith(item.href + "/");
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setMobileOpen(false)}
+                title={collapsed ? item.label : undefined}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all group ${
+                  isActive
+                    ? "bg-violet-100 text-violet-600 border border-violet-200"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-violet-50"
+                }`}
+              >
+                <item.icon className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-violet-600" : "text-gray-500 group-hover:text-gray-900"}`} />
+                {!collapsed && <span className="truncate">{item.label}</span>}
+                {!collapsed && isActive && <div className="ml-auto w-1.5 h-1.5 bg-violet-400 rounded-full" />}
+              </Link>
+            );
+          }
+
+          // Group
+          const group = entry as NavGroup;
+          const isGroupActive = group.items.some(
+            (item) => pathname === item.href || pathname.startsWith(item.href + "/")
+          );
+          const isOpen = openGroups.has(group.label);
+
           return (
-            <Link
-              key={href}
-              href={href}
-              onClick={() => setMobileOpen(false)}
-              title={collapsed ? label : undefined}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all group ${
-                isActive
-                  ? "bg-violet-100 text-violet-600 border border-violet-200"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-violet-50"
-              }`}
-            >
-              <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-violet-600" : "text-gray-500 group-hover:text-gray-900"}`} />
-              {!collapsed && <span className="truncate">{label}</span>}
-              {!collapsed && isActive && (
-                <div className="ml-auto w-1.5 h-1.5 bg-violet-400 rounded-full" />
+            <div key={group.label}>
+              <button
+                onClick={() => toggleGroup(group.label)}
+                title={collapsed ? group.label : undefined}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all group ${
+                  isGroupActive
+                    ? "bg-violet-100 text-violet-600 border border-violet-200"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-violet-50"
+                }`}
+              >
+                <group.icon className={`w-5 h-5 flex-shrink-0 ${isGroupActive ? "text-violet-600" : "text-gray-500 group-hover:text-gray-900"}`} />
+                {!collapsed && (
+                  <>
+                    <span className="truncate flex-1 text-left">{group.label}</span>
+                    <ChevronDown
+                      className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""} ${isGroupActive ? "text-violet-400" : "text-gray-400"}`}
+                    />
+                  </>
+                )}
+              </button>
+              {!collapsed && isOpen && (
+                <div className="ml-3 pl-3 border-l border-gray-200 mt-0.5 space-y-0.5">
+                  {group.items.map((item) => {
+                    const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setMobileOpen(false)}
+                        className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs transition-all group ${
+                          isActive
+                            ? "bg-violet-100 text-violet-600 font-medium"
+                            : "text-gray-500 hover:text-gray-900 hover:bg-violet-50"
+                        }`}
+                      >
+                        <item.icon className={`w-4 h-4 flex-shrink-0 ${isActive ? "text-violet-600" : "text-gray-400 group-hover:text-gray-700"}`} />
+                        <span className="truncate">{item.label}</span>
+                        {isActive && <div className="ml-auto w-1 h-1 bg-violet-400 rounded-full" />}
+                      </Link>
+                    );
+                  })}
+                </div>
               )}
-            </Link>
+            </div>
           );
         })}
-
       </nav>
 
       {/* Footer */}
