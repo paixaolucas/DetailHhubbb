@@ -16,7 +16,7 @@ if (!process.env.JWT_REFRESH_SECRET) {
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 const JWT_REFRESH_SECRET = new TextEncoder().encode(process.env.JWT_REFRESH_SECRET);
 
-const ACCESS_TOKEN_EXPIRY = process.env.JWT_EXPIRES_IN ?? "15m";
+const ACCESS_TOKEN_EXPIRY = process.env.JWT_EXPIRES_IN ?? "2h";
 const REFRESH_TOKEN_EXPIRY = process.env.JWT_REFRESH_EXPIRES_IN ?? "7d";
 
 // =============================================================================

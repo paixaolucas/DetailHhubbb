@@ -1,7 +1,7 @@
 // =============================================================================
 // NEXT.JS EDGE MIDDLEWARE
-// Lightweight JWT check — no Node.js APIs, runs in Edge runtime
-// Full cryptographic verification is done at the API route level
+// Lightweight existence check only — token expiry is handled at API layer
+// This prevents redirect loops caused by expired tokens
 // =============================================================================
 
 import { NextResponse } from "next/server";
@@ -12,12 +12,20 @@ const PUBLIC_PATHS = [
   "/login",
   "/register",
   "/forgot-password",
+  "/reset-password",
   "/communities",
   "/community",
+  "/certificates",
   "/api/auth/login",
   "/api/auth/register",
   "/api/auth/refresh",
+  "/api/auth/forgot-password",
+  "/api/auth/reset-password",
   "/api/webhooks",
+  "/api/stripe/webhook",
+  "/api/leaderboard",
+  "/api/communities",
+  "/api/platform/plan",
 ];
 
 const PROTECTED_PREFIXES = ["/dashboard", "/admin", "/ai-assistant"];
@@ -32,50 +40,50 @@ function isProtected(pathname: string): boolean {
   return PROTECTED_PREFIXES.some((p) => pathname.startsWith(p));
 }
 
-function extractToken(req: NextRequest): string | null {
+function hasToken(req: NextRequest): boolean {
+  // Check cookie OR Authorization header — just existence, NOT expiry
+  // Expiry validation happens at the API layer to avoid redirect loops
   const cookie = req.cookies.get("detailhub_access_token")?.value;
-  if (cookie) return cookie;
+  if (cookie && cookie.length > 20) return true;
   const auth = req.headers.get("Authorization");
-  if (auth?.startsWith("Bearer ")) return auth.slice(7);
-  return null;
+  if (auth?.startsWith("Bearer ") && auth.length > 27) return true;
+  return false;
 }
 
-function isTokenExpired(token: string): boolean {
+function extractRole(req: NextRequest): string {
   try {
+    const cookie = req.cookies.get("detailhub_access_token")?.value;
+    const token = cookie ?? req.headers.get("Authorization")?.slice(7);
+    if (!token) return "";
     const parts = token.split(".");
-    if (parts.length !== 3) return true;
+    if (parts.length !== 3) return "";
     const padded = parts[1].replace(/-/g, "+").replace(/_/g, "/");
     const payload = JSON.parse(atob(padded));
-    if (typeof payload.exp !== "number") return false;
-    return Math.floor(Date.now() / 1000) >= payload.exp;
+    return payload.role ?? "";
   } catch {
-    return true;
-  }
-}
-
-function extractRole(token: string): string {
-  try {
-    const parts = token.split(".");
-    if (parts.length !== 3) return "COMMUNITY_MEMBER";
-    const padded = parts[1].replace(/-/g, "+").replace(/_/g, "/");
-    const payload = JSON.parse(atob(padded));
-    return payload.role ?? "COMMUNITY_MEMBER";
-  } catch {
-    return "COMMUNITY_MEMBER";
+    return "";
   }
 }
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Always allow public paths
   if (isPublic(pathname)) {
+    return addSecurityHeaders(NextResponse.next());
+  }
+
+  // Allow static assets
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/favicon") ||
+    pathname.includes(".")
+  ) {
     return NextResponse.next();
   }
 
   if (isProtected(pathname)) {
-    const token = extractToken(request);
-
-    if (!token || isTokenExpired(token)) {
+    if (!hasToken(request)) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("redirect", pathname);
       const res = NextResponse.redirect(loginUrl);
@@ -84,27 +92,40 @@ export function middleware(request: NextRequest) {
     }
 
     // Role-based route guards (decoded without signature verification — routing only)
-    const role = extractRole(token);
-    const isSeller =
-      role === "INFLUENCER_ADMIN" ||
-      role === "MARKETPLACE_PARTNER" ||
-      role === "SUPER_ADMIN";
+    // Full cryptographic verification happens at the API layer
+    const role = extractRole(request);
 
     const SELLER_ONLY = ["/dashboard/meus-produtos", "/dashboard/vendas", "/dashboard/live"];
-    if (SELLER_ONLY.some((p) => pathname.startsWith(p)) && !isSeller) {
+    if (SELLER_ONLY.some((p) => pathname.startsWith(p)) && role === "COMMUNITY_MEMBER") {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
 
-    const ADMIN_ONLY = ["/dashboard/admin", "/dashboard/usuarios", "/dashboard/communities/new"];
+    const ADMIN_ONLY = [
+      "/dashboard/admin",
+      "/dashboard/usuarios",
+      "/dashboard/communities/new",
+    ];
     if (ADMIN_ONLY.some((p) => pathname.startsWith(p)) && role !== "SUPER_ADMIN") {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
   }
 
-  const response = NextResponse.next();
+  return addSecurityHeaders(NextResponse.next());
+}
+
+function addSecurityHeaders(response: NextResponse): NextResponse {
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set("X-Frame-Options", "DENY");
+  response.headers.set("X-XSS-Protection", "1; mode=block");
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  response.headers.set(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=()"
+  );
+  response.headers.set(
+    "Strict-Transport-Security",
+    "max-age=63072000; includeSubDomains"
+  );
   return response;
 }
 

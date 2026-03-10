@@ -5,12 +5,18 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { checkRateLimit } from "@/lib/rate-limit";
+import { getClientIp } from "@/lib/api-helpers";
 
 export async function GET(
   req: NextRequest,
   { params }: { params: { code: string } }
 ) {
   try {
+    const ip = getClientIp(req);
+    const rateLimitResponse = checkRateLimit(`cert-verify:${ip}`, 60_000, 10);
+    if (rateLimitResponse) return rateLimitResponse;
+
     const code = params.code;
     if (!code) {
       return NextResponse.json(

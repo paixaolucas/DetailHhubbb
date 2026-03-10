@@ -230,16 +230,83 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [openGroups, setOpenGroups] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    const token = localStorage.getItem("detailhub_access_token");
-    if (!token) {
-      router.push("/login");
-      return;
+    async function checkAuth() {
+      const token = localStorage.getItem("detailhub_access_token");
+      const refreshToken = localStorage.getItem("detailhub_refresh_token");
+
+      if (!token && !refreshToken) {
+        router.push("/login");
+        return;
+      }
+
+      // If no access token but have refresh token — try to refresh
+      if (!token && refreshToken) {
+        try {
+          const res = await fetch("/api/auth/refresh", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ refreshToken }),
+          });
+          const data = await res.json();
+          if (res.ok && data.data?.accessToken) {
+            localStorage.setItem("detailhub_access_token", data.data.accessToken);
+            if (data.data.refreshToken) {
+              localStorage.setItem("detailhub_refresh_token", data.data.refreshToken);
+            }
+          } else {
+            // Refresh failed — clear everything and redirect
+            localStorage.removeItem("detailhub_access_token");
+            localStorage.removeItem("detailhub_refresh_token");
+            localStorage.removeItem("detailhub_user_role");
+            localStorage.removeItem("detailhub_user_name");
+            localStorage.removeItem("detailhub_user_email");
+            localStorage.removeItem("detailhub_user_id");
+            router.push("/login");
+            return;
+          }
+        } catch {
+          router.push("/login");
+          return;
+        }
+      }
+
+      // Check if token is about to expire or already expired
+      if (token) {
+        try {
+          const parts = token.split(".");
+          if (parts.length === 3) {
+            const padded = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+            const payload = JSON.parse(atob(padded));
+            const now = Math.floor(Date.now() / 1000);
+            // If token expires within 5 minutes, proactively refresh
+            if (payload.exp && payload.exp - now < 300 && refreshToken) {
+              const res = await fetch("/api/auth/refresh", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ refreshToken }),
+              });
+              const data = await res.json();
+              if (res.ok && data.data?.accessToken) {
+                localStorage.setItem("detailhub_access_token", data.data.accessToken);
+                if (data.data.refreshToken) {
+                  localStorage.setItem("detailhub_refresh_token", data.data.refreshToken);
+                }
+              }
+            }
+          }
+        } catch {
+          // Token decode failed — continue with existing token
+        }
+      }
+
+      const storedRole = localStorage.getItem("detailhub_user_role") ?? "INFLUENCER_ADMIN";
+      const storedName = localStorage.getItem("detailhub_user_name") ?? "";
+      setRole(storedRole);
+      setUserName(storedName);
+      setAuthChecked(true);
     }
-    const storedRole = localStorage.getItem("detailhub_user_role") ?? "INFLUENCER_ADMIN";
-    const storedName = localStorage.getItem("detailhub_user_name") ?? "";
-    setRole(storedRole);
-    setUserName(storedName);
-    setAuthChecked(true);
+
+    checkAuth();
   }, [router]);
 
   // Auto-expand groups that contain the active route

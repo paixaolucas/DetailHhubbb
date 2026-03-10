@@ -68,6 +68,9 @@ export async function POST(req: NextRequest) {
       data: { passwordHash },
     });
 
+    // Revoke all refresh tokens so all sessions are invalidated
+    await db.refreshToken.deleteMany({ where: { userId: user.id } });
+
     return NextResponse.json({ success: true });
   } catch (error) {
     if (error instanceof ZodError) {
