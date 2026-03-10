@@ -23,26 +23,18 @@ export async function fetchWithTimeout(
 }
 
 async function tryRefreshToken(): Promise<string | null> {
-  const refreshToken =
-    typeof window !== "undefined"
-      ? localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN)
-      : null;
-  if (!refreshToken) return null;
-
   try {
     const res = await fetch("/api/auth/refresh", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken }),
+      credentials: "include", // sends httpOnly cookie
     });
     if (!res.ok) return null;
     const data = await res.json();
     const newToken = data.data?.accessToken;
     if (newToken) {
-      localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, newToken);
-      // Also update refresh token if rotated
-      if (data.data?.refreshToken) {
-        localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, data.data.refreshToken);
+      if (typeof window !== "undefined") {
+        localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, newToken);
       }
       return newToken;
     }
@@ -54,9 +46,8 @@ async function tryRefreshToken(): Promise<string | null> {
 
 function redirectToLogin() {
   if (typeof window !== "undefined") {
-    // Clear stale tokens
+    // Clear stale localStorage tokens (refresh token is now in httpOnly cookie, handled server-side)
     localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
-    localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
     localStorage.removeItem(STORAGE_KEYS.USER_ROLE);
     localStorage.removeItem(STORAGE_KEYS.USER_NAME);
     localStorage.removeItem(STORAGE_KEYS.USER_EMAIL);

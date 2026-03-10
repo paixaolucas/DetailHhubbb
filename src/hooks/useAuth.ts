@@ -41,13 +41,13 @@ export function useAuth(): UseAuthReturn {
 
   const logout = useCallback(async () => {
     try {
-      const refreshToken = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
       await fetch("/api/auth/logout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ refreshToken }),
+        credentials: "include",
       });
     } finally {
+      // Refresh token is in httpOnly cookie — cleared by the server on logout
       Object.values(STORAGE_KEYS).forEach((key) => localStorage.removeItem(key));
       setUser(null);
       setToken(null);

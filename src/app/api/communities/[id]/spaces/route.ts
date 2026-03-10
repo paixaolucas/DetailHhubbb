@@ -7,12 +7,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { withAuth, verifyCommunityOwnership } from "@/middleware/auth.middleware";
 import { db } from "@/lib/db";
 
-export async function GET(
-  req: NextRequest,
-  context: { params: { id: string } }
-) {
+export const GET = withAuth(async (req, { params }) => {
   try {
-    const communityId = context.params.id;
+    const communityId = params?.id;
     if (!communityId) {
       return NextResponse.json(
         { success: false, error: "Community ID required" },
@@ -32,7 +29,7 @@ export async function GET(
       { status: 500 }
     );
   }
-}
+});
 
 export const POST = withAuth(async (req, { session, params }) => {
   try {
@@ -55,6 +52,13 @@ export const POST = withAuth(async (req, { session, params }) => {
     if (!name || !slug) {
       return NextResponse.json(
         { success: false, error: "name and slug are required" },
+        { status: 400 }
+      );
+    }
+
+    if (!/^[a-z0-9-]+$/.test(slug) || slug.length < 2 || slug.length > 60) {
+      return NextResponse.json(
+        { success: false, error: "Slug inválido. Use apenas letras minúsculas, números e hífens (2-60 caracteres)." },
         { status: 400 }
       );
     }

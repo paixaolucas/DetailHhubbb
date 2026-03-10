@@ -32,6 +32,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Per-email rate limit to prevent targeted abuse (3 per 10 minutes)
+    const emailAllowed = checkRateLimit(`forgot-pwd-email:${email.toLowerCase()}`, 10 * 60 * 1000, 3);
+    if (emailAllowed) {
+      // Return same success message to avoid enumeration
+      return NextResponse.json({
+        success: true,
+        message: "Se o email existir, você receberá um link de recuperação.",
+      });
+    }
+
     const user = await db.user.findUnique({
       where: { email: email.toLowerCase().trim() },
       select: { id: true, email: true, firstName: true },

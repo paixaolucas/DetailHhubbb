@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { withAuth } from "@/middleware/auth.middleware";
 import { db } from "@/lib/db";
 
-export const GET = async () => {
+export const GET = withAuth(async (_req: NextRequest) => {
   const plan = await db.platformPlan.findFirst({
     where: { isActive: true },
     orderBy: { createdAt: "asc" },
@@ -12,4 +13,4 @@ export const GET = async () => {
   }
 
   return NextResponse.json({ success: true, data: plan });
-};
+});

@@ -94,17 +94,16 @@ export async function apiFetch<T = unknown>(
   const res = await fetch(url, { ...options, headers });
 
   if (res.status === 401) {
-    // Attempt token refresh
-    const refreshToken = localStorage.getItem("detailhub_refresh_token");
-    if (refreshToken) {
-      const refreshRes = await fetch("/api/auth/refresh", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ refreshToken }),
-      });
+    // Attempt token refresh using httpOnly cookie
+    const refreshRes = await fetch("/api/auth/refresh", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
 
-      if (refreshRes.ok) {
-        const refreshData = await refreshRes.json();
+    if (refreshRes.ok) {
+      const refreshData = await refreshRes.json();
+      if (refreshData.data?.accessToken) {
         localStorage.setItem(
           "detailhub_access_token",
           refreshData.data.accessToken

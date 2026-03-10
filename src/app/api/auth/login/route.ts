@@ -18,6 +18,19 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
+
+    // Per-email brute force protection (5 attempts per 15 minutes)
+    const emailRaw = body?.email?.toLowerCase?.() ?? "";
+    if (emailRaw) {
+      const emailAllowed = checkRateLimit(`login-email:${emailRaw}`, 15 * 60 * 1000, 5);
+      if (emailAllowed) {
+        return NextResponse.json(
+          { success: false, error: "Muitas tentativas de login. Aguarde 15 minutos." },
+          { status: 429 }
+        );
+      }
+    }
+
     const input = loginSchema.parse(body);
 
     const ipAddress =
@@ -27,15 +40,32 @@ export async function POST(req: NextRequest) {
     const result = await loginUser(input, ipAddress, userAgent);
 
     const response = NextResponse.json(
-      { success: true, data: result },
+      {
+        success: true,
+        data: {
+          user: result.user,
+          tokens: {
+            accessToken: result.tokens.accessToken,
+            expiresIn: result.tokens.expiresIn,
+          },
+        },
+      },
       { status: 200 }
     );
 
     response.cookies.set("detailhub_access_token", result.tokens.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: "strict",
       maxAge: result.tokens.expiresIn,
+      path: "/",
+    });
+
+    response.cookies.set("detailhub_refresh_token", result.tokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60, // 7 days
       path: "/",
     });
 

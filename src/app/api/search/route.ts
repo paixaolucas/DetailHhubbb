@@ -57,6 +57,22 @@ export const GET = withAuth(async (req: NextRequest, { session }) => {
       );
     }
 
+    // Get communities user has access to (platform membership or direct membership)
+    const platformMembership = await db.platformMembership.findFirst({
+      where: { userId: session.userId, status: "ACTIVE" },
+      select: { id: true },
+    });
+
+    let allowedCommunityIds: string[] | undefined;
+    if (!platformMembership) {
+      // Only get communities from direct memberships
+      const memberships = await db.communityMembership.findMany({
+        where: { userId: session.userId, status: "ACTIVE" },
+        select: { communityId: true },
+      });
+      allowedCommunityIds = memberships.map((m) => m.communityId);
+    }
+
     const results = await Promise.all([
       // Communities
       types.includes("communities")
@@ -89,6 +105,9 @@ export const GET = withAuth(async (req: NextRequest, { session }) => {
                 { title: { contains: q, mode: "insensitive" } },
                 { body: { contains: q, mode: "insensitive" } },
               ],
+              ...(allowedCommunityIds !== undefined ? {
+                space: { communityId: { in: allowedCommunityIds } },
+              } : {}),
             },
             select: {
               id: true,

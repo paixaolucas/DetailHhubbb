@@ -34,7 +34,7 @@ function LoginFormContent() {
 
       if (data.data?.tokens?.accessToken) {
         localStorage.setItem("detailhub_access_token", data.data.tokens.accessToken);
-        localStorage.setItem("detailhub_refresh_token", data.data.tokens.refreshToken);
+        // Refresh token is now stored as httpOnly cookie by the server
       }
       if (data.data?.user) {
         localStorage.setItem("detailhub_user_role", data.data.user.role);

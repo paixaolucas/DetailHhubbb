@@ -51,13 +51,20 @@ export async function POST(req: NextRequest) {
 
     const user = await db.user.findUnique({
       where: { id: payload.sub },
-      select: { id: true },
+      select: { id: true, isActive: true, isBanned: true },
     });
 
     if (!user) {
       return NextResponse.json(
         { success: false, error: "Usuário não encontrado" },
         { status: 404 }
+      );
+    }
+
+    if (!user.isActive || user.isBanned) {
+      return NextResponse.json(
+        { success: false, error: "Conta inativa ou suspensa" },
+        { status: 403 }
       );
     }
 

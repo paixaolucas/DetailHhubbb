@@ -5,8 +5,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { refreshAccessToken } from "@/services/auth/auth.service";
 import { AppError } from "@/types";
+import { checkRateLimit } from "@/lib/rate-limit";
+import { getClientIp } from "@/lib/api-helpers";
 
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+  const limited = checkRateLimit(`refresh:${ip}`, 60_000, 20);
+  if (limited) return limited;
+
   try {
     let bodyRefreshToken: string | undefined;
     try {
@@ -28,17 +34,33 @@ export async function POST(req: NextRequest) {
     const tokens = await refreshAccessToken(refreshToken);
 
     const response = NextResponse.json(
-      { success: true, data: tokens },
+      {
+        success: true,
+        data: {
+          accessToken: tokens.accessToken,
+          expiresIn: tokens.expiresIn,
+        },
+      },
       { status: 200 }
     );
 
     response.cookies.set("detailhub_access_token", tokens.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: "strict",
       maxAge: tokens.expiresIn,
       path: "/",
     });
+
+    if (tokens.refreshToken) {
+      response.cookies.set("detailhub_refresh_token", tokens.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60,
+        path: "/",
+      });
+    }
 
     return response;
   } catch (error) {

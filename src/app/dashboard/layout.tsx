@@ -232,31 +232,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   useEffect(() => {
     async function checkAuth() {
       const token = localStorage.getItem("detailhub_access_token");
-      const refreshToken = localStorage.getItem("detailhub_refresh_token");
 
-      if (!token && !refreshToken) {
-        router.push("/login");
-        return;
-      }
-
-      // If no access token but have refresh token — try to refresh
-      if (!token && refreshToken) {
+      // If no access token, try to refresh using the httpOnly cookie
+      if (!token) {
         try {
           const res = await fetch("/api/auth/refresh", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ refreshToken }),
+            credentials: "include",
           });
           const data = await res.json();
           if (res.ok && data.data?.accessToken) {
             localStorage.setItem("detailhub_access_token", data.data.accessToken);
-            if (data.data.refreshToken) {
-              localStorage.setItem("detailhub_refresh_token", data.data.refreshToken);
-            }
           } else {
             // Refresh failed — clear everything and redirect
             localStorage.removeItem("detailhub_access_token");
-            localStorage.removeItem("detailhub_refresh_token");
             localStorage.removeItem("detailhub_user_role");
             localStorage.removeItem("detailhub_user_name");
             localStorage.removeItem("detailhub_user_email");
@@ -278,19 +268,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             const padded = parts[1].replace(/-/g, "+").replace(/_/g, "/");
             const payload = JSON.parse(atob(padded));
             const now = Math.floor(Date.now() / 1000);
-            // If token expires within 5 minutes, proactively refresh
-            if (payload.exp && payload.exp - now < 300 && refreshToken) {
+            // If token expires within 5 minutes, proactively refresh via cookie
+            if (payload.exp && payload.exp - now < 300) {
               const res = await fetch("/api/auth/refresh", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ refreshToken }),
+                credentials: "include",
               });
               const data = await res.json();
               if (res.ok && data.data?.accessToken) {
                 localStorage.setItem("detailhub_access_token", data.data.accessToken);
-                if (data.data.refreshToken) {
-                  localStorage.setItem("detailhub_refresh_token", data.data.refreshToken);
-                }
               }
             }
           }
@@ -338,15 +325,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   async function handleLogout() {
     try {
-      const refreshToken = localStorage.getItem("detailhub_refresh_token");
       await fetch("/api/auth/logout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ refreshToken }),
+        credentials: "include",
       });
     } finally {
       localStorage.removeItem("detailhub_access_token");
-      localStorage.removeItem("detailhub_refresh_token");
       localStorage.removeItem("detailhub_user_role");
       localStorage.removeItem("detailhub_user_name");
       localStorage.removeItem("detailhub_user_email");

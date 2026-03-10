@@ -28,7 +28,16 @@ export async function POST(req: NextRequest) {
     const result = await registerUser(input, ipAddress);
 
     const response = NextResponse.json(
-      { success: true, data: result },
+      {
+        success: true,
+        data: {
+          user: result.user,
+          tokens: {
+            accessToken: result.tokens.accessToken,
+            expiresIn: result.tokens.expiresIn,
+          },
+        },
+      },
       { status: 201 }
     );
 
@@ -36,8 +45,16 @@ export async function POST(req: NextRequest) {
     response.cookies.set("detailhub_access_token", result.tokens.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: "strict",
       maxAge: result.tokens.expiresIn,
+      path: "/",
+    });
+
+    response.cookies.set("detailhub_refresh_token", result.tokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60, // 7 days
       path: "/",
     });
 
