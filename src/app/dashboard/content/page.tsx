@@ -243,10 +243,7 @@ export default function ContentPage() {
             <BookOpen className="w-10 h-10 text-violet-400" />
           </div>
           <h3 className="text-xl font-semibold text-gray-900 mb-2">Nenhuma comunidade encontrada</h3>
-          <p className="text-gray-400 text-sm mb-6">Crie uma comunidade primeiro para adicionar conteúdo.</p>
-          <a href="/dashboard/communities/new" className="bg-violet-600 hover:bg-violet-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all inline-block">
-            Criar comunidade
-          </a>
+          <p className="text-gray-400 text-sm mb-6">Entre em contato com o administrador para criar uma comunidade.</p>
         </div>
       </div>
     );

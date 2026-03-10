@@ -278,12 +278,6 @@ function InfluencerDashboard({ userName }: { userName: string }) {
             <p className="text-gray-400 text-sm">Desempenho das suas comunidades automotivas</p>
           </div>
         </div>
-        <Link
-          href="/dashboard/communities/new"
-          className="hidden sm:flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-violet-500/30"
-        >
-          + Nova Comunidade
-        </Link>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

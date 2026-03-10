@@ -63,13 +63,6 @@ export default function CommunitiesPage() {
           <h1 className="text-2xl font-bold text-gray-900">Comunidades</h1>
           <p className="text-gray-400 text-sm mt-1">Gerencie suas comunidades automotivas</p>
         </div>
-        <Link
-          href="/dashboard/communities/new"
-          className="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-purple-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-violet-500/30"
-        >
-          <Plus className="w-4 h-4" />
-          Nova comunidade
-        </Link>
       </div>
 
       {communities.length === 0 ? (
@@ -83,13 +76,6 @@ export default function CommunitiesPage() {
           <p className="text-gray-400 text-sm mb-8 max-w-sm mx-auto">
             Crie sua primeira comunidade automotiva e comece a monetizar sua audiência hoje.
           </p>
-          <Link
-            href="/dashboard/communities/new"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-purple-500 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-violet-500/30"
-          >
-            <Plus className="w-4 h-4" />
-            Criar comunidade
-          </Link>
         </div>
       ) : (
         <div className="grid gap-4">
