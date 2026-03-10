@@ -1,10 +1,10 @@
 // =============================================================================
 // GET /api/communities — list public communities
-// POST /api/communities — create community (influencer only)
+// POST /api/communities — create community (SUPER_ADMIN only)
 // =============================================================================
 
 import { NextRequest, NextResponse } from "next/server";
-import { withAuth, withPermission, getSessionFromRequest } from "@/middleware/auth.middleware";
+import { withAuth, withPermission, withRole, getSessionFromRequest } from "@/middleware/auth.middleware";
 import {
   listPublicCommunities,
   listAllCommunities,
@@ -50,12 +50,13 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export const POST = withPermission(Permissions.COMMUNITY_CREATE)(
+export const POST = withRole(UserRole.SUPER_ADMIN)(
   async (req, { session }) => {
     try {
       const body = await req.json();
-      const input = createCommunitySchema.parse(body);
-      const community = await createCommunity(session.userId, input);
+      const { influencerUserId, ...rest } = body;
+      const input = createCommunitySchema.parse(rest);
+      const community = await createCommunity(session.userId, input, influencerUserId);
 
       trackEvent({ userId: session.userId, type: "COMMUNITY_CREATE", properties: { communityId: community.id } });
 

@@ -24,16 +24,32 @@ import { analyticsService } from "@/services/analytics/analytics.service";
 
 export async function createCommunity(
   userId: string,
-  input: CreateCommunityInput
+  input: CreateCommunityInput,
+  targetInfluencerUserId?: string
 ): Promise<{ id: string; slug: string }> {
-  // Verify user is an influencer
-  const influencer = await db.influencer.findUnique({
-    where: { userId },
+  // If admin is creating on behalf of an influencer, use that user; otherwise use self
+  const ownerUserId = targetInfluencerUserId ?? userId;
+
+  // Find or create influencer record for ownerUserId
+  let influencer = await db.influencer.findUnique({
+    where: { userId: ownerUserId },
     select: { id: true },
   });
 
   if (!influencer) {
-    throw new ForbiddenError("Only influencers can create communities");
+    // Get the user's name for displayName
+    const user = await db.user.findUnique({
+      where: { id: ownerUserId },
+      select: { firstName: true, lastName: true },
+    });
+    if (!user) throw new ForbiddenError("Influencer user not found");
+    influencer = await db.influencer.create({
+      data: {
+        userId: ownerUserId,
+        displayName: `${user.firstName} ${user.lastName ?? ""}`.trim(),
+      },
+      select: { id: true },
+    });
   }
 
   // Check slug uniqueness

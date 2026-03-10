@@ -95,7 +95,7 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
 
-    const ADMIN_ONLY = ["/dashboard/admin", "/dashboard/usuarios"];
+    const ADMIN_ONLY = ["/dashboard/admin", "/dashboard/usuarios", "/dashboard/communities/new"];
     if (ADMIN_ONLY.some((p) => pathname.startsWith(p)) && role !== "SUPER_ADMIN") {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }

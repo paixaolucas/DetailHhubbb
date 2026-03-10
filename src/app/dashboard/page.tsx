@@ -219,6 +219,7 @@ function InfluencerDashboard({ userName }: { userName: string }) {
   const [summary, setSummary] = useState<any>(null);
   const [timeSeries, setTimeSeries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [myCommunity, setMyCommunity] = useState<{ id: string; name: string; slug: string; logoUrl: string | null } | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("detailhub_access_token");
@@ -230,11 +231,43 @@ function InfluencerDashboard({ userName }: { userName: string }) {
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    const token = localStorage.getItem("detailhub_access_token");
+    if (!token) return;
+    fetch("/api/communities/mine", { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && d.data?.length > 0) setMyCommunity(d.data[0]);
+      })
+      .catch(console.error);
+  }, []);
+
   if (loading) return <DashboardSkeleton />;
   const firstName = userName.split(" ")[0] || "Criador";
 
   return (
     <div className="space-y-6">
+      {myCommunity && (
+        <a
+          href={`/community/${myCommunity.slug}/feed`}
+          className="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-violet-600/10 to-purple-600/5 border border-violet-500/20 hover:border-violet-400/40 transition-all group"
+        >
+          <div
+            className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg flex-shrink-0 bg-violet-600"
+          >
+            {myCommunity.logoUrl ? (
+              <img src={myCommunity.logoUrl} alt={myCommunity.name} className="w-full h-full object-cover rounded-xl" />
+            ) : (
+              myCommunity.name.charAt(0)
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs text-violet-400 font-semibold uppercase tracking-wide mb-0.5">Minha Comunidade</p>
+            <p className="text-gray-900 font-semibold truncate">{myCommunity.name}</p>
+          </div>
+          <ArrowUpRight className="w-5 h-5 text-violet-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform flex-shrink-0" />
+        </a>
+      )}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-purple-500/10 rounded-xl flex items-center justify-center">
