@@ -142,7 +142,7 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("autoclub_access_token");
+    const token = localStorage.getItem("detailhub_access_token");
     if (!token) return;
     fetch("/api/analytics/platform", { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.json())
@@ -163,7 +163,7 @@ function AdminDashboard() {
         </div>
         <div>
           <h1 className="text-2xl font-bold text-white">Painel Administrativo</h1>
-          <p className="text-gray-400 text-sm">Visão geral da plataforma AutoClub Pro</p>
+          <p className="text-gray-400 text-sm">Visão geral da plataforma DetailHub</p>
         </div>
       </div>
 
@@ -226,7 +226,7 @@ function InfluencerDashboard({ userName }: { userName: string }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("autoclub_access_token");
+    const token = localStorage.getItem("detailhub_access_token");
     if (!token) return;
     fetch("/api/analytics/influencer", { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.json())
@@ -321,13 +321,14 @@ function InfluencerDashboard({ userName }: { userName: string }) {
 
 // ─── MEMBER DASHBOARD ─────────────────────────────────────────────────────────
 
-const COURSE_COLORS = ["bg-blue-500", "bg-purple-500", "bg-green-500", "bg-orange-500"];
-
 function MemberDashboardInner({ userName }: { userName: string }) {
   const firstName = userName.split(" ")[0] || "Aluno";
-  const [learningData, setLearningData] = useState<any>(null);
+  const [spaces, setSpaces] = useState<any[]>([]);
   const [lives, setLives] = useState<any[]>([]);
   const [certCount, setCertCount] = useState(0);
+  const [memberSince, setMemberSince] = useState<string | null>(null);
+  const [completedLessons, setCompletedLessons] = useState(0);
+  const [hoursWatched, setHoursWatched] = useState(0);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -336,7 +337,7 @@ function MemberDashboardInner({ userName }: { userName: string }) {
   useEffect(() => {
     const payment = searchParams.get("payment");
     if (payment === "success") {
-      toast.success("Assinatura confirmada! Bem-vindo à comunidade.");
+      toast.success("Assinatura confirmada! Bem-vindo à plataforma.");
       router.replace("/dashboard");
     } else if (payment === "canceled") {
       toast.error("Pagamento cancelado. Tente novamente se quiser.");
@@ -345,29 +346,35 @@ function MemberDashboardInner({ userName }: { userName: string }) {
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem("autoclub_access_token");
-    const userId = localStorage.getItem("autoclub_user_id");
+    const token = localStorage.getItem("detailhub_access_token");
+    const userId = localStorage.getItem("detailhub_user_id");
     if (!token || !userId) { setLoading(false); return; }
 
     const headers = { Authorization: `Bearer ${token}` };
     Promise.all([
-      fetch("/api/users/me/learning", { headers }).then((r) => r.json()),
+      fetch("/api/platform/spaces", { headers }).then((r) => r.json()),
+      fetch("/api/platform-membership/me", { headers }).then((r) => r.json()),
       fetch("/api/live-sessions?status=SCHEDULED&limit=2", { headers }).then((r) => r.json()),
       fetch(`/api/users/${userId}/certificates`, { headers }).then((r) => r.json()),
+      fetch("/api/users/me/learning", { headers }).then((r) => r.json()),
     ])
-      .then(([ld, lv, certs]) => {
-        if (ld.success) setLearningData(ld.data);
+      .then(([sp, membership, lv, certs, ld]) => {
+        if (sp.success) setSpaces((sp.data ?? []).slice(0, 3));
+        if (membership.success && membership.data.membership?.joinedAt) {
+          setMemberSince(new Date(membership.data.membership.joinedAt).toLocaleDateString("pt-BR", { month: "short", year: "numeric" }));
+        }
         if (lv.success) setLives((lv.data?.sessions ?? lv.data ?? []).slice(0, 2));
         if (certs.success) setCertCount((certs.data ?? []).length);
+        if (ld.success) {
+          setCompletedLessons(ld.data?.stats?.completedLessons ?? 0);
+          setHoursWatched(ld.data?.stats?.hoursWatched ?? 0);
+        }
       })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
 
   if (loading) return <DashboardSkeleton />;
-
-  const stats = learningData?.stats ?? {};
-  const communities: any[] = (learningData?.communities ?? []).slice(0, 2);
 
   return (
     <div className="space-y-6">
@@ -383,9 +390,9 @@ function MemberDashboardInner({ userName }: { userName: string }) {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Aulas Concluídas", value: String(stats.completedLessons ?? 0), icon: CheckCircle2, color: "text-green-400 bg-green-500/10" },
-          { label: "Horas Estudadas", value: `${stats.hoursWatched ?? 0}h`, icon: Clock, color: "text-blue-400 bg-blue-500/10" },
-          { label: "Comunidades", value: String(stats.totalCommunities ?? 0), icon: Users, color: "text-purple-400 bg-purple-500/10" },
+          { label: "Aulas Concluídas", value: String(completedLessons), icon: CheckCircle2, color: "text-green-400 bg-green-500/10" },
+          { label: "Horas Estudadas", value: `${hoursWatched}h`, icon: Clock, color: "text-blue-400 bg-blue-500/10" },
+          { label: "Membro desde", value: memberSince ?? "—", icon: Users, color: "text-purple-400 bg-purple-500/10" },
           { label: "Certificados", value: String(certCount), icon: Star, color: "text-yellow-400 bg-yellow-500/10" },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="glass-card p-5">
@@ -399,42 +406,42 @@ function MemberDashboardInner({ userName }: { userName: string }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Featured Spaces */}
         <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-white">Continuar Aprendendo</h2>
-            <Link href="/dashboard/meu-aprendizado" className="text-xs text-blue-400 hover:text-blue-300 font-medium transition-colors">
-              Ver tudo →
-            </Link>
+            <h2 className="text-base font-semibold text-white">Espaços em Destaque</h2>
           </div>
-          {communities.length === 0 ? (
-            <p className="text-sm text-gray-500 text-center py-6">Nenhuma comunidade ainda. Explore o marketplace!</p>
+          {spaces.length === 0 ? (
+            <div className="text-center py-6 space-y-3">
+              <p className="text-sm text-gray-500">Assine para acessar todos os espaços.</p>
+              <Link href="/dashboard/assinar" className="btn-premium text-sm px-4 py-2 inline-flex items-center gap-1">
+                Ver plano →
+              </Link>
+            </div>
           ) : (
-            <div className="space-y-5">
-              {communities.map((c, idx) => {
-                const firstModule = c.modules?.[0];
-                return (
-                  <div key={c.communityId} className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-white">{c.communityName}</p>
-                        <p className="text-xs text-gray-500">{firstModule?.title ?? "—"}</p>
-                      </div>
-                      <span className="text-xs font-semibold text-gray-400">{c.progress}%</span>
-                    </div>
-                    <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                      <div className={`h-full ${COURSE_COLORS[idx % COURSE_COLORS.length]} rounded-full`} style={{ width: `${c.progress}%` }} />
-                    </div>
-                    <Link href="/dashboard/meu-aprendizado" className="text-xs text-blue-400 hover:text-blue-300 font-medium transition-colors">
-                      Continuar aula →
-                    </Link>
+            <div className="space-y-2">
+              {spaces.map((space: any) => (
+                <Link
+                  key={space.id}
+                  href={`/community/${space.communitySlug}/feed/${space.slug}`}
+                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors border border-white/5 hover:border-white/10 group"
+                >
+                  <span className="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center text-base flex-shrink-0">
+                    {space.icon ?? "#"}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-white truncate">{space.name}</p>
+                    <p className="text-xs text-gray-500 truncate">{space.communityName}</p>
                   </div>
-                );
-              })}
+                  <ArrowUpRight className="w-4 h-4 text-gray-600 group-hover:text-blue-400 transition-colors flex-shrink-0" />
+                </Link>
+              ))}
             </div>
           )}
         </div>
 
         <div className="space-y-4">
+          {/* Lives */}
           <div className="glass-card p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-base font-semibold text-white">Próximas Lives</h2>
@@ -463,6 +470,7 @@ function MemberDashboardInner({ userName }: { userName: string }) {
             </div>
           </div>
 
+          {/* Marketplace promo */}
           <div className="glass-card p-5 bg-gradient-to-br from-blue-600/10 to-cyan-600/5 border-blue-500/20">
             <ShoppingBag className="w-6 h-6 mb-2 text-blue-400" />
             <p className="font-semibold text-white text-sm mb-1">Marketplace</p>
@@ -550,11 +558,17 @@ function PartnerDashboard({ userName }: { userName: string }) {
 export default function DashboardPage() {
   const [role, setRole] = useState<string | null>(null);
   const [userName, setUserName] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
-    setRole(localStorage.getItem("autoclub_user_role") ?? "INFLUENCER_ADMIN");
-    setUserName(localStorage.getItem("autoclub_user_name") ?? "");
-  }, []);
+    const storedRole = localStorage.getItem("detailhub_user_role");
+    if (!storedRole) {
+      router.replace("/login");
+      return;
+    }
+    setRole(storedRole);
+    setUserName(localStorage.getItem("detailhub_user_name") ?? "");
+  }, [router]);
 
   if (!role) return (
     <div className="flex items-center justify-center h-64">
@@ -567,6 +581,9 @@ export default function DashboardPage() {
     case "INFLUENCER_ADMIN": return <InfluencerDashboard userName={userName} />;
     case "COMMUNITY_MEMBER": return <Suspense fallback={<DashboardSkeleton />}><MemberDashboardInner userName={userName} /></Suspense>;
     case "MARKETPLACE_PARTNER": return <PartnerDashboard userName={userName} />;
-    default: return <InfluencerDashboard userName={userName} />;
+    default: {
+      router.replace("/login");
+      return null;
+    }
   }
 }

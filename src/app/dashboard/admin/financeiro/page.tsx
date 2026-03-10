@@ -68,7 +68,7 @@ export default function FinanceiroPage() {
   const [ruleSaving, setRuleSaving] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("autoclub_access_token");
+    const token = localStorage.getItem("detailhub_access_token");
     const headers = { Authorization: `Bearer ${token}` };
 
     Promise.all([
@@ -100,7 +100,7 @@ export default function FinanceiroPage() {
   async function loadRules(communityId: string) {
     if (!communityId) return;
     setRulesLoading(true);
-    const token = localStorage.getItem("autoclub_access_token");
+    const token = localStorage.getItem("detailhub_access_token");
     try {
       const res = await fetch(`/api/communities/${communityId}/commission-rules`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -116,7 +116,7 @@ export default function FinanceiroPage() {
     e.preventDefault();
     if (!selectedCommunity) return;
     setRuleSaving(true);
-    const token = localStorage.getItem("autoclub_access_token");
+    const token = localStorage.getItem("detailhub_access_token");
     try {
       const url = editingRule
         ? `/api/communities/${selectedCommunity}/commission-rules/${editingRule.id}`
@@ -140,7 +140,7 @@ export default function FinanceiroPage() {
 
   async function deleteRule(ruleId: string) {
     if (!selectedCommunity) return;
-    const token = localStorage.getItem("autoclub_access_token");
+    const token = localStorage.getItem("detailhub_access_token");
     await fetch(`/api/communities/${selectedCommunity}/commission-rules/${ruleId}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
@@ -216,7 +216,7 @@ export default function FinanceiroPage() {
         </div>
         <div>
           <h1 className="text-2xl font-bold text-white">Financeiro</h1>
-          <p className="text-gray-400 text-sm">Visão financeira da plataforma AutoClub Pro</p>
+          <p className="text-gray-400 text-sm">Visão financeira da plataforma DetailHub</p>
         </div>
       </div>
 

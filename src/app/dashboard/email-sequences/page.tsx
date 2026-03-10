@@ -59,7 +59,7 @@ export default function EmailSequencesPage() {
   // Delete confirm
   const [deleteTarget, setDeleteTarget] = useState<Sequence | null>(null);
 
-  const token = () => localStorage.getItem("autoclub_access_token") ?? "";
+  const token = () => localStorage.getItem("detailhub_access_token") ?? "";
 
   useEffect(() => {
     fetch("/api/communities/mine", { headers: { Authorization: `Bearer ${token()}` } })

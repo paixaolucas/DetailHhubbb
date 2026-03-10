@@ -56,7 +56,7 @@ export default function AdminFerramentasPage() {
   const [saving, setSaving] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<SaasTool | null>(null);
 
-  const token = () => localStorage.getItem("autoclub_access_token") ?? "";
+  const token = () => localStorage.getItem("detailhub_access_token") ?? "";
   const headers = () => ({ "Content-Type": "application/json", Authorization: `Bearer ${token()}` });
 
   const load = useCallback(() => {
@@ -326,7 +326,7 @@ export default function AdminFerramentasPage() {
                     value={form.affiliateUrl}
                     onChange={(e) => setForm((f) => ({ ...f, affiliateUrl: e.target.value }))}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500/50 placeholder-gray-600"
-                    placeholder="https://ref.exemplo.com/?ref=autoclub"
+                    placeholder="https://ref.exemplo.com/?ref=detailhub"
                   />
                 </div>
                 <div className="col-span-2">

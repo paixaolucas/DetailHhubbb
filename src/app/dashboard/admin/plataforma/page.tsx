@@ -27,8 +27,8 @@ const DEFAULT_FLAGS: FeatureFlags = {
 };
 
 const DEFAULT_CONFIG: PlatformConfig = {
-  nomePlataforma: "AutoClub Pro",
-  emailSuporte: "suporte@autoclubpro.com",
+  nomePlataforma: "DetailHub",
+  emailSuporte: "suporte@detailhub.com",
   comissao: "15",
 };
 
@@ -49,7 +49,7 @@ export default function PlataformaPage() {
   const [resetting, setResetting] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("autoclub_access_token");
+    const token = localStorage.getItem("detailhub_access_token");
     if (!token) return;
     fetch("/api/admin/platform-config", { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.json())
@@ -73,7 +73,7 @@ export default function PlataformaPage() {
   async function saveSettings() {
     setSaving(true);
     try {
-      const token = localStorage.getItem("autoclub_access_token");
+      const token = localStorage.getItem("detailhub_access_token");
       const res = await fetch("/api/admin/platform-config", {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -113,7 +113,7 @@ export default function PlataformaPage() {
   async function resetCache() {
     setResetting(true);
     try {
-      const token = localStorage.getItem("autoclub_access_token");
+      const token = localStorage.getItem("detailhub_access_token");
       const res = await fetch("/api/admin/revalidate", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
@@ -140,7 +140,7 @@ export default function PlataformaPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-white">Configurações da Plataforma</h1>
-            <p className="text-gray-400 text-sm">Controle global do AutoClub Pro</p>
+            <p className="text-gray-400 text-sm">Controle global do DetailHub</p>
           </div>
         </div>
         <button

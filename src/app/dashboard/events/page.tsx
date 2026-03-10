@@ -61,7 +61,7 @@ export default function EventsPage() {
   });
   const [creating, setCreating] = useState(false);
 
-  const token = () => localStorage.getItem("autoclub_access_token") ?? "";
+  const token = () => localStorage.getItem("detailhub_access_token") ?? "";
 
   useEffect(() => {
     const headers = { Authorization: `Bearer ${token()}` };

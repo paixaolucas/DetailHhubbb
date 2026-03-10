@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   AreaChart,
   Area,
@@ -54,28 +55,29 @@ function KpiCard({
   );
 }
 
+const PERIOD_DAYS: Record<string, number> = { "7d": 7, "30d": 30, "90d": 90, "1y": 365 };
+const PERIOD_LABELS: Record<string, string> = { "7d": "7 dias", "30d": "30 dias", "90d": "90 dias", "1y": "1 ano" };
+
 export default function AnalyticsPage() {
+  const searchParams = useSearchParams();
+  const communityId = searchParams.get("communityId");
   const [data, setData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [role, setRole] = useState<string>("INFLUENCER_ADMIN");
+  const [role, setRole] = useState<string>("");
+  const [period, setPeriod] = useState("30d");
   const [events, setEvents] = useState<{ type: string; count: number }[]>([]);
   const [recentEvents, setRecentEvents] = useState<any[]>([]);
   const [eventsLoading, setEventsLoading] = useState(false);
   const [eventFilter, setEventFilter] = useState("");
 
+  // One-time: set role + fetch admin events
   useEffect(() => {
-    const storedRole = localStorage.getItem("autoclub_user_role") ?? "INFLUENCER_ADMIN";
+    const storedRole = localStorage.getItem("detailhub_user_role") ?? "INFLUENCER_ADMIN";
     setRole(storedRole);
-    const token = localStorage.getItem("autoclub_access_token");
-    const headers = { Authorization: `Bearer ${token}` };
-    const endpoint = storedRole === "SUPER_ADMIN" ? "/api/analytics/platform" : "/api/analytics/influencer";
-    fetch(endpoint, { headers })
-      .then((r) => r.json())
-      .then((d) => d.success && setData(d.data))
-      .finally(() => setIsLoading(false));
     if (storedRole === "SUPER_ADMIN") {
+      const token = localStorage.getItem("detailhub_access_token");
       setEventsLoading(true);
-      fetch("/api/admin/analytics/events?pageSize=20", { headers })
+      fetch("/api/admin/analytics/events?pageSize=20", { headers: { Authorization: `Bearer ${token}` } })
         .then((r) => r.json())
         .then((d) => {
           if (d.success) {
@@ -86,6 +88,21 @@ export default function AnalyticsPage() {
         .finally(() => setEventsLoading(false));
     }
   }, []);
+
+  // Refetch analytics when role or period changes
+  useEffect(() => {
+    if (!role) return;
+    const token = localStorage.getItem("detailhub_access_token");
+    const days = PERIOD_DAYS[period] ?? 30;
+    const endpoint = role === "SUPER_ADMIN"
+      ? `/api/analytics/platform?days=${days}`
+      : `/api/analytics/influencer?days=${days}`;
+    setIsLoading(true);
+    fetch(endpoint, { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => r.json())
+      .then((d) => d.success && setData(d.data))
+      .finally(() => setIsLoading(false));
+  }, [role, period]);
 
   if (isLoading) {
     return (
@@ -129,15 +146,37 @@ export default function AnalyticsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold text-white">Analytics</h1>
-          <p className="text-gray-400 text-sm mt-1">Métricas da sua plataforma automotiva</p>
+          <p className="text-gray-400 text-sm mt-1">
+            Métricas da sua plataforma automotiva
+            {communityId && data?.communities && (
+              <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400">
+                {data.communities.find((c: any) => c.id === communityId)?.name ?? "Comunidade"}
+              </span>
+            )}
+          </p>
         </div>
-        <button onClick={exportCSV} className="flex items-center gap-2 px-4 py-2 glass-card hover:border-white/20 text-gray-300 hover:text-white text-sm font-medium transition-all rounded-xl">
-          <Download className="w-4 h-4" />
-          Exportar CSV
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1 glass-card p-1 rounded-xl">
+            {Object.keys(PERIOD_DAYS).map((p) => (
+              <button
+                key={p}
+                onClick={() => setPeriod(p)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                  period === p ? "bg-blue-600 text-white" : "text-gray-400 hover:text-white"
+                }`}
+              >
+                {PERIOD_LABELS[p]}
+              </button>
+            ))}
+          </div>
+          <button onClick={exportCSV} className="flex items-center gap-2 px-4 py-2 glass-card hover:border-white/20 text-gray-300 hover:text-white text-sm font-medium transition-all rounded-xl">
+            <Download className="w-4 h-4" />
+            Exportar CSV
+          </button>
+        </div>
       </div>
 
       {/* KPIs */}

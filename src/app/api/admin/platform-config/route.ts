@@ -18,8 +18,8 @@ const DEFAULT_FLAGS = {
 };
 
 const DEFAULT_CONFIG = {
-  nomePlataforma: "AutoClub Pro",
-  emailSuporte: "suporte@autoclubpro.com",
+  nomePlataforma: "DetailHub",
+  emailSuporte: "suporte@detailhub.com",
   comissao: "15",
 };
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Award, Plus, X, ChevronDown, Users } from "lucide-react";
+import { Award, Plus, X, ChevronDown, Users, Pencil } from "lucide-react";
 import { useToast } from "@/components/ui/toast-provider";
 
 interface Community { id: string; name: string; primaryColor: string }
@@ -44,8 +44,9 @@ export default function BadgesPage() {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Create modal
+  // Create/Edit modal
   const [showCreate, setShowCreate] = useState(false);
+  const [editingBadge, setEditingBadge] = useState<Badge | null>(null);
   const [newBadge, setNewBadge] = useState({ name: "", description: "", icon: "🏆", color: "#3B82F6" });
   const [creating, setCreating] = useState(false);
 
@@ -54,7 +55,7 @@ export default function BadgesPage() {
   const [awardUserId, setAwardUserId] = useState("");
   const [awarding, setAwarding] = useState(false);
 
-  const token = () => localStorage.getItem("autoclub_access_token") ?? "";
+  const token = () => localStorage.getItem("detailhub_access_token") ?? "";
 
   useEffect(() => {
     fetch("/api/communities/mine", { headers: { Authorization: `Bearer ${token()}` } })
@@ -90,27 +91,51 @@ export default function BadgesPage() {
     if (!selectedCommunity || !newBadge.name.trim() || !newBadge.description.trim()) return;
     setCreating(true);
     try {
-      const res = await fetch(`/api/communities/${selectedCommunity.id}/badges`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token()}` },
-        body: JSON.stringify({
-          name: newBadge.name.trim(),
-          description: newBadge.description.trim(),
-          icon: newBadge.icon.trim() || "🏆",
-          color: newBadge.color,
-        }),
-      });
-      const d = await res.json();
-      if (d.success) {
-        setBadges((prev) => [...prev, d.data]);
-        setShowCreate(false);
-        setNewBadge({ name: "", description: "", icon: "🏆", color: "#3B82F6" });
-        toast.success("Badge criado com sucesso!");
+      if (editingBadge) {
+        // Edit existing badge
+        const res = await fetch(`/api/communities/${selectedCommunity.id}/badges/${editingBadge.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token()}` },
+          body: JSON.stringify({
+            name: newBadge.name.trim(),
+            description: newBadge.description.trim(),
+            icon: newBadge.icon.trim() || "🏆",
+            color: newBadge.color,
+          }),
+        });
+        const d = await res.json();
+        if (d.success) {
+          setBadges((prev) => prev.map((b) => b.id === editingBadge.id ? { ...b, ...newBadge } : b));
+          setShowCreate(false);
+          setEditingBadge(null);
+          setNewBadge({ name: "", description: "", icon: "🏆", color: "#3B82F6" });
+          toast.success("Badge atualizado!");
+        } else {
+          toast.error(d.error ?? "Erro ao atualizar badge");
+        }
       } else {
-        toast.error(d.error ?? "Erro ao criar badge");
+        const res = await fetch(`/api/communities/${selectedCommunity.id}/badges`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token()}` },
+          body: JSON.stringify({
+            name: newBadge.name.trim(),
+            description: newBadge.description.trim(),
+            icon: newBadge.icon.trim() || "🏆",
+            color: newBadge.color,
+          }),
+        });
+        const d = await res.json();
+        if (d.success) {
+          setBadges((prev) => [...prev, d.data]);
+          setShowCreate(false);
+          setNewBadge({ name: "", description: "", icon: "🏆", color: "#3B82F6" });
+          toast.success("Badge criado com sucesso!");
+        } else {
+          toast.error(d.error ?? "Erro ao criar badge");
+        }
       }
     } catch {
-      toast.error("Erro ao criar badge");
+      toast.error("Erro ao salvar badge");
     } finally {
       setCreating(false);
     }
@@ -207,6 +232,7 @@ export default function BadgesPage() {
                     key={badge.id}
                     badge={badge}
                     onAward={() => { setAwardBadge(badge); setAwardUserId(""); }}
+                    onEdit={() => { setEditingBadge(badge); setNewBadge({ name: badge.name, description: badge.description, icon: badge.icon, color: badge.color }); setShowCreate(true); }}
                     canAward={members.length > 0}
                   />
                 ))}
@@ -226,6 +252,7 @@ export default function BadgesPage() {
                     key={badge.id}
                     badge={badge}
                     onAward={() => { setAwardBadge(badge); setAwardUserId(""); }}
+                    onEdit={() => { setEditingBadge(badge); setNewBadge({ name: badge.name, description: badge.description, icon: badge.icon, color: badge.color }); setShowCreate(true); }}
                     canAward={members.length > 0}
                   />
                 ))}
@@ -248,8 +275,8 @@ export default function BadgesPage() {
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="glass-card p-6 w-full max-w-md space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-white">Criar Badge</h2>
-              <button onClick={() => setShowCreate(false)} className="text-gray-500 hover:text-white transition-colors">
+              <h2 className="text-lg font-bold text-white">{editingBadge ? "Editar Badge" : "Criar Badge"}</h2>
+              <button onClick={() => { setShowCreate(false); setEditingBadge(null); setNewBadge({ name: "", description: "", icon: "🏆", color: "#3B82F6" }); }} className="text-gray-500 hover:text-white transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -326,7 +353,7 @@ export default function BadgesPage() {
                 disabled={creating || !newBadge.name.trim() || !newBadge.description.trim()}
                 className="flex-1 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
               >
-                {creating ? "Criando..." : "Criar Badge"}
+                {creating ? "Salvando..." : editingBadge ? "Salvar Alterações" : "Criar Badge"}
               </button>
             </div>
           </div>
@@ -407,11 +434,18 @@ export default function BadgesPage() {
   );
 }
 
-function BadgeCard({ badge, onAward, canAward }: { badge: Badge; onAward: () => void; canAward: boolean }) {
+function BadgeCard({ badge, onAward, onEdit, canAward }: { badge: Badge; onAward: () => void; onEdit: () => void; canAward: boolean }) {
   return (
     <div className="glass-card p-5 hover:border-white/20 transition-all group flex flex-col gap-3">
-      <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style={{ backgroundColor: `${badge.color}20` }}>
-        {badge.icon}
+      <div className="flex items-start justify-between">
+        <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style={{ backgroundColor: `${badge.color}20` }}>
+          {badge.icon}
+        </div>
+        {badge.communityId && (
+          <button onClick={onEdit} className="p-1.5 text-gray-600 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors" title="Editar badge">
+            <Pencil className="w-3.5 h-3.5" />
+          </button>
+        )}
       </div>
       <div className="flex-1">
         <p className="text-sm font-semibold text-white leading-snug">{badge.name}</p>

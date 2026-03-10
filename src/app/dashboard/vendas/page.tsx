@@ -44,7 +44,7 @@ export default function VendasPage() {
   const [purchasesTotal, setPurchasesTotal] = useState(0);
 
   useEffect(() => {
-    const role = localStorage.getItem("autoclub_user_role");
+    const role = localStorage.getItem("detailhub_user_role");
     if (
       !role ||
       (role !== "INFLUENCER_ADMIN" &&
@@ -54,7 +54,7 @@ export default function VendasPage() {
       router.push("/dashboard");
       return;
     }
-    const token = localStorage.getItem("autoclub_access_token");
+    const token = localStorage.getItem("detailhub_access_token");
     const headers = { Authorization: `Bearer ${token}` };
     Promise.all([
       fetch("/api/marketplace/listings?mine=true&pageSize=50", { headers }).then((r) => r.json()),

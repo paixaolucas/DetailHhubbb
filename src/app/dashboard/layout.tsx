@@ -15,6 +15,8 @@ import {
   Settings,
   LogOut,
   ChevronLeft,
+  ChevronDown,
+  ChevronRight,
   Menu,
   Shield,
   GraduationCap,
@@ -22,7 +24,6 @@ import {
   TrendingUp,
   Home,
   PlayCircle,
-  Car,
   X,
   DollarSign,
   Globe,
@@ -32,8 +33,6 @@ import {
   Trophy,
   Award,
   Mail,
-  Rss,
-  Search,
   Calendar,
   HelpCircle,
   Star,
@@ -83,14 +82,12 @@ const INFLUENCER_NAV = [
   { href: "/dashboard/settings", label: "Configurações", icon: Settings },
 ];
 
+// Reduced MEMBER_NAV — spaces are handled by SpacesNav
 const MEMBER_NAV = [
   { href: "/dashboard", label: "Início", icon: Home, exact: true },
-  { href: "/dashboard/minhas-comunidades", label: "Minhas Comunidades", icon: Car },
   { href: "/dashboard/meu-aprendizado", label: "Meu Aprendizado", icon: GraduationCap },
-  { href: "/dashboard/meu-aprendizado/certificados", label: "Certificados", icon: Award },
   { href: "/dashboard/leaderboard", label: "Leaderboard", icon: Trophy },
   { href: "/dashboard/lives", label: "Lives", icon: PlayCircle },
-  { href: "/dashboard/lives/calendar", label: "Calendário", icon: Calendar },
   { href: "/dashboard/marketplace", label: "Marketplace", icon: ShoppingBag },
   { href: "/dashboard/messages", label: "Mensagens", icon: MessageSquare },
   { href: "/dashboard/notifications", label: "Notificações", icon: Bell },
@@ -117,6 +114,197 @@ function getNavItems(role: string) {
   }
 }
 
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+interface SpaceItem {
+  id: string;
+  slug: string;
+  name: string;
+  icon: string | null;
+  type: string;
+  communityId: string;
+  communitySlug: string;
+  communityName: string;
+  communityLogoUrl: string | null;
+}
+
+interface CommunityGroup {
+  communityId: string;
+  communityName: string;
+  communitySlug: string;
+  communityLogoUrl: string | null;
+  spaces: SpaceItem[];
+}
+
+// ─── SpacesNav ───────────────────────────────────────────────────────────────
+
+function SpacesNav({ collapsed, onNavigate }: { collapsed: boolean; onNavigate: () => void }) {
+  const pathname = usePathname();
+  const [groups, setGroups] = useState<CommunityGroup[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const token = localStorage.getItem("detailhub_access_token");
+    if (!token) { setLoading(false); return; }
+
+    fetch("/api/platform/spaces", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.json())
+      .then((d) => {
+        if (!d.success) { setLoading(false); return; }
+
+        // Group by communityId
+        const map = new Map<string, CommunityGroup>();
+        for (const space of d.data as SpaceItem[]) {
+          if (!map.has(space.communityId)) {
+            map.set(space.communityId, {
+              communityId: space.communityId,
+              communityName: space.communityName,
+              communitySlug: space.communitySlug,
+              communityLogoUrl: space.communityLogoUrl,
+              spaces: [],
+            });
+          }
+          map.get(space.communityId)!.spaces.push(space);
+        }
+        const grouped = Array.from(map.values());
+        setGroups(grouped);
+
+        // Default: expand first community only
+        if (grouped.length > 0) {
+          setExpandedIds(new Set([grouped[0].communityId]));
+        }
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  function toggleExpand(communityId: string) {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(communityId)) next.delete(communityId);
+      else next.add(communityId);
+      return next;
+    });
+  }
+
+  const spaceIcon = (icon: string | null, type: string) => {
+    if (icon) return icon;
+    switch (type) {
+      case "ANNOUNCEMENT": return "📢";
+      case "QA": return "❓";
+      case "SHOWCASE": return "🏆";
+      default: return "#";
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="px-2 py-3 space-y-3 animate-pulse">
+        {!collapsed && (
+          <>
+            <div className="h-3 bg-white/10 rounded w-16 mx-3" />
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-4 bg-white/10 rounded mx-3" />
+            ))}
+          </>
+        )}
+      </div>
+    );
+  }
+
+  if (groups.length === 0) {
+    if (collapsed) return null;
+    return (
+      <div className="px-4 py-3">
+        <Link
+          href="/dashboard/assinar"
+          className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+        >
+          Assinar para ver espaços →
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="py-2">
+      {!collapsed && (
+        <p className="px-4 text-[10px] font-semibold text-gray-600 uppercase tracking-widest mb-1">
+          Espaços
+        </p>
+      )}
+      {groups.map((group) => {
+        const isExpanded = expandedIds.has(group.communityId);
+        return (
+          <div key={group.communityId}>
+            {/* Community header */}
+            <button
+              onClick={() => toggleExpand(group.communityId)}
+              title={collapsed ? group.communityName : undefined}
+              className="flex items-center gap-2 w-full px-2 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all group"
+            >
+              {/* Logo */}
+              {group.communityLogoUrl ? (
+                <img
+                  src={group.communityLogoUrl}
+                  alt={group.communityName}
+                  className="w-5 h-5 rounded flex-shrink-0 object-cover"
+                />
+              ) : (
+                <div className="w-5 h-5 bg-blue-500/30 rounded flex-shrink-0 flex items-center justify-center text-[9px] font-bold text-blue-300">
+                  {group.communityName.charAt(0)}
+                </div>
+              )}
+              {!collapsed && (
+                <>
+                  <span className="flex-1 text-xs font-medium text-left truncate">
+                    {group.communityName}
+                  </span>
+                  {isExpanded ? (
+                    <ChevronDown className="w-3 h-3 flex-shrink-0" />
+                  ) : (
+                    <ChevronRight className="w-3 h-3 flex-shrink-0" />
+                  )}
+                </>
+              )}
+            </button>
+
+            {/* Spaces list */}
+            {!collapsed && isExpanded && (
+              <div className="ml-3 pl-3 border-l border-white/10 space-y-0.5 mb-1">
+                {group.spaces.map((space) => {
+                  const href = `/community/${group.communitySlug}/feed/${space.slug}`;
+                  const isActive = pathname === href || pathname.startsWith(href + "/");
+                  return (
+                    <Link
+                      key={space.id}
+                      href={href}
+                      onClick={onNavigate}
+                      className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition-all ${
+                        isActive
+                          ? "text-blue-400 bg-blue-600/10"
+                          : "text-gray-500 hover:text-gray-200 hover:bg-white/5"
+                      }`}
+                    >
+                      <span className="w-4 text-center flex-shrink-0">
+                        {spaceIcon(space.icon, space.type)}
+                      </span>
+                      <span className="truncate">{space.name}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // ─── Layout ──────────────────────────────────────────────────────────────────
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -126,41 +314,39 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [mobileOpen, setMobileOpen] = useState(false);
   const [role, setRole] = useState("INFLUENCER_ADMIN");
   const [userName, setUserName] = useState("");
-  const [userEmail, setUserEmail] = useState("");
   const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("autoclub_access_token");
+    const token = localStorage.getItem("detailhub_access_token");
     if (!token) {
       router.push("/login");
       return;
     }
-    const storedRole = localStorage.getItem("autoclub_user_role") ?? "INFLUENCER_ADMIN";
-    const storedName = localStorage.getItem("autoclub_user_name") ?? "";
-    const storedEmail = localStorage.getItem("autoclub_user_email") ?? "";
+    const storedRole = localStorage.getItem("detailhub_user_role") ?? "INFLUENCER_ADMIN";
+    const storedName = localStorage.getItem("detailhub_user_name") ?? "";
     setRole(storedRole);
     setUserName(storedName);
-    setUserEmail(storedEmail);
     setAuthChecked(true);
   }, []);
 
   const navItems = getNavItems(role);
+  const isMember = role === "COMMUNITY_MEMBER";
 
   async function handleLogout() {
     try {
-      const refreshToken = localStorage.getItem("autoclub_refresh_token");
+      const refreshToken = localStorage.getItem("detailhub_refresh_token");
       await fetch("/api/auth/logout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ refreshToken }),
       });
     } finally {
-      localStorage.removeItem("autoclub_access_token");
-      localStorage.removeItem("autoclub_refresh_token");
-      localStorage.removeItem("autoclub_user_role");
-      localStorage.removeItem("autoclub_user_name");
-      localStorage.removeItem("autoclub_user_email");
-      localStorage.removeItem("autoclub_user_id");
+      localStorage.removeItem("detailhub_access_token");
+      localStorage.removeItem("detailhub_refresh_token");
+      localStorage.removeItem("detailhub_user_role");
+      localStorage.removeItem("detailhub_user_name");
+      localStorage.removeItem("detailhub_user_email");
+      localStorage.removeItem("detailhub_user_id");
       router.push("/login");
     }
   }
@@ -180,7 +366,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <Link href="/" className="flex items-center gap-2.5 flex-1 min-w-0">
             <Logo size="md" />
             <div className="min-w-0">
-              <span className="text-white font-bold text-sm leading-none block">AutoClub</span>
+              <span className="text-white font-bold text-sm leading-none block">DetailHub</span>
               <span className="text-blue-400 font-bold text-xs leading-none block">Pro</span>
             </div>
           </Link>
@@ -219,6 +405,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Nav */}
       <nav className="flex-1 py-3 overflow-y-auto space-y-0.5 px-2">
+        {/* Top nav items */}
         {navItems.map(({ href, label, icon: Icon, exact }) => {
           const isActive = exact
             ? pathname === href
@@ -243,6 +430,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </Link>
           );
         })}
+
+        {/* Spaces section for members */}
+        {isMember && (
+          <>
+            <div className="my-2 border-t border-white/10" />
+            <SpacesNav
+              collapsed={collapsed}
+              onNavigate={() => setMobileOpen(false)}
+            />
+          </>
+        )}
       </nav>
 
       {/* Footer */}
@@ -332,7 +530,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </button>
           <Link href="/" className="flex items-center gap-2 flex-1">
             <Logo size="sm" />
-            <span className="text-white font-bold text-sm">AutoClub <span className="text-blue-400">Pro</span></span>
+            <span className="text-white font-bold text-sm">DetailHub</span>
           </Link>
           <NotificationBell />
           <RoleBadge role={role} />
