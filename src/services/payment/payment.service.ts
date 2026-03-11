@@ -312,9 +312,18 @@ export async function handleWebhookEvent(
 async function handleCheckoutCompleted(
   session: Stripe.Checkout.Session
 ): Promise<void> {
-  const { userId, communityId, planId, platformPlanId, referredByInfluencerId } = session.metadata ?? {};
+  const { userId, communityId, planId, platformPlanId, referredByInfluencerId, isPremiumUpgrade, membershipId } = session.metadata ?? {};
 
   if (!userId) return;
+
+  // Premium tier upgrade (one-time payment)
+  if (isPremiumUpgrade === "true" && membershipId) {
+    await db.platformMembership.update({
+      where: { id: membershipId },
+      data: { tier: "PREMIUM" },
+    });
+    return;
+  }
 
   // Platform membership checkout
   if (platformPlanId) {

@@ -881,6 +881,7 @@ model ContentModule {
   sortOrder       Int             @default(0)
   isPublished     Boolean         @default(false)
   isLocked        Boolean         @default(false)
+  isPremium       Boolean         @default(false)
   unlockAfterDays Int?
   coverImageUrl   String?
   createdAt       DateTime        @default(now())
@@ -908,6 +909,7 @@ model ContentLesson {
   sortOrder       Int               @default(0)
   isPublished     Boolean           @default(false)
   isFree          Boolean           @default(false)
+  isPremium       Boolean           @default(false)
   isDownloadable  Boolean           @default(false)
   viewCount       Int               @default(0)
   completionCount Int               @default(0)
@@ -1199,6 +1201,7 @@ model PlatformMembership {
   stripeSubscriptionId   String?                  @unique
   currentPeriodStart     DateTime?
   currentPeriodEnd       DateTime?
+  tier                   PlatformMembershipTier   @default(STANDARD)
   cancelAtPeriodEnd      Boolean                  @default(false)
   canceledAt             DateTime?
   joinedAt               DateTime                 @default(now())
@@ -1223,6 +1226,11 @@ enum PlatformMembershipStatus {
   EXPIRED
   PAST_DUE
   TRIALING
+}
+
+enum PlatformMembershipTier {
+  STANDARD
+  PREMIUM
 }
 
 // =============================================================================

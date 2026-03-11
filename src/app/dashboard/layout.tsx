@@ -39,6 +39,7 @@ import {
   Compass,
   CheckSquare,
   Megaphone,
+  Crown,
 } from "lucide-react";
 import { RoleBadge } from "@/components/ui/badge";
 import { Logo } from "@/components/ui/logo";
@@ -170,6 +171,7 @@ const MEMBER_NAV: NavEntry[] = [
     items: [
       { href: "/dashboard/marketplace", label: "Marketplace", icon: ShoppingBag },
       { href: "/dashboard/ai", label: "Auto AI", icon: Bot },
+      { href: "/dashboard/assinar-premium", label: "Premium", icon: Crown },
     ],
   },
   {
