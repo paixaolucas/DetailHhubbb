@@ -110,8 +110,9 @@ model Influencer {
   createdAt           DateTime    @default(now())
   updatedAt           DateTime    @updatedAt
   communities              Community[]
-  referredPlatformMembers  PlatformMembership[] @relation("InfluencerReferrals")
-  user                     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  referredPlatformMembers  PlatformMembership[]    @relation("InfluencerReferrals")
+  monthlyScores            InfluencerMonthlyScore[]
+  user                     User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([stripeAccountId])
@@ -1212,4 +1213,42 @@ enum PlatformMembershipStatus {
   EXPIRED
   PAST_DUE
   TRIALING
+}
+
+// =============================================================================
+// PERFORMANCE SCORE
+// Monthly PP (Pontuação de Performance) snapshot per influencer.
+// Calculated and stored at the end of each month.
+// =============================================================================
+
+model InfluencerMonthlyScore {
+  id                   String    @id @default(cuid())
+  influencerId         String
+  year                 Int
+  month                Int       // 1–12
+  // Raw component scores (0–100 each)
+  scoreViews           Float     @default(0)
+  scoreEngagement      Float     @default(0)
+  scoreNewMembers      Float     @default(0)
+  scoreRetention       Float     @default(0)
+  scoreDeliveries      Float     @default(0)
+  // Weighted total PP (0–100)
+  totalPP              Float     @default(0)
+  // Pool share this month (0–1)
+  poolShare            Float     @default(0)
+  // Source counts (for auditability)
+  qualifiedViews       Int       @default(0)
+  engagementActions    Int       @default(0)
+  newActiveMembers     Int       @default(0)
+  retentionRate        Float     @default(0)
+  deliveriesCompleted  Int       @default(0)
+  deliveriesRequired   Int       @default(0)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  influencer           Influencer @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+
+  @@unique([influencerId, year, month])
+  @@index([influencerId])
+  @@index([year, month])
+  @@map("influencer_monthly_scores")
 }
