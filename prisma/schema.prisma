@@ -109,8 +109,9 @@ model Influencer {
   pendingPayout       Decimal     @default(0)
   createdAt           DateTime    @default(now())
   updatedAt           DateTime    @updatedAt
-  communities         Community[]
-  user                User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  communities              Community[]
+  referredPlatformMembers  PlatformMembership[] @relation("InfluencerReferrals")
+  user                     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([stripeAccountId])
@@ -1180,25 +1181,28 @@ model PlatformPlan {
 }
 
 model PlatformMembership {
-  id                   String                   @id @default(cuid())
-  userId               String                   @unique
-  planId               String
-  status               PlatformMembershipStatus @default(ACTIVE)
-  stripeSubscriptionId String?                  @unique
-  currentPeriodStart   DateTime?
-  currentPeriodEnd     DateTime?
-  cancelAtPeriodEnd    Boolean                  @default(false)
-  canceledAt           DateTime?
-  joinedAt             DateTime                 @default(now())
-  metadata             Json                     @default("{}")
-  createdAt            DateTime                 @default(now())
-  updatedAt            DateTime                 @updatedAt
-  user                 User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  plan                 PlatformPlan             @relation(fields: [planId], references: [id])
-  payments             Payment[]
+  id                     String                   @id @default(cuid())
+  userId                 String                   @unique
+  planId                 String
+  status                 PlatformMembershipStatus @default(ACTIVE)
+  stripeSubscriptionId   String?                  @unique
+  currentPeriodStart     DateTime?
+  currentPeriodEnd       DateTime?
+  cancelAtPeriodEnd      Boolean                  @default(false)
+  canceledAt             DateTime?
+  joinedAt               DateTime                 @default(now())
+  metadata               Json                     @default("{}")
+  referredByInfluencerId String?
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
+  user                   User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan                   PlatformPlan             @relation(fields: [planId], references: [id])
+  referredByInfluencer   Influencer?              @relation("InfluencerReferrals", fields: [referredByInfluencerId], references: [id])
+  payments               Payment[]
 
   @@index([userId])
   @@index([status])
+  @@index([referredByInfluencerId])
   @@map("platform_memberships")
 }
 

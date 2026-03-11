@@ -21,6 +21,13 @@ function RegisterFormContent() {
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
+  // Capture referral code from URL param or cookie (set by /convite/[code])
+  const refCode = searchParams.get("ref") ?? (
+    typeof document !== "undefined"
+      ? document.cookie.split("; ").find((c) => c.startsWith("detailhub_ref="))?.split("=")[1]
+      : undefined
+  );
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setIsLoading(true);
@@ -28,10 +35,13 @@ function RegisterFormContent() {
     setFieldErrors({});
 
     try {
+      const body: Record<string, string> = { ...form };
+      if (refCode) body.referralCode = refCode;
+
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, role: "COMMUNITY_MEMBER" }),
+        body: JSON.stringify(body),
       });
 
       const data = await res.json();

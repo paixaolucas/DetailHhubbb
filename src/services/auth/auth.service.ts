@@ -36,7 +36,17 @@ export async function registerUser(
   }
 
   const passwordHash = await hashPassword(input.password);
-  const referralCode = crypto.randomBytes(6).toString("hex").toUpperCase();
+  const newReferralCode = crypto.randomBytes(6).toString("hex").toUpperCase();
+
+  // Resolve who referred this new user (influencer's referralCode on their User)
+  let referredById: string | undefined;
+  if (input.referralCode) {
+    const referrer = await db.user.findUnique({
+      where: { referralCode: input.referralCode },
+      select: { id: true },
+    });
+    if (referrer) referredById = referrer.id;
+  }
 
   const user = await db.user.create({
     data: {
@@ -45,7 +55,8 @@ export async function registerUser(
       firstName: input.firstName,
       lastName: input.lastName,
       role: UserRole.COMMUNITY_MEMBER,
-      referralCode,
+      referralCode: newReferralCode,
+      ...(referredById ? { referredById } : {}),
     },
     select: {
       id: true,

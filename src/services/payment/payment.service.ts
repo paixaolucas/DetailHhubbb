@@ -114,7 +114,27 @@ export async function createPlatformCheckoutSession(params: {
     throw new AppError("Already has an active platform membership", 409, "ALREADY_MEMBER");
   }
 
+  // Resolve influencer that referred this user
+  let referredByInfluencerId: string | undefined;
+  const userRecord = await db.user.findUnique({
+    where: { id: params.userId },
+    select: { referredById: true },
+  });
+  if (userRecord?.referredById) {
+    const influencer = await db.influencer.findUnique({
+      where: { userId: userRecord.referredById },
+      select: { id: true },
+    });
+    if (influencer) referredByInfluencerId = influencer.id;
+  }
+
   const customerId = await getOrCreateStripeCustomer(params.userId);
+
+  const checkoutMetadata: Record<string, string> = {
+    userId: params.userId,
+    platformPlanId: plan.id,
+    ...(referredByInfluencerId ? { referredByInfluencerId } : {}),
+  };
 
   const session = await stripe.checkout.sessions.create({
     customer: customerId,
@@ -125,9 +145,9 @@ export async function createPlatformCheckoutSession(params: {
     cancel_url: params.cancelUrl,
     subscription_data: {
       trial_period_days: plan.trialDays > 0 ? plan.trialDays : undefined,
-      metadata: { userId: params.userId, platformPlanId: plan.id },
+      metadata: checkoutMetadata,
     },
-    metadata: { userId: params.userId, platformPlanId: plan.id },
+    metadata: checkoutMetadata,
     allow_promotion_codes: true,
   });
 
@@ -292,7 +312,7 @@ export async function handleWebhookEvent(
 async function handleCheckoutCompleted(
   session: Stripe.Checkout.Session
 ): Promise<void> {
-  const { userId, communityId, planId, platformPlanId } = session.metadata ?? {};
+  const { userId, communityId, planId, platformPlanId, referredByInfluencerId } = session.metadata ?? {};
 
   if (!userId) return;
 
@@ -308,6 +328,7 @@ async function handleCheckoutCompleted(
         stripeSubscriptionId: subscription.id,
         currentPeriodStart: new Date(subscription.current_period_start * 1000),
         currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+        ...(referredByInfluencerId ? { referredByInfluencerId } : {}),
       },
       update: {
         status: "ACTIVE",
@@ -317,6 +338,8 @@ async function handleCheckoutCompleted(
         currentPeriodEnd: new Date(subscription.current_period_end * 1000),
         cancelAtPeriodEnd: false,
         canceledAt: null,
+        // Only set referredByInfluencerId on first activation (don't overwrite)
+        ...(referredByInfluencerId ? { referredByInfluencerId } : {}),
       },
     });
     return;

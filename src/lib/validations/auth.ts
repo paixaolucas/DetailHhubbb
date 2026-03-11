@@ -26,6 +26,7 @@ export const registerSchema = z
       .string()
       .min(2, "Last name must be at least 2 characters")
       .max(50),
+    referralCode: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",

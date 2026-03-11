@@ -152,6 +152,10 @@ export default function SettingsPage() {
   const [influencerMsg, setInfluencerMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [influencerSaving, setInfluencerSaving] = useState(false);
 
+  // Invite link state (influencer only)
+  const [inviteLink, setInviteLink] = useState<string | null>(null);
+  const [inviteStats, setInviteStats] = useState<{ totalReferred: number; activeReferred: number } | null>(null);
+
   useEffect(() => {
     const token = localStorage.getItem("detailhub_access_token");
     const role = localStorage.getItem("detailhub_user_role");
@@ -192,6 +196,16 @@ export default function SettingsPage() {
               twitter: links.twitter ?? "",
               website: links.website ?? "",
             });
+          }
+        })
+        .catch(() => {});
+
+      fetch("/api/influencers/me/invite-link", { headers: { Authorization: `Bearer ${token}` } })
+        .then((r) => r.json())
+        .then((d) => {
+          if (d.success && d.data) {
+            setInviteLink(d.data.inviteLink);
+            setInviteStats(d.data.stats);
           }
         })
         .catch(() => {});
@@ -400,8 +414,9 @@ export default function SettingsPage() {
   }
 
   function copyReferral() {
-    if (user?.referralCode) {
-      navigator.clipboard.writeText(user.referralCode);
+    const textToCopy = inviteLink ?? user?.referralCode;
+    if (textToCopy) {
+      navigator.clipboard.writeText(textToCopy);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
@@ -425,10 +440,12 @@ export default function SettingsPage() {
     { key: "profile", label: "Perfil", icon: User },
     { key: "security", label: "Segurança", icon: Lock },
     { key: "notifications", label: "Notificações", icon: Bell },
-    { key: "referral", label: "Referral", icon: Gift },
     { key: "subscription", label: "Assinatura", icon: CreditCard },
     ...(user.role === "INFLUENCER_ADMIN"
-      ? [{ key: "influencer" as Tab, label: "Perfil Público", icon: Star }]
+      ? [
+          { key: "referral" as Tab, label: "Link de Convite", icon: Gift },
+          { key: "influencer" as Tab, label: "Perfil Público", icon: Star },
+        ]
       : []),
   ];
 
@@ -640,30 +657,30 @@ export default function SettingsPage() {
         </div>
       )}
 
-      {/* Referral tab */}
+      {/* Referral tab — influencer only */}
       {activeTab === "referral" && (
         <div className="glass-card p-6 space-y-4">
-          <h2 className="text-base font-semibold text-gray-900">Programa de Referral</h2>
+          <h2 className="text-base font-semibold text-gray-900">Link de Convite</h2>
           <p className="text-gray-400 text-sm">
-            Indique amigos e ganhe comissões recorrentes quando eles se cadastrarem na plataforma.
+            Use este link personalizado para convidar sua audiência. Cada membro que entrar pelo seu link é registrado como seu — a comissão é permanente enquanto ele permanecer ativo.
           </p>
-          {user.referralCode ? (
-            <div className="space-y-3">
+          {inviteLink ? (
+            <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1.5">Seu código de referral</label>
+                <label className="block text-sm font-medium text-gray-600 mb-1.5">Seu link de convite personalizado</label>
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
-                    value={user.referralCode}
+                    value={inviteLink}
                     readOnly
-                    className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 font-mono text-sm"
+                    className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm truncate"
                   />
                   <button
                     type="button"
                     onClick={copyReferral}
-                    className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
+                    className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all flex-shrink-0 ${
                       copied
-                        ? "bg-green-600 text-gray-900"
+                        ? "bg-green-600 text-white"
                         : "bg-gray-50 hover:bg-violet-50 text-gray-600 border border-gray-200"
                     }`}
                   >
@@ -671,23 +688,24 @@ export default function SettingsPage() {
                     {copied ? "Copiado!" : "Copiar"}
                   </button>
                 </div>
+                <p className="text-xs text-gray-500 mt-1.5">
+                  Compartilhe este link no YouTube, Instagram e WhatsApp. Cada membro que entrar por ele é seu — para sempre.
+                </p>
               </div>
-              <div className="grid grid-cols-2 gap-4 pt-2">
-                <div className="bg-white rounded-xl p-4 text-center">
-                  <p className="text-2xl font-bold text-gray-900">—</p>
-                  <p className="text-xs text-gray-500 mt-1">Indicações</p>
-                  <p className="text-xs text-gray-600 mt-0.5">Em breve</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white rounded-xl p-4 text-center border border-gray-100">
+                  <p className="text-2xl font-bold text-gray-900">{inviteStats?.totalReferred ?? 0}</p>
+                  <p className="text-xs text-gray-500 mt-1">Total captados</p>
                 </div>
-                <div className="bg-white rounded-xl p-4 text-center">
-                  <p className="text-2xl font-bold text-gray-900">—</p>
-                  <p className="text-xs text-gray-500 mt-1">Comissões ganhas</p>
-                  <p className="text-xs text-gray-600 mt-0.5">Em breve</p>
+                <div className="bg-white rounded-xl p-4 text-center border border-green-100">
+                  <p className="text-2xl font-bold text-green-600">{inviteStats?.activeReferred ?? 0}</p>
+                  <p className="text-xs text-gray-500 mt-1">Ativos hoje</p>
                 </div>
               </div>
             </div>
           ) : (
             <div className="text-center py-8 text-gray-500 text-sm">
-              Código de referral não disponível para o seu plano atual.
+              Link de convite não disponível. Entre em contato com o suporte.
             </div>
           )}
         </div>
