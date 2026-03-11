@@ -107,12 +107,14 @@ model Influencer {
   isActive            Boolean     @default(true)
   totalEarnings       Decimal     @default(0)
   pendingPayout       Decimal     @default(0)
+  bioLinkConfirmed    Boolean     @default(false)
   createdAt           DateTime    @default(now())
   updatedAt           DateTime    @updatedAt
   communities              Community[]
   referredPlatformMembers  PlatformMembership[]    @relation("InfluencerReferrals")
   monthlyScores            InfluencerMonthlyScore[]
   milestones               InfluencerMilestone[]
+  externalMentions         InfluencerExternalMention[]
   user                     User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -1285,4 +1287,26 @@ enum MilestoneType {
   TOP_CREATOR_MONTH     // rank #1 PP in a closed month
   CRESCIMENTO_ACELERADO // +100 new referred members in a single month
   EMBAIXADOR            // 12 consecutive months at 100% contract deliveries
+}
+
+// =============================================================================
+// EXTERNAL MENTIONS
+// Manually registered external mentions of the platform by influencers.
+// (Instagram stories, YouTube end cards, WhatsApp convocations, etc.)
+// Platform-tracked deliveries (videos, lives, forum) come from their own models.
+// =============================================================================
+
+model InfluencerExternalMention {
+  id           String     @id @default(cuid())
+  influencerId String
+  year         Int
+  month        Int        // 1–12
+  platform     String     // "instagram" | "youtube" | "whatsapp" | "tiktok" | "other"
+  url          String?    // proof link when available
+  description  String     // brief description of the mention
+  createdAt    DateTime   @default(now())
+  influencer   Influencer @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+
+  @@index([influencerId, year, month])
+  @@map("influencer_external_mentions")
 }

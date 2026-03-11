@@ -37,6 +37,7 @@ import {
   HelpCircle,
   Star,
   Compass,
+  CheckSquare,
 } from "lucide-react";
 import { RoleBadge } from "@/components/ui/badge";
 import { Logo } from "@/components/ui/logo";
@@ -129,6 +130,7 @@ const INFLUENCER_NAV: NavEntry[] = [
       { href: "/dashboard/financeiro", label: "Financeiro", icon: DollarSign },
       { href: "/dashboard/performance", label: "Performance (PP)", icon: Trophy },
       { href: "/dashboard/milestones", label: "Marcos & Bônus", icon: Award },
+      { href: "/dashboard/entregas", label: "Entregas do Mês", icon: CheckSquare },
       { href: "/dashboard/analytics", label: "Analytics", icon: BarChart2 },
       { href: "/dashboard/marketplace", label: "Marketplace", icon: ShoppingBag },
       { href: "/dashboard/tools", label: "Ferramentas", icon: Wrench },
