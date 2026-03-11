@@ -71,6 +71,9 @@ model User {
   platformMembership     PlatformMembership?
   // Advertiser profile
   advertiser             Advertiser?
+  // Events
+  hostedEvents           Event[]               @relation("HostedEvents")
+  eventRegistrations     EventRegistration[]
 
   @@index([email])
   @@index([role])
@@ -170,6 +173,8 @@ model Community {
   // Phase 6 — Landing
   faqs                CommunityFAQ[]
   testimonials        CommunityTestimonial[]
+  // Events
+  events              Event[]
 
   @@index([slug])
   @@index([influencerId])
@@ -1289,6 +1294,104 @@ enum MilestoneType {
   TOP_CREATOR_MONTH     // rank #1 PP in a closed month
   CRESCIMENTO_ACELERADO // +100 new referred members in a single month
   EMBAIXADOR            // 12 consecutive months at 100% contract deliveries
+}
+
+// =============================================================================
+// EVENTS & TICKETS
+// Influencers can create events (online, in-person or hybrid) with paid or
+// free ticket types. Members register and receive a confirmation.
+// =============================================================================
+
+enum EventType {
+  ONLINE
+  IN_PERSON
+  HYBRID
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  SOLD_OUT
+  CANCELED
+  COMPLETED
+}
+
+enum EventRegistrationStatus {
+  CONFIRMED
+  PENDING_PAYMENT
+  CANCELED
+  ATTENDED
+}
+
+model Event {
+  id            String        @id @default(cuid())
+  hostId        String
+  communityId   String?
+  title         String
+  slug          String        @unique
+  description   String?
+  coverImageUrl String?
+  type          EventType     @default(ONLINE)
+  status        EventStatus   @default(DRAFT)
+  startAt       DateTime
+  endAt         DateTime?
+  timezone      String        @default("America/Sao_Paulo")
+  location      String?       // address/venue for IN_PERSON/HYBRID
+  onlineUrl     String?       // meeting link for ONLINE/HYBRID
+  capacity      Int?          // null = unlimited
+  isPublic      Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  host          User          @relation("HostedEvents", fields: [hostId], references: [id])
+  community     Community?    @relation(fields: [communityId], references: [id])
+  ticketTypes   EventTicketType[]
+  registrations EventRegistration[]
+
+  @@index([hostId])
+  @@index([communityId])
+  @@index([status])
+  @@index([startAt])
+  @@map("events")
+}
+
+model EventTicketType {
+  id            String              @id @default(cuid())
+  eventId       String
+  name          String
+  description   String?
+  price         Decimal             @default(0)
+  currency      String              @default("brl")
+  quantity      Int?                // null = unlimited
+  sold          Int                 @default(0)
+  isActive      Boolean             @default(true)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  event         Event               @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  registrations EventRegistration[]
+
+  @@index([eventId])
+  @@map("event_ticket_types")
+}
+
+model EventRegistration {
+  id           String                  @id @default(cuid())
+  eventId      String
+  userId       String
+  ticketTypeId String
+  status       EventRegistrationStatus @default(CONFIRMED)
+  paymentId    String?
+  amount       Decimal                 @default(0)
+  checkedInAt  DateTime?
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+  event        Event                   @relation(fields: [eventId], references: [id])
+  user         User                    @relation(fields: [userId], references: [id])
+  ticketType   EventTicketType         @relation(fields: [ticketTypeId], references: [id])
+
+  @@unique([eventId, userId])
+  @@index([eventId])
+  @@index([userId])
+  @@map("event_registrations")
 }
 
 // =============================================================================

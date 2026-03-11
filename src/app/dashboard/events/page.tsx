@@ -1,316 +1,724 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Calendar, Plus, Video, X, ChevronDown, Users, Clock } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import {
+  Calendar,
+  Plus,
+  MapPin,
+  Globe,
+  Users,
+  Ticket,
+  Clock,
+  CheckCircle,
+  XCircle,
+  Eye,
+  Trash2,
+  Edit3,
+  Send,
+  ChevronLeft,
+  ChevronRight,
+  AlertCircle,
+  Video,
+  Building,
+  Layers,
+} from "lucide-react";
 import { useToast } from "@/components/ui/toast-provider";
 
-interface Community { id: string; name: string; primaryColor: string }
-interface LiveSession {
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+type EventType = "ONLINE" | "IN_PERSON" | "HYBRID";
+type EventStatus = "DRAFT" | "PUBLISHED" | "SOLD_OUT" | "CANCELED" | "COMPLETED";
+
+interface TicketType {
   id: string;
-  title: string;
-  description: string | null;
-  scheduledAt: string;
-  status: "SCHEDULED" | "LIVE" | "ENDED" | "CANCELED";
-  isPublic: boolean;
-  isRecorded: boolean;
-  community: { id: string; name: string; primaryColor: string };
-  host: { id: string; firstName: string; lastName: string; avatarUrl: string | null };
-  _count: { attendees: number };
+  name: string;
+  price: number;
+  quantity: number | null;
+  sold: number;
+  isActive: boolean;
 }
 
-const STATUS_CONFIG = {
-  SCHEDULED: { label: "Agendada",  color: "text-violet-400 bg-violet-500/10 border-violet-500/20" },
-  LIVE:      { label: "Ao Vivo",   color: "text-red-400 bg-red-500/10 border-red-500/20" },
-  ENDED:     { label: "Encerrada", color: "text-gray-400 bg-white border-gray-200" },
-  CANCELED:  { label: "Cancelada", color: "text-orange-400 bg-orange-500/10 border-orange-500/20" },
+interface Event {
+  id: string;
+  title: string;
+  slug: string;
+  type: EventType;
+  status: EventStatus;
+  startAt: string;
+  endAt: string | null;
+  location: string | null;
+  capacity: number | null;
+  isPublic: boolean;
+  coverImageUrl: string | null;
+  community: { id: string; name: string; logoUrl: string | null } | null;
+  ticketTypes: TicketType[];
+  _count: { registrations: number };
+}
+
+interface Attendee {
+  id: string;
+  status: string;
+  amount: number;
+  checkedInAt: string | null;
+  createdAt: string;
+  user: { id: string; firstName: string; lastName: string; email: string; avatarUrl: string | null };
+  ticketType: { id: string; name: string; price: number };
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+const TYPE_CONFIG: Record<EventType, { label: string; icon: React.ElementType; color: string }> = {
+  ONLINE: { label: "Online", icon: Video, color: "text-blue-400" },
+  IN_PERSON: { label: "Presencial", icon: Building, color: "text-green-400" },
+  HYBRID: { label: "Híbrido", icon: Layers, color: "text-purple-400" },
 };
 
-function Skeleton() {
+const STATUS_CONFIG: Record<EventStatus, { label: string; color: string }> = {
+  DRAFT: { label: "Rascunho", color: "text-gray-400 bg-gray-400/10" },
+  PUBLISHED: { label: "Publicado", color: "text-green-400 bg-green-400/10" },
+  SOLD_OUT: { label: "Esgotado", color: "text-orange-400 bg-orange-400/10" },
+  CANCELED: { label: "Cancelado", color: "text-red-400 bg-red-400/10" },
+  COMPLETED: { label: "Concluído", color: "text-blue-400 bg-blue-400/10" },
+};
+
+function fmtBrl(n: number) {
+  return n === 0 ? "Gratuito" : n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+function fmtDate(d: string) {
+  return new Date(d).toLocaleString("pt-BR", {
+    day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",
+  });
+}
+
+// ---------------------------------------------------------------------------
+// CreateEventModal
+// ---------------------------------------------------------------------------
+function CreateEventModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+  const toast = useToast();
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
+    type: "ONLINE" as EventType,
+    startAt: "",
+    endAt: "",
+    location: "",
+    onlineUrl: "",
+    capacity: "",
+    isPublic: true,
+    coverImageUrl: "",
+  });
+
+  const set = (k: string, v: string | boolean) => setForm((f) => ({ ...f, [k]: v }));
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!form.title || !form.startAt) {
+      toast.error("Preencha título e data de início");
+      return;
+    }
+    setLoading(true);
+    try {
+      const body: Record<string, unknown> = {
+        ...form,
+        startAt: new Date(form.startAt).toISOString(),
+        endAt: form.endAt ? new Date(form.endAt).toISOString() : undefined,
+        capacity: form.capacity ? parseInt(form.capacity) : undefined,
+      };
+      const res = await fetch("/api/events", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error);
+      toast.success("Evento criado!");
+      onCreated();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erro ao criar evento");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
-    <div className="space-y-4 animate-pulse">
-      <div className="h-8 bg-gray-50 rounded-xl w-40" />
-      {[...Array(4)].map((_, i) => (
-        <div key={i} className="glass-card p-5 space-y-3">
-          <div className="flex justify-between">
-            <div className="h-4 bg-gray-50 rounded w-48" />
-            <div className="h-6 bg-gray-50 rounded-full w-20" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+      <div className="glass-card w-full max-w-lg p-6 animate-slide-up max-h-[90vh] overflow-y-auto">
+        <h2 className="text-lg font-semibold text-white mb-4">Novo Evento</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm text-gray-400 mb-1">Título *</label>
+            <input
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+              placeholder="Ex: Workshop de Polimento Profissional"
+              value={form.title}
+              onChange={(e) => set("title", e.target.value)}
+            />
           </div>
-          <div className="h-3 bg-gray-50 rounded w-32" />
-        </div>
-      ))}
+          <div>
+            <label className="block text-sm text-gray-400 mb-1">Formato *</label>
+            <select
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+              value={form.type}
+              onChange={(e) => set("type", e.target.value as EventType)}
+            >
+              <option value="ONLINE">Online</option>
+              <option value="IN_PERSON">Presencial</option>
+              <option value="HYBRID">Híbrido</option>
+            </select>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Data Início *</label>
+              <input
+                type="datetime-local"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                value={form.startAt}
+                onChange={(e) => set("startAt", e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Data Fim</label>
+              <input
+                type="datetime-local"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                value={form.endAt}
+                onChange={(e) => set("endAt", e.target.value)}
+              />
+            </div>
+          </div>
+          {(form.type === "IN_PERSON" || form.type === "HYBRID") && (
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Local / Endereço</label>
+              <input
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                placeholder="Rua, número, cidade"
+                value={form.location}
+                onChange={(e) => set("location", e.target.value)}
+              />
+            </div>
+          )}
+          {(form.type === "ONLINE" || form.type === "HYBRID") && (
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Link Online</label>
+              <input
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                placeholder="https://meet.google.com/..."
+                value={form.onlineUrl}
+                onChange={(e) => set("onlineUrl", e.target.value)}
+              />
+            </div>
+          )}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Capacidade</label>
+              <input
+                type="number"
+                min="1"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                placeholder="Ilimitado"
+                value={form.capacity}
+                onChange={(e) => set("capacity", e.target.value)}
+              />
+            </div>
+            <div className="flex items-end pb-2">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <div
+                  onClick={() => set("isPublic", !form.isPublic)}
+                  className={`w-10 h-5 rounded-full transition-colors cursor-pointer ${form.isPublic ? "bg-blue-500" : "bg-white/10"}`}
+                >
+                  <div className={`w-4 h-4 bg-white rounded-full mt-0.5 transition-transform ${form.isPublic ? "translate-x-5 ml-0.5" : "translate-x-0.5"}`} />
+                </div>
+                <span className="text-gray-300 text-sm">Público</span>
+              </label>
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm text-gray-400 mb-1">Capa (URL da imagem)</label>
+            <input
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+              placeholder="https://..."
+              value={form.coverImageUrl}
+              onChange={(e) => set("coverImageUrl", e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-400 mb-1">Descrição</label>
+            <textarea
+              rows={3}
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500 resize-none"
+              placeholder="Descreva o evento..."
+              value={form.description}
+              onChange={(e) => set("description", e.target.value)}
+            />
+          </div>
+          <div className="flex gap-3 pt-2">
+            <button type="button" onClick={onClose} className="flex-1 py-2 border border-white/10 rounded-lg text-gray-400 text-sm hover:bg-white/5 transition-colors">
+              Cancelar
+            </button>
+            <button type="submit" disabled={loading} className="flex-1 btn-premium py-2 rounded-lg text-sm font-medium disabled:opacity-50">
+              {loading ? "Criando..." : "Criar Evento"}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
 
-export default function EventsPage() {
+// ---------------------------------------------------------------------------
+// AddTicketModal
+// ---------------------------------------------------------------------------
+function AddTicketModal({ eventId, onClose, onAdded }: { eventId: string; onClose: () => void; onAdded: () => void }) {
   const toast = useToast();
-  const [sessions, setSessions] = useState<LiveSession[]>([]);
-  const [communities, setCommunities] = useState<Community[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<"upcoming" | "all">("upcoming");
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({ name: "", description: "", price: "0", quantity: "" });
+  const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
-  // Create modal
-  const [showCreate, setShowCreate] = useState(false);
-  const [form, setForm] = useState({
-    communityId: "",
-    title: "",
-    description: "",
-    scheduledAt: "",
-    isPublic: false,
-    isRecorded: true,
-  });
-  const [creating, setCreating] = useState(false);
-
-  const token = () => localStorage.getItem("detailhub_access_token") ?? "";
-
-  useEffect(() => {
-    const headers = { Authorization: `Bearer ${token()}` };
-    Promise.all([
-      fetch("/api/live-sessions", { headers }).then((r) => r.json()),
-      fetch("/api/communities/mine", { headers }).then((r) => r.json()),
-    ])
-      .then(([lv, cm]) => {
-        if (lv.success) setSessions(lv.data ?? []);
-        if (cm.success) {
-          setCommunities(cm.data ?? []);
-          if (cm.data?.[0]) setForm((f) => ({ ...f, communityId: cm.data[0].id }));
-        }
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
-
-  const displayed = filter === "upcoming"
-    ? sessions.filter((s) => s.status === "SCHEDULED" || s.status === "LIVE")
-    : sessions;
-
-  async function handleCreate() {
-    if (!form.communityId || !form.title.trim() || !form.scheduledAt) return;
-    setCreating(true);
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!form.name) { toast.error("Nome é obrigatório"); return; }
+    setLoading(true);
     try {
-      const res = await fetch("/api/live-sessions", {
+      const res = await fetch(`/api/events/${eventId}/ticket-types`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token()}` },
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
-          communityId: form.communityId,
-          title: form.title.trim(),
-          description: form.description.trim() || undefined,
-          scheduledAt: new Date(form.scheduledAt).toISOString(),
-          isPublic: form.isPublic,
-          isRecorded: form.isRecorded,
+          name: form.name,
+          description: form.description || undefined,
+          price: parseFloat(form.price) || 0,
+          quantity: form.quantity ? parseInt(form.quantity) : undefined,
         }),
       });
-      const d = await res.json();
-      if (d.success) {
-        setSessions((prev) => [d.data, ...prev]);
-        setShowCreate(false);
-        setForm((f) => ({ ...f, title: "", description: "", scheduledAt: "" }));
-        toast.success("Live agendada com sucesso!");
-      } else {
-        toast.error(d.error ?? "Erro ao criar live");
-      }
-    } catch {
-      toast.error("Erro ao criar live");
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error);
+      toast.success("Ingresso adicionado!");
+      onAdded();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erro");
     } finally {
-      setCreating(false);
+      setLoading(false);
     }
   }
 
-  if (loading) return <Skeleton />;
-
   return (
-    <div className="space-y-6 max-w-3xl">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-red-500/10 rounded-xl flex items-center justify-center">
-            <Calendar className="w-5 h-5 text-red-400" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+      <div className="glass-card w-full max-w-sm p-6 animate-slide-up">
+        <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <Ticket size={18} className="text-blue-400" />
+          Novo Tipo de Ingresso
+        </h2>
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div>
+            <label className="block text-sm text-gray-400 mb-1">Nome *</label>
+            <input className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500" placeholder="Ex: VIP, Geral, Gratuito" value={form.name} onChange={(e) => set("name", e.target.value)} />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Preço (R$)</label>
+              <input type="number" min="0" step="0.01" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500" value={form.price} onChange={(e) => set("price", e.target.value)} />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Qtd. (vazio=∞)</label>
+              <input type="number" min="1" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500" placeholder="Ilimitado" value={form.quantity} onChange={(e) => set("quantity", e.target.value)} />
+            </div>
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Eventos & Lives</h1>
-            <p className="text-gray-400 text-sm">Gerencie as lives e eventos das suas comunidades</p>
+            <label className="block text-sm text-gray-400 mb-1">Descrição</label>
+            <input className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500" placeholder="Benefícios inclusos..." value={form.description} onChange={(e) => set("description", e.target.value)} />
           </div>
-        </div>
-        <button
-          onClick={() => setShowCreate(true)}
-          disabled={communities.length === 0}
-          className="flex items-center gap-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-violet-500/30"
-        >
-          <Plus className="w-4 h-4" />
-          Agendar Live
-        </button>
+          <div className="flex gap-3 pt-2">
+            <button type="button" onClick={onClose} className="flex-1 py-2 border border-white/10 rounded-lg text-gray-400 text-sm hover:bg-white/5 transition-colors">Cancelar</button>
+            <button type="submit" disabled={loading} className="flex-1 btn-premium py-2 rounded-lg text-sm font-medium disabled:opacity-50">{loading ? "Adicionando..." : "Adicionar"}</button>
+          </div>
+        </form>
       </div>
+    </div>
+  );
+}
 
-      {/* Filter */}
-      <div className="flex gap-2">
-        {(["upcoming", "all"] as const).map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-              filter === f
-                ? "bg-violet-600/20 text-violet-400 border border-violet-500/30"
-                : "text-gray-400 hover:text-gray-900 border border-gray-200 hover:border-violet-200 hover:bg-violet-50"
-            }`}
-          >
-            {f === "upcoming" ? "Próximas" : "Todas"}
+// ---------------------------------------------------------------------------
+// AttendeesModal
+// ---------------------------------------------------------------------------
+function AttendeesModal({ eventId, eventTitle, onClose }: { eventId: string; eventTitle: string; onClose: () => void }) {
+  const toast = useToast();
+  const [attendees, setAttendees] = useState<Attendee[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`/api/events/${eventId}/attendees`, { credentials: "include" })
+      .then((r) => r.json())
+      .then((d) => { if (d.success) setAttendees(d.data); })
+      .catch(() => toast.error("Erro ao carregar participantes"))
+      .finally(() => setLoading(false));
+  }, [eventId, toast]);
+
+  const STATUS_LABEL: Record<string, string> = {
+    CONFIRMED: "Confirmado",
+    PENDING_PAYMENT: "Aguardando Pgto",
+    CANCELED: "Cancelado",
+    ATTENDED: "Presente",
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+      <div className="glass-card w-full max-w-2xl p-6 animate-slide-up max-h-[80vh] flex flex-col">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-white">Participantes — {eventTitle}</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
+            <XCircle size={20} />
           </button>
-        ))}
-      </div>
-
-      {/* Sessions */}
-      {displayed.length === 0 ? (
-        <div className="glass-card p-16 text-center">
-          <Video className="w-10 h-10 text-gray-600 mx-auto mb-3" />
-          <p className="text-gray-900 font-semibold mb-1">Nenhuma live encontrada</p>
-          <p className="text-gray-500 text-sm">
-            {filter === "upcoming" ? "Agende sua próxima live para engajar a comunidade." : "Nenhuma live registrada ainda."}
-          </p>
         </div>
-      ) : (
-        <div className="space-y-3">
-          {displayed.map((session) => {
-            const st = STATUS_CONFIG[session.status] ?? STATUS_CONFIG.SCHEDULED;
-            const date = new Date(session.scheduledAt);
-            return (
-              <div key={session.id} className="glass-card p-5 hover:border-violet-200 transition-all">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-start gap-3 flex-1 min-w-0">
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
-                      style={{ backgroundColor: `${session.community.primaryColor}20` }}
-                    >
-                      <Video className="w-5 h-5" style={{ color: session.community.primaryColor }} />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-gray-900 truncate">{session.title}</p>
-                      <p className="text-xs text-violet-400 mt-0.5">{session.community.name}</p>
-                      {session.description && (
-                        <p className="text-xs text-gray-500 mt-1 line-clamp-1">{session.description}</p>
-                      )}
-                      <div className="flex items-center gap-3 mt-2">
-                        <span className="flex items-center gap-1 text-xs text-gray-500">
-                          <Clock className="w-3.5 h-3.5" />
-                          {date.toLocaleString("pt-BR", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
-                        </span>
-                        <span className="flex items-center gap-1 text-xs text-gray-500">
-                          <Users className="w-3.5 h-3.5" />
-                          {session._count.attendees} participante{session._count.attendees !== 1 ? "s" : ""}
-                        </span>
-                        {session.isRecorded && (
-                          <span className="text-xs text-gray-500">Gravada</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <span className={`text-xs px-2.5 py-1 rounded-full border flex-shrink-0 font-medium ${st.color}`}>
-                    {st.label}
-                  </span>
+        {loading ? (
+          <div className="space-y-2">
+            {[...Array(5)].map((_, i) => <div key={i} className="h-12 bg-white/5 rounded animate-pulse" />)}
+          </div>
+        ) : attendees.length === 0 ? (
+          <p className="text-gray-500 text-sm text-center py-8">Nenhum participante ainda.</p>
+        ) : (
+          <div className="overflow-y-auto space-y-2 flex-1">
+            {attendees.map((a) => (
+              <div key={a.id} className="flex items-center gap-3 bg-white/3 rounded-lg p-3">
+                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm text-gray-300 font-medium flex-shrink-0">
+                  {a.user.firstName[0]}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white text-sm font-medium">{a.user.firstName} {a.user.lastName}</p>
+                  <p className="text-gray-500 text-xs truncate">{a.user.email}</p>
+                </div>
+                <div className="text-right flex-shrink-0">
+                  <p className="text-gray-300 text-xs">{a.ticketType.name}</p>
+                  <p className="text-gray-500 text-xs">{STATUS_LABEL[a.status] ?? a.status}</p>
                 </div>
               </div>
-            );
-          })}
+            ))}
+          </div>
+        )}
+        <p className="text-gray-500 text-xs mt-3">{attendees.length} participante(s)</p>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// EventCard
+// ---------------------------------------------------------------------------
+function EventCard({
+  event,
+  onPublish,
+  onDelete,
+  onAddTicket,
+  onViewAttendees,
+}: {
+  event: Event;
+  onPublish: (id: string) => void;
+  onDelete: (id: string) => void;
+  onAddTicket: (id: string) => void;
+  onViewAttendees: (event: Event) => void;
+}) {
+  const { label, color } = STATUS_CONFIG[event.status];
+  const { label: typeLabel, icon: TypeIcon, color: typeColor } = TYPE_CONFIG[event.type];
+  const registrations = event._count.registrations;
+  const lowestPrice = event.ticketTypes.length > 0
+    ? Math.min(...event.ticketTypes.map((t) => Number(t.price)))
+    : null;
+
+  return (
+    <div className="glass-card p-5 space-y-4">
+      {/* Cover */}
+      {event.coverImageUrl && (
+        <img src={event.coverImageUrl} alt={event.title} className="w-full h-32 object-cover rounded-lg" />
+      )}
+
+      {/* Header */}
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-white text-sm font-semibold truncate">{event.title}</p>
+          {event.community && (
+            <p className="text-gray-500 text-xs mt-0.5">{event.community.name}</p>
+          )}
+        </div>
+        <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${color}`}>
+          {label}
+        </span>
+      </div>
+
+      {/* Meta */}
+      <div className="space-y-1.5 text-xs text-gray-400">
+        <div className="flex items-center gap-1.5">
+          <Clock size={12} />
+          <span>{fmtDate(event.startAt)}</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <TypeIcon size={12} className={typeColor} />
+          <span>{typeLabel}</span>
+          {event.location && <span className="text-gray-500">· {event.location}</span>}
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="flex items-center gap-1">
+            <Users size={12} />
+            {registrations}{event.capacity ? ` / ${event.capacity}` : ""} inscritos
+          </span>
+          {lowestPrice !== null && (
+            <span className="flex items-center gap-1">
+              <Ticket size={12} />
+              {fmtBrl(lowestPrice)}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Ticket types */}
+      {event.ticketTypes.length > 0 && (
+        <div className="space-y-1">
+          {event.ticketTypes.map((t) => (
+            <div key={t.id} className="flex items-center justify-between text-xs bg-white/3 rounded px-2 py-1">
+              <span className="text-gray-300">{t.name}</span>
+              <span className="text-gray-400">{fmtBrl(Number(t.price))} · {t.sold}{t.quantity ? `/${t.quantity}` : ""} vendidos</span>
+            </div>
+          ))}
         </div>
       )}
 
-      {/* Create modal */}
-      {showCreate && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="glass-card p-6 w-full max-w-md space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-gray-900">Agendar Live</h2>
-              <button onClick={() => setShowCreate(false)} className="text-gray-500 hover:text-gray-900 transition-colors">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+      {/* Actions */}
+      <div className="flex flex-wrap gap-2 pt-1">
+        {event.status === "DRAFT" && (
+          <button
+            onClick={() => onPublish(event.id)}
+            className="flex items-center gap-1 px-2.5 py-1.5 bg-green-500/10 border border-green-500/20 rounded-lg text-green-400 text-xs hover:bg-green-500/20 transition-colors"
+          >
+            <Send size={11} />
+            Publicar
+          </button>
+        )}
+        <button
+          onClick={() => onAddTicket(event.id)}
+          className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-lg text-blue-400 text-xs hover:bg-blue-500/20 transition-colors"
+        >
+          <Ticket size={11} />
+          + Ingresso
+        </button>
+        <button
+          onClick={() => onViewAttendees(event)}
+          className="flex items-center gap-1 px-2.5 py-1.5 bg-white/5 border border-white/10 rounded-lg text-gray-300 text-xs hover:bg-white/10 transition-colors"
+        >
+          <Eye size={11} />
+          Participantes
+        </button>
+        {(event.status === "DRAFT" || event.status === "CANCELED") && (
+          <button
+            onClick={() => onDelete(event.id)}
+            className="p-1.5 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 hover:bg-red-500/20 transition-colors"
+          >
+            <Trash2 size={12} />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
 
-            {communities.length > 1 && (
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1.5">Comunidade</label>
-                <div className="relative">
-                  <select
-                    value={form.communityId}
-                    onChange={(e) => setForm((f) => ({ ...f, communityId: e.target.value }))}
-                    className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-3 pr-10 text-gray-900 text-sm focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30 transition-all"
-                  >
-                    {communities.map((c) => (
-                      <option key={c.id} value={c.id} className="bg-white">{c.name}</option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
-                </div>
-              </div>
-            )}
+// ---------------------------------------------------------------------------
+// Main page
+// ---------------------------------------------------------------------------
+export default function EventsPage() {
+  const toast = useToast();
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showCreate, setShowCreate] = useState(false);
+  const [addTicketEventId, setAddTicketEventId] = useState<string | null>(null);
+  const [attendeesEvent, setAttendeesEvent] = useState<Event | null>(null);
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Título</label>
-              <input
-                type="text"
-                value={form.title}
-                onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-                placeholder="Ex: Masterclass Mecânica"
-                className="w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all"
-              />
-            </div>
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({ page: String(page) });
+      if (statusFilter !== "ALL") params.set("status", statusFilter);
+      const res = await fetch(`/api/events?${params}`, { credentials: "include" });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error);
+      setEvents(data.data ?? []);
+      setTotalPages(data.meta.totalPages);
+      setTotal(data.meta.total);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erro ao carregar");
+    } finally {
+      setLoading(false);
+    }
+  }, [toast, statusFilter, page]);
 
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Descrição <span className="text-gray-600">(opcional)</span></label>
-              <textarea
-                value={form.description}
-                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-                rows={3}
-                placeholder="Descreva o conteúdo da live..."
-                className="w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all resize-none"
-              />
-            </div>
+  useEffect(() => { load(); }, [load]);
+  useEffect(() => { setPage(1); }, [statusFilter]);
 
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Data e Hora</label>
-              <input
-                type="datetime-local"
-                value={form.scheduledAt}
-                onChange={(e) => setForm((f) => ({ ...f, scheduledAt: e.target.value }))}
-                className="w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all [color-scheme:dark]"
-              />
-            </div>
+  async function handlePublish(id: string) {
+    try {
+      const res = await fetch(`/api/events/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ status: "PUBLISHED" }),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error);
+      toast.success("Evento publicado!");
+      load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erro ao publicar");
+    }
+  }
 
-            <div className="flex items-center gap-6">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={form.isPublic}
-                  onChange={(e) => setForm((f) => ({ ...f, isPublic: e.target.checked }))}
-                  className="w-4 h-4 accent-violet-500 rounded"
-                />
-                <span className="text-sm text-gray-600">Pública</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={form.isRecorded}
-                  onChange={(e) => setForm((f) => ({ ...f, isRecorded: e.target.checked }))}
-                  className="w-4 h-4 accent-violet-500 rounded"
-                />
-                <span className="text-sm text-gray-600">Gravar</span>
-              </label>
-            </div>
+  async function handleDelete(id: string) {
+    if (!confirm("Excluir ou cancelar este evento?")) return;
+    try {
+      const res = await fetch(`/api/events/${id}`, { method: "DELETE", credentials: "include" });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error);
+      toast.success(data.data?.canceled ? "Evento cancelado" : "Evento excluído");
+      load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erro");
+    }
+  }
 
-            <div className="flex gap-3 pt-1">
-              <button
-                onClick={() => setShowCreate(false)}
-                className="flex-1 px-4 py-2.5 border border-gray-200 hover:border-violet-200 text-gray-600 hover:text-gray-900 rounded-xl text-sm transition-all"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleCreate}
-                disabled={creating || !form.title.trim() || !form.scheduledAt}
-                className="flex-1 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
-              >
-                {creating ? "Agendando..." : "Agendar"}
-              </button>
-            </div>
-          </div>
+  const upcomingCount = events.filter((e) => e.status === "PUBLISHED" && new Date(e.startAt) > new Date()).length;
+  const draftCount = events.filter((e) => e.status === "DRAFT").length;
+  const totalRegistrations = events.reduce((s, e) => s + e._count.registrations, 0);
+
+  if (loading && events.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div className="h-8 bg-white/5 rounded animate-pulse w-48" />
+        <div className="grid grid-cols-3 gap-4">
+          {[...Array(3)].map((_, i) => <div key={i} className="h-20 bg-white/5 rounded-xl animate-pulse" />)}
         </div>
+        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {[...Array(4)].map((_, i) => <div key={i} className="h-56 bg-white/5 rounded-xl animate-pulse" />)}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6 animate-fade-in">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+            <Calendar size={24} className="text-blue-400" />
+            Eventos
+          </h1>
+          <p className="text-gray-400 text-sm mt-1">Crie e gerencie seus eventos com ingressos</p>
+        </div>
+        <button
+          onClick={() => setShowCreate(true)}
+          className="btn-premium px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2"
+        >
+          <Plus size={16} />
+          Novo Evento
+        </button>
+      </div>
+
+      {/* KPIs */}
+      <div className="grid grid-cols-3 gap-4">
+        {[
+          { label: "Próximos eventos", value: upcomingCount, icon: Calendar, color: "text-green-400" },
+          { label: "Rascunhos", value: draftCount, icon: Edit3, color: "text-yellow-400" },
+          { label: "Total inscrições", value: totalRegistrations, icon: Users, color: "text-blue-400" },
+        ].map(({ label, value, icon: Icon, color }) => (
+          <div key={label} className="glass-card p-4">
+            <div className="flex items-center gap-2 mb-1">
+              <Icon size={16} className={color} />
+              <span className="text-gray-400 text-xs">{label}</span>
+            </div>
+            <p className="text-2xl font-bold text-white">{value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-wrap gap-2 items-center justify-between">
+        <div className="flex flex-wrap gap-2">
+          {["ALL", "DRAFT", "PUBLISHED", "COMPLETED", "CANCELED"].map((s) => (
+            <button
+              key={s}
+              onClick={() => setStatusFilter(s)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                statusFilter === s ? "bg-blue-500 text-white" : "bg-white/5 border border-white/10 text-gray-400 hover:text-white"
+              }`}
+            >
+              {s === "ALL" ? "Todos" : STATUS_CONFIG[s as EventStatus]?.label ?? s}
+            </button>
+          ))}
+        </div>
+        <p className="text-gray-500 text-xs">{total} evento(s)</p>
+      </div>
+
+      {/* Events grid */}
+      {events.length === 0 ? (
+        <div className="glass-card p-12 text-center">
+          <Calendar size={40} className="text-gray-600 mx-auto mb-3" />
+          <p className="text-gray-400 text-sm">Nenhum evento encontrado.</p>
+          <button onClick={() => setShowCreate(true)} className="mt-4 btn-premium px-4 py-2 rounded-lg text-sm">
+            Criar primeiro evento
+          </button>
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {events.map((event) => (
+            <EventCard
+              key={event.id}
+              event={event}
+              onPublish={handlePublish}
+              onDelete={handleDelete}
+              onAddTicket={(id) => setAddTicketEventId(id)}
+              onViewAttendees={(e) => setAttendeesEvent(e)}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-end gap-2">
+          <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className="p-2 bg-white/5 border border-white/10 rounded-lg text-gray-400 hover:text-white disabled:opacity-40 transition-colors">
+            <ChevronLeft size={16} />
+          </button>
+          <span className="text-gray-400 text-sm">pág. {page} de {totalPages}</span>
+          <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page >= totalPages} className="p-2 bg-white/5 border border-white/10 rounded-lg text-gray-400 hover:text-white disabled:opacity-40 transition-colors">
+            <ChevronRight size={16} />
+          </button>
+        </div>
+      )}
+
+      {/* Modals */}
+      {showCreate && (
+        <CreateEventModal
+          onClose={() => setShowCreate(false)}
+          onCreated={() => { setShowCreate(false); load(); }}
+        />
+      )}
+      {addTicketEventId && (
+        <AddTicketModal
+          eventId={addTicketEventId}
+          onClose={() => setAddTicketEventId(null)}
+          onAdded={() => { setAddTicketEventId(null); load(); }}
+        />
+      )}
+      {attendeesEvent && (
+        <AttendeesModal
+          eventId={attendeesEvent.id}
+          eventTitle={attendeesEvent.title}
+          onClose={() => setAttendeesEvent(null)}
+        />
       )}
     </div>
   );
