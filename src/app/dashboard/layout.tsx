@@ -38,6 +38,7 @@ import {
   Star,
   Compass,
   CheckSquare,
+  Megaphone,
 } from "lucide-react";
 import { RoleBadge } from "@/components/ui/badge";
 import { Logo } from "@/components/ui/logo";
@@ -75,6 +76,7 @@ const ADMIN_NAV: NavEntry[] = [
       { href: "/dashboard/admin/comunidades", label: "Comunidades", icon: Globe },
       { href: "/dashboard/usuarios", label: "Usuários", icon: Shield },
       { href: "/dashboard/admin/denuncias", label: "Denúncias", icon: Flag },
+      { href: "/dashboard/admin/anuncios", label: "Anúncios", icon: Megaphone },
       { href: "/dashboard/admin/plataforma", label: "Plataforma", icon: Server },
       { href: "/dashboard/admin/financeiro", label: "Financeiro", icon: DollarSign },
       { href: "/dashboard/admin/ferramentas", label: "Ferramentas", icon: Wrench },
@@ -191,6 +193,7 @@ const PARTNER_NAV: NavEntry[] = [
     items: [
       { href: "/dashboard/meus-produtos", label: "Meus Produtos", icon: Package },
       { href: "/dashboard/vendas", label: "Vendas", icon: TrendingUp },
+      { href: "/dashboard/anuncios", label: "Meus Anúncios", icon: Megaphone },
     ],
   },
   {
