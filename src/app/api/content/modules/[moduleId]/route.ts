@@ -21,12 +21,12 @@ const updateModuleSchema = z.object({
 
 async function assertOwnership(userId: string, userRole: string, moduleId: string) {
   if (userRole === UserRole.SUPER_ADMIN) return;
-  const module = await db.contentModule.findUnique({
+  const contentModule = await db.contentModule.findUnique({
     where: { id: moduleId },
     select: { community: { select: { influencer: { select: { userId: true } } } } },
   });
-  if (!module) throw new NotFoundError("Module not found");
-  if (module.community.influencer.userId !== userId) {
+  if (!contentModule) throw new NotFoundError("Module not found");
+  if (contentModule.community.influencer.userId !== userId) {
     throw new ForbiddenError("You can only manage content in your own community");
   }
 }

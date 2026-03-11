@@ -22,7 +22,7 @@ export default function SearchResults({ results, query, onClose }: SearchResults
     return (
       <div className="px-4 py-8 text-center">
         <p className="text-sm text-gray-400">
-          Nenhum resultado para <span className="text-gray-900 font-medium">"{query}"</span>
+          Nenhum resultado para <span className="text-gray-900 font-medium">&quot;{query}&quot;</span>
         </p>
       </div>
     );
@@ -105,7 +105,7 @@ export default function SearchResults({ results, query, onClose }: SearchResults
             onClose();
           }}
         >
-          Ver todos os resultados para "{query}"
+          Ver todos os resultados para &quot;{query}&quot;
         </button>
       </div>
     </div>

@@ -73,13 +73,13 @@ export const POST = withAuth(async (req, { session }) => {
       );
     }
 
-    const module = await contentService.createModule(
+    const createdModule = await contentService.createModule(
       session.userId,
       session.role,
       parsed.data
     );
 
-    return NextResponse.json({ success: true, data: module }, { status: 201 });
+    return NextResponse.json({ success: true, data: createdModule }, { status: 201 });
   } catch (error) {
     if (error instanceof AppError) {
       return NextResponse.json(

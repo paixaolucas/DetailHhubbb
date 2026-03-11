@@ -172,7 +172,7 @@ export default function SearchPage() {
             <Search className="w-12 h-12 text-gray-600 mx-auto mb-3" />
             <p className="text-gray-400">
               Nenhum resultado para{" "}
-              <span className="text-gray-900 font-medium">"{query}"</span>
+              <span className="text-gray-900 font-medium">&quot;{query}&quot;</span>
             </p>
           </div>
         )}

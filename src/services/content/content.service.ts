@@ -69,14 +69,14 @@ export async function createLesson(
   userRole: string,
   input: CreateLessonInput
 ) {
-  const module = await db.contentModule.findUnique({
+  const contentModule = await db.contentModule.findUnique({
     where: { id: input.moduleId },
     select: { communityId: true },
   });
 
-  if (!module) throw new NotFoundError("Module not found");
+  if (!contentModule) throw new NotFoundError("Module not found");
 
-  await assertCommunityOwnership(userId, userRole, module.communityId);
+  await assertCommunityOwnership(userId, userRole, contentModule.communityId);
 
   return db.contentLesson.create({
     data: {

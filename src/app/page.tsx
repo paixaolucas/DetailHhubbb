@@ -336,7 +336,7 @@ function TestimonialsSection() {
                 ))}
               </div>
 
-              <p className="text-gray-600 text-sm leading-relaxed mb-6">"{text}"</p>
+              <p className="text-gray-600 text-sm leading-relaxed mb-6">&quot;{text}&quot;</p>
 
               <div className="flex items-center gap-3">
                 <img

@@ -222,7 +222,7 @@ export default function SequenceEditor({
 
         {steps.length === 0 && (
           <p className="text-sm text-gray-500 text-center py-4 border border-dashed border-gray-200 rounded-xl">
-            Nenhum passo adicionado ainda. Clique em "Adicionar Passo" para começar.
+            Nenhum passo adicionado ainda. Clique em &quot;Adicionar Passo&quot; para começar.
           </p>
         )}
 
