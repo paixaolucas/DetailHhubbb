@@ -128,6 +128,7 @@ const INFLUENCER_NAV: NavEntry[] = [
     items: [
       { href: "/dashboard/financeiro", label: "Financeiro", icon: DollarSign },
       { href: "/dashboard/performance", label: "Performance (PP)", icon: Trophy },
+      { href: "/dashboard/milestones", label: "Marcos & Bônus", icon: Award },
       { href: "/dashboard/analytics", label: "Analytics", icon: BarChart2 },
       { href: "/dashboard/marketplace", label: "Marketplace", icon: ShoppingBag },
       { href: "/dashboard/tools", label: "Ferramentas", icon: Wrench },

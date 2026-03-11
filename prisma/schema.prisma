@@ -112,6 +112,7 @@ model Influencer {
   communities              Community[]
   referredPlatformMembers  PlatformMembership[]    @relation("InfluencerReferrals")
   monthlyScores            InfluencerMonthlyScore[]
+  milestones               InfluencerMilestone[]
   user                     User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -1251,4 +1252,37 @@ model InfluencerMonthlyScore {
   @@index([influencerId])
   @@index([year, month])
   @@map("influencer_monthly_scores")
+}
+
+// =============================================================================
+// INFLUENCER MILESTONES
+// Records each milestone unlocked by an influencer (Bronze, Prata, Ouro, etc.)
+// =============================================================================
+
+model InfluencerMilestone {
+  id           String        @id @default(cuid())
+  influencerId String
+  type         MilestoneType
+  achievedAt   DateTime      @default(now())
+  bonusAmount  Decimal       @default(0)
+  bonusPaid    Boolean       @default(false)
+  bonusPaidAt  DateTime?
+  // Extra context: e.g. { month: "2025-01", membersCount: 55, rank: 1 }
+  metadata     Json          @default("{}")
+  createdAt    DateTime      @default(now())
+  influencer   Influencer    @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+
+  @@index([influencerId])
+  @@index([type])
+  @@index([bonusPaid])
+  @@map("influencer_milestones")
+}
+
+enum MilestoneType {
+  BRONZE                // first month ≥50 active referred members
+  PRATA                 // 200 active referred members for 2 consecutive months
+  OURO                  // 500 active referred members for 3 consecutive months
+  TOP_CREATOR_MONTH     // rank #1 PP in a closed month
+  CRESCIMENTO_ACELERADO // +100 new referred members in a single month
+  EMBAIXADOR            // 12 consecutive months at 100% contract deliveries
 }
