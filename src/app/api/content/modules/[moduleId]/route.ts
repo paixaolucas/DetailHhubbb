@@ -16,6 +16,7 @@ const updateModuleSchema = z.object({
   unlockAfterDays: z.number().int().min(0).nullable().optional(),
   isPublished: z.boolean().optional(),
   isLocked: z.boolean().optional(),
+  isPremium: z.boolean().optional(),
 });
 
 async function assertOwnership(userId: string, userRole: string, moduleId: string) {
@@ -29,6 +30,33 @@ async function assertOwnership(userId: string, userRole: string, moduleId: strin
     throw new ForbiddenError("You can only manage content in your own community");
   }
 }
+
+export const PATCH = withAuth(async (req, { session, params }) => {
+  try {
+    const moduleId = params?.moduleId;
+    if (!moduleId) return NextResponse.json({ success: false, error: "moduleId required" }, { status: 400 });
+
+    await assertOwnership(session.userId, session.role, moduleId);
+
+    const body = await req.json();
+    const parsed = updateModuleSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ success: false, error: parsed.error.errors[0].message }, { status: 422 });
+    }
+
+    const updated = await db.contentModule.update({
+      where: { id: moduleId },
+      data: parsed.data,
+    });
+
+    return NextResponse.json({ success: true, data: updated });
+  } catch (error) {
+    if (error instanceof AppError) {
+      return NextResponse.json({ success: false, error: error.message }, { status: error.statusCode });
+    }
+    return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
+  }
+});
 
 export const PUT = withAuth(async (req, { session, params }) => {
   try {
