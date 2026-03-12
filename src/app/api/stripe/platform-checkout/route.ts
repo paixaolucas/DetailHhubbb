@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 import { withAuth } from "@/middleware/auth.middleware";
 import { createPlatformCheckoutSession } from "@/services/payment/payment.service";

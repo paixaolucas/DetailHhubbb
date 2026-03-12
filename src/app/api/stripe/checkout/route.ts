@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 // =============================================================================
 // POST /api/stripe/checkout
 // Creates a Stripe checkout session for community subscription
