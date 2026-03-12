@@ -73,7 +73,7 @@ export default function AssinarPage() {
   return (
     <div className="max-w-lg mx-auto py-12 px-4">
       <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/30 rounded-full px-4 py-1.5 text-sm text-violet-300 mb-4">
+        <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/30 rounded-full px-4 py-1.5 text-sm text-violet-600 mb-4">
           <Car className="w-4 h-4" />
           Assinatura Única
         </div>
@@ -98,12 +98,12 @@ export default function AssinarPage() {
             <div className="flex items-end justify-center gap-1 mb-2">
               <span className="text-gray-400 text-lg">R$</span>
               <span className="text-5xl font-bold text-gray-900">
-                {plan ? Number(plan.price).toLocaleString("pt-BR") : "600"}
+                {plan ? Number(plan.price).toLocaleString("pt-BR") : "837"}
               </span>
               <span className="text-gray-400 text-lg mb-1">/ano</span>
             </div>
             <p className="text-gray-500 text-sm">
-              {plan?.name ?? "DetailHub Anual"} — menos de R$50/mês
+              {plan?.name ?? "DetailHub Anual"} — R$69,75/mês
             </p>
           </div>
 
@@ -128,7 +128,7 @@ export default function AssinarPage() {
             ) : (
               <Zap className="w-4 h-4" />
             )}
-            {submitting ? "Redirecionando..." : "Assinar agora — R$600/ano"}
+            {submitting ? "Redirecionando..." : "Assinar agora — R$837/ano"}
           </button>
 
           <p className="text-center text-xs text-gray-600 mt-4">

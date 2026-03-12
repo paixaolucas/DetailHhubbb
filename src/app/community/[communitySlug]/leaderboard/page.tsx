@@ -5,6 +5,7 @@ import { Trophy, Medal, Star } from "lucide-react";
 import { LeaderboardRow } from "@/components/gamification/LeaderboardRow";
 import { BadgeGrid } from "@/components/gamification/BadgeGrid";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface LeaderboardEntry {
   userId?: string;
@@ -46,6 +47,7 @@ export default function LeaderboardPage({
   params: { communitySlug: string };
 }) {
   const { communitySlug } = params;
+  const router = useRouter();
 
   const [community, setCommunity] = useState<Community | null>(null);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -143,13 +145,13 @@ export default function LeaderboardPage({
       {/* Header */}
       <header className="border-b border-gray-200 bg-[#F8F7FF]/80 backdrop-blur-xl sticky top-0 z-10">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link
-            href={`/community/${communitySlug}`}
+          <button
+            onClick={() => router.back()}
             className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-900 transition-colors"
           >
             <span className="text-violet-400">←</span>
             {community?.name ?? communitySlug}
-          </Link>
+          </button>
         </div>
       </header>
 

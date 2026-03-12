@@ -8,8 +8,8 @@ import {
   ExternalLink,
   Settings,
   BarChart2,
-  MoreVertical,
 } from "lucide-react";
+import { CommunityThumbnail } from "@/components/community/CommunityThumbnail";
 
 interface Community {
   id: string;
@@ -17,6 +17,7 @@ interface Community {
   slug: string;
   shortDescription: string | null;
   logoUrl: string | null;
+  bannerUrl: string | null;
   primaryColor: string;
   memberCount: number;
   isPublished: boolean;
@@ -94,22 +95,25 @@ export default function CommunitiesPage() {
           {communities.map((community) => (
             <div
               key={community.id}
-              className="glass-card p-6 hover:border-violet-200 transition-all group"
+              className="glass-card overflow-hidden hover:border-violet-200 transition-all group"
             >
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex items-center gap-4 min-w-0">
-                  {/* Logo */}
-                  <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center text-gray-900 font-bold text-lg flex-shrink-0"
-                    style={{ backgroundColor: community.primaryColor }}
-                  >
-                    {community.name.charAt(0)}
-                  </div>
+              {/* Compact thumbnail */}
+              <div className="h-20 overflow-hidden">
+                <CommunityThumbnail
+                  bannerUrl={community.bannerUrl}
+                  primaryColor={community.primaryColor}
+                  name={community.name}
+                  className="!aspect-auto h-20 w-full"
+                  aspectRatio="video"
+                />
+              </div>
 
+              <div className="p-5 flex items-start justify-between gap-4">
+                <div className="flex items-center gap-3 min-w-0">
                   {/* Info */}
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-semibold text-gray-900 group-hover:text-violet-300 transition-colors">
+                      <h3 className="font-semibold text-gray-900 group-hover:text-violet-600 transition-colors">
                         {community.name}
                       </h3>
                       <span
@@ -125,7 +129,7 @@ export default function CommunitiesPage() {
                     <p className="text-sm text-gray-400 mt-0.5 truncate">
                       {community.shortDescription ?? "Sem descrição"}
                     </p>
-                    <p className="text-xs text-gray-600 mt-0.5">
+                    <p className="text-xs text-gray-500 mt-0.5">
                       detailhub.com/{community.slug}
                     </p>
                   </div>

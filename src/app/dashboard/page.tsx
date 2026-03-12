@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/components/ui/toast-provider";
+import { CommunityThumbnail } from "@/components/community/CommunityThumbnail";
 import {
   AreaChart,
   Area,
@@ -597,7 +598,7 @@ function MemberDashboardInner({ userName }: { userName: string }) {
             </div>
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
-                <span className="text-3xl font-bold text-gray-900">R$ 600</span>
+                <span className="text-3xl font-bold text-gray-900">R$ 837</span>
                 <span className="text-gray-400 text-sm">/ano</span>
               </div>
               <Link
@@ -614,15 +615,12 @@ function MemberDashboardInner({ userName }: { userName: string }) {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   {communities.slice(0, 3).map((community) => (
                     <div key={community.id} className="glass-card overflow-hidden opacity-60 blur-[2px] pointer-events-none select-none">
-                      <div
-                        className="h-24 relative"
-                        style={{ background: community.bannerUrl ? undefined : `linear-gradient(135deg, ${community.primaryColor} 0%, ${community.primaryColor}80 100%)` }}
-                      >
-                        {community.bannerUrl && <Image src={community.bannerUrl} alt="" fill className="object-cover" />}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-3">
-                          <span className="font-bold text-white text-sm">{community.name}</span>
-                        </div>
-                      </div>
+                      <CommunityThumbnail
+                        bannerUrl={community.bannerUrl}
+                        primaryColor={community.primaryColor}
+                        name={community.name}
+                        aspectRatio="video"
+                      />
                     </div>
                   ))}
                 </div>
@@ -637,45 +635,44 @@ function MemberDashboardInner({ userName }: { userName: string }) {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {communities.map((community) => (
               <Link
                 key={community.id}
                 href={`/community/${community.slug}/feed`}
-                className="glass-card overflow-hidden hover:scale-[1.01] hover:border-white/20 transition-all duration-300 group block"
+                className="glass-card overflow-hidden card-hover hover:border-violet-200 transition-all duration-300 group block"
               >
-                {/* Banner */}
-                <div
-                  className="relative w-full aspect-[5/2]"
-                  style={{
-                    background: community.bannerUrl
-                      ? undefined
-                      : `linear-gradient(135deg, ${community.primaryColor} 0%, ${community.primaryColor}80 50%, ${community.primaryColor}20 100%)`,
-                  }}
-                >
-                  {community.bannerUrl && (
-                    <Image
-                      src={community.bannerUrl}
-                      alt={community.name}
-                      fill
-                      className="object-cover object-top"
-                    />
-                  )}
-                  {/* Membros no canto superior direito */}
+                {/* Thumbnail with member badge */}
+                <div className="relative">
+                  <CommunityThumbnail
+                    bannerUrl={community.bannerUrl}
+                    primaryColor={community.primaryColor}
+                    name={community.name}
+                    aspectRatio="video"
+                  />
                   <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/50 backdrop-blur-sm text-white/90 text-xs px-2.5 py-1 rounded-full">
                     <Users className="w-3 h-3" />
-                    <span>{community.memberCount.toLocaleString("pt-BR")} membros</span>
+                    <span>{community.memberCount.toLocaleString("pt-BR")}</span>
                   </div>
                 </div>
 
                 {/* Info */}
                 <div className="p-4">
-                  <h3 className="font-bold text-gray-900 text-base mb-1">{community.name}</h3>
+                  <div className="flex items-center gap-2.5 mb-2">
+                    {community.logoUrl ? (
+                      <Image src={community.logoUrl} alt={community.name} width={32} height={32} className="w-8 h-8 rounded-lg object-cover flex-shrink-0 border border-gray-100" />
+                    ) : (
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style={{ backgroundColor: community.primaryColor }}>
+                        {community.name.charAt(0)}
+                      </div>
+                    )}
+                    <h3 className="font-bold text-gray-900 text-sm leading-tight">{community.name}</h3>
+                  </div>
                   {community.shortDescription && (
-                    <p className="text-sm text-gray-400 line-clamp-2 mb-3">{community.shortDescription}</p>
+                    <p className="text-xs text-gray-400 line-clamp-2 mb-3">{community.shortDescription}</p>
                   )}
                   <div
-                    className="w-full py-2 rounded-xl text-sm font-semibold text-white text-center transition-opacity group-hover:opacity-90"
+                    className="w-full py-2 rounded-xl text-xs font-semibold text-white text-center transition-opacity group-hover:opacity-90"
                     style={{ backgroundColor: community.primaryColor }}
                   >
                     Acessar comunidade →

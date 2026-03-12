@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -10,15 +9,16 @@ import {
   BarChart2,
   Star,
   CheckCircle,
-  ChevronRight,
   Wrench,
   Car,
   Trophy,
   Gauge,
   BadgeCheck,
+  ChevronRight,
 } from "lucide-react";
 import { Footer } from "@/components/layout/footer";
 import { NavBar } from "@/components/layout/navbar";
+import { CommunityThumbnail } from "@/components/community/CommunityThumbnail";
 
 // ─── Static data ─────────────────────────────────────────────────────────────
 
@@ -69,7 +69,7 @@ const features = [
 
 const steps = [
   { step: "01", title: "Crie sua conta", desc: "Registre-se e configure seu perfil em menos de 5 minutos.", icon: Users },
-  { step: "02", title: "Assine o plano", desc: "R$600/ano — acesso imediato a todas as comunidades da plataforma.", icon: CheckCircle },
+  { step: "02", title: "Assine o plano", desc: "R$837/ano — acesso imediato a todas as comunidades da plataforma.", icon: CheckCircle },
   { step: "03", title: "Explore e evolua", desc: "Acesse cursos, lives, marketplace e a IA mecânica sem limites.", icon: Trophy },
 ];
 
@@ -84,26 +84,53 @@ const testimonials = [
   {
     name: "Rafael Costa",
     role: "Criador de Conteúdo Automotivo",
-    company: "Tuner desde 2019, 12k seguidores",
-    avatarUrl: "https://i.pravatar.cc/96?u=rafael-costa",
     text: "O DetailHub transformou minha comunidade de seguidores em uma fonte de renda recorrente. Nunca foi tão fácil monetizar.",
     stars: 5,
+    avatarColor: "from-blue-500 to-blue-600",
+    initials: "RC",
   },
   {
     name: "Ana Lima",
     role: "Entusiasta de Tuning",
-    company: "Proprietária do Clube Turbo SP",
-    avatarUrl: "https://i.pravatar.cc/96?u=ana-lima",
     text: "Finalmente uma plataforma que entende a cultura automotiva. O conteúdo e a IA mecânica são incríveis.",
     stars: 5,
+    avatarColor: "from-violet-500 to-purple-600",
+    initials: "AL",
   },
   {
     name: "Carlos Mendes",
     role: "Mecânico Profissional",
-    company: "AutoCenter Mendes — RJ",
-    avatarUrl: "https://i.pravatar.cc/96?u=carlos-mendes",
     text: "Uso o marketplace para vender meus cursos de manutenção. Em 3 meses recuperei o investimento 10x.",
     stars: 5,
+    avatarColor: "from-orange-500 to-red-500",
+    initials: "CM",
+  },
+];
+
+const featuredCommunities = [
+  {
+    name: "Barba",
+    slug: "barba",
+    primaryColor: "#FA4616",
+    bannerUrl: "/photos/barba-thumb.png",
+    members: "2.4k",
+    description: "Estética automotiva sem enrolação. Queimando mitos.",
+  },
+  {
+    name: "Corujão",
+    slug: "corujao",
+    primaryColor: "#F7941D",
+    bannerUrl: "/photos/corujao-thumb.png",
+    members: "1.8k",
+    description: "Não é estúdio, não é detail. É zika! @corujaozk",
+  },
+  {
+    name: "Comunidade no Mel",
+    slug: "no-mel",
+    primaryColor: "#FCB749",
+    bannerUrl: "/photos/neto-thumb.png",
+    members: "3.1k",
+    description: "Educação em estética automotiva do zero ao avançado.",
   },
 ];
 
@@ -169,12 +196,54 @@ function HeroSection() {
 
         {/* Trust indicators */}
         <div className="flex items-center justify-center gap-3 sm:gap-6 mt-12 flex-wrap">
-          {["R$600/ano. Acesso a tudo.", "Setup em 5 minutos", "Cancele quando quiser"].map((item) => (
+          {["R$837/ano. Acesso a tudo.", "Setup em 5 minutos", "Cancele quando quiser"].map((item) => (
             <div key={item} className="flex items-center gap-2 text-gray-500 text-sm">
               <CheckCircle className="w-4 h-4 text-green-500" />
               {item}
             </div>
           ))}
+        </div>
+
+        {/* Dashboard mockup */}
+        <div className="relative mt-16 max-w-3xl mx-auto">
+          <div style={{ perspective: "1200px" }}>
+            <div
+              className="rounded-2xl overflow-hidden shadow-2xl shadow-violet-500/20 border border-violet-200"
+              style={{ transform: "rotateX(8deg) rotateY(-1deg)" }}
+            >
+              {/* Window chrome */}
+              <div className="bg-white px-4 py-2.5 flex items-center gap-2 border-b border-gray-100">
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-red-400" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                  <div className="w-3 h-3 rounded-full bg-green-400" />
+                </div>
+                <div className="flex-1 mx-3 bg-gray-100 rounded-full h-5 text-[10px] text-gray-400 flex items-center px-3">
+                  detailhub.com/dashboard
+                </div>
+              </div>
+              {/* Content */}
+              <div className="bg-[#F8F7FF] p-4 grid grid-cols-3 gap-3">
+                {featuredCommunities.map((c) => (
+                  <div key={c.slug} className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100">
+                    <CommunityThumbnail
+                      bannerUrl={c.bannerUrl}
+                      primaryColor={c.primaryColor}
+                      name={c.name}
+                      className="!aspect-auto h-20 w-full"
+                    />
+                    <div className="p-2 space-y-1.5">
+                      <div className="h-2 bg-gray-100 rounded w-3/4" />
+                      <div className="h-2 bg-gray-100 rounded w-1/2" />
+                      <div className="h-5 rounded-lg mt-2" style={{ backgroundColor: `${c.primaryColor}22` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          {/* Glow below */}
+          <div className="absolute inset-x-16 bottom-0 h-12 bg-violet-500/20 blur-3xl -z-10" />
         </div>
       </div>
     </section>
@@ -195,6 +264,71 @@ function StatsBar() {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FeaturedCommunitiesSection() {
+  return (
+    <section className="bg-[#F8F7FF] py-24 overflow-hidden">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/20 rounded-full px-3 py-1 text-xs text-violet-400 mb-4">
+            <Trophy className="w-3 h-3" />
+            Comunidades em destaque
+          </div>
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            Explore comunidades premium
+          </h2>
+          <p className="text-gray-400 text-lg max-w-xl mx-auto">
+            Dezenas de comunidades automotivas esperando por você. Uma assinatura, acesso a todas.
+          </p>
+        </div>
+
+        {/* Horizontal scroll mobile / 3-col grid desktop */}
+        <div className="flex gap-5 overflow-x-auto pb-4 md:grid md:grid-cols-3 md:overflow-visible md:pb-0 snap-x snap-mandatory md:snap-none">
+          {featuredCommunities.map((community, i) => (
+            <div
+              key={community.slug}
+              className="flex-shrink-0 w-72 md:w-auto glass-card overflow-hidden card-hover snap-start animate-slide-up"
+              style={{ animationDelay: `${i * 75}ms` }}
+            >
+              <CommunityThumbnail
+                bannerUrl={community.bannerUrl}
+                primaryColor={community.primaryColor}
+                name={community.name}
+                className="!aspect-auto h-52"
+              />
+              <div className="p-5">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-bold text-gray-900">{community.name}</h3>
+                  <div className="flex items-center gap-1 text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                    <Users className="w-3 h-3" />
+                    {community.members}
+                  </div>
+                </div>
+                <p className="text-sm text-gray-500 leading-relaxed mb-4">{community.description}</p>
+                <Link
+                  href="/register"
+                  className="block w-full text-center text-sm font-semibold py-2 rounded-xl text-white transition-opacity hover:opacity-90"
+                  style={{ backgroundColor: community.primaryColor }}
+                >
+                  Ver comunidade <ChevronRight className="inline w-4 h-4 -mt-0.5" />
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="text-center mt-10">
+          <Link
+            href="/register"
+            className="inline-flex items-center gap-2 text-violet-600 hover:text-violet-700 font-medium text-sm border border-violet-200 hover:border-violet-300 px-5 py-2.5 rounded-xl transition-all hover:bg-violet-50"
+          >
+            Ver todas as comunidades <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
       </div>
     </section>
@@ -285,10 +419,10 @@ function PricingSection() {
                 </div>
                 <div className="flex items-end justify-center gap-1">
                   <span className="text-gray-400 text-xl">R$</span>
-                  <span className="text-6xl font-bold text-gray-900">600</span>
+                  <span className="text-6xl font-bold text-gray-900">837</span>
                   <span className="text-gray-400 text-xl mb-2">/ano</span>
                 </div>
-                <p className="text-gray-500 text-sm mt-2">Menos de R$50 por mês</p>
+                <p className="text-gray-500 text-sm mt-2">R$69,75 por mês</p>
               </div>
 
               <ul className="space-y-3 mb-8">
@@ -328,32 +462,27 @@ function TestimonialsSection() {
           <p className="text-gray-400 text-lg">Milhares de criadores e membros satisfeitos.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {testimonials.map(({ name, role, company, avatarUrl, text, stars }) => (
-            <div key={name} className="glass-card p-6">
-              <div className="flex gap-1 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          {testimonials.map(({ name, role, text, stars, avatarColor, initials }) => (
+            <div key={name} className="glass-card p-7 flex flex-col gap-5">
+              <div className="flex gap-1">
                 {Array.from({ length: stars }).map((_, i) => (
                   <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                 ))}
               </div>
 
-              <p className="text-gray-600 text-sm leading-relaxed mb-6">&quot;{text}&quot;</p>
+              <p className="text-gray-600 text-sm leading-relaxed flex-1">&quot;{text}&quot;</p>
 
-              <div className="flex items-center gap-3">
-                <Image
-                  src={avatarUrl}
-                  alt={name}
-                  width={48}
-                  height={48}
-                  className="w-12 h-12 rounded-full object-cover flex-shrink-0 border border-gray-200"
-                />
+              <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
+                <div className={`w-11 h-11 rounded-full bg-gradient-to-br ${avatarColor} flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
+                  {initials}
+                </div>
                 <div>
                   <div className="flex items-center gap-1.5">
                     <p className="text-gray-900 font-semibold text-sm">{name}</p>
                     <BadgeCheck className="w-4 h-4 text-violet-400 flex-shrink-0" />
                   </div>
                   <p className="text-gray-400 text-xs">{role}</p>
-                  <p className="text-gray-600 text-xs">{company}</p>
                 </div>
               </div>
             </div>
@@ -380,7 +509,7 @@ function CTASection() {
             </div>
 
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6 max-w-2xl mx-auto">
-              R$600/ano. Acesso a tudo. Cancele quando quiser.
+              R$837/ano. Acesso a tudo. Cancele quando quiser.
             </h2>
 
             <p className="text-violet-100 text-lg mb-10 max-w-xl mx-auto">
@@ -414,6 +543,7 @@ export default function HomePage() {
       <NavBar />
       <HeroSection />
       <StatsBar />
+      <FeaturedCommunitiesSection />
       <FeaturesSection />
       <HowItWorksSection />
       <PricingSection />

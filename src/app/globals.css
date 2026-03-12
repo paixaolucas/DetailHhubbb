@@ -206,6 +206,21 @@
     background-size: 40px 40px;
   }
 
+  /* Dot pattern for thumbnails */
+  .dot-pattern {
+    background-image: radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  /* Hover card scale */
+  .card-hover {
+    transition: transform 200ms ease, box-shadow 200ms ease;
+  }
+  .card-hover:hover {
+    transform: scale(1.02);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  }
+
   /* Noise overlay */
   .noise-overlay::before {
     content: "";
