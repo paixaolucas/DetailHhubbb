@@ -24,14 +24,14 @@ import {
 } from "recharts";
 
 const chartStyle = {
-  grid: { strokeDasharray: "3 3", stroke: "rgba(255,255,255,0.05)" },
+  grid: { strokeDasharray: "3 3", stroke: "rgba(0,0,0,0.08)" },
   axis: { tick: { fontSize: 11, fill: "#6b7280" }, tickLine: false, axisLine: false },
   tooltip: {
     contentStyle: {
-      backgroundColor: "#16152A",
-      border: "1px solid rgba(255,255,255,0.1)",
+      backgroundColor: "#ffffff",
+      border: "1px solid #e5e7eb",
       borderRadius: "12px",
-      color: "#f9fafb",
+      color: "#111827",
       fontSize: "13px",
     },
   },

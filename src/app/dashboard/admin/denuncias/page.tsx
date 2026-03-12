@@ -7,7 +7,7 @@
 // =============================================================================
 
 import { useState, useEffect, useCallback } from "react";
-import { AlertTriangle, CheckCircle, EyeOff, Filter, RefreshCw, Clock } from "lucide-react";
+import { AlertTriangle, CheckCircle, EyeOff, Filter, RefreshCw, Clock, Eye, X, Ban } from "lucide-react";
 import { useToast } from "@/components/ui/toast-provider";
 
 // ---------------------------------------------------------------------------
@@ -71,6 +71,132 @@ const STATUS_CONFIG: Record<ReportStatus, { label: string; color: string }> = {
 };
 
 // ---------------------------------------------------------------------------
+// ContentPreviewModal
+// ---------------------------------------------------------------------------
+
+interface ContentPreview {
+  type: string;
+  id: string;
+  body?: string;
+  title?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  role?: string;
+}
+
+function ContentPreviewModal({
+  report,
+  onClose,
+  onAction,
+}: {
+  report: Report;
+  onClose: () => void;
+  onAction: (id: string, status: "RESOLVED" | "IGNORED") => void;
+}) {
+  const [content, setContent] = useState<ContentPreview | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const token = localStorage.getItem("detailhub_access_token");
+    const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+
+    async function load() {
+      try {
+        let url = "";
+        if (report.targetType === "POST") url = `/api/posts/${report.targetId}`;
+        else if (report.targetType === "COMMENT") url = `/api/comments/${report.targetId}`;
+        else if (report.targetType === "USER") url = `/api/users/${report.targetId}`;
+        else { setContent({ type: report.targetType, id: report.targetId }); setLoading(false); return; }
+
+        const res = await fetch(url, { headers });
+        const data = await res.json();
+        if (data.success) {
+          const d = data.data;
+          setContent({
+            type: report.targetType,
+            id: report.targetId,
+            body: d.body ?? d.content,
+            title: d.title,
+            firstName: d.firstName ?? d.author?.firstName,
+            lastName: d.lastName ?? d.author?.lastName,
+            email: d.email,
+            role: d.role,
+          });
+        } else {
+          setContent({ type: report.targetType, id: report.targetId, body: "Conteúdo não disponível ou removido." });
+        }
+      } catch {
+        setContent({ type: report.targetType, id: report.targetId, body: "Erro ao carregar conteúdo." });
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, [report]);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white border border-gray-200 rounded-2xl shadow-2xl w-full max-w-lg animate-slide-up">
+        <div className="p-5 border-b border-gray-200 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-gray-900">
+            Conteúdo reportado — {TARGET_LABELS[report.targetType] ?? report.targetType}
+          </h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-900 p-1 rounded-lg hover:bg-gray-100 transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="p-5">
+          {loading ? (
+            <div className="space-y-2 animate-pulse">
+              <div className="h-4 bg-gray-100 rounded w-3/4" />
+              <div className="h-4 bg-gray-100 rounded w-full" />
+              <div className="h-4 bg-gray-100 rounded w-2/3" />
+            </div>
+          ) : content ? (
+            <div className="space-y-3">
+              {content.type === "USER" ? (
+                <div className="space-y-1">
+                  <p className="text-sm font-semibold text-gray-900">{content.firstName} {content.lastName}</p>
+                  {content.email && <p className="text-xs text-gray-500">{content.email}</p>}
+                  {content.role && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md">{content.role}</span>}
+                </div>
+              ) : (
+                <div className="bg-gray-50 rounded-xl p-4 text-sm text-gray-700 leading-relaxed whitespace-pre-wrap break-words max-h-48 overflow-y-auto">
+                  {content.body ?? "Sem conteúdo"}
+                </div>
+              )}
+              <p className="text-xs text-gray-400 font-mono">ID: {content.id}</p>
+            </div>
+          ) : null}
+        </div>
+
+        {report.status === "PENDING" && (
+          <div className="p-5 border-t border-gray-200 flex items-center gap-2">
+            <button
+              onClick={() => { onAction(report.id, "RESOLVED"); onClose(); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 hover:bg-green-100 border border-green-200 text-green-700 text-xs font-medium rounded-lg transition-colors"
+            >
+              <CheckCircle className="w-3.5 h-3.5" />
+              Resolver
+            </button>
+            <button
+              onClick={() => { onAction(report.id, "IGNORED"); onClose(); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 text-xs font-medium rounded-lg transition-colors"
+            >
+              <EyeOff className="w-3.5 h-3.5" />
+              Ignorar
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Skeleton
 // ---------------------------------------------------------------------------
 
@@ -106,6 +232,7 @@ export default function AdminDenunciasPage() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [previewReport, setPreviewReport] = useState<Report | null>(null);
 
   const fetchReports = useCallback(async (p: number, status: string) => {
     setLoading(true);
@@ -265,26 +392,35 @@ export default function AdminDenunciasPage() {
                 </div>
 
                 {/* Actions */}
-                {isPending && (
-                  <div className="flex items-center gap-2 pl-11">
-                    <button
-                      onClick={() => handleAction(report.id, "RESOLVED")}
-                      disabled={isActing}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 hover:bg-green-100 border border-green-200 text-green-700 text-xs font-medium rounded-lg transition-colors disabled:opacity-50"
-                    >
-                      <CheckCircle className="w-3.5 h-3.5" />
-                      {isActing ? "Processando..." : "Resolver"}
-                    </button>
-                    <button
-                      onClick={() => handleAction(report.id, "IGNORED")}
-                      disabled={isActing}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 text-xs font-medium rounded-lg transition-colors disabled:opacity-50"
-                    >
-                      <EyeOff className="w-3.5 h-3.5" />
-                      Ignorar
-                    </button>
-                  </div>
-                )}
+                <div className="flex items-center gap-2 pl-11">
+                  <button
+                    onClick={() => setPreviewReport(report)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-medium rounded-lg transition-colors"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    Ver conteúdo
+                  </button>
+                  {isPending && (
+                    <>
+                      <button
+                        onClick={() => handleAction(report.id, "RESOLVED")}
+                        disabled={isActing}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 hover:bg-green-100 border border-green-200 text-green-700 text-xs font-medium rounded-lg transition-colors disabled:opacity-50"
+                      >
+                        <CheckCircle className="w-3.5 h-3.5" />
+                        {isActing ? "Processando..." : "Resolver"}
+                      </button>
+                      <button
+                        onClick={() => handleAction(report.id, "IGNORED")}
+                        disabled={isActing}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 text-xs font-medium rounded-lg transition-colors disabled:opacity-50"
+                      >
+                        <EyeOff className="w-3.5 h-3.5" />
+                        Ignorar
+                      </button>
+                    </>
+                  )}
+                </div>
 
                 {/* Resolved timestamp */}
                 {!isPending && report.resolvedAt && (
@@ -297,6 +433,15 @@ export default function AdminDenunciasPage() {
           })
         )}
       </div>
+
+      {/* Content preview modal */}
+      {previewReport && (
+        <ContentPreviewModal
+          report={previewReport}
+          onClose={() => setPreviewReport(null)}
+          onAction={handleAction}
+        />
+      )}
 
       {/* Pagination */}
       {pagination && pagination.totalPages > 1 && (

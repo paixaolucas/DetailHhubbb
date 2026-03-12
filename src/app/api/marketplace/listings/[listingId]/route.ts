@@ -9,6 +9,49 @@ import { AppError, ForbiddenError, NotFoundError } from "@/types";
 import { UserRole, MarketplaceListingStatus, MarketplaceListingType } from "@prisma/client";
 import { z } from "zod";
 
+export const GET = withAuth(async (req, { session, params }) => {
+  try {
+    const listingId = params?.listingId;
+    if (!listingId) return NextResponse.json({ success: false, error: "listingId required" }, { status: 400 });
+
+    const listing = await db.marketplaceListing.findUnique({
+      where: { id: listingId },
+      include: {
+        seller: {
+          select: { id: true, firstName: true, lastName: true, avatarUrl: true },
+        },
+        _count: { select: { purchases: true } },
+      },
+    });
+
+    if (!listing) {
+      return NextResponse.json({ success: false, error: "Listing not found" }, { status: 404 });
+    }
+
+    // Fetch other listings by the same seller
+    const otherListings = await db.marketplaceListing.findMany({
+      where: {
+        sellerId: listing.sellerId,
+        id: { not: listingId },
+        status: MarketplaceListingStatus.ACTIVE,
+      },
+      take: 3,
+      include: {
+        seller: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } },
+        _count: { select: { purchases: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return NextResponse.json({ success: true, data: { ...listing, otherListings } });
+  } catch (error) {
+    if (error instanceof AppError) {
+      return NextResponse.json({ success: false, error: error.message }, { status: error.statusCode });
+    }
+    return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
+  }
+});
+
 const updateListingSchema = z.object({
   title: z.string().min(3).max(200).optional(),
   description: z.string().min(10).max(5000).optional(),

@@ -46,6 +46,7 @@ export const GET = withAuth(async (req, { session }) => {
     const search = searchParams.get("search");
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1"));
     const pageSize = Math.min(50, Math.max(1, parseInt(searchParams.get("pageSize") ?? "20")));
+    const sort = searchParams.get("sort") ?? "featured";
 
     const where: any = {
       ...(mine ? { sellerId: session.userId } : { status: MarketplaceListingStatus.ACTIVE }),
@@ -77,7 +78,15 @@ export const GET = withAuth(async (req, { session }) => {
         where,
         skip: (page - 1) * pageSize,
         take: pageSize,
-        orderBy: mine ? { createdAt: "desc" } : { isFeatured: "desc" },
+        orderBy: mine
+          ? { createdAt: "desc" }
+          : sort === "price_asc"
+          ? { price: "asc" }
+          : sort === "price_desc"
+          ? { price: "desc" }
+          : sort === "newest"
+          ? { createdAt: "desc" }
+          : { isFeatured: "desc" },
         include: {
           seller: {
             select: { id: true, firstName: true, lastName: true, avatarUrl: true },

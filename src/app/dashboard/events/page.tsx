@@ -407,6 +407,118 @@ function AttendeesModal({ eventId, eventTitle, onClose }: { eventId: string; eve
 }
 
 // ---------------------------------------------------------------------------
+// EditEventModal
+// ---------------------------------------------------------------------------
+function EditEventModal({ event, onClose, onSaved }: { event: Event; onClose: () => void; onSaved: () => void }) {
+  const toast = useToast();
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({
+    title: event.title,
+    type: event.type,
+    startAt: event.startAt ? new Date(event.startAt).toISOString().slice(0, 16) : "",
+    endAt: event.endAt ? new Date(event.endAt).toISOString().slice(0, 16) : "",
+    location: event.location ?? "",
+    capacity: event.capacity ? String(event.capacity) : "",
+    isPublic: event.isPublic,
+    coverImageUrl: event.coverImageUrl ?? "",
+  });
+
+  const set = (k: string, v: string | boolean) => setForm((f) => ({ ...f, [k]: v }));
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!form.title || !form.startAt) { toast.error("Preencha título e data de início"); return; }
+    setLoading(true);
+    try {
+      const body: Record<string, unknown> = {
+        title: form.title,
+        type: form.type,
+        startAt: new Date(form.startAt).toISOString(),
+        endAt: form.endAt ? new Date(form.endAt).toISOString() : null,
+        location: form.location || null,
+        capacity: form.capacity ? parseInt(form.capacity) : null,
+        isPublic: form.isPublic,
+        coverImageUrl: form.coverImageUrl || null,
+      };
+      const res = await fetch(`/api/events/${event.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error);
+      toast.success("Evento atualizado!");
+      onSaved();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erro ao salvar");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+      <div className="glass-card w-full max-w-lg p-6 animate-slide-up max-h-[90vh] overflow-y-auto">
+        <h2 className="text-lg font-semibold text-white mb-4">Editar Evento</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm text-gray-400 mb-1">Título *</label>
+            <input className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500" value={form.title} onChange={(e) => set("title", e.target.value)} />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-400 mb-1">Formato *</label>
+            <select className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500" value={form.type} onChange={(e) => set("type", e.target.value as EventType)}>
+              <option value="ONLINE">Online</option>
+              <option value="IN_PERSON">Presencial</option>
+              <option value="HYBRID">Híbrido</option>
+            </select>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Data Início *</label>
+              <input type="datetime-local" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500" value={form.startAt} onChange={(e) => set("startAt", e.target.value)} />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Data Fim</label>
+              <input type="datetime-local" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500" value={form.endAt} onChange={(e) => set("endAt", e.target.value)} />
+            </div>
+          </div>
+          {(form.type === "IN_PERSON" || form.type === "HYBRID") && (
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Local / Endereço</label>
+              <input className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500" placeholder="Rua, número, cidade" value={form.location} onChange={(e) => set("location", e.target.value)} />
+            </div>
+          )}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Capacidade</label>
+              <input type="number" min="1" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500" placeholder="Ilimitado" value={form.capacity} onChange={(e) => set("capacity", e.target.value)} />
+            </div>
+            <div className="flex items-end pb-2">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <div onClick={() => set("isPublic", !form.isPublic)} className={`w-10 h-5 rounded-full transition-colors cursor-pointer ${form.isPublic ? "bg-blue-500" : "bg-white/10"}`}>
+                  <div className={`w-4 h-4 bg-white rounded-full mt-0.5 transition-transform ${form.isPublic ? "translate-x-5 ml-0.5" : "translate-x-0.5"}`} />
+                </div>
+                <span className="text-gray-300 text-sm">Público</span>
+              </label>
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm text-gray-400 mb-1">Capa (URL)</label>
+            <input className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500" placeholder="https://..." value={form.coverImageUrl} onChange={(e) => set("coverImageUrl", e.target.value)} />
+          </div>
+          <div className="flex gap-3 pt-2">
+            <button type="button" onClick={onClose} className="flex-1 py-2 border border-white/10 rounded-lg text-gray-400 text-sm hover:bg-white/5 transition-colors">Cancelar</button>
+            <button type="submit" disabled={loading} className="flex-1 btn-premium py-2 rounded-lg text-sm font-medium disabled:opacity-50">{loading ? "Salvando..." : "Salvar"}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // EventCard
 // ---------------------------------------------------------------------------
 function EventCard({
@@ -415,12 +527,14 @@ function EventCard({
   onDelete,
   onAddTicket,
   onViewAttendees,
+  onEdit,
 }: {
   event: Event;
   onPublish: (id: string) => void;
   onDelete: (id: string) => void;
   onAddTicket: (id: string) => void;
   onViewAttendees: (event: Event) => void;
+  onEdit: (event: Event) => void;
 }) {
   const { label, color } = STATUS_CONFIG[event.status];
   const { label: typeLabel, icon: TypeIcon, color: typeColor } = TYPE_CONFIG[event.type];
@@ -511,6 +625,13 @@ function EventCard({
           <Eye size={11} />
           Participantes
         </button>
+        <button
+          onClick={() => onEdit(event)}
+          className="flex items-center gap-1 px-2.5 py-1.5 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-yellow-400 text-xs hover:bg-yellow-500/20 transition-colors"
+        >
+          <Edit3 size={11} />
+          Editar
+        </button>
         {(event.status === "DRAFT" || event.status === "CANCELED") && (
           <button
             onClick={() => onDelete(event.id)}
@@ -534,6 +655,7 @@ export default function EventsPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [addTicketEventId, setAddTicketEventId] = useState<string | null>(null);
   const [attendeesEvent, setAttendeesEvent] = useState<Event | null>(null);
+  const [editEvent, setEditEvent] = useState<Event | null>(null);
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -682,6 +804,7 @@ export default function EventsPage() {
               onDelete={handleDelete}
               onAddTicket={(id) => setAddTicketEventId(id)}
               onViewAttendees={(e) => setAttendeesEvent(e)}
+              onEdit={(e) => setEditEvent(e)}
             />
           ))}
         </div>
@@ -719,6 +842,13 @@ export default function EventsPage() {
           eventId={attendeesEvent.id}
           eventTitle={attendeesEvent.title}
           onClose={() => setAttendeesEvent(null)}
+        />
+      )}
+      {editEvent && (
+        <EditEventModal
+          event={editEvent}
+          onClose={() => setEditEvent(null)}
+          onSaved={() => { setEditEvent(null); load(); }}
         />
       )}
     </div>

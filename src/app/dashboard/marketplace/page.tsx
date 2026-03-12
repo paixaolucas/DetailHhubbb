@@ -1,15 +1,11 @@
 "use client";
 
-// =============================================================================
-// MARKETPLACE PAGE — DetailHub Dark Theme
-// Fetches listings via API (auth-aware: members only see community listings)
-// =============================================================================
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { ShoppingBag, Star, Sparkles, Search } from "lucide-react";
-import { BuyButton } from "@/components/marketplace/buy-button";
+import Link from "next/link";
+import { ShoppingBag, Star, Sparkles, Search, ChevronDown } from "lucide-react";
 import { SellButton } from "@/components/marketplace/sell-button";
+import { Pagination } from "@/components/ui/pagination";
 
 interface Listing {
   id: string;
@@ -40,18 +36,25 @@ const TYPE_LABELS: Record<string, { label: string; color: string }> = {
   SERVICE: { label: "Serviço", color: "bg-pink-500/10 text-pink-400 border-pink-500/20" },
 };
 
+const SORT_OPTIONS = [
+  { value: "featured", label: "Destaques" },
+  { value: "newest", label: "Mais recentes" },
+  { value: "price_asc", label: "Menor preço" },
+  { value: "price_desc", label: "Maior preço" },
+];
+
 function ListingSkeleton() {
   return (
     <div className="glass-card overflow-hidden animate-pulse">
-      <div className="h-40 bg-white" />
+      <div className="h-40 bg-white/5" />
       <div className="p-5 space-y-3">
-        <div className="h-3 bg-gray-50 rounded w-16" />
-        <div className="h-4 bg-gray-50 rounded w-3/4" />
-        <div className="h-3 bg-gray-50 rounded w-full" />
-        <div className="h-3 bg-gray-50 rounded w-2/3" />
-        <div className="flex items-center justify-between pt-3 border-t border-gray-200">
-          <div className="h-5 bg-gray-50 rounded w-20" />
-          <div className="h-8 bg-gray-50 rounded-xl w-24" />
+        <div className="h-3 bg-white/10 rounded w-16" />
+        <div className="h-4 bg-white/10 rounded w-3/4" />
+        <div className="h-3 bg-white/10 rounded w-full" />
+        <div className="h-3 bg-white/10 rounded w-2/3" />
+        <div className="flex items-center justify-between pt-3 border-t border-white/10">
+          <div className="h-5 bg-white/10 rounded w-20" />
+          <div className="h-8 bg-white/10 rounded-xl w-24" />
         </div>
       </div>
     </div>
@@ -63,29 +66,47 @@ export default function MarketplacePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
+  const [sort, setSort] = useState("featured");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
-  useEffect(() => {
+  const fetchListings = useCallback(async (p: number, q: string, type: string, s: string) => {
     const token = localStorage.getItem("detailhub_access_token");
-    if (!token) {
-      setIsLoading(false);
-      return;
-    }
+    if (!token) { setIsLoading(false); return; }
 
     const params = new URLSearchParams();
-    if (search) params.set("search", search);
-    if (typeFilter) params.set("type", typeFilter);
-    params.set("pageSize", "50");
+    if (q) params.set("search", q);
+    if (type) params.set("type", type);
+    params.set("sort", s);
+    params.set("page", String(p));
+    params.set("pageSize", "12");
 
-    fetch(`/api/marketplace/listings?${params}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.success) setListings(d.data ?? []);
-      })
-      .catch(() => {})
-      .finally(() => setIsLoading(false));
-  }, [search, typeFilter]);
+    try {
+      const res = await fetch(`/api/marketplace/listings?${params}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const d = await res.json();
+      if (d.success) {
+        setListings(d.data ?? []);
+        setTotalPages(d.pagination?.totalPages ?? 1);
+        setTotal(d.pagination?.totalCount ?? 0);
+      }
+    } catch {
+      // silent
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const t = setTimeout(() => fetchListings(page, search, typeFilter, sort), search ? 300 : 0);
+    return () => clearTimeout(t);
+  }, [page, search, typeFilter, sort, fetchListings]);
+
+  // Reset page on filter change
+  useEffect(() => { setPage(1); }, [search, typeFilter, sort]);
 
   return (
     <div className="space-y-6">
@@ -108,16 +129,31 @@ export default function MarketplacePage() {
             className="bg-transparent text-sm text-gray-900 placeholder-gray-600 outline-none flex-1"
           />
         </div>
-        <select
-          value={typeFilter}
-          onChange={(e) => setTypeFilter(e.target.value)}
-          className="bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-600 outline-none"
-        >
-          <option value="">Todos os tipos</option>
-          {Object.entries(TYPE_LABELS).map(([key, { label }]) => (
-            <option key={key} value={key}>{label}</option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            className="appearance-none bg-white border border-gray-200 rounded-xl px-3 py-2 pr-8 text-sm text-gray-600 outline-none"
+          >
+            <option value="">Todos os tipos</option>
+            {Object.entries(TYPE_LABELS).map(([key, { label }]) => (
+              <option key={key} value={key}>{label}</option>
+            ))}
+          </select>
+          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+        </div>
+        <div className="relative">
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+            className="appearance-none bg-white border border-gray-200 rounded-xl px-3 py-2 pr-8 text-sm text-gray-600 outline-none"
+          >
+            {SORT_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+        </div>
       </div>
 
       {/* Grid */}
@@ -146,9 +182,10 @@ export default function MarketplacePage() {
             };
 
             return (
-              <div
+              <Link
                 key={listing.id}
-                className="glass-card overflow-hidden hover:border-violet-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-violet-500/10 group relative"
+                href={`/dashboard/marketplace/${listing.id}`}
+                className="glass-card overflow-hidden hover:border-violet-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-violet-500/10 group relative block"
               >
                 {/* Cover */}
                 {listing.coverImageUrl ? (
@@ -208,24 +245,28 @@ export default function MarketplacePage() {
                     )}
                   </div>
 
-                  <div className="flex items-center justify-between pt-3 border-t border-gray-200">
+                  <div className="pt-3 border-t border-gray-200">
                     <span className="text-xl font-bold text-gray-900">
                       R${" "}
                       {Number(listing.price).toLocaleString("pt-BR", {
                         minimumFractionDigits: 2,
                       })}
                     </span>
-                    <BuyButton
-                      listingId={listing.id}
-                      price={Number(listing.price)}
-                      title={listing.title}
-                    />
                   </div>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>
+      )}
+
+      {!isLoading && listings.length > 0 && (
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+          total={total}
+        />
       )}
     </div>
   );

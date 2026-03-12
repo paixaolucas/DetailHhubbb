@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Users, Search, Ban, CheckCircle, ShieldAlert, ShieldCheck, UserX } from "lucide-react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { Users, Search, Ban, CheckCircle, ShieldAlert, ShieldCheck, UserX, ChevronLeft, ChevronRight } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { useToast } from "@/components/ui/toast-provider";
 
@@ -41,6 +41,8 @@ interface Stats {
   influencers: number;
 }
 
+const PAGE_SIZE = 20;
+
 export default function UsuariosPage() {
   const toast = useToast();
   const [users, setUsers] = useState<User[]>([]);
@@ -49,14 +51,74 @@ export default function UsuariosPage() {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("ALL");
   const [statusFilter, setStatusFilter] = useState("ALL");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [roleLoading, setRoleLoading] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [banTarget, setBanTarget] = useState<string | null>(null);
 
+  // Bulk selection
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
+  const [bulkProgress, setBulkProgress] = useState("");
+
+  const searchRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
     setCurrentUserId(localStorage.getItem("detailhub_user_id"));
   }, []);
+
+  const fetchUsers = useCallback(async (p: number, q: string, role: string, status: string) => {
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem("detailhub_access_token");
+      const params = new URLSearchParams({ page: String(p), pageSize: String(PAGE_SIZE) });
+      if (q) params.set("search", q);
+      if (role !== "ALL") params.set("role", role);
+      // Note: status filtering is client-side since API doesn't support it yet
+
+      const res = await fetch(`/api/users?${params}`, { headers: { Authorization: `Bearer ${token}` } });
+      const d = await res.json();
+      if (d.success) {
+        let list: User[] = d.data ?? [];
+        // Client-side status filter
+        if (status === "ACTIVE") list = list.filter((u) => u.isActive && !u.isBanned);
+        else if (status === "BANNED") list = list.filter((u) => u.isBanned);
+        else if (status === "INACTIVE") list = list.filter((u) => !u.isActive);
+
+        setUsers(list);
+        setTotal(d.pagination?.total ?? list.length);
+        setTotalPages(d.pagination?.totalPages ?? 1);
+        // Compute stats from first page response (approximation)
+        setStats({
+          total: d.pagination?.total ?? list.length,
+          active: list.filter((u) => u.isActive && !u.isBanned).length,
+          banned: list.filter((u) => u.isBanned).length,
+          influencers: list.filter((u) => u.role === "INFLUENCER_ADMIN").length,
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Debounce search
+  const handleSearchChange = (val: string) => {
+    setSearch(val);
+    if (searchRef.current) clearTimeout(searchRef.current);
+    searchRef.current = setTimeout(() => {
+      setPage(1);
+      fetchUsers(1, val, roleFilter, statusFilter);
+    }, 300);
+  };
+
+  useEffect(() => {
+    fetchUsers(page, search, roleFilter, statusFilter);
+    setSelected(new Set());
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, roleFilter, statusFilter]);
 
   async function updateRole(userId: string, role: string) {
     if (userId === currentUserId) return;
@@ -82,25 +144,6 @@ export default function UsuariosPage() {
       }
     } finally { setRoleLoading(null); }
   }
-
-  useEffect(() => {
-    const token = localStorage.getItem("detailhub_access_token");
-    fetch("/api/users", { headers: { Authorization: `Bearer ${token}` } })
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.success) {
-          const u = d.data ?? [];
-          setUsers(u);
-          setStats({
-            total: u.length,
-            active: u.filter((x: User) => x.isActive && !x.isBanned).length,
-            banned: u.filter((x: User) => x.isBanned).length,
-            influencers: u.filter((x: User) => x.role === "INFLUENCER_ADMIN").length,
-          });
-        }
-      })
-      .finally(() => setIsLoading(false));
-  }, []);
 
   async function updateStatus(userId: string, action: "ban" | "unban" | "deactivate" | "activate") {
     setActionLoading(userId);
@@ -132,27 +175,55 @@ export default function UsuariosPage() {
     } finally { setActionLoading(null); }
   }
 
-  const filtered = users.filter((u) => {
-    const matchSearch =
-      search === "" ||
-      u.firstName.toLowerCase().includes(search.toLowerCase()) ||
-      u.lastName.toLowerCase().includes(search.toLowerCase()) ||
-      u.email.toLowerCase().includes(search.toLowerCase());
-    const matchRole = roleFilter === "ALL" || u.role === roleFilter;
-    const matchStatus =
-      statusFilter === "ALL" ||
-      (statusFilter === "ACTIVE" && u.isActive && !u.isBanned) ||
-      (statusFilter === "BANNED" && u.isBanned) ||
-      (statusFilter === "INACTIVE" && !u.isActive);
-    return matchSearch && matchRole && matchStatus;
-  });
+  // Bulk actions
+  const toggleSelect = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selected.size === users.length) setSelected(new Set());
+    else setSelected(new Set(users.map((u) => u.id)));
+  };
+
+  async function bulkAction(action: "ban" | "activate") {
+    const ids = Array.from(selected);
+    if (!ids.length) return;
+    setBulkLoading(true);
+    const token = localStorage.getItem("detailhub_access_token");
+    const body = action === "ban" ? { isBanned: true } : { isActive: true, isBanned: false };
+    let done = 0;
+    const results = await Promise.allSettled(
+      ids.map((id) =>
+        fetch(`/api/users/${id}/status`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify(body),
+        }).then(() => {
+          done++;
+          setBulkProgress(`Processando ${done} de ${ids.length}...`);
+        })
+      )
+    );
+    const failed = results.filter((r) => r.status === "rejected").length;
+    setBulkLoading(false);
+    setBulkProgress("");
+    setSelected(new Set());
+    if (failed > 0) toast.error(`${failed} erro(s) ao processar`);
+    else toast.success(`${ids.length} usuário(s) atualizados`);
+    fetchUsers(page, search, roleFilter, statusFilter);
+  }
 
   function formatDate(d: string | null) {
     if (!d) return "—";
     return new Date(d).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
   }
 
-  if (isLoading) {
+  if (isLoading && users.length === 0) {
     return (
       <div className="space-y-6 animate-pulse">
         <div className="h-8 bg-gray-50 rounded-xl w-32" />
@@ -170,13 +241,13 @@ export default function UsuariosPage() {
           <div className="divide-y divide-white/5">
             {[...Array(5)].map((_, i) => (
               <div key={i} className="flex items-center gap-4 px-4 py-3">
+                <div className="w-4 h-4 bg-gray-50 rounded" />
                 <div className="w-8 h-8 bg-gray-50 rounded-xl flex-shrink-0" />
                 <div className="flex-1 space-y-1.5">
                   <div className="h-3.5 bg-gray-50 rounded w-36" />
                   <div className="h-3 bg-gray-50 rounded w-48" />
                 </div>
                 <div className="h-6 bg-gray-50 rounded-full w-20 hidden sm:block" />
-                <div className="h-6 bg-gray-50 rounded-full w-16 hidden md:block" />
               </div>
             ))}
           </div>
@@ -218,14 +289,14 @@ export default function UsuariosPage() {
             <input
               type="text"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               placeholder="Buscar por nome ou email..."
               className="w-full bg-white border border-gray-200 focus:border-violet-400 rounded-xl pl-10 pr-4 py-2.5 text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all"
             />
           </div>
           <select
             value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
+            onChange={(e) => { setRoleFilter(e.target.value); setPage(1); }}
             className="bg-white border border-gray-200 hover:border-violet-200 rounded-xl px-4 py-2.5 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400/30"
           >
             <option value="ALL">Todos os roles</option>
@@ -236,7 +307,7 @@ export default function UsuariosPage() {
           </select>
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
             className="bg-white border border-gray-200 hover:border-violet-200 rounded-xl px-4 py-2.5 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400/30"
           >
             <option value="ALL">Todos os status</option>
@@ -248,7 +319,7 @@ export default function UsuariosPage() {
       </div>
 
       {/* Table */}
-      {filtered.length === 0 ? (
+      {users.length === 0 && !isLoading ? (
         <div className="glass-card p-12 text-center">
           <Users className="w-10 h-10 text-gray-500 mx-auto mb-3" />
           <p className="text-gray-400 text-sm">Nenhum usuário encontrado.</p>
@@ -257,13 +328,21 @@ export default function UsuariosPage() {
         <div className="glass-card overflow-hidden">
           <div className="p-4 border-b border-gray-200 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-gray-900">
-              {filtered.length} usuário(s)
+              {isLoading ? "Carregando..." : `${total} usuário(s)`}
             </h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100">
+                  <th className="px-4 py-3 w-10">
+                    <input
+                      type="checkbox"
+                      checked={users.length > 0 && selected.size === users.length}
+                      onChange={toggleSelectAll}
+                      className="rounded border-gray-300 text-violet-600 focus:ring-violet-400"
+                    />
+                  </th>
                   <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-4 py-3">Usuário</th>
                   <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-4 py-3 hidden sm:table-cell">Role</th>
                   <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-4 py-3 hidden md:table-cell">Status</th>
@@ -274,8 +353,16 @@ export default function UsuariosPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {filtered.map((user) => (
-                  <tr key={user.id} className="hover:bg-violet-50 transition-colors">
+                {users.map((user) => (
+                  <tr key={user.id} className={`hover:bg-violet-50 transition-colors ${selected.has(user.id) ? "bg-violet-50" : ""}`}>
+                    <td className="px-4 py-3">
+                      <input
+                        type="checkbox"
+                        checked={selected.has(user.id)}
+                        onChange={() => toggleSelect(user.id)}
+                        className="rounded border-gray-300 text-violet-600 focus:ring-violet-400"
+                      />
+                    </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-violet-500/20 rounded-xl flex items-center justify-center text-violet-400 font-semibold text-xs flex-shrink-0">
@@ -329,36 +416,20 @@ export default function UsuariosPage() {
                         ) : (
                           <>
                             {!user.isBanned ? (
-                              <button
-                                onClick={() => setBanTarget(user.id)}
-                                className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-                                title="Banir usuário"
-                              >
+                              <button onClick={() => setBanTarget(user.id)} className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors" title="Banir usuário">
                                 <Ban className="w-3.5 h-3.5" />
                               </button>
                             ) : (
-                              <button
-                                onClick={() => updateStatus(user.id, "unban")}
-                                className="p-1.5 text-gray-500 hover:text-green-400 hover:bg-green-500/10 rounded-lg transition-colors"
-                                title="Desbanir usuário"
-                              >
+                              <button onClick={() => updateStatus(user.id, "unban")} className="p-1.5 text-gray-500 hover:text-green-400 hover:bg-green-500/10 rounded-lg transition-colors" title="Desbanir usuário">
                                 <ShieldAlert className="w-3.5 h-3.5" />
                               </button>
                             )}
                             {user.isActive ? (
-                              <button
-                                onClick={() => updateStatus(user.id, "deactivate")}
-                                className="p-1.5 text-gray-500 hover:text-orange-400 hover:bg-orange-500/10 rounded-lg transition-colors"
-                                title="Desativar conta"
-                              >
+                              <button onClick={() => updateStatus(user.id, "deactivate")} className="p-1.5 text-gray-500 hover:text-orange-400 hover:bg-orange-500/10 rounded-lg transition-colors" title="Desativar conta">
                                 <UserX className="w-3.5 h-3.5" />
                               </button>
                             ) : (
-                              <button
-                                onClick={() => updateStatus(user.id, "activate")}
-                                className="p-1.5 text-gray-500 hover:text-green-400 hover:bg-green-500/10 rounded-lg transition-colors"
-                                title="Ativar conta"
-                              >
+                              <button onClick={() => updateStatus(user.id, "activate")} className="p-1.5 text-gray-500 hover:text-green-400 hover:bg-green-500/10 rounded-lg transition-colors" title="Ativar conta">
                                 <CheckCircle className="w-3.5 h-3.5" />
                               </button>
                             )}
@@ -371,6 +442,54 @@ export default function UsuariosPage() {
               </tbody>
             </table>
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="p-4 border-t border-gray-100 flex items-center justify-between">
+              <p className="text-sm text-gray-500">Página {page} de {totalPages}</p>
+              <div className="flex items-center gap-1">
+                <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 disabled:opacity-40 transition-colors">
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page >= totalPages} className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 disabled:opacity-40 transition-colors">
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Bulk action bar */}
+      {selected.size > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 bg-gray-900 border border-white/10 rounded-2xl px-5 py-3 shadow-2xl">
+          <span className="text-sm text-white font-medium">
+            {bulkLoading ? bulkProgress : `${selected.size} selecionado(s)`}
+          </span>
+          <div className="w-px h-5 bg-white/20" />
+          <button
+            onClick={() => bulkAction("ban")}
+            disabled={bulkLoading}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 text-xs font-medium rounded-xl transition-colors disabled:opacity-50"
+          >
+            <Ban className="w-3.5 h-3.5" />
+            Banir
+          </button>
+          <button
+            onClick={() => bulkAction("activate")}
+            disabled={bulkLoading}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500/20 hover:bg-green-500/30 text-green-400 text-xs font-medium rounded-xl transition-colors disabled:opacity-50"
+          >
+            <CheckCircle className="w-3.5 h-3.5" />
+            Ativar
+          </button>
+          <button
+            onClick={() => setSelected(new Set())}
+            disabled={bulkLoading}
+            className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-gray-300 text-xs font-medium rounded-xl transition-colors disabled:opacity-50"
+          >
+            Cancelar
+          </button>
         </div>
       )}
 
