@@ -7,6 +7,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { MessageCircle, ThumbsUp, Pin, MoreHorizontal, EyeOff, Eye, Trash2 } from "lucide-react";
 import ReactionBar from "@/components/feed/ReactionBar";
 import { useToast } from "@/components/ui/toast-provider";
@@ -85,9 +86,11 @@ function ImageGrid({ urls }: { urls: string[] }) {
   if (urls.length === 0) return null;
   if (urls.length === 1) {
     return (
-      <img
+      <Image
         src={urls[0]}
         alt=""
+        width={800}
+        height={288}
         className="w-full max-h-72 object-cover rounded-lg mt-3 border border-gray-200"
       />
     );
@@ -96,7 +99,7 @@ function ImageGrid({ urls }: { urls: string[] }) {
     return (
       <div className="grid grid-cols-2 gap-1 mt-3">
         {urls.map((url, i) => (
-          <img key={i} src={url} alt="" className="w-full h-36 object-cover rounded-lg border border-gray-200" />
+          <Image key={i} src={url} alt="" width={400} height={144} className="w-full h-36 object-cover rounded-lg border border-gray-200" />
         ))}
       </div>
     );
@@ -107,7 +110,7 @@ function ImageGrid({ urls }: { urls: string[] }) {
     <div className="grid grid-cols-2 gap-1 mt-3">
       {shown.map((url, i) => (
         <div key={i} className="relative">
-          <img src={url} alt="" className="w-full h-36 object-cover rounded-lg border border-gray-200" />
+          <Image src={url} alt="" width={400} height={144} className="w-full h-36 object-cover rounded-lg border border-gray-200" />
           {i === 3 && extra > 0 && (
             <div className="absolute inset-0 bg-black/60 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">+{extra}</span>
@@ -271,9 +274,11 @@ export default function PostCard({
         {/* Author row */}
         <div className="flex items-center gap-3 mb-3">
           {post.author.avatarUrl ? (
-            <img
+            <Image
               src={post.author.avatarUrl}
               alt={authorName}
+              width={32}
+              height={32}
               className="w-8 h-8 rounded-full object-cover flex-shrink-0 border border-gray-200"
             />
           ) : (

@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 import { Search, Users, ArrowLeft, Award } from "lucide-react";
 
@@ -147,7 +148,7 @@ export default function CommunityMembersPage() {
             <ArrowLeft className="w-4 h-4" />
           </Link>
           {community?.logoUrl ? (
-            <img src={community.logoUrl} alt={community.name} className="w-7 h-7 rounded-lg object-cover" />
+            <Image src={community.logoUrl} alt={community.name} width={28} height={28} className="w-7 h-7 rounded-lg object-cover" />
           ) : (
             <div
               className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-gray-900"
@@ -225,9 +226,11 @@ export default function CommunityMembersPage() {
                   >
                     {/* Avatar */}
                     {member.user.avatarUrl ? (
-                      <img
+                      <Image
                         src={member.user.avatarUrl}
                         alt={fullName}
+                        width={48}
+                        height={48}
                         className="w-12 h-12 rounded-full object-cover flex-shrink-0 border border-gray-200"
                       />
                     ) : (

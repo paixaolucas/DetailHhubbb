@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 import { ArrowLeft, Trash2, MessageCircle, Hash } from "lucide-react";
 import Link from "next/link";
 import ReactionBar from "@/components/feed/ReactionBar";
@@ -180,7 +181,7 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
     } finally {
       setLoading(false);
     }
-  }, [postId]);
+  }, [postId, communitySlug]);
 
   useEffect(() => {
     fetchPost();
@@ -347,9 +348,11 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
         {/* Author */}
         <div className="flex items-center gap-3 mb-5">
           {post.author.avatarUrl ? (
-            <img
+            <Image
               src={post.author.avatarUrl}
               alt={authorName}
+              width={40}
+              height={40}
               className="w-10 h-10 rounded-full object-cover border border-gray-200"
             />
           ) : (
@@ -385,9 +388,11 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
           <div className={`mt-4 grid gap-2 ${post.attachments.length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
             {post.attachments.map((url, i) => (
               <a key={i} href={url} target="_blank" rel="noopener noreferrer">
-                <img
+                <Image
                   src={url}
                   alt=""
+                  width={800}
+                  height={384}
                   className="w-full rounded-xl object-cover border border-gray-200 hover:opacity-90 transition-opacity cursor-zoom-in max-h-96"
                 />
               </a>

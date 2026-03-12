@@ -6,6 +6,7 @@
 // =============================================================================
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { ShoppingBag, Star, Sparkles, Search } from "lucide-react";
 import { BuyButton } from "@/components/marketplace/buy-button";
 import { SellButton } from "@/components/marketplace/sell-button";
@@ -152,9 +153,11 @@ export default function MarketplacePage() {
                 {/* Cover */}
                 {listing.coverImageUrl ? (
                   <div className="h-40 overflow-hidden">
-                    <img
+                    <Image
                       src={listing.coverImageUrl}
                       alt={listing.title}
+                      width={400}
+                      height={160}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>

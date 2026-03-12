@@ -6,6 +6,7 @@
 // =============================================================================
 
 import { useState } from "react";
+import Image from "next/image";
 import { ThumbsUp, Trash2, CornerDownRight } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 
@@ -172,9 +173,11 @@ export default function CommentItem({
       <div className="flex gap-3">
         {/* Avatar */}
         {comment.author.avatarUrl ? (
-          <img
+          <Image
             src={comment.author.avatarUrl}
             alt={authorName}
+            width={32}
+            height={32}
             className="w-8 h-8 rounded-full object-cover flex-shrink-0 border border-gray-200 mt-0.5"
           />
         ) : (

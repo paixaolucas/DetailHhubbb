@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Bell, Trash2, CheckCheck } from "lucide-react";
 // date-fns is not in this project — using inline helpers below
 
@@ -106,9 +107,11 @@ function ActorAvatar({
 
   if (actor.avatarUrl) {
     return (
-      <img
+      <Image
         src={actor.avatarUrl}
         alt={`${actor.firstName} ${actor.lastName}`}
+        width={36}
+        height={36}
         className="w-9 h-9 rounded-full object-cover flex-shrink-0"
       />
     );

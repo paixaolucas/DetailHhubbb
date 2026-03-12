@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   HelpCircle, Plus, Pencil, Trash2, ChevronUp, ChevronDown,
   X, Check, GripVertical,
@@ -67,7 +67,7 @@ export default function FaqsPage() {
       .finally(() => setCommLoading(false));
   }, []);
 
-  function loadFaqs(communityId: string) {
+  const loadFaqs = useCallback((communityId: string) => {
     if (!communityId) return;
     setLoading(true);
     fetch(`/api/communities/${communityId}/faqs`, { headers: { Authorization: `Bearer ${token()}` } })
@@ -75,9 +75,9 @@ export default function FaqsPage() {
       .then((d) => setFaqs(d.data ?? []))
       .catch(console.error)
       .finally(() => setLoading(false));
-  }
+  }, []);
 
-  useEffect(() => { loadFaqs(selectedId); }, [selectedId]);
+  useEffect(() => { loadFaqs(selectedId); }, [selectedId, loadFaqs]);
 
   function openCreate() {
     setEditing(null);

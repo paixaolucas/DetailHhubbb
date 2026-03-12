@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import {
   Calendar,
   Plus,
@@ -432,7 +433,7 @@ function EventCard({
     <div className="glass-card p-5 space-y-4">
       {/* Cover */}
       {event.coverImageUrl && (
-        <img src={event.coverImageUrl} alt={event.title} className="w-full h-32 object-cover rounded-lg" />
+        <Image src={event.coverImageUrl} alt={event.title} width={600} height={128} className="w-full h-32 object-cover rounded-lg" />
       )}
 
       {/* Header */}

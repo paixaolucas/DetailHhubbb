@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 interface LeaderboardUser {
   id: string;
   firstName: string;
@@ -43,9 +45,11 @@ export function LeaderboardRow({ rank, user, points, level }: LeaderboardRowProp
       {/* Avatar */}
       <div className="w-9 h-9 rounded-full flex-shrink-0 overflow-hidden">
         {user.avatarUrl ? (
-          <img
+          <Image
             src={user.avatarUrl}
             alt={fullName}
+            width={36}
+            height={36}
             className="w-full h-full object-cover"
           />
         ) : (

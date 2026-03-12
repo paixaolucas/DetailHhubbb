@@ -255,7 +255,7 @@ export default function MilestonesPage() {
       })
       .catch(() => setError("Erro de conexão"))
       .finally(() => setLoading(false));
-  }, []);
+  }, [toast]);
 
   if (loading) {
     return (

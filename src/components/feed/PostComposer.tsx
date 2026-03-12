@@ -7,6 +7,7 @@
 // =============================================================================
 
 import { useState, useRef } from "react";
+import Image from "next/image";
 import { Send, Plus, Minus, ImageIcon, X } from "lucide-react";
 import { useUploadThing } from "@/utils/uploadthing";
 
@@ -137,9 +138,11 @@ export default function PostComposer({ spaceId, onPost }: PostComposerProps) {
         <div className="flex flex-wrap gap-2">
           {previewUrls.map((url, idx) => (
             <div key={idx} className="relative group">
-              <img
+              <Image
                 src={url}
                 alt=""
+                width={80}
+                height={80}
                 className="w-20 h-20 object-cover rounded-lg border border-gray-200"
               />
               <button

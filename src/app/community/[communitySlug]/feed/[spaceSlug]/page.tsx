@@ -8,6 +8,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import { SpaceItem } from "@/components/feed/SpaceSidebar";
@@ -320,10 +321,10 @@ export default function SpaceFeedPage() {
           {/* Community banner */}
           {!loading && community?.bannerUrl && (
             <div className="relative h-20 rounded-xl overflow-hidden flex-shrink-0">
-              <img src={community.bannerUrl} alt={community.name} className="w-full h-full object-cover" />
+              <Image src={community.bannerUrl} alt={community.name} fill className="object-cover" />
               <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex items-center px-5 gap-3">
                 {community.logoUrl ? (
-                  <img src={community.logoUrl} alt={community.name} className="w-8 h-8 rounded-lg object-cover border border-gray-200 flex-shrink-0" />
+                  <Image src={community.logoUrl} alt={community.name} width={32} height={32} className="w-8 h-8 rounded-lg object-cover border border-gray-200 flex-shrink-0" />
                 ) : (
                   <div
                     className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-gray-900 flex-shrink-0"

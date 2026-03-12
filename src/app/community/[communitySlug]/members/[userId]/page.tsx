@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowLeft, MapPin, Car, MessageCircle, ThumbsUp, Calendar, ExternalLink,
@@ -207,9 +208,11 @@ export default function MemberProfilePage() {
         <div className="flex items-start gap-5">
           {/* Avatar */}
           {profile?.user.avatarUrl ? (
-            <img
+            <Image
               src={profile.user.avatarUrl}
               alt={fullName}
+              width={80}
+              height={80}
               className="w-20 h-20 rounded-2xl object-cover border border-gray-200 flex-shrink-0"
             />
           ) : (

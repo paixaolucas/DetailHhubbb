@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 import {
   Star, Plus, Pencil, Trash2, X, Check, Eye, EyeOff,
 } from "lucide-react";
@@ -96,7 +97,7 @@ export default function TestimonialsPage() {
       .finally(() => setCommLoading(false));
   }, []);
 
-  function loadTestimonials(communityId: string) {
+  const loadTestimonials = useCallback((communityId: string) => {
     if (!communityId) return;
     setLoading(true);
     // Use PATCH endpoint that accepts all (active + inactive) for admin view
@@ -107,9 +108,9 @@ export default function TestimonialsPage() {
       .then((d) => setTestimonials(d.data ?? []))
       .catch(console.error)
       .finally(() => setLoading(false));
-  }
+  }, []);
 
-  useEffect(() => { loadTestimonials(selectedId); }, [selectedId]);
+  useEffect(() => { loadTestimonials(selectedId); }, [selectedId, loadTestimonials]);
 
   function openCreate() {
     setEditing(null);
@@ -352,7 +353,7 @@ export default function TestimonialsPage() {
               {/* Author */}
               <div className="flex items-center gap-3">
                 {t.avatarUrl ? (
-                  <img src={t.avatarUrl} alt={t.authorName} className="w-10 h-10 rounded-full object-cover" />
+                  <Image src={t.avatarUrl} alt={t.authorName} width={40} height={40} className="w-10 h-10 rounded-full object-cover" />
                 ) : (
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-600 to-purple-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                     {t.authorName[0]?.toUpperCase()}

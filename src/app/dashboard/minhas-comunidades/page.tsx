@@ -6,6 +6,7 @@
 // =============================================================================
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Users, Lock, CheckCircle, Search, BookOpen, Video } from "lucide-react";
 
@@ -104,9 +105,11 @@ export default function MinhasComunidadesPage() {
         {/* Header */}
         <div className="flex items-start gap-4 mb-4 pr-6">
           {community.logoUrl ? (
-            <img
+            <Image
               src={community.logoUrl}
               alt={community.name}
+              width={48}
+              height={48}
               className={`w-12 h-12 rounded-xl object-cover flex-shrink-0 ${!hasAccess ? "opacity-40 grayscale" : ""}`}
             />
           ) : (

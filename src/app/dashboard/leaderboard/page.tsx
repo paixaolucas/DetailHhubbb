@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Trophy, Medal, Crown, Car, Users } from "lucide-react";
 import { STORAGE_KEYS } from "@/lib/constants";
 
@@ -39,7 +40,7 @@ function Avatar({ user, size = "md" }: { user: LeaderEntry["user"]; size?: "sm" 
   const initials = `${user.firstName[0] ?? ""}${user.lastName[0] ?? ""}`.toUpperCase();
   const cls = size === "sm" ? "w-8 h-8 text-xs" : "w-10 h-10 text-sm";
   if (user.avatarUrl) {
-    return <img src={user.avatarUrl} alt={initials} className={`${cls} rounded-full object-cover`} />;
+    return <Image src={user.avatarUrl} alt={initials} width={40} height={40} className={`${cls} rounded-full object-cover`} />;
   }
   return (
     <div className={`${cls} rounded-full bg-gradient-to-br from-violet-600 to-purple-500 flex items-center justify-center text-white font-bold flex-shrink-0`}>

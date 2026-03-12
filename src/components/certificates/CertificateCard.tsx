@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { Award, ExternalLink, Calendar } from "lucide-react";
 
@@ -37,9 +38,11 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
       {/* Community identity */}
       <div className="flex items-center gap-3">
         {community.logoUrl ? (
-          <img
+          <Image
             src={community.logoUrl}
             alt={community.name}
+            width={40}
+            height={40}
             className="w-10 h-10 rounded-xl object-cover border border-gray-200 flex-shrink-0"
           />
         ) : (

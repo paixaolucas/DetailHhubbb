@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import {
   User,
   Lock,
@@ -489,7 +490,7 @@ export default function SettingsPage() {
       <div className="glass-card p-5 flex items-center gap-4">
         <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-500 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
           {user.avatarUrl ? (
-            <img src={user.avatarUrl} alt={user.firstName} className="w-full h-full rounded-2xl object-cover" />
+            <Image src={user.avatarUrl} alt={user.firstName} width={64} height={64} className="w-full h-full rounded-2xl object-cover" />
           ) : initials}
         </div>
         <div>
@@ -548,7 +549,7 @@ export default function SettingsPage() {
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-500 flex items-center justify-center text-white text-xl font-bold flex-shrink-0 overflow-hidden">
                 {(avatarPreview || profileForm.avatarUrl) ? (
-                  <img src={avatarPreview || profileForm.avatarUrl} alt="" className="w-full h-full object-cover" />
+                  <Image src={avatarPreview || profileForm.avatarUrl} alt="" width={64} height={64} className="w-full h-full object-cover" />
                 ) : initials}
               </div>
               <div>

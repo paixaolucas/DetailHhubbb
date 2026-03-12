@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Users, FileText, User } from "lucide-react";
 
 type ResultType = "community" | "post" | "member";
@@ -33,7 +34,7 @@ export default function SearchResultItem({ type, item, onClick }: SearchResultIt
       <button className={baseClass} onClick={onClick}>
         <div className="w-9 h-9 rounded-lg overflow-hidden flex-shrink-0">
           {item.logoUrl ? (
-            <img src={item.logoUrl} alt={item.name} className="w-full h-full object-cover" />
+            <Image src={item.logoUrl} alt={item.name} width={36} height={36} className="w-full h-full object-cover" />
           ) : (
             <Initials name={item.name} className="w-full h-full" />
           )}
@@ -94,7 +95,7 @@ export default function SearchResultItem({ type, item, onClick }: SearchResultIt
       <button className={baseClass} onClick={onClick}>
         <div className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0">
           {item.avatarUrl ? (
-            <img src={item.avatarUrl} alt={fullName} className="w-full h-full object-cover" />
+            <Image src={item.avatarUrl} alt={fullName} width={36} height={36} className="w-full h-full object-cover" />
           ) : (
             <Initials name={fullName || "?"} className="w-full h-full rounded-full" />
           )}

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Bell } from "lucide-react";
 import { useRouter } from "next/navigation";
 // ─── Inline time-ago (no date-fns required) ───────────────────────────────────
@@ -68,9 +69,11 @@ function ActorAvatar({
 
   if (actor.avatarUrl) {
     return (
-      <img
+      <Image
         src={actor.avatarUrl}
         alt={`${actor.firstName} ${actor.lastName}`}
+        width={32}
+        height={32}
         className="w-8 h-8 rounded-full object-cover flex-shrink-0"
       />
     );

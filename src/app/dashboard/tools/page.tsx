@@ -2,6 +2,7 @@
 // SAAS TOOLS PAGE — DetailHub Dark Theme
 // =============================================================================
 
+import Image from "next/image";
 import { db } from "@/lib/db";
 import { ExternalLink, Star, Wrench } from "lucide-react";
 
@@ -111,9 +112,11 @@ function ToolCard({ tool, featured = false }: { tool: any; featured?: boolean })
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           {tool.logoUrl ? (
-            <img
+            <Image
               src={tool.logoUrl}
               alt={tool.name}
+              width={40}
+              height={40}
               className="w-10 h-10 rounded-xl object-cover"
             />
           ) : (

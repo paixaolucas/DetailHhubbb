@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   Users,
@@ -364,7 +365,7 @@ function InfluencerDashboard({ userName }: { userName: string }) {
           <div className="glass-card p-5 space-y-4">
             <div className="flex items-center gap-3">
               {community.logoUrl ? (
-                <img src={community.logoUrl} alt={community.name} className="w-10 h-10 rounded-xl object-cover border border-gray-200 flex-shrink-0" />
+                <Image src={community.logoUrl} alt={community.name} width={40} height={40} className="w-10 h-10 rounded-xl object-cover border border-gray-200 flex-shrink-0" />
               ) : (
                 <div className="w-10 h-10 rounded-xl bg-violet-600 flex items-center justify-center text-white font-bold flex-shrink-0">
                   {community.name.charAt(0)}
@@ -428,7 +429,7 @@ function InfluencerDashboard({ userName }: { userName: string }) {
                   return (
                     <div key={m.id} className="flex items-center gap-3 p-2 rounded-xl hover:bg-violet-50 transition-colors">
                       {m.user.avatarUrl ? (
-                        <img src={m.user.avatarUrl} alt={name} className="w-8 h-8 rounded-full object-cover border border-gray-200 flex-shrink-0" />
+                        <Image src={m.user.avatarUrl} alt={name} width={32} height={32} className="w-8 h-8 rounded-full object-cover border border-gray-200 flex-shrink-0" />
                       ) : (
                         <div className="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center text-xs font-bold text-violet-600 flex-shrink-0">
                           {initials}
@@ -497,7 +498,7 @@ function MemberDashboardInner({ userName }: { userName: string }) {
       toast.error("Pagamento cancelado. Tente novamente se quiser.");
       router.replace("/dashboard");
     }
-  }, []);
+  }, [searchParams, toast, router]);
 
   useEffect(() => {
     const token = localStorage.getItem("detailhub_access_token");
@@ -617,7 +618,7 @@ function MemberDashboardInner({ userName }: { userName: string }) {
                         className="h-24 relative"
                         style={{ background: community.bannerUrl ? undefined : `linear-gradient(135deg, ${community.primaryColor} 0%, ${community.primaryColor}80 100%)` }}
                       >
-                        {community.bannerUrl && <img src={community.bannerUrl} alt="" className="w-full h-full object-cover" />}
+                        {community.bannerUrl && <Image src={community.bannerUrl} alt="" fill className="object-cover" />}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-3">
                           <span className="font-bold text-white text-sm">{community.name}</span>
                         </div>
@@ -653,10 +654,11 @@ function MemberDashboardInner({ userName }: { userName: string }) {
                   }}
                 >
                   {community.bannerUrl && (
-                    <img
+                    <Image
                       src={community.bannerUrl}
                       alt={community.name}
-                      className="w-full h-full object-cover object-top"
+                      fill
+                      className="object-cover object-top"
                     />
                   )}
                   {/* Membros no canto superior direito */}
@@ -740,7 +742,7 @@ function MemberDashboardInner({ userName }: { userName: string }) {
                       {idx + 1}
                     </span>
                     {entry.user?.avatarUrl ? (
-                      <img src={entry.user.avatarUrl} alt={name} className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
+                      <Image src={entry.user.avatarUrl} alt={name} width={36} height={36} className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
                     ) : (
                       <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-600 to-purple-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                         {initials}

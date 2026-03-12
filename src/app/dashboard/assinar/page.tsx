@@ -29,7 +29,7 @@ export default function AssinarPage() {
     if (payment === "canceled") {
       toast.error("Pagamento cancelado. Tente novamente quando quiser.");
     }
-  }, []);
+  }, [searchParams, toast]);
 
   useEffect(() => {
     // Fetch active platform plan

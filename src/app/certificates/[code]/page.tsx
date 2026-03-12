@@ -3,6 +3,7 @@
 // /certificates/[code]
 // =============================================================================
 
+import Image from "next/image";
 import { Logo } from "@/components/ui/logo";
 import { CheckCircle2, XCircle, Award, Calendar, Shield } from "lucide-react";
 import Link from "next/link";
@@ -145,9 +146,11 @@ export default async function CertificatePage({
               {/* Community info */}
               <div className="flex items-center justify-center gap-3 py-3 border-t border-b border-gray-200">
                 {certificate.community.logoUrl ? (
-                  <img
+                  <Image
                     src={certificate.community.logoUrl}
                     alt={certificate.community.name}
+                    width={36}
+                    height={36}
                     className="w-9 h-9 rounded-xl object-cover border border-gray-200"
                   />
                 ) : (

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowLeft, Settings, Palette, Users, AlertTriangle,
@@ -488,7 +489,7 @@ export default function CommunitySettingsPage() {
             <label className="block text-sm font-medium text-gray-600 mb-3">Preview</label>
             <div className="border border-gray-200 rounded-xl overflow-hidden max-w-xs">
               {appearanceForm.bannerUrl ? (
-                <img src={appearanceForm.bannerUrl} alt="cover" className="h-20 w-full object-cover" />
+                <Image src={appearanceForm.bannerUrl} alt="cover" width={320} height={80} className="h-20 w-full object-cover" />
               ) : (
                 <div className="h-20 relative grid-pattern opacity-20" style={{ backgroundColor: appearanceForm.primaryColor }} />
               )}

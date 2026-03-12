@@ -4,6 +4,7 @@
 
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
+import Image from "next/image";
 import Link from "next/link";
 import { Users, BookOpen, Video, ArrowRight, Star, ChevronDown } from "lucide-react";
 import { MembershipSection } from "@/components/community/membership-section";
@@ -149,10 +150,11 @@ export default async function CommunityPage({
       {/* Full-width Banner */}
       {community.bannerUrl && (
         <div className="relative w-full h-56 md:h-72 overflow-hidden">
-          <img
+          <Image
             src={community.bannerUrl}
             alt={`${community.name} banner`}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0a0f1a]/40 to-[#0a0f1a]" />
         </div>
@@ -172,9 +174,11 @@ export default async function CommunityPage({
         <div className="container mx-auto px-4 text-center relative">
           {/* Logo */}
           {community.logoUrl ? (
-            <img
+            <Image
               src={community.logoUrl}
               alt={community.name}
+              width={96}
+              height={96}
               className="w-24 h-24 rounded-2xl mx-auto mb-6 object-cover border-2 border-gray-200 shadow-2xl"
             />
           ) : (
@@ -261,9 +265,11 @@ export default async function CommunityPage({
             <h2 className="text-xl font-bold text-gray-900 mb-5">Seu mentor</h2>
             <div className="flex items-start gap-5">
               {influencer.user.avatarUrl ? (
-                <img
+                <Image
                   src={influencer.user.avatarUrl}
                   alt={hostName}
+                  width={64}
+                  height={64}
                   className="w-16 h-16 rounded-2xl object-cover flex-shrink-0 shadow-lg border border-gray-200"
                 />
               ) : (
@@ -344,9 +350,11 @@ export default async function CommunityPage({
                     </p>
                     <div className="flex items-center gap-3 mt-1">
                       {t.avatarUrl ? (
-                        <img
+                        <Image
                           src={t.avatarUrl}
                           alt={t.authorName}
+                          width={36}
+                          height={36}
                           className="w-9 h-9 rounded-full object-cover border border-gray-200 flex-shrink-0"
                         />
                       ) : (

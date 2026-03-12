@@ -6,6 +6,7 @@
 // =============================================================================
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { Hash, Menu, X, Users, Trophy } from "lucide-react";
@@ -81,9 +82,11 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
       {/* Community header */}
       <div className="h-14 flex items-center gap-3 px-4 border-b border-gray-200 flex-shrink-0">
         {community?.logoUrl ? (
-          <img
+          <Image
             src={community.logoUrl}
             alt={community.name}
+            width={28}
+            height={28}
             className="w-7 h-7 rounded-lg object-cover flex-shrink-0"
           />
         ) : (

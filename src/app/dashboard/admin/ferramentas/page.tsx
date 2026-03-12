@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { Wrench, Plus, Pencil, Trash2, Star, ExternalLink, ToggleLeft, ToggleRight } from "lucide-react";
 import { useToast } from "@/components/ui/toast-provider";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
@@ -192,7 +193,7 @@ export default function AdminFerramentasPage() {
                 <div key={tool.id} className="flex items-center gap-4 px-5 py-4 hover:bg-violet-50 transition-colors">
                   <div className="w-10 h-10 bg-violet-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
                     {tool.logoUrl ? (
-                      <img src={tool.logoUrl} alt={tool.name} className="w-10 h-10 rounded-xl object-cover" />
+                      <Image src={tool.logoUrl} alt={tool.name} width={40} height={40} className="w-10 h-10 rounded-xl object-cover" />
                     ) : (
                       <span className="text-violet-400 font-bold">{tool.name.charAt(0)}</span>
                     )}

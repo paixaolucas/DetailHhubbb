@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import Image from "next/image";
 import { MessageSquare, Send, ArrowLeft, Search, User } from "lucide-react";
 
 // ---------------------------------------------------------------------------
@@ -63,9 +64,11 @@ function Avatar({ user, size = "md" }: { user: Participant; size?: "sm" | "md" }
   const sz = size === "sm" ? "w-8 h-8 text-xs" : "w-10 h-10 text-sm";
   if (user.avatarUrl) {
     return (
-      <img
+      <Image
         src={user.avatarUrl}
         alt={user.firstName}
+        width={40}
+        height={40}
         className={`${sz} rounded-xl object-cover flex-shrink-0 border border-gray-200`}
       />
     );

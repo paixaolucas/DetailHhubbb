@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 import {
   MapPin,
@@ -263,9 +264,11 @@ export default function MemberProfilePage() {
           <div className="flex items-start gap-5">
             {/* Avatar */}
             {user.avatarUrl ? (
-              <img
+              <Image
                 src={user.avatarUrl}
                 alt={fullName}
+                width={80}
+                height={80}
                 className="w-20 h-20 rounded-2xl object-cover flex-shrink-0"
               />
             ) : (
@@ -357,9 +360,11 @@ export default function MemberProfilePage() {
                 <div className="grid grid-cols-3 gap-1.5">
                   {profile.metadata.carPhotos.slice(0, 3).map((url, i) => (
                     <a key={i} href={url} target="_blank" rel="noopener noreferrer">
-                      <img
+                      <Image
                         src={url}
                         alt=""
+                        width={200}
+                        height={80}
                         className="w-full h-20 object-cover rounded-lg border border-gray-200 hover:opacity-90 transition-opacity"
                       />
                     </a>

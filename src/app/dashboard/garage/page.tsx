@@ -7,6 +7,7 @@
 // =============================================================================
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { Car, Save, ImageIcon, X, Share2 } from "lucide-react";
 import { useUploadThing } from "@/utils/uploadthing";
 
@@ -286,9 +287,11 @@ export default function GaragePage() {
           <div className="grid grid-cols-3 gap-2">
             {form.carPhotos.map((url, i) => (
               <div key={i} className="relative group">
-                <img
+                <Image
                   src={url}
                   alt=""
+                  width={200}
+                  height={112}
                   className="w-full h-28 object-cover rounded-xl border border-gray-200"
                 />
                 <button
@@ -308,9 +311,11 @@ export default function GaragePage() {
           <div className="grid grid-cols-3 gap-2">
             {previewUrls.map((url, i) => (
               <div key={i} className="relative group">
-                <img
+                <Image
                   src={url}
                   alt=""
+                  width={200}
+                  height={112}
                   className="w-full h-28 object-cover rounded-xl border border-violet-500/30 opacity-70"
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
