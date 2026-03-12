@@ -45,6 +45,9 @@ function hasToken(req: NextRequest): boolean {
   // Expiry validation happens at the API layer to avoid redirect loops
   const cookie = req.cookies.get("detailhub_access_token")?.value;
   if (cookie && cookie.length > 20) return true;
+  // Also allow through if refresh token is present — client-side refresh will handle expired access tokens
+  const refreshCookie = req.cookies.get("detailhub_refresh_token")?.value;
+  if (refreshCookie && refreshCookie.length > 20) return true;
   const auth = req.headers.get("Authorization");
   if (auth?.startsWith("Bearer ") && auth.length > 27) return true;
   return false;

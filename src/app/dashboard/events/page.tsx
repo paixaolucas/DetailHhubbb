@@ -24,6 +24,26 @@ import {
   Layers,
 } from "lucide-react";
 import { useToast } from "@/components/ui/toast-provider";
+import { STORAGE_KEYS } from "@/lib/constants";
+
+// ---------------------------------------------------------------------------
+// Auth helper — adds Bearer token from localStorage to every request
+// ---------------------------------------------------------------------------
+function authedFetch(url: string, options?: RequestInit): Promise<Response> {
+  const token =
+    typeof window !== "undefined"
+      ? localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN)
+      : null;
+  return fetch(url, {
+    ...options,
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...(options?.headers as Record<string, string>),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+}
 
 // ---------------------------------------------------------------------------
 // Types
@@ -129,10 +149,8 @@ function CreateEventModal({ onClose, onCreated }: { onClose: () => void; onCreat
         endAt: form.endAt ? new Date(form.endAt).toISOString() : undefined,
         capacity: form.capacity ? parseInt(form.capacity) : undefined,
       };
-      const res = await fetch("/api/events", {
+      const res = await authedFetch("/api/events", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify(body),
       });
       const data = await res.json();
@@ -285,10 +303,8 @@ function AddTicketModal({ eventId, onClose, onAdded }: { eventId: string; onClos
     if (!form.name) { toast.error("Nome é obrigatório"); return; }
     setLoading(true);
     try {
-      const res = await fetch(`/api/events/${eventId}/ticket-types`, {
+      const res = await authedFetch(`/api/events/${eventId}/ticket-types`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify({
           name: form.name,
           description: form.description || undefined,
@@ -352,7 +368,7 @@ function AttendeesModal({ eventId, eventTitle, onClose }: { eventId: string; eve
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/events/${eventId}/attendees`, { credentials: "include" })
+    authedFetch(`/api/events/${eventId}/attendees`)
       .then((r) => r.json())
       .then((d) => { if (d.success) setAttendees(d.data); })
       .catch(() => toast.error("Erro ao carregar participantes"))
@@ -440,10 +456,8 @@ function EditEventModal({ event, onClose, onSaved }: { event: Event; onClose: ()
         isPublic: form.isPublic,
         coverImageUrl: form.coverImageUrl || null,
       };
-      const res = await fetch(`/api/events/${event.id}`, {
+      const res = await authedFetch(`/api/events/${event.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify(body),
       });
       const data = await res.json();
@@ -666,7 +680,7 @@ export default function EventsPage() {
     try {
       const params = new URLSearchParams({ page: String(page) });
       if (statusFilter !== "ALL") params.set("status", statusFilter);
-      const res = await fetch(`/api/events?${params}`, { credentials: "include" });
+      const res = await authedFetch(`/api/events?${params}`);
       const data = await res.json();
       if (!data.success) throw new Error(data.error);
       setEvents(data.data ?? []);
@@ -684,10 +698,8 @@ export default function EventsPage() {
 
   async function handlePublish(id: string) {
     try {
-      const res = await fetch(`/api/events/${id}`, {
+      const res = await authedFetch(`/api/events/${id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify({ status: "PUBLISHED" }),
       });
       const data = await res.json();
@@ -702,7 +714,7 @@ export default function EventsPage() {
   async function handleDelete(id: string) {
     if (!confirm("Excluir ou cancelar este evento?")) return;
     try {
-      const res = await fetch(`/api/events/${id}`, { method: "DELETE", credentials: "include" });
+      const res = await authedFetch(`/api/events/${id}`, { method: "DELETE" });
       const data = await res.json();
       if (!data.success) throw new Error(data.error);
       toast.success(data.data?.canceled ? "Evento cancelado" : "Evento excluído");
