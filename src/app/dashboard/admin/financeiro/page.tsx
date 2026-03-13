@@ -39,7 +39,7 @@ const COMM_TYPE_LABEL: Record<string, string> = {
 
 // Preços da plataforma
 const PRECO_ANUAL = 837;      // R$837/ano
-const PRECO_PIX = 97;         // R$97/mês
+const PRECO_PIX = 837 / 12;   // R$69,75/mês (equivalente mensal do plano anual)
 const COMISSAO = 0.15;        // 15% plataforma
 
 const QUICK_PERIODS = [
@@ -425,7 +425,7 @@ export default function FinanceiroPage() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-gray-900">PIX Mensal</p>
-                <p className="text-xs text-gray-500">R$ {PRECO_PIX.toLocaleString("pt-BR")}/mês por membro</p>
+                <p className="text-xs text-gray-500">R$ {PRECO_PIX.toFixed(2).replace(".", ",")}/mês por membro</p>
               </div>
             </div>
             <div className="space-y-2.5">
@@ -454,7 +454,7 @@ export default function FinanceiroPage() {
               </div>
               <div className="mt-3 p-2.5 bg-emerald-500/5 rounded-xl border border-emerald-500/10">
                 <p className="text-xs text-emerald-400 text-center">
-                  Diferença vs anual: <strong>+ R$ {(PRECO_PIX - PRECO_ANUAL / 12).toFixed(2)}/mês</strong> por membro
+                  Mesmo valor do plano anual fracionado: <strong>R$837 ÷ 12</strong>
                 </p>
               </div>
             </div>
