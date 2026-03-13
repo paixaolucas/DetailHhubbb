@@ -158,6 +158,47 @@ export const GET = withRole(UserRole.INFLUENCER_ADMIN)(async (_req, { session })
     });
   }
 
+  // ── Recent payments split by type (for Pagamentos tab) ─────────────────────
+  const recentPaymentsRaw = await db.payment.findMany({
+    where: {
+      status: "SUCCEEDED",
+      platformMembership: { referredByInfluencerId: influencerId },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 20,
+    select: {
+      id: true,
+      amount: true,
+      createdAt: true,
+      platformMembership: {
+        select: {
+          plan: { select: { interval: true, intervalCount: true, price: true } },
+          user: { select: { firstName: true, lastName: true } },
+        },
+      },
+    },
+  });
+
+  const recentPayments = recentPaymentsRaw.map((p) => {
+    const interval = p.platformMembership?.plan.interval ?? "year";
+    const planPrice = Number(p.platformMembership?.plan.price ?? annualPrice);
+    const intervalCount = p.platformMembership?.plan.intervalCount ?? 1;
+    const isAnnual = interval === "year";
+    // Commission on the actual amount paid
+    const commission = Number(p.amount) * COMMISSION_RATE;
+    return {
+      id: p.id,
+      memberName: p.platformMembership?.user
+        ? `${p.platformMembership.user.firstName} ${p.platformMembership.user.lastName}`
+        : "Membro",
+      type: isAnnual ? "annual" : "monthly",
+      typeLabel: isAnnual ? "Anual (à vista)" : "Mensal (recorrente)",
+      amount: Number(p.amount),
+      commission: parseFloat(commission.toFixed(2)),
+      createdAt: p.createdAt.toISOString(),
+    };
+  });
+
   // ── Badge progress ──────────────────────────────────────────────────────────
   const BADGES = [
     { name: "Bronze", threshold: 50, color: "#cd7f32" },
@@ -197,6 +238,7 @@ export const GET = withRole(UserRole.INFLUENCER_ADMIN)(async (_req, { session })
         annualTicket: parseFloat(annualPrice.toFixed(2)),
       },
       monthlyHistory,
+      recentPayments,
       badge: {
         current: currentBadge,
         next: nextBadge

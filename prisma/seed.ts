@@ -399,7 +399,7 @@ async function main() {
     data: {
       name: "DetailHub Anual",
       description: "Acesso completo a todas as comunidades automotivas da plataforma.",
-      price: 600,
+      price: 837,
       currency: "brl",
       interval: "year",
       intervalCount: 1,
@@ -763,8 +763,8 @@ async function main() {
   // =============================================================================
   await db.payment.createMany({
     data: [
-      { userId: member1.id, amount: 600, currency: "brl", status: "SUCCEEDED", type: "SUBSCRIPTION", createdAt: new Date(Date.now() - 30 * 86400000) },
-      { userId: member2.id, amount: 600, currency: "brl", status: "SUCCEEDED", type: "SUBSCRIPTION", createdAt: new Date(Date.now() - 25 * 86400000) },
+      { userId: member1.id, amount: 837, currency: "brl", status: "SUCCEEDED", type: "SUBSCRIPTION", createdAt: new Date(Date.now() - 30 * 86400000) },
+      { userId: member2.id, amount: 837, currency: "brl", status: "SUCCEEDED", type: "SUBSCRIPTION", createdAt: new Date(Date.now() - 25 * 86400000) },
     ],
   });
   console.log("✅ Payment history created");
