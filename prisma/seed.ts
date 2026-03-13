@@ -3,7 +3,7 @@
 // Creates realistic test data for all platform entities
 // =============================================================================
 
-import { PrismaClient, UserRole, CommissionType, SaaSToolCategory, EventType, EventStatus, PostType } from "@prisma/client";
+import { PrismaClient, UserRole, CommissionType, SaaSToolCategory, EventType, EventStatus, PostType, PaymentStatus, PaymentType } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const db = new PrismaClient();
@@ -121,8 +121,8 @@ async function main() {
         youtube: "BarbaOficial",
       },
       isVerified: true,
-      totalEarnings: 58590,
-      pendingPayout: 4883,
+      totalEarnings: 53512,
+      pendingPayout: 3500,
     },
   });
 
@@ -409,6 +409,20 @@ async function main() {
     },
   });
 
+  const platformPlanMonthly = await db.platformPlan.create({
+    data: {
+      name: "DetailHub Mensal (PIX)",
+      description: "Acesso completo a todas as comunidades. Cobrança mensal via PIX ou cartão recorrente.",
+      price: 69.75,
+      currency: "brl",
+      interval: "month",
+      intervalCount: 1,
+      trialDays: 0,
+      features: ["Acesso a todas as comunidades", "Conteúdo ilimitado", "Lives & streaming", "Marketplace", "Auto AI"],
+      isActive: true,
+    },
+  });
+
   // =============================================================================
   // 500 DEMO MEMBERS + PLATFORM MEMBERSHIPS
   // =============================================================================
@@ -434,21 +448,32 @@ async function main() {
 
   const now = new Date();
 
-  // Distribute referrals: Barba 200, Corujão 150, Neto 150
+  // Distribute referrals: Barba 200 (20 mensais PIX + 180 anuais), Corujão 150, Neto 150
+  // All joinedAt spread over the last 6 months per influencer block so charts show data
   await db.platformMembership.createMany({
     data: demoMembers.map((member, i) => {
       const referredByInfluencerId =
         i < 200 ? influencerBarba.id : i < 350 ? influencerCorujao.id : influencerNeto.id;
-      // Spread joinedAt over last 12 months for a realistic chart
-      const monthOffset = Math.floor((i / 500) * 12);
-      const dayOffset = (i % 28) + 1;
-      const joinedAt = new Date(now.getFullYear(), now.getMonth() - 11 + monthOffset, dayOffset);
+
+      // First 20 Barba members use the monthly PIX plan
+      const isMonthly = i < 20;
+      const planId = isMonthly ? platformPlanMonthly.id : platformPlan.id;
+
+      // Spread joinedAt over last 6 months per influencer block for a realistic chart
+      const localIndex = i < 200 ? i : i < 350 ? i - 200 : i - 350;
+      const blockSize = i < 200 ? 200 : 150;
+      const monthOffset = Math.floor((localIndex / blockSize) * 6); // 0..5
+      const dayOffset = (localIndex % 28) + 1;
+      const joinedAt = new Date(now.getFullYear(), now.getMonth() - 5 + monthOffset, dayOffset);
+
       return {
         userId: member.id,
-        planId: platformPlan.id,
+        planId,
         status: "ACTIVE" as const,
         currentPeriodStart: joinedAt,
-        currentPeriodEnd: new Date(joinedAt.getFullYear() + 1, joinedAt.getMonth(), joinedAt.getDate()),
+        currentPeriodEnd: isMonthly
+          ? new Date(joinedAt.getFullYear(), joinedAt.getMonth() + 1, joinedAt.getDate())
+          : new Date(joinedAt.getFullYear() + 1, joinedAt.getMonth(), joinedAt.getDate()),
         referredByInfluencerId,
         joinedAt,
       };
@@ -488,6 +513,36 @@ async function main() {
       { userId: member2.id, planId: platformPlan.id, status: "ACTIVE", currentPeriodStart: new Date(), currentPeriodEnd: new Date(Date.now() + 365 * 86400000), referredByInfluencerId: influencerCorujao.id, joinedAt: new Date(Date.now() - 3 * 86400000) },
     ],
   });
+
+  // =============================================================================
+  // PLATFORM PAYMENTS — create SUCCEEDED payment per platform membership
+  // Enables the "Pagamentos Recentes" tab to show data for each influencer
+  // =============================================================================
+  console.log("🔄 Creating platform payments...");
+
+  const allPlatformMemberships = await db.platformMembership.findMany({
+    select: {
+      id: true,
+      userId: true,
+      joinedAt: true,
+      plan: { select: { interval: true, price: true } },
+    },
+  });
+
+  await db.payment.createMany({
+    data: allPlatformMemberships.map((m) => ({
+      userId: m.userId,
+      platformMembershipId: m.id,
+      amount: Number(m.plan.price),
+      currency: "brl",
+      status: PaymentStatus.SUCCEEDED,
+      type: PaymentType.SUBSCRIPTION,
+      description: m.plan.interval === "year" ? "DetailHub Anual" : "DetailHub Mensal (PIX)",
+      createdAt: m.joinedAt,
+    })),
+  });
+
+  console.log(`✅ ${allPlatformMemberships.length} platform payments created`);
 
   // =============================================================================
   // COMMUNITY MEMBERSHIPS (visible in community settings > Members tab)
