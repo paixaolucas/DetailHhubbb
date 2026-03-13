@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import {
   AreaChart,
@@ -59,6 +60,7 @@ const PERIOD_DAYS: Record<string, number> = { "7d": 7, "30d": 30, "90d": 90, "1y
 const PERIOD_LABELS: Record<string, string> = { "7d": "7 dias", "30d": "30 dias", "90d": "90 dias", "1y": "1 ano" };
 
 export default function AnalyticsPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const communityId = searchParams.get("communityId");
   const [data, setData] = useState<any>(null);
@@ -73,6 +75,10 @@ export default function AnalyticsPage() {
   // One-time: set role + fetch admin events
   useEffect(() => {
     const storedRole = localStorage.getItem("detailhub_user_role") ?? "INFLUENCER_ADMIN";
+    if (storedRole === "COMMUNITY_MEMBER" || storedRole === "MARKETPLACE_PARTNER") {
+      router.replace("/dashboard");
+      return;
+    }
     setRole(storedRole);
     if (storedRole === "SUPER_ADMIN") {
       const token = localStorage.getItem("detailhub_access_token");

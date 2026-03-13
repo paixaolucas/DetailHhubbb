@@ -153,9 +153,13 @@ export async function verifyPlatformMembership(
 ): Promise<boolean> {
   const membership = await db.platformMembership.findUnique({
     where: { userId },
-    select: { status: true },
+    select: { status: true, currentPeriodEnd: true },
   });
-  return membership?.status === "ACTIVE";
+  return (
+    membership?.status === "ACTIVE" &&
+    membership.currentPeriodEnd != null &&
+    membership.currentPeriodEnd > new Date()
+  );
 }
 
 export async function verifyMembership(
@@ -165,9 +169,13 @@ export async function verifyMembership(
   // Check community-level membership first
   const membership = await db.communityMembership.findUnique({
     where: { userId_communityId: { userId, communityId } },
-    select: { status: true },
+    select: { status: true, currentPeriodEnd: true },
   });
-  if (membership?.status === "ACTIVE") return true;
+  if (
+    membership?.status === "ACTIVE" &&
+    membership.currentPeriodEnd != null &&
+    membership.currentPeriodEnd > new Date()
+  ) return true;
 
   // Platform membership grants access to all communities
   return verifyPlatformMembership(userId);

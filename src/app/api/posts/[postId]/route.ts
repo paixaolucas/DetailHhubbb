@@ -5,6 +5,7 @@
 // =============================================================================
 
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import {
   withAuth,
   verifyMembership,
@@ -27,6 +28,21 @@ export const GET = withAuth(async (req, { session, params }) => {
         { success: false, error: "Post ID required" },
         { status: 400 }
       );
+    }
+
+    // Fetch only communityId first to verify membership before loading full post
+    const postMeta = await db.post.findUnique({
+      where: { id: postId },
+      select: { communityId: true },
+    });
+
+    if (!postMeta) {
+      return NextResponse.json({ success: false, error: "Post not found" }, { status: 404 });
+    }
+
+    const isMember = await verifyMembership(session.userId, postMeta.communityId);
+    if (!isMember) {
+      return NextResponse.json({ success: false, error: "Membership required" }, { status: 403 });
     }
 
     const post = await db.post.findUnique({
@@ -56,11 +72,6 @@ export const GET = withAuth(async (req, { session, params }) => {
 
     if (!post) {
       return NextResponse.json({ success: false, error: "Post not found" }, { status: 404 });
-    }
-
-    const isMember = await verifyMembership(session.userId, post.communityId);
-    if (!isMember) {
-      return NextResponse.json({ success: false, error: "Membership required" }, { status: 403 });
     }
 
     // Increment view count in the background — do not await to avoid delaying response
@@ -103,8 +114,23 @@ export const PATCH = withAuth(async (req, { session, params }) => {
       return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
     }
 
-    const body = await req.json();
-    const { title, body: postBody } = body;
+    const updatePostSchema = z
+      .object({
+        title: z.string().max(255).optional(),
+        body: z.string().max(50_000).optional(),
+      })
+      .refine((d) => d.title !== undefined || d.body !== undefined, {
+        message: "At least one field required",
+      });
+
+    const parsed = updatePostSchema.safeParse(await req.json().catch(() => ({})));
+    if (!parsed.success) {
+      return NextResponse.json(
+        { success: false, error: parsed.error.errors[0]?.message ?? "Invalid input" },
+        { status: 422 }
+      );
+    }
+    const { title, body: postBody } = parsed.data;
 
     const updateData: Record<string, unknown> = {};
     if (title !== undefined) updateData.title = title;

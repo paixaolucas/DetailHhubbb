@@ -108,6 +108,14 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
 
+    const INFLUENCER_ONLY = ["/dashboard/analytics"];
+    if (
+      INFLUENCER_ONLY.some((p) => pathname.startsWith(p)) &&
+      role !== "SUPER_ADMIN" && role !== "INFLUENCER_ADMIN"
+    ) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+
     const ADMIN_ONLY = [
       "/dashboard/admin",
       "/dashboard/usuarios",
@@ -134,6 +142,11 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
     "Strict-Transport-Security",
     "max-age=63072000; includeSubDomains"
   );
+  response.headers.set(
+    "Content-Security-Policy",
+    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:;"
+  );
+  response.headers.set("X-Permitted-Cross-Domain-Policies", "none");
   return response;
 }
 

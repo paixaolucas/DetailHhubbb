@@ -32,10 +32,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Per-email rate limit to prevent targeted abuse (3 per 10 minutes)
-    const emailLimited = checkRateLimit(`forgot-pwd-email:${email.toLowerCase()}`, 10 * 60 * 1000, 3);
+    // Per-email rate limit: 2 per hour to prevent targeted abuse / email DoS
+    const emailLimited = checkRateLimit(`forgot-pwd-email:${email.toLowerCase()}`, 60 * 60 * 1000, 2);
     if (emailLimited) {
       // Return same success message to avoid enumeration
+      return NextResponse.json({
+        success: true,
+        message: "Se o email existir, você receberá um link de recuperação.",
+      });
+    }
+
+    // Per-IP rate limit: 5 per hour to prevent mass enumeration
+    const ipLimited = checkRateLimit(`forgot-pwd-ip:${ip}`, 60 * 60 * 1000, 5);
+    if (ipLimited) {
       return NextResponse.json({
         success: true,
         message: "Se o email existir, você receberá um link de recuperação.",

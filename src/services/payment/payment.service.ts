@@ -327,6 +327,19 @@ async function handleCheckoutCompleted(
 
   // Platform membership checkout
   if (platformPlanId) {
+    // Validate that the Stripe customer matches the userId in metadata
+    const userRecord = await db.user.findUnique({
+      where: { id: userId },
+      select: { stripeCustomerId: true },
+    });
+    if (
+      userRecord?.stripeCustomerId &&
+      session.customer !== userRecord.stripeCustomerId
+    ) {
+      console.error(`[Webhook] Customer mismatch for userId ${userId}: expected ${userRecord.stripeCustomerId}, got ${session.customer}`);
+      return;
+    }
+
     const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
     await db.platformMembership.upsert({
       where: { userId },
@@ -413,6 +426,13 @@ async function handleInvoicePaymentSucceeded(
 
   // Platform membership invoice
   if (platformPlanId) {
+    // Idempotency check — Stripe may redeliver the same event
+    const existingPayment = await db.payment.findFirst({
+      where: { stripeInvoiceId: invoice.id },
+      select: { id: true },
+    });
+    if (existingPayment) return;
+
     const platformMembership = await db.platformMembership.findUnique({
       where: { userId },
       select: { id: true },
@@ -445,6 +465,13 @@ async function handleInvoicePaymentSucceeded(
   }
 
   if (!communityId) return;
+
+  // Idempotency check — Stripe may redeliver the same event
+  const existingPayment = await db.payment.findFirst({
+    where: { stripeInvoiceId: invoice.id },
+    select: { id: true },
+  });
+  if (existingPayment) return;
 
   const membership = await db.communityMembership.findUnique({
     where: { userId_communityId: { userId, communityId } },

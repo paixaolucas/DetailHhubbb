@@ -204,18 +204,38 @@ function CommunityCard({ community }: { community: Community }) {
       {/* Banner */}
       <div
         className="h-28 relative"
-        style={{
-          background: `linear-gradient(135deg, ${community.primaryColor}40, ${community.primaryColor}20), #F0EEFF`,
-        }}
+        style={
+          community.bannerUrl
+            ? undefined
+            : { background: `linear-gradient(135deg, ${community.primaryColor}40, ${community.primaryColor}20), #F0EEFF` }
+        }
       >
-        <div className="absolute inset-0 grid-pattern opacity-20" />
-        <div className="absolute bottom-0 left-5 translate-y-1/2">
-          <div
-            className="w-14 h-14 rounded-xl border-2 border-white flex items-center justify-center text-white font-bold text-xl shadow-lg"
-            style={{ backgroundColor: community.primaryColor }}
-          >
-            {community.name.charAt(0)}
+        {community.bannerUrl ? (
+          <div className="absolute inset-0 overflow-hidden">
+            <img
+              src={community.bannerUrl}
+              alt={community.name}
+              className="w-full h-full object-cover"
+            />
           </div>
+        ) : (
+          <div className="absolute inset-0 grid-pattern opacity-20" />
+        )}
+        <div className="absolute bottom-0 left-5 translate-y-1/2">
+          {community.logoUrl ? (
+            <img
+              src={community.logoUrl}
+              alt={community.name}
+              className="w-14 h-14 rounded-xl border-2 border-white shadow-lg object-cover"
+            />
+          ) : (
+            <div
+              className="w-14 h-14 rounded-xl border-2 border-white flex items-center justify-center text-white font-bold text-xl shadow-lg"
+              style={{ backgroundColor: community.primaryColor }}
+            >
+              {community.name.charAt(0)}
+            </div>
+          )}
         </div>
       </div>
 
@@ -223,9 +243,22 @@ function CommunityCard({ community }: { community: Community }) {
         <h3 className="font-bold text-gray-900 text-lg leading-tight group-hover:text-violet-600 transition-colors">
           {community.name}
         </h3>
-        <p className="text-sm text-gray-500 mt-0.5 mb-3">
-          por {community.influencer.displayName}
-        </p>
+        <div className="flex items-center gap-1.5 mt-0.5 mb-3">
+          {community.influencer.user.avatarUrl ? (
+            <img
+              src={community.influencer.user.avatarUrl}
+              alt={community.influencer.displayName}
+              className="w-5 h-5 rounded-full object-cover"
+            />
+          ) : (
+            <div className="w-5 h-5 rounded-full bg-violet-500 flex items-center justify-center text-white text-[9px] font-bold">
+              {community.influencer.displayName.charAt(0).toUpperCase()}
+            </div>
+          )}
+          <p className="text-sm text-gray-500">
+            por {community.influencer.displayName}
+          </p>
+        </div>
 
         {community.shortDescription && (
           <p className="text-sm text-gray-400 line-clamp-2 mb-4">
