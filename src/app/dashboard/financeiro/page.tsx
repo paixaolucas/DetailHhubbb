@@ -27,7 +27,10 @@ interface FinanceiroSummary {
   activeReferred: number;
   totalReferred: number;
   newThisMonth: number;
+  annualMembersCount: number;
+  monthlyMembersCount: number;
   projectedMonthlyCommission: number;
+  annualRenewalCommission: number;
   totalEarnings: number;
   pendingPayout: number;
   retentionRate: number;
@@ -35,6 +38,7 @@ interface FinanceiroSummary {
   rank: number;
   totalInfluencers: number;
   monthlyTicket: number;
+  annualTicket: number;
 }
 
 interface BadgeInfo {
@@ -200,9 +204,15 @@ export default function FinanceiroPage() {
       {/* KPI grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
-          label="Comissão Projetada"
+          label="Comissão Mensal"
           value={fmt(summary.projectedMonthlyCommission)}
-          sub={`35% × ${summary.activeReferred} membros × ${fmt(summary.monthlyTicket)}/mês`}
+          sub={
+            summary.monthlyMembersCount > 0
+              ? `35% × ${summary.monthlyMembersCount} mensal${summary.monthlyMembersCount !== 1 ? "is" : ""} × ${fmt(summary.monthlyTicket)}`
+              : summary.annualMembersCount > 0
+              ? "Todos seus membros são plano anual (à vista)"
+              : "Nenhum membro ativo ainda"
+          }
           icon={DollarSign}
           highlight
         />
@@ -226,6 +236,32 @@ export default function FinanceiroPage() {
           icon={UserPlus}
         />
       </div>
+
+      {/* Breakdown anual vs mensal */}
+      {summary.activeReferred > 0 && (
+        <div className="glass-card p-4 flex flex-wrap gap-6 items-center">
+          <div className="flex items-center gap-2 text-sm">
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block" />
+            <span className="text-gray-500">À vista (anual):</span>
+            <span className="font-semibold text-gray-900">{summary.annualMembersCount} membros</span>
+            {summary.annualMembersCount > 0 && (
+              <span className="text-gray-400">
+                — comissão de {fmt(summary.annualRenewalCommission)} na renovação
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <span className="w-2.5 h-2.5 rounded-full bg-violet-500 inline-block" />
+            <span className="text-gray-500">Mensal (recorrente):</span>
+            <span className="font-semibold text-gray-900">{summary.monthlyMembersCount} membros</span>
+            {summary.monthlyMembersCount > 0 && (
+              <span className="text-gray-400">
+                — {fmt(summary.projectedMonthlyCommission)}/mês
+              </span>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Earnings row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -384,7 +420,10 @@ export default function FinanceiroPage() {
       <div className="glass-card p-4 flex items-start gap-3">
         <ArrowUpRight className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
         <p className="text-xs text-gray-500 leading-relaxed">
-          <strong className="text-gray-700">Como funciona:</strong> você recebe 35% de cada mensalidade dos membros que trouxe via seu link de convite, enquanto eles permanecerem ativos. O valor exato depende do plano vigente e é pago no dia 15 do mês seguinte ao fechamento. Um holdback de 20% é retido por 30 dias para proteção contra chargebacks.
+          <strong className="text-gray-700">Como funciona:</strong> você recebe 35% de cada pagamento dos membros que trouxe via seu link de convite.{" "}
+          <strong className="text-gray-600">Plano anual (à vista):</strong> a comissão entra de uma vez (35% de {fmt(summary.annualTicket)}).{" "}
+          <strong className="text-gray-600">Plano mensal:</strong> a comissão entra todo mês (35% de {fmt(summary.monthlyTicket)}).{" "}
+          O pagamento é feito no dia 15 do mês seguinte. Um holdback de 20% é retido por 30 dias para proteção contra chargebacks.
         </p>
       </div>
     </div>

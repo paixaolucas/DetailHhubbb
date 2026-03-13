@@ -2,6 +2,7 @@
 // GET /api/influencers/me/financeiro
 // Financial dashboard data for INFLUENCER_ADMIN.
 // Returns member stats, projected commission, ranking and monthly history.
+// Separates annual (à vista) and monthly members for accurate projections.
 // =============================================================================
 
 import { NextResponse } from "next/server";
@@ -28,59 +29,75 @@ export const GET = withRole(UserRole.INFLUENCER_ADMIN)(async (_req, { session })
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  // ── Member counts ───────────────────────────────────────────────────────────
-  const [totalReferred, activeReferred, newThisMonth, canceledThisMonth] =
-    await Promise.all([
-      db.platformMembership.count({
-        where: { referredByInfluencerId: influencerId },
-      }),
-      db.platformMembership.count({
-        where: { referredByInfluencerId: influencerId, status: "ACTIVE" },
-      }),
-      db.platformMembership.count({
-        where: {
-          referredByInfluencerId: influencerId,
-          joinedAt: { gte: startOfMonth },
-        },
-      }),
-      db.platformMembership.count({
-        where: {
-          referredByInfluencerId: influencerId,
-          status: "CANCELED",
-          canceledAt: { gte: startOfMonth },
-        },
-      }),
-    ]);
-
-  // ── Projected commission ────────────────────────────────────────────────────
-  // Use the most recent active platform plan price as the reference ticket
+  // ── Fetch active plan for price reference ────────────────────────────────────
   const activePlan = await db.platformPlan.findFirst({
     where: { isActive: true },
     orderBy: { price: "asc" },
     select: { price: true, interval: true, intervalCount: true },
   });
 
-  let monthlyTicket = 79; // fallback from document (R$79/month reference)
-  if (activePlan) {
-    const price = Number(activePlan.price);
-    if (activePlan.interval === "year") {
-      monthlyTicket = price / 12;
-    } else if (activePlan.interval === "month") {
-      monthlyTicket = price / activePlan.intervalCount;
-    }
-  }
+  // R$837/ano ÷ 12 = R$69.75/mês — fallback se não houver plano no banco
+  const annualPrice = activePlan?.interval === "year"
+    ? Number(activePlan.price)
+    : activePlan
+      ? Number(activePlan.price) * (12 / (activePlan.intervalCount ?? 1))
+      : 837;
 
-  const projectedMonthlyCommission = activeReferred * monthlyTicket * COMMISSION_RATE;
+  const monthlyEquivalent = activePlan?.interval === "month"
+    ? Number(activePlan.price) / (activePlan.intervalCount ?? 1)
+    : annualPrice / 12;
 
-  // ── Retention rate ──────────────────────────────────────────────────────────
+  // ── Member counts ───────────────────────────────────────────────────────────
+  const [totalReferred, newThisMonth, canceledThisMonth] = await Promise.all([
+    db.platformMembership.count({
+      where: { referredByInfluencerId: influencerId },
+    }),
+    db.platformMembership.count({
+      where: {
+        referredByInfluencerId: influencerId,
+        joinedAt: { gte: startOfMonth },
+      },
+    }),
+    db.platformMembership.count({
+      where: {
+        referredByInfluencerId: influencerId,
+        status: "CANCELED",
+        canceledAt: { gte: startOfMonth },
+      },
+    }),
+  ]);
+
+  // ── Active members with plan — to split annual vs monthly ──────────────────
+  const activeMembershipsWithPlan = await db.platformMembership.findMany({
+    where: { referredByInfluencerId: influencerId, status: "ACTIVE" },
+    select: {
+      plan: { select: { interval: true, intervalCount: true, price: true } },
+    },
+  });
+
+  const activeReferred = activeMembershipsWithPlan.length;
+
+  const annualMembersCount = activeMembershipsWithPlan.filter(
+    (m) => m.plan.interval === "year"
+  ).length;
+
+  const monthlyMembersCount = activeMembershipsWithPlan.filter(
+    (m) => m.plan.interval === "month"
+  ).length;
+
+  // ── Projected commission ────────────────────────────────────────────────────
+  // Monthly: recorrente todo mês (apenas membros mensais)
+  // Annual:  chega de uma vez na renovação (1× por ano)
+  const projectedMonthlyCommission = monthlyMembersCount * monthlyEquivalent * COMMISSION_RATE;
+  const annualRenewalCommission = annualMembersCount * annualPrice * COMMISSION_RATE;
+
+  // ── Retention & churn ───────────────────────────────────────────────────────
   const retentionRate =
     totalReferred > 0 ? (activeReferred / totalReferred) * 100 : 0;
-
-  // ── Churn rate (this month) ─────────────────────────────────────────────────
   const baseForChurn = activeReferred + canceledThisMonth;
   const churnRate = baseForChurn > 0 ? (canceledThisMonth / baseForChurn) * 100 : 0;
 
-  // ── Rank among all influencers (by active referred members) ─────────────────
+  // ── Rank ────────────────────────────────────────────────────────────────────
   const allInfluencerCounts = await db.platformMembership.groupBy({
     by: ["referredByInfluencerId"],
     where: { status: "ACTIVE", referredByInfluencerId: { not: null } },
@@ -95,25 +112,49 @@ export const GET = withRole(UserRole.INFLUENCER_ADMIN)(async (_req, { session })
   const rank = rankIndex >= 0 ? rankIndex + 1 : totalInfluencers + 1;
 
   // ── Monthly history (last 6 months) ────────────────────────────────────────
-  const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
-  const monthlyHistory: { month: string; newMembers: number; commission: number }[] = [];
+  // Commission is calculated per actual payment type:
+  //   annual member → R$ annualPrice × 35% (one-time on join)
+  //   monthly member → R$ monthlyEquivalent × 35% (each month)
+  const monthlyHistory: { month: string; newMembers: number; commission: number; annualNew: number; monthlyNew: number }[] = [];
 
   for (let i = 5; i >= 0; i--) {
     const start = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const end = new Date(now.getFullYear(), now.getMonth() - i + 1, 0, 23, 59, 59);
     const label = start.toLocaleDateString("pt-BR", { month: "short", year: "2-digit" });
 
-    const newInMonth = await db.platformMembership.count({
+    const newWithPlans = await db.platformMembership.findMany({
       where: {
         referredByInfluencerId: influencerId,
         joinedAt: { gte: start, lte: end },
       },
+      select: {
+        plan: { select: { interval: true, intervalCount: true, price: true } },
+      },
     });
+
+    let commission = 0;
+    let annualNew = 0;
+    let monthlyNew = 0;
+
+    for (const m of newWithPlans) {
+      const price = Number(m.plan.price);
+      if (m.plan.interval === "year") {
+        // Paid in full: commission on the full annual amount
+        commission += price * COMMISSION_RATE;
+        annualNew++;
+      } else {
+        // Monthly: commission on the monthly charge
+        commission += (price / (m.plan.intervalCount ?? 1)) * COMMISSION_RATE;
+        monthlyNew++;
+      }
+    }
 
     monthlyHistory.push({
       month: label,
-      newMembers: newInMonth,
-      commission: parseFloat((newInMonth * monthlyTicket * COMMISSION_RATE).toFixed(2)),
+      newMembers: newWithPlans.length,
+      commission: parseFloat(commission.toFixed(2)),
+      annualNew,
+      monthlyNew,
     });
   }
 
@@ -142,14 +183,18 @@ export const GET = withRole(UserRole.INFLUENCER_ADMIN)(async (_req, { session })
         activeReferred,
         totalReferred,
         newThisMonth,
+        annualMembersCount,
+        monthlyMembersCount,
         projectedMonthlyCommission: parseFloat(projectedMonthlyCommission.toFixed(2)),
+        annualRenewalCommission: parseFloat(annualRenewalCommission.toFixed(2)),
         totalEarnings: Number(influencer.totalEarnings),
         pendingPayout: Number(influencer.pendingPayout),
         retentionRate: parseFloat(retentionRate.toFixed(1)),
         churnRate: parseFloat(churnRate.toFixed(1)),
         rank,
         totalInfluencers,
-        monthlyTicket: parseFloat(monthlyTicket.toFixed(2)),
+        monthlyTicket: parseFloat(monthlyEquivalent.toFixed(2)),
+        annualTicket: parseFloat(annualPrice.toFixed(2)),
       },
       monthlyHistory,
       badge: {

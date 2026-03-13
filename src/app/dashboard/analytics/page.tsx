@@ -340,7 +340,7 @@ export default function AnalyticsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-white">
-                  {["Influenciador", "Comunidade", "MRR", "Membros", "Comissão"].map((h) => (
+                  {["Influenciador", "Comunidade", "MRR", "Membros", "Taxa", "Comissão"].map((h) => (
                     <th
                       key={h}
                       className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide ${
@@ -355,26 +355,32 @@ export default function AnalyticsPage() {
               <tbody className="divide-y divide-white/5">
                 {influencerStats.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="text-center py-8 text-gray-500 text-sm">
+                    <td colSpan={6} className="text-center py-8 text-gray-500 text-sm">
                       Nenhum dado disponível
                     </td>
                   </tr>
                 ) : (
-                  influencerStats.map((inf: any, i: number) => (
-                    <tr key={i} className="hover:bg-violet-50 transition-colors">
-                      <td className="px-6 py-4 font-medium text-gray-900">{inf.displayName}</td>
-                      <td className="px-6 py-4 text-gray-400">{inf.communityName}</td>
-                      <td className="px-6 py-4 text-right font-semibold text-gray-900">
-                        R$ {inf.mrr.toLocaleString("pt-BR")}
-                      </td>
-                      <td className="px-6 py-4 text-right text-gray-400">
-                        {inf.totalMembers.toLocaleString("pt-BR")}
-                      </td>
-                      <td className="px-6 py-4 text-right text-green-400 font-medium">
-                        {(inf.commissionRate * 100).toFixed(0)}%
-                      </td>
-                    </tr>
-                  ))
+                  influencerStats.map((inf: any, i: number) => {
+                    const commissionAmount = inf.mrr * inf.commissionRate;
+                    return (
+                      <tr key={i} className="hover:bg-violet-50 transition-colors">
+                        <td className="px-6 py-4 font-medium text-gray-900">{inf.displayName}</td>
+                        <td className="px-6 py-4 text-gray-400">{inf.communityName}</td>
+                        <td className="px-6 py-4 text-right font-semibold text-gray-900">
+                          R$ {inf.mrr.toLocaleString("pt-BR")}
+                        </td>
+                        <td className="px-6 py-4 text-right text-gray-400">
+                          {inf.totalMembers.toLocaleString("pt-BR")}
+                        </td>
+                        <td className="px-6 py-4 text-right text-gray-400">
+                          {(inf.commissionRate * 100).toFixed(0)}%
+                        </td>
+                        <td className="px-6 py-4 text-right text-green-400 font-medium">
+                          R$ {commissionAmount.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>
