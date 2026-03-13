@@ -11,7 +11,7 @@ import { db } from "@/lib/db";
 import { stripe } from "@/lib/stripe/stripe";
 import { PlatformMembershipStatus } from "@prisma/client";
 
-const PREMIUM_PRICE_ANNUAL_BRL = 60000; // R$600 additional / year (in centavos)
+const PREMIUM_PRICE_ANNUAL_BRL = 83700; // R$837/ano (plano único, em centavos)
 const PREMIUM_PRODUCT_NAME = "DetailHub Premium";
 const PREMIUM_PRODUCT_DESCRIPTION =
   "Acesso a conteúdo exclusivo premium, suporte prioritário e benefícios especiais";

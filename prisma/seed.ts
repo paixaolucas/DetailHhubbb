@@ -121,8 +121,8 @@ async function main() {
         youtube: "BarbaOficial",
       },
       isVerified: true,
-      totalEarnings: 84000,
-      pendingPayout: 7000,
+      totalEarnings: 58590,
+      pendingPayout: 4883,
     },
   });
 
@@ -135,8 +135,8 @@ async function main() {
         instagram: "@corujaozk",
       },
       isVerified: true,
-      totalEarnings: 63000,
-      pendingPayout: 5250,
+      totalEarnings: 43943,
+      pendingPayout: 3662,
     },
   });
 
@@ -149,8 +149,8 @@ async function main() {
         instagram: "@neto",
       },
       isVerified: true,
-      totalEarnings: 63000,
-      pendingPayout: 5250,
+      totalEarnings: 43943,
+      pendingPayout: 3662,
     },
   });
 
@@ -805,11 +805,11 @@ async function main() {
 ║ SuperAdmin    admin@comunidadehub.com / Admin@123456!      ║
 ╠═══════════════════════════════════════════════════════════╣
 ║ Barba         barba@comunidade.com / Influencer@123!       ║
-║               200 membros referidos · R$7.000/mês          ║
+║               200 membros referidos · R$4.882,50/mês       ║
 ║ Corujão       corujao@comunidade.com / Influencer@123!     ║
-║               150 membros referidos · R$5.250/mês          ║
+║               150 membros referidos · R$3.661,88/mês       ║
 ║ Neto          neto@comunidade.com / Influencer@123!        ║
-║               150 membros referidos · R$5.250/mês          ║
+║               150 membros referidos · R$3.661,88/mês       ║
 ╠═══════════════════════════════════════════════════════════╣
 ║ Member 1      membro1@email.com / Membro@123!              ║
 ║ Member 2      membro2@email.com / Membro@123!              ║
