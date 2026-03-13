@@ -271,13 +271,27 @@ export default function FinanceiroPage() {
     setCommRules((r) => r.filter((x) => x.id !== ruleId));
   }
 
-  // ── Computed payment totals ──────────────────────────────────────────────────
+  // ── Computed payment totals (reativos ao período) ────────────────────────────
+  const days = (() => {
+    if (period === "custom" && customStart && customEnd) {
+      const ms = new Date(customEnd).getTime() - new Date(customStart).getTime();
+      return Math.max(1, Math.round(ms / 86400000));
+    }
+    return QUICK_PERIODS.find((p) => p.key === period)?.days ?? 30;
+  })();
+  const periodScale = days / 30;
+  const isMonthly   = days >= 28 && days <= 31;
+
   const totalAnnualMembers = MOCK_INFLUENCERS.reduce((s, i) => s + i.annualMembers, 0);
   const totalPixMembers    = MOCK_INFLUENCERS.reduce((s, i) => s + i.pixMembers, 0);
 
-  // Receita bruta (mensal equivalente)
-  const receitaBrutaAnual = (totalAnnualMembers * PRECO_ANUAL) / 12;
-  const receitaBrutaPix   = totalPixMembers * PRECO_PIX;
+  // MRR base (sempre mensal — independe do período)
+  const mrrAnualBase = (totalAnnualMembers * PRECO_ANUAL) / 12;
+  const mrrPixBase   = totalPixMembers * PRECO_PIX;
+
+  // Receita bruta escalada pelo período
+  const receitaBrutaAnual = mrrAnualBase * periodScale;
+  const receitaBrutaPix   = mrrPixBase   * periodScale;
   const receitaBrutaTotal = receitaBrutaAnual + receitaBrutaPix;
 
   // Comissão da plataforma
@@ -337,7 +351,8 @@ export default function FinanceiroPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         {[
           {
-            label: "MRR Total", value: `R$ ${receitaBrutaTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
+            label: isMonthly ? "MRR Total" : `Receita — ${days}d`,
+            value: `R$ ${receitaBrutaTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
             icon: TrendingUp, color: "text-green-400", bg: "bg-green-500/10",
           },
           {
@@ -345,7 +360,8 @@ export default function FinanceiroPage() {
             icon: Users, color: "text-violet-400", bg: "bg-violet-500/10",
           },
           {
-            label: "Repasse Influencers", value: `R$ ${repasseTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
+            label: isMonthly ? "Repasse Influencers" : `Repasse — ${days}d`,
+            value: `R$ ${repasseTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
             icon: ArrowUpRight, color: "text-purple-400", bg: "bg-purple-500/10",
           },
           {
@@ -370,7 +386,7 @@ export default function FinanceiroPage() {
       <div>
         <h2 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
           <span className="w-1.5 h-5 bg-green-500 rounded-full" />
-          Pagamentos por Tipo
+          Pagamentos por Tipo — <span className="text-green-400 font-normal">{periodLabel}</span>
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
@@ -391,7 +407,7 @@ export default function FinanceiroPage() {
                 <span className="font-semibold text-gray-900">{totalAnnualMembers.toLocaleString("pt-BR")}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Receita bruta (MRR)</span>
+                <span className="text-gray-500">{isMonthly ? "Receita bruta (MRR)" : `Receita bruta (${days}d)`}</span>
                 <span className="font-semibold text-green-400">
                   R$ {receitaBrutaAnual.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                 </span>
@@ -434,7 +450,7 @@ export default function FinanceiroPage() {
                 <span className="font-semibold text-gray-900">{totalPixMembers.toLocaleString("pt-BR")}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Receita bruta (MRR)</span>
+                <span className="text-gray-500">{isMonthly ? "Receita bruta (MRR)" : `Receita bruta (${days}d)`}</span>
                 <span className="font-semibold text-green-400">
                   R$ {receitaBrutaPix.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                 </span>
@@ -512,7 +528,9 @@ export default function FinanceiroPage() {
       <div className="glass-card overflow-hidden">
         <div className="p-5 border-b border-gray-200">
           <h2 className="text-base font-semibold text-gray-900">Repasse por Influencer — Anual vs PIX Mensal</h2>
-          <p className="text-xs text-gray-500 mt-1">Comissão de {(COMISSAO * 100).toFixed(0)}% retida pela plataforma em ambos os tipos</p>
+          <p className="text-xs text-gray-500 mt-1">
+            Comissão de {(COMISSAO * 100).toFixed(0)}% · período de {days} dias · {isMonthly ? "valores mensais (MRR)" : `receita proporcional a ${days}d`}
+          </p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -529,6 +547,8 @@ export default function FinanceiroPage() {
             <tbody className="divide-y divide-white/5">
               {MOCK_INFLUENCERS.map((inf, i) => {
                 const c = calcInfluencer(inf);
+                const netAnualScaled = c.netAnual * periodScale;
+                const netPixScaled   = c.netPix   * periodScale;
                 return (
                   <tr key={i} className="hover:bg-green-50 transition-colors">
                     <td className="px-5 py-3.5">
@@ -549,13 +569,13 @@ export default function FinanceiroPage() {
                       <span className="text-xs px-2 py-0.5 bg-emerald-500/10 text-emerald-400 rounded-full">{inf.pixMembers}</span>
                     </td>
                     <td className="px-5 py-3.5 text-right text-blue-400 font-medium">
-                      R$ {c.netAnual.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                      R$ {netAnualScaled.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     </td>
                     <td className="px-5 py-3.5 text-right text-emerald-400 font-medium hidden md:table-cell">
-                      R$ {c.netPix.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                      R$ {netPixScaled.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     </td>
                     <td className="px-5 py-3.5 text-right font-bold text-green-400">
-                      R$ {c.netTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                      R$ {(netAnualScaled + netPixScaled).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     </td>
                   </tr>
                 );
