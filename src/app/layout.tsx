@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/toast-provider";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -49,6 +51,8 @@ export default function RootLayout({
         <ToastProvider>
           {children}
         </ToastProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

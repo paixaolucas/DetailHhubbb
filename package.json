@@ -31,6 +31,8 @@
     "@react-email/components": "^1.0.8",
     "@stripe/stripe-js": "^3.0.0",
     "@uploadthing/react": "^7.3.3",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
