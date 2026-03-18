@@ -21,6 +21,7 @@ const PUBLIC_PATHS = [
   "/api/auth/refresh",
   "/api/auth/forgot-password",
   "/api/auth/reset-password",
+  "/api/auth/google",
   "/api/webhooks",
   "/api/stripe/webhook",
   "/api/leaderboard",

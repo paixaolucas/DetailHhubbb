@@ -72,6 +72,7 @@ export const PUT = withAuth(async (req, { session }) => {
         select: { passwordHash: true },
       });
       if (!user) throw new ValidationError("User not found");
+      if (!user.passwordHash) throw new ValidationError("This account uses Google login and has no password set");
       const isValid = await verifyPassword(currentPassword, user.passwordHash);
       if (!isValid) throw new ValidationError("Current password is incorrect");
       passwordHash = await hashPassword(newPassword);

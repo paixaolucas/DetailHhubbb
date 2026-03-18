@@ -112,6 +112,187 @@ export async function registerUser(
 }
 
 // =============================================================================
+// GOOGLE OAUTH LOGIN / REGISTER
+// =============================================================================
+
+interface GoogleAuthInput {
+  googleId: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl?: string;
+  emailVerified?: boolean;
+}
+
+export async function loginOrRegisterWithGoogle(
+  input: GoogleAuthInput,
+  ipAddress?: string,
+  referralCode?: string
+): Promise<{ user: AuthSession; tokens: AuthTokens }> {
+  // Check if user already exists by googleId or email
+  const existingUser = await db.user.findFirst({
+    where: {
+      OR: [{ googleId: input.googleId }, { email: input.email }],
+    },
+    select: {
+      id: true,
+      email: true,
+      googleId: true,
+      role: true,
+      firstName: true,
+      lastName: true,
+      avatarUrl: true,
+      isActive: true,
+      isBanned: true,
+      bannedReason: true,
+    },
+  });
+
+  if (existingUser) {
+    // Existing user — check account status
+    if (existingUser.isBanned) {
+      throw new AppError(
+        "Conta suspensa. Entre em contato com o suporte.",
+        403,
+        "ACCOUNT_BANNED"
+      );
+    }
+
+    if (!existingUser.isActive) {
+      throw new AppError("Account deactivated", 403, "ACCOUNT_INACTIVE");
+    }
+
+    // Link Google ID if not yet linked (user registered with email/password before)
+    if (!existingUser.googleId) {
+      await db.user.update({
+        where: { id: existingUser.id },
+        data: {
+          googleId: input.googleId,
+          emailVerified: new Date(),
+          ...(input.avatarUrl && !existingUser.avatarUrl
+            ? { avatarUrl: input.avatarUrl }
+            : {}),
+        },
+      });
+    }
+
+    // Generate tokens
+    const [accessToken, refreshToken] = await Promise.all([
+      createAccessToken({
+        userId: existingUser.id,
+        email: existingUser.email,
+        role: existingUser.role,
+      }),
+      createRefreshToken(existingUser.id),
+    ]);
+
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+    await db.$transaction([
+      db.refreshToken.create({
+        data: {
+          token: refreshToken,
+          userId: existingUser.id,
+          expiresAt,
+          ipAddress,
+        },
+      }),
+      db.user.update({
+        where: { id: existingUser.id },
+        data: { lastLoginAt: new Date(), lastLoginIp: ipAddress },
+      }),
+    ]);
+
+    return {
+      user: {
+        userId: existingUser.id,
+        email: existingUser.email,
+        role: existingUser.role,
+        firstName: existingUser.firstName,
+        lastName: existingUser.lastName,
+        avatarUrl: existingUser.avatarUrl,
+      },
+      tokens: {
+        accessToken,
+        refreshToken,
+        expiresIn: getAccessTokenExpiry(),
+      },
+    };
+  }
+
+  // New user — register
+  const newReferralCode = crypto.randomBytes(6).toString("hex").toUpperCase();
+
+  let referredById: string | undefined;
+  if (referralCode) {
+    const referrer = await db.user.findUnique({
+      where: { referralCode },
+      select: { id: true },
+    });
+    if (referrer) referredById = referrer.id;
+  }
+
+  const user = await db.user.create({
+    data: {
+      email: input.email,
+      googleId: input.googleId,
+      firstName: input.firstName,
+      lastName: input.lastName,
+      avatarUrl: input.avatarUrl,
+      emailVerified: input.emailVerified ? new Date() : null,
+      role: UserRole.COMMUNITY_MEMBER,
+      referralCode: newReferralCode,
+      ...(referredById ? { referredById } : {}),
+    },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      firstName: true,
+      lastName: true,
+      avatarUrl: true,
+    },
+  });
+
+  const [accessToken, refreshToken] = await Promise.all([
+    createAccessToken({ userId: user.id, email: user.email, role: user.role }),
+    createRefreshToken(user.id),
+  ]);
+
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+  await db.refreshToken.create({
+    data: {
+      token: refreshToken,
+      userId: user.id,
+      expiresAt,
+      ipAddress,
+    },
+  });
+
+  // Send welcome email (non-blocking)
+  sendWelcomeEmail({ email: user.email, firstName: user.firstName }).catch(
+    (err) => console.error("[Auth] welcome email failed:", err)
+  );
+
+  return {
+    user: {
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      avatarUrl: user.avatarUrl,
+    },
+    tokens: {
+      accessToken,
+      refreshToken,
+      expiresIn: getAccessTokenExpiry(),
+    },
+  };
+}
+
+// =============================================================================
 // LOGIN
 // =============================================================================
 
@@ -152,6 +333,15 @@ export async function loginUser(
 
   if (!user.isActive) {
     throw new AppError("Account deactivated", 403, "ACCOUNT_INACTIVE");
+  }
+
+  // User registered via Google only (no password set)
+  if (!user.passwordHash) {
+    throw new AppError(
+      "Esta conta usa login com Google. Clique em \"Entrar com Google\".",
+      400,
+      "GOOGLE_ONLY_ACCOUNT"
+    );
   }
 
   const passwordValid = await verifyPassword(

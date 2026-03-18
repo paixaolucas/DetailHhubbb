@@ -38,6 +38,8 @@ STRIPE_WEBHOOK_SECRET=
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
 OPENAI_API_KEY=
 RESEND_API_KEY=
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
 UPLOADTHING_SECRET=
 UPLOADTHING_APP_ID=
 NEXT_PUBLIC_APP_URL=http://localhost:3000
@@ -50,7 +52,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 | Conta | Email | Senha |
 |-------|-------|-------|
 | Super Admin | admin@comunidadehub.com | Admin@123456! |
-| Influencer | joao@comunidade.com | Influencer@123! |
+| Influencer | joao@comunidade.com | C |
 | Membro | membro1@email.com | Membro@123! |
 
 ---
@@ -99,6 +101,15 @@ MARKETPLACE_PARTNER → vende produtos no marketplace
   - `detailhub_user_email`
   - `detailhub_user_id`
 - **SEMPRE** usar `STORAGE_KEYS` de `src/lib/constants.ts` — nunca strings literais
+
+### Google OAuth
+- Fluxo: `/api/auth/google` → Google consent → `/api/auth/google/callback` → `/api/auth/google/complete` (hydra localStorage) → redirect
+- `User.googleId` (unique, optional) — vincula conta ao Google
+- `User.passwordHash` agora é opcional — contas Google-only não têm senha
+- Se usuário Google tenta login com senha, retorna erro `GOOGLE_ONLY_ACCOUNT`
+- Se usuário email/senha faz login com Google, vincula o `googleId` automaticamente
+- CSRF via cookie `google_oauth_state` + state param
+- Variáveis: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
 
 ### Middleware de API
 ```ts

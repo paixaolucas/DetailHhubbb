@@ -44,3 +44,5 @@ public/uploads/*
 # Type checking cache
 .tsbuildinfo
 next-env.d.ts
+
+.vercel
