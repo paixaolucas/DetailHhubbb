@@ -6,6 +6,7 @@ import {
   NotificationDropdown,
   type NotificationItem,
 } from "./NotificationDropdown";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -20,7 +21,7 @@ export function NotificationBell() {
 
   function getToken(): string | null {
     return typeof window !== "undefined"
-      ? localStorage.getItem("detailhub_access_token")
+      ? localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN)
       : null;
   }
 

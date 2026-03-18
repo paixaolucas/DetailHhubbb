@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Hash, ArrowRight, Layers, AlertCircle } from "lucide-react";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 interface Space {
   id: string;
@@ -82,14 +83,14 @@ export default function CommunityFeedPage() {
       setLoading(true);
       setError("");
       try {
-        const token = localStorage.getItem("detailhub_access_token");
+        const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
 
         if (!token) {
           router.push(`/login?redirect=/community/${communitySlug}/feed`);
           return;
         }
 
-        const role = localStorage.getItem("detailhub_user_role");
+        const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
 
         // 1. Fetch public communities + owned communities in parallel
         const [pubRes, mineRes] = await Promise.all([

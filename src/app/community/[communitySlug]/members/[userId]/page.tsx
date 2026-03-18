@@ -12,6 +12,7 @@ import Link from "next/link";
 import {
   ArrowLeft, MapPin, Car, MessageCircle, ThumbsUp, Calendar, ExternalLink,
 } from "lucide-react";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -127,7 +128,7 @@ export default function MemberProfilePage() {
     async function load() {
       setLoading(true);
       try {
-        const token = localStorage.getItem("detailhub_access_token");
+        const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
         if (!token) {
           router.push(`/login?redirect=/community/${communitySlug}/members/${userId}`);
           return;

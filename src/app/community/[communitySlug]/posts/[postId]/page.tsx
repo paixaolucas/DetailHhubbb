@@ -8,6 +8,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import PostDetail from "@/components/feed/PostDetail";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 export default function PostDetailPage() {
   const params = useParams();
@@ -18,7 +19,7 @@ export default function PostDetailPage() {
 
   // Auth guard — runs only on client
   useEffect(() => {
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     if (!token) {
       router.push(
         `/login?redirect=/community/${communitySlug}/posts/${postId}`

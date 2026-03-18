@@ -10,6 +10,7 @@ import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Search, Users, ArrowLeft, Award } from "lucide-react";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 interface MemberUser {
   id: string;
@@ -65,7 +66,7 @@ export default function CommunityMembersPage() {
 
   const fetchMembers = useCallback(
     async (communityId: string, pageNum: number) => {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(
         `/api/communities/${communityId}/members?page=${pageNum}&pageSize=20&status=ACTIVE`,
         { headers: { Authorization: `Bearer ${token}` } }
@@ -84,7 +85,7 @@ export default function CommunityMembersPage() {
       setLoading(true);
       setError("");
       try {
-        const token = localStorage.getItem("detailhub_access_token");
+        const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
 
         // Find community by slug
         const mineRes = await fetch("/api/communities/mine", {

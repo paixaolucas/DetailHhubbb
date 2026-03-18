@@ -12,6 +12,7 @@ import { ArrowLeft, Trash2, MessageCircle, Hash } from "lucide-react";
 import Link from "next/link";
 import ReactionBar from "@/components/feed/ReactionBar";
 import CommentItem, { CommentData } from "@/components/feed/CommentItem";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -129,9 +130,9 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
     setLoading(true);
     setError("");
     try {
-      const token = localStorage.getItem("detailhub_access_token");
-      const uid = localStorage.getItem("detailhub_user_id");
-      const role = localStorage.getItem("detailhub_user_role");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+      const uid = localStorage.getItem(STORAGE_KEYS.USER_ID);
+      const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
       setCurrentUserId(uid);
 
       const res = await fetch(`/api/posts/${postId}`, {
@@ -204,7 +205,7 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
     if (reactionLoading || !post) return;
     setReactionLoading(true);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(`/api/posts/${postId}/reactions`, {
         method: "POST",
         headers: {
@@ -241,7 +242,7 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
     setCommentLoading(true);
     setCommentError("");
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(`/api/posts/${postId}/comments`, {
         method: "POST",
         headers: {
@@ -270,7 +271,7 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
     if (!window.confirm("Excluir este post permanentemente?")) return;
     setDeleting(true);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(`/api/posts/${postId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },

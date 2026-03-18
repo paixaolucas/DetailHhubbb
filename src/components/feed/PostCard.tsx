@@ -12,6 +12,7 @@ import { MessageCircle, ThumbsUp, Pin, MoreHorizontal, EyeOff, Eye, Trash2 } fro
 import ReactionBar from "@/components/feed/ReactionBar";
 import { useToast } from "@/components/ui/toast-provider";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -179,7 +180,7 @@ export default function PostCard({
     setActionLoading(true);
     setMenuOpen(false);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(`/api/posts/${post.id}/pin`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}` },
@@ -202,7 +203,7 @@ export default function PostCard({
     setActionLoading(true);
     setMenuOpen(false);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(`/api/posts/${post.id}/hide`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}` },
@@ -225,7 +226,7 @@ export default function PostCard({
     setConfirmDelete(false);
     setActionLoading(true);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(`/api/posts/${post.id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },

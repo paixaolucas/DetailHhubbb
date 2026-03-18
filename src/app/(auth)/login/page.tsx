@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Loader2, Car, Bot, Video } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 function LoginFormContent() {
   const searchParams = useSearchParams();
@@ -40,14 +41,14 @@ function LoginFormContent() {
       }
 
       if (data.data?.tokens?.accessToken) {
-        localStorage.setItem("detailhub_access_token", data.data.tokens.accessToken);
+        localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, data.data.tokens.accessToken);
       }
       if (data.data?.user) {
-        localStorage.setItem("detailhub_user_role", data.data.user.role);
-        localStorage.setItem("detailhub_user_name", `${data.data.user.firstName} ${data.data.user.lastName}`.trim());
-        localStorage.setItem("detailhub_user_email", data.data.user.email);
+        localStorage.setItem(STORAGE_KEYS.USER_ROLE, data.data.user.role);
+        localStorage.setItem(STORAGE_KEYS.USER_NAME, `${data.data.user.firstName} ${data.data.user.lastName}`.trim());
+        localStorage.setItem(STORAGE_KEYS.USER_EMAIL, data.data.user.email);
         if (data.data.user.userId) {
-          localStorage.setItem("detailhub_user_id", data.data.user.userId);
+          localStorage.setItem(STORAGE_KEYS.USER_ID, data.data.user.userId);
         }
       }
 

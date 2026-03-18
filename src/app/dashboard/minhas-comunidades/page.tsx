@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Users, Lock, CheckCircle, Search, BookOpen, Video } from "lucide-react";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 type Community = {
   id: string;
@@ -34,7 +35,7 @@ export default function MinhasComunidadesPage() {
   useEffect(() => {
     async function load() {
       try {
-        const token = localStorage.getItem("detailhub_access_token");
+        const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
         const headers: Record<string, string> = {};
         if (token) headers["Authorization"] = `Bearer ${token}`;
 

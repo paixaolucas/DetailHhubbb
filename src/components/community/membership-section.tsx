@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { CheckCircle, ArrowRight, Zap } from "lucide-react";
 import { PlanCheckoutButton } from "@/components/community/plan-checkout-button";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 type Plan = {
   id: string;
@@ -46,7 +47,7 @@ export function MembershipSection({
   useEffect(() => {
     async function checkMembership() {
       try {
-        const token = localStorage.getItem("detailhub_access_token");
+        const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
         if (!token) {
           setIsLoading(false);
           return;

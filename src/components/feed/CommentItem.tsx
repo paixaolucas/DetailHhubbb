@@ -9,6 +9,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { ThumbsUp, Trash2, CornerDownRight } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -94,7 +95,7 @@ export default function CommentItem({
     if (likeLoading) return;
     setLikeLoading(true);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(`/api/comments/${comment.id}/reactions`, {
         method: "POST",
         headers: {
@@ -121,7 +122,7 @@ export default function CommentItem({
     setDeleting(true);
     setConfirmDelete(false);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(`/api/comments/${comment.id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
@@ -142,7 +143,7 @@ export default function CommentItem({
     setReplyLoading(true);
     setReplyError("");
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(`/api/posts/${postId}/comments`, {
         method: "POST",
         headers: {

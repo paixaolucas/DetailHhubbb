@@ -12,6 +12,7 @@ import { useParams, usePathname, useRouter } from "next/navigation";
 import { Hash, Menu, X, Users, Trophy } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 interface Space {
   id: string;
@@ -44,8 +45,8 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("detailhub_access_token");
-    const name = localStorage.getItem("detailhub_user_name") ?? "";
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+    const name = localStorage.getItem(STORAGE_KEYS.USER_NAME) ?? "";
     setUserName(name);
     setUserInitials(
       name.split(" ").slice(0, 2).map((n: string) => n[0]).join("").toUpperCase() || "U"

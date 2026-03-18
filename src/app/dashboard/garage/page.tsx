@@ -10,6 +10,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Car, Save, ImageIcon, X, Share2 } from "lucide-react";
 import { useUploadThing } from "@/utils/uploadthing";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 interface GarageData {
   carBrand: string;
@@ -46,8 +47,8 @@ export default function GaragePage() {
   const { startUpload } = useUploadThing("postAttachmentUploader");
 
   useEffect(() => {
-    const uid = localStorage.getItem("detailhub_user_id");
-    const token = localStorage.getItem("detailhub_access_token");
+    const uid = localStorage.getItem(STORAGE_KEYS.USER_ID);
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     setUserId(uid);
 
     if (!uid || !token) {
@@ -106,7 +107,7 @@ export default function GaragePage() {
     setSuccess("");
 
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       let newPhotoUrls: string[] = [];
 
       if (selectedFiles.length > 0) {

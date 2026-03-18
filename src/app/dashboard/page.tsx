@@ -24,6 +24,7 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/components/ui/toast-provider";
 import { CommunityThumbnail } from "@/components/community/CommunityThumbnail";
+import { STORAGE_KEYS } from "@/lib/constants";
 import {
   AreaChart,
   Area,
@@ -149,7 +150,7 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     if (!token) return;
     fetch("/api/analytics/platform", { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.json())
@@ -252,7 +253,7 @@ function InfluencerDashboard({ userName }: { userName: string }) {
   const [membersLoading, setMembersLoading] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     if (!token) return;
     Promise.all([
       fetch("/api/analytics/influencer", { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json()),
@@ -502,7 +503,7 @@ function MemberDashboardInner({ userName }: { userName: string }) {
   }, [searchParams, toast, router]);
 
   useEffect(() => {
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     if (!token) { setLoading(false); return; }
 
     const headers = { Authorization: `Bearer ${token}` };
@@ -841,13 +842,13 @@ export default function DashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const storedRole = localStorage.getItem("detailhub_user_role");
+    const storedRole = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
     if (!storedRole) {
       router.replace("/login");
       return;
     }
     setRole(storedRole);
-    setUserName(localStorage.getItem("detailhub_user_name") ?? "");
+    setUserName(localStorage.getItem(STORAGE_KEYS.USER_NAME) ?? "");
   }, [router]);
 
   if (!role) return (

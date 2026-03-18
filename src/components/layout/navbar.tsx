@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X, LayoutDashboard, ChevronDown, LogOut } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 interface AuthUser {
   name: string;
@@ -15,18 +16,18 @@ function useNavAuth() {
   const [user, setUser] = useState<AuthUser | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("detailhub_access_token");
-    const name = localStorage.getItem("detailhub_user_name");
-    const email = localStorage.getItem("detailhub_user_email");
-    const role = localStorage.getItem("detailhub_user_role");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+    const name = localStorage.getItem(STORAGE_KEYS.USER_NAME);
+    const email = localStorage.getItem(STORAGE_KEYS.USER_EMAIL);
+    const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
     if (token && name) {
       setUser({ name, email: email ?? "", role: role ?? "" });
     }
   }, []);
 
   function logout() {
-    ["detailhub_access_token", "detailhub_refresh_token", "detailhub_user_role",
-     "detailhub_user_name", "detailhub_user_email", "detailhub_user_id"].forEach(
+    [STORAGE_KEYS.ACCESS_TOKEN, STORAGE_KEYS.REFRESH_TOKEN, STORAGE_KEYS.USER_ROLE,
+     STORAGE_KEYS.USER_NAME, STORAGE_KEYS.USER_EMAIL, STORAGE_KEYS.USER_ID].forEach(
       (k) => localStorage.removeItem(k)
     );
     setUser(null);

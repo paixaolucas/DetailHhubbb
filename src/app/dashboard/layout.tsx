@@ -39,11 +39,14 @@ import {
   Compass,
   CheckSquare,
   Megaphone,
+  Car,
+  Search,
 } from "lucide-react";
 import { RoleBadge } from "@/components/ui/badge";
 import { Logo } from "@/components/ui/logo";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import SearchBar from "@/components/search/SearchBar";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -135,6 +138,7 @@ const INFLUENCER_NAV: NavEntry[] = [
       { href: "/dashboard/entregas", label: "Entregas do Mês", icon: CheckSquare },
       { href: "/dashboard/analytics", label: "Analytics", icon: BarChart2 },
       { href: "/dashboard/marketplace", label: "Marketplace", icon: ShoppingBag },
+      { href: "/dashboard/anuncios", label: "Anúncios", icon: Megaphone },
       { href: "/dashboard/tools", label: "Ferramentas", icon: Wrench },
       { href: "/dashboard/ai", label: "Auto AI", icon: Bot },
     ],
@@ -155,11 +159,13 @@ const MEMBER_NAV: NavEntry[] = [
   { type: "link", href: "/dashboard", label: "Início", icon: Home, exact: true },
   {
     type: "group",
-    label: "Aprender",
-    icon: GraduationCap,
+    label: "Comunidades",
+    icon: Users,
     items: [
+      { href: "/dashboard/minhas-comunidades", label: "Minhas Comunidades", icon: Users },
       { href: "/dashboard/meu-aprendizado", label: "Meu Aprendizado", icon: GraduationCap },
       { href: "/dashboard/lives", label: "Lives", icon: PlayCircle },
+      { href: "/dashboard/lives/calendar", label: "Calendário", icon: Calendar },
       { href: "/dashboard/leaderboard", label: "Leaderboard", icon: Trophy },
     ],
   },
@@ -168,8 +174,10 @@ const MEMBER_NAV: NavEntry[] = [
     label: "Explorar",
     icon: Compass,
     items: [
+      { href: "/dashboard/garage", label: "Minha Garagem", icon: Car },
       { href: "/dashboard/marketplace", label: "Marketplace", icon: ShoppingBag },
       { href: "/dashboard/ai", label: "Auto AI", icon: Bot },
+      { href: "/dashboard/search", label: "Buscar", icon: Search },
     ],
   },
   {
@@ -240,7 +248,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   useEffect(() => {
     async function checkAuth() {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
 
       // If no access token, try to refresh using the httpOnly cookie
       if (!token) {
@@ -252,14 +260,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           });
           const data = await res.json();
           if (res.ok && data.data?.accessToken) {
-            localStorage.setItem("detailhub_access_token", data.data.accessToken);
+            localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, data.data.accessToken);
           } else {
             // Refresh failed — clear everything and redirect
-            localStorage.removeItem("detailhub_access_token");
-            localStorage.removeItem("detailhub_user_role");
-            localStorage.removeItem("detailhub_user_name");
-            localStorage.removeItem("detailhub_user_email");
-            localStorage.removeItem("detailhub_user_id");
+            localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+            localStorage.removeItem(STORAGE_KEYS.USER_ROLE);
+            localStorage.removeItem(STORAGE_KEYS.USER_NAME);
+            localStorage.removeItem(STORAGE_KEYS.USER_EMAIL);
+            localStorage.removeItem(STORAGE_KEYS.USER_ID);
             router.push("/login");
             return;
           }
@@ -286,7 +294,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               });
               const data = await res.json();
               if (res.ok && data.data?.accessToken) {
-                localStorage.setItem("detailhub_access_token", data.data.accessToken);
+                localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, data.data.accessToken);
               }
             }
           }
@@ -295,8 +303,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         }
       }
 
-      const storedRole = localStorage.getItem("detailhub_user_role") ?? "INFLUENCER_ADMIN";
-      const storedName = localStorage.getItem("detailhub_user_name") ?? "";
+      const storedRole = localStorage.getItem(STORAGE_KEYS.USER_ROLE) ?? "INFLUENCER_ADMIN";
+      const storedName = localStorage.getItem(STORAGE_KEYS.USER_NAME) ?? "";
       setRole(storedRole);
       setUserName(storedName);
       setAuthChecked(true);
@@ -340,11 +348,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         credentials: "include",
       });
     } finally {
-      localStorage.removeItem("detailhub_access_token");
-      localStorage.removeItem("detailhub_user_role");
-      localStorage.removeItem("detailhub_user_name");
-      localStorage.removeItem("detailhub_user_email");
-      localStorage.removeItem("detailhub_user_id");
+      localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+      localStorage.removeItem(STORAGE_KEYS.USER_ROLE);
+      localStorage.removeItem(STORAGE_KEYS.USER_NAME);
+      localStorage.removeItem(STORAGE_KEYS.USER_EMAIL);
+      localStorage.removeItem(STORAGE_KEYS.USER_ID);
       router.push("/login");
     }
   }

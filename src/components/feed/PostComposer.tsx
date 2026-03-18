@@ -10,6 +10,7 @@ import { useState, useRef } from "react";
 import Image from "next/image";
 import { Send, Plus, Minus, ImageIcon, X } from "lucide-react";
 import { useUploadThing } from "@/utils/uploadthing";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 interface PostComposerProps {
   spaceId: string;
@@ -54,7 +55,7 @@ export default function PostComposer({ spaceId, onPost }: PostComposerProps) {
     setError("");
 
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       let attachments: string[] = [];
 
       // Upload images first

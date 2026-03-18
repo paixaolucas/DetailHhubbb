@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Search, X } from "lucide-react";
 import SearchResults from "./SearchResults";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 interface SearchData {
   communities: any[];
@@ -52,7 +53,7 @@ export default function SearchBar() {
     }
     setIsLoading(true);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(
         `/api/search?q=${encodeURIComponent(q)}&types=communities,posts,members`,
         {
