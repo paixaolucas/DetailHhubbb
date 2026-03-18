@@ -7,11 +7,11 @@ const PX: Record<string, number> = { sm: 28, md: 32, lg: 40, xl: 56 };
 
 export function Logo({ size = "md", className = "" }: LogoProps) {
   const px = PX[size];
-  const iconPx = px * 0.6;
+  const iconPx = px * 0.65;
 
   return (
     <div
-      className={`bg-gradient-to-br from-violet-600 to-violet-500 rounded-xl flex items-center justify-center flex-shrink-0 ${className}`}
+      className={`bg-gradient-to-br from-[#006079] to-[#009CD9] rounded-xl flex items-center justify-center flex-shrink-0 ${className}`}
       style={{ width: px, height: px }}
     >
       <svg
@@ -21,16 +21,22 @@ export function Logo({ size = "md", className = "" }: LogoProps) {
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        {/* Outer ring */}
-        <circle cx="12" cy="12" r="9.5" stroke="white" strokeWidth="1.75" />
-        {/* Center hub */}
-        <circle cx="12" cy="12" r="2.5" fill="white" />
-        {/* Top spoke (270°) */}
-        <line x1="12" y1="9.5" x2="12" y2="2.5" stroke="white" strokeWidth="1.75" strokeLinecap="round" />
-        {/* Bottom-right spoke (30°) */}
-        <line x1="14.17" y1="13.25" x2="20.23" y2="16.75" stroke="white" strokeWidth="1.75" strokeLinecap="round" />
-        {/* Bottom-left spoke (150°) */}
-        <line x1="9.83" y1="13.25" x2="3.77" y2="16.75" stroke="white" strokeWidth="1.75" strokeLinecap="round" />
+        {/* Left figure */}
+        <circle cx="7.5" cy="5.5" r="2.2" fill="white" />
+        <path d="M5.3 9.5C5.3 8.4 6.2 7.5 7.5 7.5C8.8 7.5 9.7 8.4 9.7 9.5V14.5C9.7 14.8 9.5 15 9.2 15H5.8C5.5 15 5.3 14.8 5.3 14.5V9.5Z" fill="white" />
+
+        {/* Right figure */}
+        <circle cx="16.5" cy="5.5" r="2.2" fill="white" />
+        <path d="M14.3 9.5C14.3 8.4 15.2 7.5 16.5 7.5C17.8 7.5 18.7 8.4 18.7 9.5V14.5C18.7 14.8 18.5 15 18.2 15H14.8C14.5 15 14.3 14.8 14.3 14.5V9.5Z" fill="white" />
+
+        {/* H crossbar */}
+        <rect x="9.2" y="10.5" width="5.6" height="2.2" rx="0.5" fill="white" />
+
+        {/* H left leg extension */}
+        <rect x="6.2" y="14.5" width="3" height="4" rx="0.5" fill="white" />
+
+        {/* H right leg extension */}
+        <rect x="14.8" y="14.5" width="3" height="4" rx="0.5" fill="white" />
       </svg>
     </div>
   );

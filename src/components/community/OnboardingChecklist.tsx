@@ -93,18 +93,18 @@ export default function OnboardingChecklist({ community }: Props) {
   const progressPct = Math.round((completedCount / items.length) * 100);
 
   return (
-    <div className="bg-violet-500/5 border border-violet-500/20 rounded-2xl p-5 mb-6">
+    <div className="bg-[#009CD9]/5 border border-[#009CD9]/20 rounded-2xl p-5 mb-6">
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h3 className="text-gray-900 font-semibold text-sm">Configure sua comunidade</h3>
+          <h3 className="text-[#EEE6E4] font-semibold text-sm">Configure sua comunidade</h3>
           <p className="text-gray-400 text-xs mt-0.5">
             {completedCount} de {items.length} etapas concluídas
           </p>
         </div>
         <button
           onClick={handleDismiss}
-          className="text-gray-600 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100"
+          className="text-gray-400 hover:text-gray-400 transition-colors p-1 rounded-lg hover:bg-white/10"
           title="Dispensar"
         >
           <X className="w-4 h-4" />
@@ -112,9 +112,9 @@ export default function OnboardingChecklist({ community }: Props) {
       </div>
 
       {/* Progress bar */}
-      <div className="h-1.5 bg-gray-50 rounded-full mb-5 overflow-hidden">
+      <div className="h-1.5 bg-white/5 rounded-full mb-5 overflow-hidden">
         <div
-          className="h-full bg-violet-500 rounded-full transition-all duration-500"
+          className="h-full bg-[#009CD9] rounded-full transition-all duration-500"
           style={{ width: `${progressPct}%` }}
         />
       </div>
@@ -126,10 +126,10 @@ export default function OnboardingChecklist({ community }: Props) {
             {item.done ? (
               <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
             ) : (
-              <Circle className="w-4 h-4 text-gray-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
             )}
             <div className="flex-1 min-w-0">
-              <p className={`text-sm font-medium leading-tight ${item.done ? "text-gray-500 line-through" : "text-gray-700"}`}>
+              <p className={`text-sm font-medium leading-tight ${item.done ? "text-gray-500 line-through" : "text-gray-300"}`}>
                 {item.label}
               </p>
               {!item.done && (
@@ -139,7 +139,7 @@ export default function OnboardingChecklist({ community }: Props) {
             {!item.done && item.action && (
               <Link
                 href={item.action.href}
-                className="flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300 flex-shrink-0 transition-colors"
+                className="flex items-center gap-1 text-xs text-[#009CD9] hover:text-[#009CD9] flex-shrink-0 transition-colors"
               >
                 {item.action.label}
                 <ChevronRight className="w-3 h-3" />

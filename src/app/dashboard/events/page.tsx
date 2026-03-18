@@ -91,9 +91,9 @@ interface Attendee {
 // Helpers
 // ---------------------------------------------------------------------------
 const TYPE_CONFIG: Record<EventType, { label: string; icon: React.ElementType; color: string }> = {
-  ONLINE: { label: "Online", icon: Video, color: "text-blue-400" },
+  ONLINE: { label: "Online", icon: Video, color: "text-[#009CD9]" },
   IN_PERSON: { label: "Presencial", icon: Building, color: "text-green-400" },
-  HYBRID: { label: "Híbrido", icon: Layers, color: "text-purple-400" },
+  HYBRID: { label: "Híbrido", icon: Layers, color: "text-[#009CD9]" },
 };
 
 const STATUS_CONFIG: Record<EventStatus, { label: string; color: string }> = {
@@ -101,7 +101,7 @@ const STATUS_CONFIG: Record<EventStatus, { label: string; color: string }> = {
   PUBLISHED: { label: "Publicado", color: "text-green-400 bg-green-400/10" },
   SOLD_OUT: { label: "Esgotado", color: "text-orange-400 bg-orange-400/10" },
   CANCELED: { label: "Cancelado", color: "text-red-400 bg-red-400/10" },
-  COMPLETED: { label: "Concluído", color: "text-blue-400 bg-blue-400/10" },
+  COMPLETED: { label: "Concluído", color: "text-[#009CD9] bg-[#009CD9]/10" },
 };
 
 function fmtBrl(n: number) {
@@ -172,7 +172,7 @@ function CreateEventModal({ onClose, onCreated }: { onClose: () => void; onCreat
           <div>
             <label className="block text-sm text-gray-400 mb-1">Título *</label>
             <input
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]"
               placeholder="Ex: Workshop de Polimento Profissional"
               value={form.title}
               onChange={(e) => set("title", e.target.value)}
@@ -181,7 +181,7 @@ function CreateEventModal({ onClose, onCreated }: { onClose: () => void; onCreat
           <div>
             <label className="block text-sm text-gray-400 mb-1">Formato *</label>
             <select
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]"
               value={form.type}
               onChange={(e) => set("type", e.target.value as EventType)}
             >
@@ -195,7 +195,7 @@ function CreateEventModal({ onClose, onCreated }: { onClose: () => void; onCreat
               <label className="block text-sm text-gray-400 mb-1">Data Início *</label>
               <input
                 type="datetime-local"
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]"
                 value={form.startAt}
                 onChange={(e) => set("startAt", e.target.value)}
               />
@@ -204,7 +204,7 @@ function CreateEventModal({ onClose, onCreated }: { onClose: () => void; onCreat
               <label className="block text-sm text-gray-400 mb-1">Data Fim</label>
               <input
                 type="datetime-local"
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]"
                 value={form.endAt}
                 onChange={(e) => set("endAt", e.target.value)}
               />
@@ -214,7 +214,7 @@ function CreateEventModal({ onClose, onCreated }: { onClose: () => void; onCreat
             <div>
               <label className="block text-sm text-gray-400 mb-1">Local / Endereço</label>
               <input
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]"
                 placeholder="Rua, número, cidade"
                 value={form.location}
                 onChange={(e) => set("location", e.target.value)}
@@ -225,7 +225,7 @@ function CreateEventModal({ onClose, onCreated }: { onClose: () => void; onCreat
             <div>
               <label className="block text-sm text-gray-400 mb-1">Link Online</label>
               <input
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]"
                 placeholder="https://meet.google.com/..."
                 value={form.onlineUrl}
                 onChange={(e) => set("onlineUrl", e.target.value)}
@@ -238,7 +238,7 @@ function CreateEventModal({ onClose, onCreated }: { onClose: () => void; onCreat
               <input
                 type="number"
                 min="1"
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]"
                 placeholder="Ilimitado"
                 value={form.capacity}
                 onChange={(e) => set("capacity", e.target.value)}
@@ -248,9 +248,9 @@ function CreateEventModal({ onClose, onCreated }: { onClose: () => void; onCreat
               <label className="flex items-center gap-2 cursor-pointer">
                 <div
                   onClick={() => set("isPublic", !form.isPublic)}
-                  className={`w-10 h-5 rounded-full transition-colors cursor-pointer ${form.isPublic ? "bg-blue-500" : "bg-white/10"}`}
+                  className={`w-10 h-5 rounded-full transition-colors cursor-pointer ${form.isPublic ? "bg-[#009CD9]" : "bg-white/10"}`}
                 >
-                  <div className={`w-4 h-4 bg-white rounded-full mt-0.5 transition-transform ${form.isPublic ? "translate-x-5 ml-0.5" : "translate-x-0.5"}`} />
+                  <div className={`w-4 h-4 bg-white/5 rounded-full mt-0.5 transition-transform ${form.isPublic ? "translate-x-5 ml-0.5" : "translate-x-0.5"}`} />
                 </div>
                 <span className="text-gray-300 text-sm">Público</span>
               </label>
@@ -259,7 +259,7 @@ function CreateEventModal({ onClose, onCreated }: { onClose: () => void; onCreat
           <div>
             <label className="block text-sm text-gray-400 mb-1">Capa (URL da imagem)</label>
             <input
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]"
               placeholder="https://..."
               value={form.coverImageUrl}
               onChange={(e) => set("coverImageUrl", e.target.value)}
@@ -269,7 +269,7 @@ function CreateEventModal({ onClose, onCreated }: { onClose: () => void; onCreat
             <label className="block text-sm text-gray-400 mb-1">Descrição</label>
             <textarea
               rows={3}
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500 resize-none"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9] resize-none"
               placeholder="Descreva o evento..."
               value={form.description}
               onChange={(e) => set("description", e.target.value)}
@@ -327,27 +327,27 @@ function AddTicketModal({ eventId, onClose, onAdded }: { eventId: string; onClos
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
       <div className="glass-card w-full max-w-sm p-6 animate-slide-up">
         <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-          <Ticket size={18} className="text-blue-400" />
+          <Ticket size={18} className="text-[#009CD9]" />
           Novo Tipo de Ingresso
         </h2>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
             <label className="block text-sm text-gray-400 mb-1">Nome *</label>
-            <input className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500" placeholder="Ex: VIP, Geral, Gratuito" value={form.name} onChange={(e) => set("name", e.target.value)} />
+            <input className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]" placeholder="Ex: VIP, Geral, Gratuito" value={form.name} onChange={(e) => set("name", e.target.value)} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm text-gray-400 mb-1">Preço (R$)</label>
-              <input type="number" min="0" step="0.01" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500" value={form.price} onChange={(e) => set("price", e.target.value)} />
+              <input type="number" min="0" step="0.01" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]" value={form.price} onChange={(e) => set("price", e.target.value)} />
             </div>
             <div>
               <label className="block text-sm text-gray-400 mb-1">Qtd. (vazio=∞)</label>
-              <input type="number" min="1" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500" placeholder="Ilimitado" value={form.quantity} onChange={(e) => set("quantity", e.target.value)} />
+              <input type="number" min="1" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]" placeholder="Ilimitado" value={form.quantity} onChange={(e) => set("quantity", e.target.value)} />
             </div>
           </div>
           <div>
             <label className="block text-sm text-gray-400 mb-1">Descrição</label>
-            <input className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500" placeholder="Benefícios inclusos..." value={form.description} onChange={(e) => set("description", e.target.value)} />
+            <input className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]" placeholder="Benefícios inclusos..." value={form.description} onChange={(e) => set("description", e.target.value)} />
           </div>
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose} className="flex-1 py-2 border border-white/10 rounded-lg text-gray-400 text-sm hover:bg-white/5 transition-colors">Cancelar</button>
@@ -478,11 +478,11 @@ function EditEventModal({ event, onClose, onSaved }: { event: Event; onClose: ()
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm text-gray-400 mb-1">Título *</label>
-            <input className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500" value={form.title} onChange={(e) => set("title", e.target.value)} />
+            <input className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]" value={form.title} onChange={(e) => set("title", e.target.value)} />
           </div>
           <div>
             <label className="block text-sm text-gray-400 mb-1">Formato *</label>
-            <select className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500" value={form.type} onChange={(e) => set("type", e.target.value as EventType)}>
+            <select className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]" value={form.type} onChange={(e) => set("type", e.target.value as EventType)}>
               <option value="ONLINE">Online</option>
               <option value="IN_PERSON">Presencial</option>
               <option value="HYBRID">Híbrido</option>
@@ -491,28 +491,28 @@ function EditEventModal({ event, onClose, onSaved }: { event: Event; onClose: ()
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm text-gray-400 mb-1">Data Início *</label>
-              <input type="datetime-local" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500" value={form.startAt} onChange={(e) => set("startAt", e.target.value)} />
+              <input type="datetime-local" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]" value={form.startAt} onChange={(e) => set("startAt", e.target.value)} />
             </div>
             <div>
               <label className="block text-sm text-gray-400 mb-1">Data Fim</label>
-              <input type="datetime-local" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500" value={form.endAt} onChange={(e) => set("endAt", e.target.value)} />
+              <input type="datetime-local" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]" value={form.endAt} onChange={(e) => set("endAt", e.target.value)} />
             </div>
           </div>
           {(form.type === "IN_PERSON" || form.type === "HYBRID") && (
             <div>
               <label className="block text-sm text-gray-400 mb-1">Local / Endereço</label>
-              <input className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500" placeholder="Rua, número, cidade" value={form.location} onChange={(e) => set("location", e.target.value)} />
+              <input className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]" placeholder="Rua, número, cidade" value={form.location} onChange={(e) => set("location", e.target.value)} />
             </div>
           )}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm text-gray-400 mb-1">Capacidade</label>
-              <input type="number" min="1" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500" placeholder="Ilimitado" value={form.capacity} onChange={(e) => set("capacity", e.target.value)} />
+              <input type="number" min="1" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]" placeholder="Ilimitado" value={form.capacity} onChange={(e) => set("capacity", e.target.value)} />
             </div>
             <div className="flex items-end pb-2">
               <label className="flex items-center gap-2 cursor-pointer">
-                <div onClick={() => set("isPublic", !form.isPublic)} className={`w-10 h-5 rounded-full transition-colors cursor-pointer ${form.isPublic ? "bg-blue-500" : "bg-white/10"}`}>
-                  <div className={`w-4 h-4 bg-white rounded-full mt-0.5 transition-transform ${form.isPublic ? "translate-x-5 ml-0.5" : "translate-x-0.5"}`} />
+                <div onClick={() => set("isPublic", !form.isPublic)} className={`w-10 h-5 rounded-full transition-colors cursor-pointer ${form.isPublic ? "bg-[#009CD9]" : "bg-white/10"}`}>
+                  <div className={`w-4 h-4 bg-white/5 rounded-full mt-0.5 transition-transform ${form.isPublic ? "translate-x-5 ml-0.5" : "translate-x-0.5"}`} />
                 </div>
                 <span className="text-gray-300 text-sm">Público</span>
               </label>
@@ -520,7 +520,7 @@ function EditEventModal({ event, onClose, onSaved }: { event: Event; onClose: ()
           </div>
           <div>
             <label className="block text-sm text-gray-400 mb-1">Capa (URL)</label>
-            <input className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500" placeholder="https://..." value={form.coverImageUrl} onChange={(e) => set("coverImageUrl", e.target.value)} />
+            <input className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]" placeholder="https://..." value={form.coverImageUrl} onChange={(e) => set("coverImageUrl", e.target.value)} />
           </div>
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose} className="flex-1 py-2 border border-white/10 rounded-lg text-gray-400 text-sm hover:bg-white/5 transition-colors">Cancelar</button>
@@ -619,7 +619,7 @@ function EventCard({
         {event.status === "DRAFT" && (
           <button
             onClick={() => onPublish(event.id)}
-            className="flex items-center gap-1 px-2.5 py-1.5 bg-green-500/10 border border-green-500/20 rounded-lg text-green-400 text-xs hover:bg-green-500/20 transition-colors"
+            className="flex items-center gap-1 px-2.5 py-1.5 bg-green-500/10 border border-green-500/20 rounded-lg text-green-400 text-xs hover:bg-green-500/100/20 transition-colors"
           >
             <Send size={11} />
             Publicar
@@ -627,7 +627,7 @@ function EventCard({
         )}
         <button
           onClick={() => onAddTicket(event.id)}
-          className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-lg text-blue-400 text-xs hover:bg-blue-500/20 transition-colors"
+          className="flex items-center gap-1 px-2.5 py-1.5 bg-[#009CD9]/10 border border-[#009CD9]/20 rounded-lg text-[#009CD9] text-xs hover:bg-[#009CD9]/20 transition-colors"
         >
           <Ticket size={11} />
           + Ingresso
@@ -748,7 +748,7 @@ export default function EventsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <Calendar size={24} className="text-blue-400" />
+            <Calendar size={24} className="text-[#009CD9]" />
             Eventos
           </h1>
           <p className="text-gray-400 text-sm mt-1">Crie e gerencie seus eventos com ingressos</p>
@@ -767,7 +767,7 @@ export default function EventsPage() {
         {[
           { label: "Próximos eventos", value: upcomingCount, icon: Calendar, color: "text-green-400" },
           { label: "Rascunhos", value: draftCount, icon: Edit3, color: "text-yellow-400" },
-          { label: "Total inscrições", value: totalRegistrations, icon: Users, color: "text-blue-400" },
+          { label: "Total inscrições", value: totalRegistrations, icon: Users, color: "text-[#009CD9]" },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="glass-card p-4">
             <div className="flex items-center gap-2 mb-1">
@@ -787,7 +787,7 @@ export default function EventsPage() {
               key={s}
               onClick={() => setStatusFilter(s)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                statusFilter === s ? "bg-blue-500 text-white" : "bg-white/5 border border-white/10 text-gray-400 hover:text-white"
+                statusFilter === s ? "bg-[#009CD9] text-white" : "bg-white/5 border border-white/10 text-gray-400 hover:text-white"
               }`}
             >
               {s === "ALL" ? "Todos" : STATUS_CONFIG[s as EventStatus]?.label ?? s}
@@ -800,7 +800,7 @@ export default function EventsPage() {
       {/* Events grid */}
       {events.length === 0 ? (
         <div className="glass-card p-12 text-center">
-          <Calendar size={40} className="text-gray-600 mx-auto mb-3" />
+          <Calendar size={40} className="text-gray-400 mx-auto mb-3" />
           <p className="text-gray-400 text-sm">Nenhum evento encontrado.</p>
           <button onClick={() => setShowCreate(true)} className="mt-4 btn-premium px-4 py-2 rounded-lg text-sm">
             Criar primeiro evento

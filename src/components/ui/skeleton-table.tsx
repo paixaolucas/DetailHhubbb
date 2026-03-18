@@ -15,7 +15,7 @@ export function SkeletonTable({ rows = 5, columns = 4, showHeader = true }: Skel
             <tr>
               {Array.from({ length: columns }).map((_, i) => (
                 <th key={i} className="px-4 py-3 text-left">
-                  <div className="h-4 bg-gray-50 rounded animate-pulse w-24" />
+                  <div className="h-4 bg-white/10 rounded animate-pulse w-24" />
                 </th>
               ))}
             </tr>
@@ -23,11 +23,11 @@ export function SkeletonTable({ rows = 5, columns = 4, showHeader = true }: Skel
         )}
         <tbody>
           {Array.from({ length: rows }).map((_, rowIdx) => (
-            <tr key={rowIdx} className="border-t border-gray-100">
+            <tr key={rowIdx} className="border-t border-white/10">
               {Array.from({ length: columns }).map((_, colIdx) => (
                 <td key={colIdx} className="px-4 py-3">
                   <div
-                    className="h-4 bg-gray-50 rounded animate-pulse"
+                    className="h-4 bg-white/10 rounded animate-pulse"
                     style={{ width: colIdx === 0 ? "60%" : colIdx === columns - 1 ? "40%" : "80%" }}
                   />
                 </td>

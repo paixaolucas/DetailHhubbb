@@ -104,26 +104,26 @@ function RegisterFormContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F7FF] flex">
+    <div className="min-h-screen bg-[#1A1A1A] flex">
       {/* Left panel — decorative */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-[#F0EEFF]">
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-[#1A1A1A]">
         <div className="absolute inset-0 grid-pattern opacity-30" />
-        <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-violet-600/20 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-[#006079]/20 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-60 h-60 bg-cyan-600/15 rounded-full blur-3xl" />
 
         <div className="relative flex flex-col justify-center px-16 py-12">
           <Link href="/" className="flex items-center gap-2.5 mb-16">
             <Logo size="lg" />
-            <span className="text-gray-900 font-bold text-xl">DetailHub</span>
+            <span className="text-[#EEE6E4] font-bold text-xl">Detailer&apos;HUB</span>
           </Link>
 
           <div className="space-y-8">
             <div>
-              <h1 className="text-4xl font-bold text-gray-900 leading-tight mb-4">
+              <h1 className="text-4xl font-bold text-[#EEE6E4] leading-tight mb-4">
                 Junte-se à maior
-                <span className="bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent"> comunidade automotiva</span>
+                <span className="bg-gradient-to-r from-[#009CD9] to-[#007A99] bg-clip-text text-transparent"> comunidade automotiva</span>
               </h1>
-              <p className="text-gray-500 text-lg leading-relaxed">
+              <p className="text-gray-400 text-lg leading-relaxed">
                 Acesse conteúdos exclusivos, comunidades premium e ferramentas criadas para entusiastas.
               </p>
             </div>
@@ -134,9 +134,9 @@ function RegisterFormContent() {
                 { icon: Bot, text: "IA Mecânica para diagnosticar e aprender" },
                 { icon: Video, text: "Lives, cursos e marketplace" },
               ].map(({ icon: Icon, text }) => (
-                <div key={text} className="flex items-center gap-3 text-gray-600">
-                  <div className="w-8 h-8 bg-violet-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Icon className="w-4 h-4 text-violet-400" />
+                <div key={text} className="flex items-center gap-3 text-gray-400">
+                  <div className="w-8 h-8 bg-[#006079]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Icon className="w-4 h-4 text-[#009CD9]" />
                   </div>
                   <span className="text-sm">{text}</span>
                 </div>
@@ -151,12 +151,12 @@ function RegisterFormContent() {
         {/* Mobile logo */}
         <Link href="/" className="flex items-center gap-2.5 mb-8 lg:hidden">
           <Logo size="md" />
-          <span className="text-gray-900 font-bold text-lg">DetailHub</span>
+          <span className="text-[#EEE6E4] font-bold text-lg">Detailer&apos;HUB</span>
         </Link>
 
         <div className="w-full max-w-md">
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">Criar sua conta</h2>
+            <h2 className="text-2xl font-bold text-[#EEE6E4] mb-1">Criar sua conta</h2>
             <p className="text-gray-400">Preencha seus dados para começar.</p>
           </div>
 
@@ -175,7 +175,7 @@ function RegisterFormContent() {
                   ? `/community/${searchParams.get("community")}`
                   : "/dashboard"
             )}${refCode ? `&ref=${encodeURIComponent(refCode)}` : ""}`}
-            className="w-full flex items-center justify-center gap-3 bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50 rounded-xl px-4 py-3.5 text-gray-700 font-medium transition-all active:scale-[0.98] mb-6"
+            className="w-full flex items-center justify-center gap-3 bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/10 rounded-xl px-4 py-3.5 text-gray-300 font-medium transition-all active:scale-[0.98] mb-6"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
@@ -188,24 +188,24 @@ function RegisterFormContent() {
 
           <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200"></div>
+              <div className="w-full border-t border-white/10"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="bg-[#F8F7FF] px-3 text-gray-400">ou</span>
+              <span className="bg-[#1A1A1A] px-3 text-gray-400">ou</span>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1.5">Nome</label>
+                <label className="block text-sm font-medium text-gray-400 mb-1.5">Nome</label>
                 <input
                   type="text"
                   required
                   value={form.firstName}
                   onChange={(e) => setForm((f) => ({ ...f, firstName: e.target.value }))}
-                  className={`w-full bg-white border rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm ${
-                    fieldErrors.firstName ? "border-red-500/50" : "border-gray-200 hover:border-violet-200 focus:border-violet-400"
+                  className={`w-full bg-white/5 border rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 transition-all text-sm ${
+                    fieldErrors.firstName ? "border-red-500/50" : "border-white/10 hover:border-[#007A99] focus:border-[#009CD9]"
                   }`}
                   placeholder="João"
                   autoComplete="given-name"
@@ -213,14 +213,14 @@ function RegisterFormContent() {
                 {fieldErrors.firstName && <p className="mt-1 text-xs text-red-400">{fieldErrors.firstName}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1.5">Sobrenome</label>
+                <label className="block text-sm font-medium text-gray-400 mb-1.5">Sobrenome</label>
                 <input
                   type="text"
                   required
                   value={form.lastName}
                   onChange={(e) => setForm((f) => ({ ...f, lastName: e.target.value }))}
-                  className={`w-full bg-white border rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm ${
-                    fieldErrors.lastName ? "border-red-500/50" : "border-gray-200 hover:border-violet-200 focus:border-violet-400"
+                  className={`w-full bg-white/5 border rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 transition-all text-sm ${
+                    fieldErrors.lastName ? "border-red-500/50" : "border-white/10 hover:border-[#007A99] focus:border-[#009CD9]"
                   }`}
                   placeholder="Silva"
                   autoComplete="family-name"
@@ -231,7 +231,7 @@ function RegisterFormContent() {
 
             {(["email", "password", "confirmPassword"] as const).map((field) => (
               <div key={field}>
-                <label className="block text-sm font-medium text-gray-600 mb-1.5">
+                <label className="block text-sm font-medium text-gray-400 mb-1.5">
                   {field === "email" ? "Email" : field === "password" ? "Senha" : "Confirmar senha"}
                 </label>
                 <input
@@ -239,8 +239,8 @@ function RegisterFormContent() {
                   required
                   value={form[field]}
                   onChange={(e) => setForm((f) => ({ ...f, [field]: e.target.value }))}
-                  className={`w-full bg-white border rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm ${
-                    fieldErrors[field] ? "border-red-500/50" : "border-gray-200 hover:border-violet-200 focus:border-violet-400"
+                  className={`w-full bg-white/5 border rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 transition-all text-sm ${
+                    fieldErrors[field] ? "border-red-500/50" : "border-white/10 hover:border-[#007A99] focus:border-[#009CD9]"
                   }`}
                   placeholder={field === "email" ? "seu@email.com" : "••••••••"}
                   autoComplete={field === "email" ? "email" : "new-password"}
@@ -253,7 +253,7 @@ function RegisterFormContent() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full mt-2 bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-violet-500/30 active:scale-[0.98]"
+              className="w-full mt-2 bg-gradient-to-r from-[#006079] to-[#009CD9] hover:from-[#007A99] hover:to-[#009CD9] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-[#006079]/30 active:scale-[0.98]"
             >
               {isLoading ? (
                 <>
@@ -268,7 +268,7 @@ function RegisterFormContent() {
 
           <p className="text-center text-gray-500 text-sm mt-6">
             Já tem conta?{" "}
-            <Link href="/login" className="text-violet-400 hover:text-violet-300 font-medium transition-colors">
+            <Link href="/login" className="text-[#009CD9] hover:text-[#007A99] font-medium transition-colors">
               Entrar
             </Link>
           </p>

@@ -107,15 +107,15 @@ function CheckRow({
   const ok = isBoolean ? Boolean(done) : Number(done) >= Number(required);
 
   return (
-    <div className={`flex items-center gap-4 p-4 rounded-xl border transition-all ${ok ? "border-green-200 bg-green-50" : "border-gray-100 bg-gray-50"}`}>
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${ok ? "bg-green-100" : "bg-white border border-gray-200"}`}>
+    <div className={`flex items-center gap-4 p-4 rounded-xl border transition-all ${ok ? "border-green-200 bg-green-50" : "border-white/10 bg-white/5"}`}>
+      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${ok ? "bg-green-100" : "bg-white/5 border border-white/10"}`}>
         <Icon className={`w-5 h-5 ${ok ? "text-green-600" : "text-gray-400"}`} />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <p className="text-sm font-medium text-gray-900">{label}</p>
+          <p className="text-sm font-medium text-[#EEE6E4]">{label}</p>
           {!auto && (
-            <span className="text-xs px-1.5 py-0.5 rounded bg-blue-50 text-blue-500 border border-blue-100">
+            <span className="text-xs px-1.5 py-0.5 rounded bg-[#006079]/10 text-[#009CD9] border border-[#006079]/20">
               manual
             </span>
           )}
@@ -143,7 +143,7 @@ function HistoryBar({ month }: { month: HistoryMonth }) {
   const color = pct >= 80 ? "#10b981" : pct >= 50 ? "#f59e0b" : "#ef4444";
   return (
     <div className="text-center">
-      <div className="w-full bg-gray-100 rounded-full h-16 flex flex-col-reverse mx-auto relative overflow-hidden">
+      <div className="w-full bg-white/5 rounded-full h-16 flex flex-col-reverse mx-auto relative overflow-hidden">
         <div
           className="rounded-full transition-all"
           style={{ height: `${pct}%`, backgroundColor: color, minHeight: pct > 0 ? 4 : 0 }}
@@ -260,7 +260,7 @@ export default function EntregasPage() {
     <div className="space-y-6 max-w-3xl">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Entregas do Mês</h1>
+        <h1 className="text-2xl font-bold text-[#EEE6E4]">Entregas do Mês</h1>
         <p className="text-gray-400 text-sm mt-1">
           Acompanhe o cumprimento do contrato mínimo mensal
         </p>
@@ -270,22 +270,22 @@ export default function EntregasPage() {
       <div className="flex items-center justify-between glass-card px-4 py-3">
         <button
           onClick={prevMonth}
-          className="p-1.5 hover:bg-violet-50 rounded-lg transition-colors"
+          className="p-1.5 hover:bg-[#006079]/10 rounded-lg transition-colors"
         >
           <ChevronLeft className="w-4 h-4 text-gray-500" />
         </button>
         <div className="text-center">
-          <p className="text-sm font-semibold text-gray-900 capitalize">
+          <p className="text-sm font-semibold text-[#EEE6E4] capitalize">
             {monthName(year, month)}
           </p>
           {isCurrentMonth && (
-            <span className="text-xs text-violet-500 font-medium">mês atual — ao vivo</span>
+            <span className="text-xs text-[#007A99] font-medium">mês atual — ao vivo</span>
           )}
         </div>
         <button
           onClick={nextMonth}
           disabled={isCurrentMonth}
-          className="p-1.5 hover:bg-violet-50 rounded-lg transition-colors disabled:opacity-30"
+          className="p-1.5 hover:bg-[#006079]/10 rounded-lg transition-colors disabled:opacity-30"
         >
           <ChevronRight className="w-4 h-4 text-gray-500" />
         </button>
@@ -294,7 +294,7 @@ export default function EntregasPage() {
       {loading ? (
         <div className="space-y-3 animate-pulse">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-16 bg-gray-100 rounded-xl" />
+            <div key={i} className="h-16 bg-white/5 rounded-xl" />
           ))}
         </div>
       ) : !data ? (
@@ -304,12 +304,12 @@ export default function EntregasPage() {
           {/* Overall progress */}
           <div className="glass-card p-5">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-sm font-semibold text-gray-900">Progresso geral</p>
+              <p className="text-sm font-semibold text-[#EEE6E4]">Progresso geral</p>
               <span className={`text-sm font-bold ${data.completionPct === 100 ? "text-green-600" : "text-amber-500"}`}>
                 {data.completedItems}/{data.totalItems} itens
               </span>
             </div>
-            <div className="w-full bg-gray-100 rounded-full h-2.5">
+            <div className="w-full bg-white/5 rounded-full h-2.5">
               <div
                 className="h-2.5 rounded-full transition-all duration-700"
                 style={{
@@ -358,16 +358,16 @@ export default function EntregasPage() {
 
             {/* Bio link — toggle */}
             <div
-              className={`flex items-center gap-4 p-4 rounded-xl border transition-all cursor-pointer ${data.bioLinkConfirmed ? "border-green-200 bg-green-50" : "border-gray-100 bg-gray-50"}`}
+              className={`flex items-center gap-4 p-4 rounded-xl border transition-all cursor-pointer ${data.bioLinkConfirmed ? "border-green-200 bg-green-50" : "border-white/10 bg-white/5"}`}
               onClick={!bioUpdating ? toggleBioLink : undefined}
             >
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${data.bioLinkConfirmed ? "bg-green-100" : "bg-white border border-gray-200"}`}>
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${data.bioLinkConfirmed ? "bg-green-100" : "bg-white/5 border border-white/10"}`}>
                 <Link className={`w-5 h-5 ${data.bioLinkConfirmed ? "text-green-600" : "text-gray-400"}`} />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <p className="text-sm font-medium text-gray-900">Link ativo na bio</p>
-                  <span className="text-xs px-1.5 py-0.5 rounded bg-blue-50 text-blue-500 border border-blue-100">manual</span>
+                  <p className="text-sm font-medium text-[#EEE6E4]">Link ativo na bio</p>
+                  <span className="text-xs px-1.5 py-0.5 rounded bg-[#006079]/10 text-[#009CD9] border border-[#006079]/20">manual</span>
                 </div>
                 <p className="text-xs text-gray-400 mt-0.5">
                   Link permanente para a plataforma nas suas redes (Instagram, YouTube, etc.)
@@ -375,7 +375,7 @@ export default function EntregasPage() {
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
                 {bioUpdating ? (
-                  <div className="w-4 h-4 border-2 border-violet-400 border-t-transparent rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-[#009CD9] border-t-transparent rounded-full animate-spin" />
                 ) : data.bioLinkConfirmed ? (
                   <CheckCircle2 className="w-5 h-5 text-green-500" />
                 ) : (
@@ -389,13 +389,13 @@ export default function EntregasPage() {
           <div className="glass-card p-5 space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-sm font-semibold text-gray-900">Menções externas registradas</h2>
+                <h2 className="text-sm font-semibold text-[#EEE6E4]">Menções externas registradas</h2>
                 <p className="text-xs text-gray-400">{data.mentions.length} / 2 mínimo este mês</p>
               </div>
               {isCurrentMonth && (
                 <button
                   onClick={() => setShowForm((v) => !v)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold rounded-lg transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#006079] hover:bg-[#007A99] text-white text-xs font-semibold rounded-lg transition-all"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Registrar
@@ -405,14 +405,14 @@ export default function EntregasPage() {
 
             {/* Add form */}
             {showForm && (
-              <form onSubmit={addMention} className="border border-violet-100 rounded-xl p-4 bg-violet-50/50 space-y-3">
+              <form onSubmit={addMention} className="border border-violet-100 rounded-xl p-4 bg-[#006079]/10/50 space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">Plataforma</label>
+                    <label className="block text-xs font-medium text-gray-400 mb-1">Plataforma</label>
                     <select
                       value={mentionForm.platform}
                       onChange={(e) => setMentionForm((f) => ({ ...f, platform: e.target.value }))}
-                      className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-violet-400/30 focus:border-violet-400"
+                      className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-[#EEE6E4] focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 focus:border-[#009CD9]"
                     >
                       {Object.entries(PLATFORM_LABELS).map(([k, v]) => (
                         <option key={k} value={k}>{v}</option>
@@ -420,18 +420,18 @@ export default function EntregasPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">Link (opcional)</label>
+                    <label className="block text-xs font-medium text-gray-400 mb-1">Link (opcional)</label>
                     <input
                       type="url"
                       value={mentionForm.url}
                       onChange={(e) => setMentionForm((f) => ({ ...f, url: e.target.value }))}
                       placeholder="https://..."
-                      className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-violet-400/30 focus:border-violet-400"
+                      className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-[#EEE6E4] focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 focus:border-[#009CD9]"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Descrição</label>
+                  <label className="block text-xs font-medium text-gray-400 mb-1">Descrição</label>
                   <input
                     type="text"
                     required
@@ -439,21 +439,21 @@ export default function EntregasPage() {
                     onChange={(e) => setMentionForm((f) => ({ ...f, description: e.target.value }))}
                     placeholder="Ex: Story no Instagram com swipe up para a plataforma"
                     maxLength={200}
-                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-violet-400/30 focus:border-violet-400"
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-[#EEE6E4] focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 focus:border-[#009CD9]"
                   />
                 </div>
                 <div className="flex gap-2 justify-end">
                   <button
                     type="button"
                     onClick={() => setShowForm(false)}
-                    className="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 transition-colors"
+                    className="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-300 transition-colors"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
                     disabled={mentionSaving}
-                    className="flex items-center gap-1.5 px-4 py-1.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition-all"
+                    className="flex items-center gap-1.5 px-4 py-1.5 bg-[#006079] hover:bg-[#007A99] disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition-all"
                   >
                     {mentionSaving ? (
                       <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -476,19 +476,19 @@ export default function EntregasPage() {
                 {data.mentions.map((m) => {
                   const PlatformIcon = PLATFORM_ICONS[m.platform] ?? ExternalLink;
                   return (
-                    <div key={m.id} className="flex items-start gap-3 p-3 bg-white rounded-xl border border-gray-100">
-                      <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div key={m.id} className="flex items-start gap-3 p-3 bg-white/5 rounded-xl border border-white/10">
+                      <div className="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
                         <PlatformIcon className="w-4 h-4 text-gray-500" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-medium text-gray-500">{PLATFORM_LABELS[m.platform]}</p>
-                        <p className="text-sm text-gray-900 mt-0.5">{m.description}</p>
+                        <p className="text-sm text-[#EEE6E4] mt-0.5">{m.description}</p>
                         {m.url && (
                           <a
                             href={m.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-xs text-violet-500 hover:underline mt-0.5 block truncate"
+                            className="text-xs text-[#007A99] hover:underline mt-0.5 block truncate"
                           >
                             {m.url}
                           </a>
@@ -513,7 +513,7 @@ export default function EntregasPage() {
           {/* History bars */}
           {data.history.length > 0 && (
             <div className="glass-card p-5">
-              <h2 className="text-sm font-semibold text-gray-900 mb-4">Histórico de cumprimento</h2>
+              <h2 className="text-sm font-semibold text-[#EEE6E4] mb-4">Histórico de cumprimento</h2>
               <div className="grid grid-cols-6 gap-2">
                 {data.history.map((h) => (
                   <HistoryBar key={`${h.year}-${h.month}`} month={h} />
@@ -524,9 +524,9 @@ export default function EntregasPage() {
 
           {/* Info */}
           <div className="glass-card p-4 flex items-start gap-3">
-            <Info className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+            <Info className="w-4 h-4 text-[#009CD9] mt-0.5 flex-shrink-0" />
             <p className="text-xs text-gray-500 leading-relaxed">
-              <strong className="text-gray-700">Atenção:</strong> menções externas e link na bio são registrados manualmente e dependem de boa-fé. Entregas rastreadas automaticamente (vídeos, lives e fórum) têm verificação direta da plataforma e contam para a Pontuação de Performance (PP).
+              <strong className="text-gray-300">Atenção:</strong> menções externas e link na bio são registrados manualmente e dependem de boa-fé. Entregas rastreadas automaticamente (vídeos, lives e fórum) têm verificação direta da plataforma e contam para a Pontuação de Performance (PP).
             </p>
           </div>
         </>

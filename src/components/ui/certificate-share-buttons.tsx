@@ -25,7 +25,7 @@ export function CertificateShareButtons() {
     <div className="flex items-center justify-center gap-3 flex-wrap">
       <button
         onClick={shareLinkedIn}
-        className="flex items-center gap-2 px-4 py-2.5 bg-[#0A66C2] hover:bg-[#004182] text-gray-900 text-sm font-semibold rounded-xl transition-all"
+        className="flex items-center gap-2 px-4 py-2.5 bg-[#0A66C2] hover:bg-[#004182] text-white text-sm font-semibold rounded-xl transition-all"
       >
         <Linkedin className="w-4 h-4" />
         Compartilhar no LinkedIn
@@ -34,8 +34,8 @@ export function CertificateShareButtons() {
         onClick={copyLink}
         className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all ${
           copied
-            ? "bg-green-600 text-gray-900"
-            : "bg-gray-50 hover:bg-violet-50 border border-gray-200 text-gray-600 hover:text-gray-900"
+            ? "bg-green-600 text-white"
+            : "bg-white/5 hover:bg-[#006079]/10 border border-white/10 text-gray-400 hover:text-[#EEE6E4]"
         }`}
       >
         {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}

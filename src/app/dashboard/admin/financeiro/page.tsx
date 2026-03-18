@@ -11,14 +11,14 @@ import {
 } from "recharts";
 
 const chartStyle = {
-  grid: { strokeDasharray: "3 3", stroke: "rgba(0,0,0,0.08)" },
+  grid: { strokeDasharray: "3 3", stroke: "rgba(255,255,255,0.05)" },
   axis: { tick: { fontSize: 11, fill: "#6b7280" }, tickLine: false, axisLine: false },
   tooltip: {
     contentStyle: {
-      backgroundColor: "#ffffff",
-      border: "1px solid #e5e7eb",
+      backgroundColor: "#1A1A1A",
+      border: "1px solid rgba(255,255,255,0.1)",
       borderRadius: "12px",
-      color: "#111827",
+      color: "#f9fafb",
       fontSize: "13px",
     },
   },
@@ -26,7 +26,7 @@ const chartStyle = {
 
 const STATUS_LABEL: Record<string, { label: string; color: string }> = {
   PENDING:   { label: "Pendente",   color: "text-yellow-400 bg-yellow-500/10" },
-  CONFIRMED: { label: "Confirmado", color: "text-violet-400 bg-violet-500/10" },
+  CONFIRMED: { label: "Confirmado", color: "text-[#009CD9] bg-[#007A99]/10" },
   PAID_OUT:  { label: "Pago",       color: "text-green-400 bg-green-500/10" },
   REVERSED:  { label: "Estornado",  color: "text-red-400 bg-red-500/10" },
 };
@@ -122,7 +122,7 @@ function PeriodSelector({
             key={key}
             onClick={() => { onChange(key); setShowCal(false); }}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-              period === key ? "bg-green-600 text-white" : "text-gray-400 hover:text-gray-900"
+              period === key ? "bg-green-600 text-white" : "text-gray-400 hover:text-[#EEE6E4]"
             }`}
           >
             {label}
@@ -131,7 +131,7 @@ function PeriodSelector({
         <button
           onClick={() => setShowCal((v) => !v)}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-            period === "custom" ? "bg-green-600 text-white" : "text-gray-400 hover:text-gray-900"
+            period === "custom" ? "bg-green-600 text-white" : "text-gray-400 hover:text-[#EEE6E4]"
           }`}
         >
           <Calendar className="w-3 h-3" />
@@ -149,7 +149,7 @@ function PeriodSelector({
               value={tmpStart}
               max={tmpEnd || undefined}
               onChange={(e) => setTmpStart(e.target.value)}
-              className="text-xs bg-white border border-gray-200 rounded-lg px-2 py-1.5 text-gray-900 focus:outline-none focus:border-green-500"
+              className="text-xs bg-white/5 border border-white/10 rounded-lg px-2 py-1.5 text-[#EEE6E4] focus:outline-none focus:border-green-500"
             />
           </div>
           <div className="flex items-center gap-1.5">
@@ -159,17 +159,17 @@ function PeriodSelector({
               value={tmpEnd}
               min={tmpStart || undefined}
               onChange={(e) => setTmpEnd(e.target.value)}
-              className="text-xs bg-white border border-gray-200 rounded-lg px-2 py-1.5 text-gray-900 focus:outline-none focus:border-green-500"
+              className="text-xs bg-white/5 border border-white/10 rounded-lg px-2 py-1.5 text-[#EEE6E4] focus:outline-none focus:border-green-500"
             />
           </div>
           <button
             onClick={() => { if (tmpStart && tmpEnd) { onCustomApply(tmpStart, tmpEnd); onChange("custom"); setShowCal(false); } }}
             disabled={!tmpStart || !tmpEnd}
-            className="bg-green-600 hover:bg-green-500 disabled:opacity-40 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+            className="bg-green-600 hover:bg-green-500/100 disabled:opacity-40 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
           >
             Aplicar
           </button>
-          <button onClick={() => setShowCal(false)} className="p-1.5 text-gray-400 hover:text-gray-900">
+          <button onClick={() => setShowCal(false)} className="p-1.5 text-gray-400 hover:text-[#EEE6E4]">
             <X className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -311,16 +311,16 @@ export default function FinanceiroPage() {
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-8 bg-gray-50 rounded-xl w-36" />
+        <div className="h-8 bg-white/5 rounded-xl w-36" />
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="glass-card p-5 space-y-3">
-              <div className="flex justify-between"><div className="h-3 bg-gray-50 rounded w-24" /><div className="w-9 h-9 bg-gray-50 rounded-xl" /></div>
-              <div className="h-7 bg-gray-50 rounded w-32" />
+              <div className="flex justify-between"><div className="h-3 bg-white/5 rounded w-24" /><div className="w-9 h-9 bg-white/5 rounded-xl" /></div>
+              <div className="h-7 bg-white/5 rounded w-32" />
             </div>
           ))}
         </div>
-        <div className="glass-card p-6 h-72 bg-white" />
+        <div className="glass-card p-6 h-72 bg-white/5" />
       </div>
     );
   }
@@ -334,7 +334,7 @@ export default function FinanceiroPage() {
             <DollarSign className="w-5 h-5 text-green-400" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Financeiro</h1>
+            <h1 className="text-2xl font-bold text-[#EEE6E4]">Financeiro</h1>
             <p className="text-gray-400 text-sm">Visão financeira · <span className="text-green-400">{periodLabel}</span></p>
           </div>
         </div>
@@ -357,12 +357,12 @@ export default function FinanceiroPage() {
           },
           {
             label: "Membros Ativos", value: (totalAnnualMembers + totalPixMembers).toLocaleString("pt-BR"),
-            icon: Users, color: "text-violet-400", bg: "bg-violet-500/10",
+            icon: Users, color: "text-[#009CD9]", bg: "bg-[#007A99]/10",
           },
           {
             label: isMonthly ? "Repasse Influencers" : `Repasse — ${days}d`,
             value: `R$ ${repasseTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
-            icon: ArrowUpRight, color: "text-purple-400", bg: "bg-purple-500/10",
+            icon: ArrowUpRight, color: "text-[#009CD9]", bg: "bg-[#009CD9]/10",
           },
           {
             label: `Comissão Plataforma (${(COMISSAO * 100).toFixed(0)}%)`,
@@ -377,34 +377,34 @@ export default function FinanceiroPage() {
                 <Icon className={`w-4 h-4 ${color}`} />
               </div>
             </div>
-            <p className="text-xl font-bold text-gray-900">{value}</p>
+            <p className="text-xl font-bold text-[#EEE6E4]">{value}</p>
           </div>
         ))}
       </div>
 
       {/* ── Separação de Pagamentos ─────────────────────────────────────────────── */}
       <div>
-        <h2 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
+        <h2 className="text-base font-semibold text-[#EEE6E4] mb-3 flex items-center gap-2">
           <span className="w-1.5 h-5 bg-green-500 rounded-full" />
           Pagamentos por Tipo — <span className="text-green-400 font-normal">{periodLabel}</span>
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
           {/* Anual */}
-          <div className="glass-card p-5 border-l-4 border-blue-500/50">
+          <div className="glass-card p-5 border-l-4 border-[#009CD9]/50">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-blue-500/10 rounded-xl flex items-center justify-center">
-                <CreditCard className="w-4 h-4 text-blue-400" />
+              <div className="w-8 h-8 bg-[#009CD9]/10 rounded-xl flex items-center justify-center">
+                <CreditCard className="w-4 h-4 text-[#009CD9]" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-gray-900">Plano Anual</p>
+                <p className="text-sm font-semibold text-[#EEE6E4]">Plano Anual</p>
                 <p className="text-xs text-gray-500">R$ {PRECO_ANUAL.toLocaleString("pt-BR")}/ano por membro</p>
               </div>
             </div>
             <div className="space-y-2.5">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Assinantes ativos</span>
-                <span className="font-semibold text-gray-900">{totalAnnualMembers.toLocaleString("pt-BR")}</span>
+                <span className="font-semibold text-[#EEE6E4]">{totalAnnualMembers.toLocaleString("pt-BR")}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">{isMonthly ? "Receita bruta (MRR)" : `Receita bruta (${days}d)`}</span>
@@ -420,13 +420,13 @@ export default function FinanceiroPage() {
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-900 font-semibold">Repasse líquido (influencers)</span>
-                <span className="text-blue-400 font-bold">
+                <span className="text-[#EEE6E4] font-semibold">Repasse líquido (influencers)</span>
+                <span className="text-[#009CD9] font-bold">
                   R$ {repasseAnual.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                 </span>
               </div>
-              <div className="mt-3 p-2.5 bg-blue-500/5 rounded-xl border border-blue-500/10">
-                <p className="text-xs text-blue-400 text-center">
+              <div className="mt-3 p-2.5 bg-[#009CD9]/5 rounded-xl border border-[#009CD9]/10">
+                <p className="text-xs text-[#009CD9] text-center">
                   Equivalente mensal por membro: <strong>R$ {(PRECO_ANUAL / 12).toFixed(2)}</strong>
                 </p>
               </div>
@@ -440,14 +440,14 @@ export default function FinanceiroPage() {
                 <Smartphone className="w-4 h-4 text-emerald-400" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-gray-900">PIX Mensal</p>
+                <p className="text-sm font-semibold text-[#EEE6E4]">PIX Mensal</p>
                 <p className="text-xs text-gray-500">R$ {PRECO_PIX.toFixed(2).replace(".", ",")}/mês por membro</p>
               </div>
             </div>
             <div className="space-y-2.5">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Assinantes ativos</span>
-                <span className="font-semibold text-gray-900">{totalPixMembers.toLocaleString("pt-BR")}</span>
+                <span className="font-semibold text-[#EEE6E4]">{totalPixMembers.toLocaleString("pt-BR")}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">{isMonthly ? "Receita bruta (MRR)" : `Receita bruta (${days}d)`}</span>
@@ -463,7 +463,7 @@ export default function FinanceiroPage() {
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-900 font-semibold">Repasse líquido (influencers)</span>
+                <span className="text-[#EEE6E4] font-semibold">Repasse líquido (influencers)</span>
                 <span className="text-emerald-400 font-bold">
                   R$ {repassePix.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                 </span>
@@ -482,9 +482,9 @@ export default function FinanceiroPage() {
       {timeSeries.length > 0 && (
         <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
-            <h2 className="text-base font-semibold text-gray-900">Receita por Tipo de Pagamento</h2>
+            <h2 className="text-base font-semibold text-[#EEE6E4]">Receita por Tipo de Pagamento</h2>
             <div className="flex items-center gap-4 text-xs text-gray-500">
-              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-blue-500 inline-block" /> Anual</span>
+              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-[#009CD9] inline-block" /> Anual</span>
               <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-emerald-500 inline-block" /> PIX Mensal</span>
             </div>
           </div>
@@ -526,8 +526,8 @@ export default function FinanceiroPage() {
 
       {/* ── Repasse por Influencer ───────────────────────────────────────────────── */}
       <div className="glass-card overflow-hidden">
-        <div className="p-5 border-b border-gray-200">
-          <h2 className="text-base font-semibold text-gray-900">Repasse por Influencer — Anual vs PIX Mensal</h2>
+        <div className="p-5 border-b border-white/10">
+          <h2 className="text-base font-semibold text-[#EEE6E4]">Repasse por Influencer — Anual vs PIX Mensal</h2>
           <p className="text-xs text-gray-500 mt-1">
             Comissão de {(COMISSAO * 100).toFixed(0)}% · período de {days} dias · {isMonthly ? "valores mensais (MRR)" : `receita proporcional a ${days}d`}
           </p>
@@ -535,11 +535,11 @@ export default function FinanceiroPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-white">
+              <tr className="bg-white/5">
                 <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-5 py-3">Influencer</th>
                 <th className="text-right text-xs font-medium text-gray-500 uppercase tracking-wide px-5 py-3 hidden sm:table-cell">Membros Anuais</th>
                 <th className="text-right text-xs font-medium text-gray-500 uppercase tracking-wide px-5 py-3 hidden sm:table-cell">Membros PIX</th>
-                <th className="text-right text-xs font-medium text-blue-500 uppercase tracking-wide px-5 py-3">Repasse Anual</th>
+                <th className="text-right text-xs font-medium text-[#009CD9] uppercase tracking-wide px-5 py-3">Repasse Anual</th>
                 <th className="text-right text-xs font-medium text-emerald-500 uppercase tracking-wide px-5 py-3 hidden md:table-cell">Repasse PIX</th>
                 <th className="text-right text-xs font-medium text-gray-500 uppercase tracking-wide px-5 py-3">Total Líquido</th>
               </tr>
@@ -550,25 +550,25 @@ export default function FinanceiroPage() {
                 const netAnualScaled = c.netAnual * periodScale;
                 const netPixScaled   = c.netPix   * periodScale;
                 return (
-                  <tr key={i} className="hover:bg-green-50 transition-colors">
+                  <tr key={i} className="hover:bg-green-500/10 transition-colors">
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 bg-gradient-to-br from-violet-600 to-purple-500 rounded-xl flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                        <div className="w-8 h-8 bg-gradient-to-br from-[#006079] to-[#009CD9] rounded-xl flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                           {inf.displayName.charAt(0)}
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-900">{inf.displayName}</p>
+                          <p className="text-sm font-medium text-[#EEE6E4]">{inf.displayName}</p>
                           <p className="text-xs text-gray-500">{inf.communityName}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-5 py-3.5 text-right text-gray-400 hidden sm:table-cell">
-                      <span className="text-xs px-2 py-0.5 bg-blue-500/10 text-blue-400 rounded-full">{inf.annualMembers}</span>
+                      <span className="text-xs px-2 py-0.5 bg-[#009CD9]/10 text-[#009CD9] rounded-full">{inf.annualMembers}</span>
                     </td>
                     <td className="px-5 py-3.5 text-right text-gray-400 hidden sm:table-cell">
                       <span className="text-xs px-2 py-0.5 bg-emerald-500/10 text-emerald-400 rounded-full">{inf.pixMembers}</span>
                     </td>
-                    <td className="px-5 py-3.5 text-right text-blue-400 font-medium">
+                    <td className="px-5 py-3.5 text-right text-[#009CD9] font-medium">
                       R$ {netAnualScaled.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     </td>
                     <td className="px-5 py-3.5 text-right text-emerald-400 font-medium hidden md:table-cell">
@@ -582,10 +582,10 @@ export default function FinanceiroPage() {
               })}
               {/* Totals row */}
               <tr className="bg-green-500/5 font-semibold">
-                <td className="px-5 py-3 text-sm text-gray-900">Total Geral</td>
+                <td className="px-5 py-3 text-sm text-[#EEE6E4]">Total Geral</td>
                 <td className="px-5 py-3 text-right text-gray-500 hidden sm:table-cell">{totalAnnualMembers}</td>
                 <td className="px-5 py-3 text-right text-gray-500 hidden sm:table-cell">{totalPixMembers}</td>
-                <td className="px-5 py-3 text-right text-blue-400">
+                <td className="px-5 py-3 text-right text-[#009CD9]">
                   R$ {repasseAnual.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                 </td>
                 <td className="px-5 py-3 text-right text-emerald-400 hidden md:table-cell">
@@ -602,63 +602,63 @@ export default function FinanceiroPage() {
 
       {/* Commission Rules */}
       <div className="glass-card overflow-hidden">
-        <div className="p-5 border-b border-gray-200 flex flex-wrap items-center gap-3">
-          <h2 className="text-base font-semibold text-gray-900 flex-1">Regras de Comissão</h2>
+        <div className="p-5 border-b border-white/10 flex flex-wrap items-center gap-3">
+          <h2 className="text-base font-semibold text-[#EEE6E4] flex-1">Regras de Comissão</h2>
           {communities.length > 0 && (
             <select
               value={selectedCommunity}
               onChange={(e) => { setSelectedCommunity(e.target.value); loadRules(e.target.value); }}
-              className="bg-white border border-gray-200 rounded-xl px-3 py-1.5 text-gray-900 text-xs focus:outline-none"
+              className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-[#EEE6E4] text-xs focus:outline-none"
             >
               {communities.map((c: any) => (
-                <option key={c.id} value={c.id} className="bg-white">{c.name}</option>
+                <option key={c.id} value={c.id} className="bg-white/5">{c.name}</option>
               ))}
             </select>
           )}
           <button
             onClick={() => { setShowRuleForm(true); setEditingRule(null); setRuleForm({ name: "", type: "PERCENTAGE", rate: "", isActive: true }); if (selectedCommunity) loadRules(selectedCommunity); }}
-            className="flex items-center gap-1.5 bg-violet-600 hover:bg-violet-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
+            className="flex items-center gap-1.5 bg-[#006079] hover:bg-[#007A99] text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
           >
             <Plus className="w-3.5 h-3.5" /> Nova Regra
           </button>
         </div>
 
         {showRuleForm && (
-          <form onSubmit={saveRule} className="p-5 border-b border-gray-200 space-y-3 bg-white/[0.02]">
-            <h3 className="text-sm font-semibold text-gray-900">{editingRule ? "Editar Regra" : "Nova Regra"}</h3>
+          <form onSubmit={saveRule} className="p-5 border-b border-white/10 space-y-3 bg-white/[0.02]">
+            <h3 className="text-sm font-semibold text-[#EEE6E4]">{editingRule ? "Editar Regra" : "Nova Regra"}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <input
                 required placeholder="Nome da regra" value={ruleForm.name}
                 onChange={(e) => setRuleForm((p) => ({ ...p, name: e.target.value }))}
-                className="bg-white border border-gray-200 rounded-xl px-3 py-2 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-violet-500/50"
+                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-[#EEE6E4] text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#007A99]/50"
               />
               <select
                 value={ruleForm.type}
                 onChange={(e) => setRuleForm((p) => ({ ...p, type: e.target.value }))}
-                className="bg-white border border-gray-200 rounded-xl px-3 py-2 text-gray-900 text-sm focus:outline-none"
+                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-[#EEE6E4] text-sm focus:outline-none"
               >
-                <option value="PERCENTAGE" className="bg-white">Percentual (%)</option>
-                <option value="FLAT_FEE" className="bg-white">Valor Fixo (R$)</option>
-                <option value="TIERED" className="bg-white">Escalonado</option>
+                <option value="PERCENTAGE" className="bg-white/5">Percentual (%)</option>
+                <option value="FLAT_FEE" className="bg-white/5">Valor Fixo (R$)</option>
+                <option value="TIERED" className="bg-white/5">Escalonado</option>
               </select>
               <input
                 required type="number" step="0.01"
                 placeholder={ruleForm.type === "PERCENTAGE" ? "Ex: 15 (para 15%)" : "Ex: 50 (R$)"}
                 value={ruleForm.rate}
                 onChange={(e) => setRuleForm((p) => ({ ...p, rate: e.target.value }))}
-                className="bg-white border border-gray-200 rounded-xl px-3 py-2 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-violet-500/50"
+                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-[#EEE6E4] text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#007A99]/50"
               />
             </div>
             <div className="flex items-center gap-3">
-              <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+              <label className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer">
                 <input type="checkbox" checked={ruleForm.isActive} onChange={(e) => setRuleForm((p) => ({ ...p, isActive: e.target.checked }))} className="rounded" />
                 Regra ativa
               </label>
               <div className="flex gap-2 ml-auto">
-                <button type="button" onClick={() => { setShowRuleForm(false); setEditingRule(null); }} className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-400 hover:text-gray-900 border border-gray-200 rounded-xl transition-colors">
+                <button type="button" onClick={() => { setShowRuleForm(false); setEditingRule(null); }} className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-400 hover:text-[#EEE6E4] border border-white/10 rounded-xl transition-colors">
                   <X className="w-3.5 h-3.5" /> Cancelar
                 </button>
-                <button type="submit" disabled={ruleSaving} className="flex items-center gap-1.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition-all">
+                <button type="submit" disabled={ruleSaving} className="flex items-center gap-1.5 bg-[#006079] hover:bg-[#007A99] disabled:opacity-50 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition-all">
                   <Check className="w-3.5 h-3.5" /> {ruleSaving ? "Salvando..." : "Salvar"}
                 </button>
               </div>
@@ -675,15 +675,15 @@ export default function FinanceiroPage() {
         ) : (
           <div className="divide-y divide-white/5">
             {commRules.map((rule: any) => (
-              <div key={rule.id} className="flex items-center gap-3 px-5 py-3 hover:bg-violet-50 transition-colors">
+              <div key={rule.id} className="flex items-center gap-3 px-5 py-3 hover:bg-[#006079]/10 transition-colors">
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900">{rule.name}</p>
+                  <p className="text-sm font-medium text-[#EEE6E4]">{rule.name}</p>
                   <p className="text-xs text-gray-500">{COMM_TYPE_LABEL[rule.type] ?? rule.type} · Taxa: {Number(rule.rate)}{rule.type === "PERCENTAGE" ? "%" : " R$"}</p>
                 </div>
-                <span className={`text-xs px-2 py-0.5 rounded-full border ${rule.isActive ? "bg-green-500/10 text-green-400 border-green-500/20" : "bg-gray-500/10 text-gray-400 border-gray-500/20"}`}>
+                <span className={`text-xs px-2 py-0.5 rounded-full border ${rule.isActive ? "bg-green-500/10 text-green-400 border-green-500/20" : "bg-white/50/10 text-gray-400 border-gray-500/20"}`}>
                   {rule.isActive ? "Ativa" : "Inativa"}
                 </span>
-                <button onClick={() => { setEditingRule(rule); setRuleForm({ name: rule.name, type: rule.type, rate: String(rule.rate), isActive: rule.isActive }); setShowRuleForm(true); }} className="p-1.5 text-gray-500 hover:text-violet-400 hover:bg-violet-500/10 rounded-lg transition-colors">
+                <button onClick={() => { setEditingRule(rule); setRuleForm({ name: rule.name, type: rule.type, rate: String(rule.rate), isActive: rule.isActive }); setShowRuleForm(true); }} className="p-1.5 text-gray-500 hover:text-[#009CD9] hover:bg-[#007A99]/10 rounded-lg transition-colors">
                   <Pencil className="w-3.5 h-3.5" />
                 </button>
                 <button onClick={() => deleteRule(rule.id)} className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
@@ -697,8 +697,8 @@ export default function FinanceiroPage() {
 
       {/* Commission Transactions */}
       <div className="glass-card overflow-hidden">
-        <div className="p-5 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-gray-900">Transações de Comissão</h2>
+        <div className="p-5 border-b border-white/10 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-[#EEE6E4]">Transações de Comissão</h2>
           {commTotal > 10 && <span className="text-xs text-gray-500">{commTotal} no total</span>}
         </div>
         {commissions.length === 0 ? (
@@ -707,7 +707,7 @@ export default function FinanceiroPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-white">
+                <tr className="bg-white/5">
                   {["Comunidade", "Destinatário", "Bruto", "Taxa", "Líquido", "Status"].map((h) => (
                     <th key={h} className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-5 py-3">{h}</th>
                   ))}
@@ -717,10 +717,10 @@ export default function FinanceiroPage() {
                 {commissions.map((tx: any) => {
                   const st = STATUS_LABEL[tx.status] ?? { label: tx.status, color: "text-gray-400" };
                   return (
-                    <tr key={tx.id} className="hover:bg-green-50 transition-colors">
-                      <td className="px-5 py-3 font-medium text-gray-900">{tx.community?.name ?? "—"}</td>
+                    <tr key={tx.id} className="hover:bg-green-500/10 transition-colors">
+                      <td className="px-5 py-3 font-medium text-[#EEE6E4]">{tx.community?.name ?? "—"}</td>
                       <td className="px-5 py-3 text-gray-400">{tx.recipient ? `${tx.recipient.firstName} ${tx.recipient.lastName}` : "—"}</td>
-                      <td className="px-5 py-3 text-gray-600">R$ {Number(tx.grossAmount).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</td>
+                      <td className="px-5 py-3 text-gray-400">R$ {Number(tx.grossAmount).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</td>
                       <td className="px-5 py-3 text-red-400">R$ {Number(tx.platformFee).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</td>
                       <td className="px-5 py-3 text-green-400 font-semibold">R$ {Number(tx.netAmount).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</td>
                       <td className="px-5 py-3">

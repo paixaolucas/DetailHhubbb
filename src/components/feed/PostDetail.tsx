@@ -75,19 +75,19 @@ function timeAgo(dateStr: string): string {
 function PostSkeleton() {
   return (
     <div className="animate-pulse space-y-4">
-      <div className="h-4 bg-gray-50 rounded w-24" />
-      <div className="h-8 bg-gray-50 rounded w-3/4" />
+      <div className="h-4 bg-white/5 rounded w-24" />
+      <div className="h-8 bg-white/5 rounded w-3/4" />
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-gray-50 rounded-full" />
+        <div className="w-10 h-10 bg-white/5 rounded-full" />
         <div className="space-y-1.5">
-          <div className="h-4 bg-gray-50 rounded w-32" />
-          <div className="h-3 bg-gray-50 rounded w-20" />
+          <div className="h-4 bg-white/5 rounded w-32" />
+          <div className="h-3 bg-white/5 rounded w-20" />
         </div>
       </div>
       <div className="space-y-2">
-        <div className="h-4 bg-gray-50 rounded" />
-        <div className="h-4 bg-gray-50 rounded w-5/6" />
-        <div className="h-4 bg-gray-50 rounded w-4/6" />
+        <div className="h-4 bg-white/5 rounded" />
+        <div className="h-4 bg-white/5 rounded w-5/6" />
+        <div className="h-4 bg-white/5 rounded w-4/6" />
       </div>
     </div>
   );
@@ -302,7 +302,7 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
           <p className="text-red-400 text-sm">{error || "Post não encontrado."}</p>
           <button
             onClick={() => router.back()}
-            className="mt-3 text-xs text-gray-400 hover:text-gray-900 transition-colors"
+            className="mt-3 text-xs text-gray-400 hover:text-[#EEE6E4] transition-colors"
           >
             ← Voltar
           </button>
@@ -320,18 +320,18 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
       {/* Back button */}
       <button
         onClick={() => router.back()}
-        className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+        className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-300 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         Voltar
       </button>
 
       {/* Post card */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6">
+      <div className="bg-white/5 border border-white/10 rounded-xl p-6">
         {/* Space breadcrumb */}
         <Link
           href={`/community/${communitySlug}/feed/${post.space.slug}`}
-          className="inline-flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300 mb-4 transition-colors"
+          className="inline-flex items-center gap-1 text-xs text-[#009CD9] hover:text-[#009CD9] mb-4 transition-colors"
           onClick={(e) => e.stopPropagation()}
         >
           <Hash className="w-3 h-3" />
@@ -340,7 +340,7 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
 
         {/* Title */}
         {post.title && (
-          <h1 className="text-2xl font-bold text-gray-900 mb-4 leading-snug">
+          <h1 className="text-2xl font-bold text-[#EEE6E4] mb-4 leading-snug">
             {post.title}
           </h1>
         )}
@@ -353,22 +353,22 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
               alt={authorName}
               width={40}
               height={40}
-              className="w-10 h-10 rounded-full object-cover border border-gray-200"
+              className="w-10 h-10 rounded-full object-cover border border-white/10"
             />
           ) : (
-            <div className="w-10 h-10 rounded-full bg-violet-600/70 flex items-center justify-center text-sm font-bold text-white">
+            <div className="w-10 h-10 rounded-full bg-[#006079]/70 flex items-center justify-center text-sm font-bold text-white">
               {initials}
             </div>
           )}
           <div>
-            <p className="text-sm font-semibold text-gray-700">{authorName}</p>
+            <p className="text-sm font-semibold text-gray-300">{authorName}</p>
             <p className="text-xs text-gray-500">{timeAgo(post.createdAt)}</p>
           </div>
           {isAuthor && (
             <button
               onClick={handleDeletePost}
               disabled={deleting}
-              className="ml-auto inline-flex items-center gap-1.5 text-xs text-gray-600 hover:text-red-400 transition-colors disabled:opacity-50"
+              className="ml-auto inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-red-400 transition-colors disabled:opacity-50"
             >
               <Trash2 className="w-3.5 h-3.5" />
               {deleting ? "Excluindo..." : "Excluir"}
@@ -378,7 +378,7 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
 
         {/* Body */}
         {post.body && post.body.trim() !== " " && (
-          <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap break-words">
+          <p className="text-gray-400 text-sm leading-relaxed whitespace-pre-wrap break-words">
             {post.body}
           </p>
         )}
@@ -393,7 +393,7 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
                   alt=""
                   width={800}
                   height={384}
-                  className="w-full rounded-xl object-cover border border-gray-200 hover:opacity-90 transition-opacity cursor-zoom-in max-h-96"
+                  className="w-full rounded-xl object-cover border border-white/10 hover:opacity-90 transition-opacity cursor-zoom-in max-h-96"
                 />
               </a>
             ))}
@@ -401,7 +401,7 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
         )}
 
         {/* Reaction bar */}
-        <div className="mt-5 pt-4 border-t border-gray-200">
+        <div className="mt-5 pt-4 border-t border-white/10">
           <ReactionBar
             postId={postId}
             reactions={reactions}
@@ -428,7 +428,7 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
               placeholder="Escreva um comentário..."
               rows={3}
               required
-              className="w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-500/40 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-violet-500/20 resize-none transition-all"
+              className="w-full bg-white/5 border border-white/10 hover:border-[#006079]/40 focus:border-[#009CD9]/40 rounded-xl px-4 py-3 text-sm text-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/20 resize-none transition-all"
             />
             {commentError && (
               <p className="text-xs text-red-400">{commentError}</p>
@@ -437,7 +437,7 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
               <button
                 type="submit"
                 disabled={commentLoading || !commentBody.trim()}
-                className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-4 py-2 rounded-lg transition-all"
+                className="inline-flex items-center gap-2 bg-[#006079] hover:bg-[#007A99] disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-4 py-2 rounded-lg transition-all"
               >
                 {commentLoading ? (
                   <>
@@ -460,7 +460,7 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
 
         {/* Comment list */}
         {comments.length === 0 ? (
-          <p className="text-sm text-gray-600 text-center py-8">
+          <p className="text-sm text-gray-400 text-center py-8">
             Seja o primeiro a comentar.
           </p>
         ) : (

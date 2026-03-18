@@ -40,13 +40,13 @@ export default function ReactionBar({
             className={[
               "inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium transition-all select-none",
               active
-                ? "bg-violet-500/20 border border-violet-500/40 text-violet-300 hover:bg-violet-500/30"
-                : "bg-white border border-gray-200 text-gray-400 hover:bg-gray-100 hover:text-gray-700",
+                ? "bg-[#009CD9]/20 border border-[#009CD9]/40 text-[#009CD9] hover:bg-[#009CD9]/30"
+                : "bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10 hover:text-gray-300",
             ].join(" ")}
           >
             <span className="text-sm leading-none">{emoji}</span>
             {count > 0 && (
-              <span className={active ? "text-violet-300" : "text-gray-500"}>
+              <span className={active ? "text-[#009CD9]" : "text-gray-500"}>
                 {count}
               </span>
             )}

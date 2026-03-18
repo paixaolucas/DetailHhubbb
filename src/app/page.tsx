@@ -27,15 +27,15 @@ const features = [
     icon: Users,
     title: "Comunidades Exclusivas",
     desc: "Acesse comunidades automotivas premium com total isolamento de membros, conteúdo e pagamentos.",
-    color: "text-violet-400",
-    bg: "bg-violet-500/10",
+    color: "text-[#009CD9]",
+    bg: "bg-[#006079]/10",
   },
   {
     icon: BookOpen,
     title: "Conteúdo em Módulos",
     desc: "Cursos, aulas e tutoriais organizados em módulos com progresso rastreável e suporte a vídeo e PDF.",
-    color: "text-purple-400",
-    bg: "bg-purple-500/10",
+    color: "text-[#009CD9]",
+    bg: "bg-[#009CD9]/10",
   },
   {
     icon: Video,
@@ -84,9 +84,9 @@ const testimonials = [
   {
     name: "Rafael Costa",
     role: "Criador de Conteúdo Automotivo",
-    text: "O DetailHub transformou minha comunidade de seguidores em uma fonte de renda recorrente. Nunca foi tão fácil monetizar.",
+    text: "O Detailer'HUB transformou minha comunidade de seguidores em uma fonte de renda recorrente. Nunca foi tão fácil monetizar.",
     stars: 5,
-    avatarColor: "from-blue-500 to-blue-600",
+    avatarColor: "from-[#006079] to-[#009CD9]",
     initials: "RC",
   },
   {
@@ -94,7 +94,7 @@ const testimonials = [
     role: "Entusiasta de Tuning",
     text: "Finalmente uma plataforma que entende a cultura automotiva. O conteúdo e a IA mecânica são incríveis.",
     stars: 5,
-    avatarColor: "from-violet-500 to-purple-600",
+    avatarColor: "from-[#006079] to-[#009CD9]",
     initials: "AL",
   },
   {
@@ -148,29 +148,29 @@ const pricingFeatures = [
 
 function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-[#F8F7FF] pt-24 pb-32">
+    <section className="relative overflow-hidden bg-[#1A1A1A] pt-24 pb-32">
       {/* Background grid */}
       <div className="absolute inset-0 grid-pattern opacity-50" />
 
       {/* Gradient orbs — no animate-pulse to avoid paint storm */}
-      <div className="absolute top-20 left-1/4 w-96 h-96 bg-violet-600/20 rounded-full blur-3xl" />
+      <div className="absolute top-20 left-1/4 w-96 h-96 bg-[#006079]/20 rounded-full blur-3xl" />
       <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-cyan-600/15 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-4 text-center relative">
         {/* Badge */}
-        <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/30 rounded-full px-4 py-1.5 text-sm text-violet-600 mb-8">
+        <div className="inline-flex items-center gap-2 bg-[#006079]/10 border border-[#007A99]/30 rounded-full px-4 py-1.5 text-sm text-[#009CD9] mb-8">
           <Car className="w-4 h-4" />
           A plataforma premium para comunidades automotivas
         </div>
 
         {/* Headline */}
         <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-[1.1] tracking-tight">
-          <span className="text-gray-900">Sua comunidade </span>
+          <span className="text-[#EEE6E4]">Sua comunidade </span>
           <br />
-          <span className="bg-gradient-to-r from-violet-400 via-violet-300 to-purple-300 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-[#009CD9] via-[#007A99] to-[#006079] bg-clip-text text-transparent">
             automotiva
           </span>
-          <span className="text-gray-900">, premium.</span>
+          <span className="text-[#EEE6E4]">, premium.</span>
         </h1>
 
         <p className="text-gray-400 text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
@@ -182,13 +182,13 @@ function HeroSection() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="/register"
-            className="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-purple-500 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:shadow-xl hover:shadow-violet-500/30 active:scale-95 w-full sm:w-auto justify-center"
+            className="flex items-center gap-2 bg-gradient-to-r from-[#006079] to-[#009CD9] hover:from-[#007A99] hover:to-[#009CD9] text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:shadow-xl hover:shadow-[#006079]/30 active:scale-95 w-full sm:w-auto justify-center"
           >
             Começar agora <ArrowRight className="w-5 h-5" />
           </Link>
           <Link
             href="#preco"
-            className="flex items-center gap-2 border border-gray-200 hover:border-gray-300 text-gray-600 hover:text-gray-900 px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:bg-violet-50 w-full sm:w-auto justify-center"
+            className="flex items-center gap-2 border border-white/10 hover:border-white/20 text-gray-400 hover:text-[#EEE6E4] px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:bg-white/5 w-full sm:w-auto justify-center"
           >
             Ver planos
           </Link>
@@ -208,24 +208,24 @@ function HeroSection() {
         <div className="relative mt-16 max-w-3xl mx-auto">
           <div style={{ perspective: "1200px" }}>
             <div
-              className="rounded-2xl overflow-hidden shadow-2xl shadow-violet-500/20 border border-violet-200"
+              className="rounded-2xl overflow-hidden shadow-2xl shadow-[#006079]/20 border border-white/10"
               style={{ transform: "rotateX(8deg) rotateY(-1deg)" }}
             >
               {/* Window chrome */}
-              <div className="bg-white px-4 py-2.5 flex items-center gap-2 border-b border-gray-100">
+              <div className="bg-white/5 px-4 py-2.5 flex items-center gap-2 border-b border-white/10">
                 <div className="flex gap-1.5">
                   <div className="w-3 h-3 rounded-full bg-red-400" />
                   <div className="w-3 h-3 rounded-full bg-yellow-400" />
                   <div className="w-3 h-3 rounded-full bg-green-400" />
                 </div>
-                <div className="flex-1 mx-3 bg-gray-100 rounded-full h-5 text-[10px] text-gray-400 flex items-center px-3">
-                  detailhub.com/dashboard
+                <div className="flex-1 mx-3 bg-white/5 rounded-full h-5 text-[10px] text-gray-400 flex items-center px-3">
+                  detailerhub.com/dashboard
                 </div>
               </div>
               {/* Content */}
-              <div className="bg-[#F8F7FF] p-4 grid grid-cols-3 gap-3">
+              <div className="bg-[#1A1A1A] p-4 grid grid-cols-3 gap-3">
                 {featuredCommunities.map((c) => (
-                  <div key={c.slug} className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100">
+                  <div key={c.slug} className="bg-white/5 rounded-xl overflow-hidden shadow-sm border border-white/10">
                     <CommunityThumbnail
                       bannerUrl={c.bannerUrl}
                       primaryColor={c.primaryColor}
@@ -233,8 +233,8 @@ function HeroSection() {
                       className="!aspect-auto h-20 w-full"
                     />
                     <div className="p-2 space-y-1.5">
-                      <div className="h-2 bg-gray-100 rounded w-3/4" />
-                      <div className="h-2 bg-gray-100 rounded w-1/2" />
+                      <div className="h-2 bg-white/10 rounded w-3/4" />
+                      <div className="h-2 bg-white/10 rounded w-1/2" />
                       <div className="h-5 rounded-lg mt-2" style={{ backgroundColor: `${c.primaryColor}22` }} />
                     </div>
                   </div>
@@ -243,7 +243,7 @@ function HeroSection() {
             </div>
           </div>
           {/* Glow below */}
-          <div className="absolute inset-x-16 bottom-0 h-12 bg-violet-500/20 blur-3xl -z-10" />
+          <div className="absolute inset-x-16 bottom-0 h-12 bg-[#006079]/20 blur-3xl -z-10" />
         </div>
       </div>
     </section>
@@ -252,12 +252,12 @@ function HeroSection() {
 
 function StatsBar() {
   return (
-    <section className="bg-[#F0EEFF] border-y border-gray-200 py-12">
+    <section className="bg-[#222222] border-y border-white/10 py-12">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
           {stats.map(({ value, label, growth }) => (
             <div key={label} className="text-center">
-              <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-1">{value}</div>
+              <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#EEE6E4] mb-1">{value}</div>
               <div className="text-gray-500 text-sm">{label}</div>
               <div className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-medium">
                 {growth}
@@ -272,14 +272,14 @@ function StatsBar() {
 
 function FeaturedCommunitiesSection() {
   return (
-    <section className="bg-[#F8F7FF] py-24 overflow-hidden">
+    <section className="bg-[#1A1A1A] py-24 overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/20 rounded-full px-3 py-1 text-xs text-violet-400 mb-4">
+          <div className="inline-flex items-center gap-2 bg-[#006079]/10 border border-[#006079]/20 rounded-full px-3 py-1 text-xs text-[#009CD9] mb-4">
             <Trophy className="w-3 h-3" />
             Comunidades em destaque
           </div>
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl font-bold text-[#EEE6E4] mb-4">
             Explore comunidades premium
           </h2>
           <p className="text-gray-400 text-lg max-w-xl mx-auto">
@@ -303,8 +303,8 @@ function FeaturedCommunitiesSection() {
               />
               <div className="p-5">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-bold text-gray-900">{community.name}</h3>
-                  <div className="flex items-center gap-1 text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                  <h3 className="font-bold text-[#EEE6E4]">{community.name}</h3>
+                  <div className="flex items-center gap-1 text-xs text-gray-500 bg-white/5 px-2 py-0.5 rounded-full">
                     <Users className="w-3 h-3" />
                     {community.members}
                   </div>
@@ -325,7 +325,7 @@ function FeaturedCommunitiesSection() {
         <div className="text-center mt-10">
           <Link
             href="/register"
-            className="inline-flex items-center gap-2 text-violet-600 hover:text-violet-700 font-medium text-sm border border-violet-200 hover:border-violet-300 px-5 py-2.5 rounded-xl transition-all hover:bg-violet-50"
+            className="inline-flex items-center gap-2 text-[#009CD9] hover:text-[#007A99] font-medium text-sm border border-[#006079]/20 hover:border-[#006079]/30 px-5 py-2.5 rounded-xl transition-all hover:bg-[#006079]/10"
           >
             Ver todas as comunidades <ArrowRight className="w-4 h-4" />
           </Link>
@@ -337,14 +337,14 @@ function FeaturedCommunitiesSection() {
 
 function FeaturesSection() {
   return (
-    <section id="features" className="bg-[#F8F7FF] py-24">
+    <section id="features" className="bg-[#1A1A1A] py-24">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/20 rounded-full px-3 py-1 text-xs text-violet-400 mb-4">
+          <div className="inline-flex items-center gap-2 bg-[#006079]/10 border border-[#006079]/20 rounded-full px-3 py-1 text-xs text-[#009CD9] mb-4">
             <Gauge className="w-3 h-3" />
             Funcionalidades
           </div>
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl font-bold text-[#EEE6E4] mb-4">
             Tudo que sua comunidade precisa
           </h2>
           <p className="text-gray-400 text-lg max-w-xl mx-auto">
@@ -356,12 +356,12 @@ function FeaturesSection() {
           {features.map(({ icon: Icon, title, desc, color, bg }) => (
             <div
               key={title}
-              className="glass-card p-8 hover:border-violet-200 transition-all duration-300 group"
+              className="glass-card p-8 hover:border-[#006079]/20 transition-all duration-300 group"
             >
               <div className={`w-12 h-12 ${bg} rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
                 <Icon className={`w-6 h-6 ${color}`} />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">{title}</h3>
+              <h3 className="text-xl font-semibold text-[#EEE6E4] mb-3">{title}</h3>
               <p className="text-gray-400 leading-relaxed">{desc}</p>
             </div>
           ))}
@@ -373,21 +373,21 @@ function FeaturesSection() {
 
 function HowItWorksSection() {
   return (
-    <section id="como-funciona" className="bg-[#F0EEFF] py-24">
+    <section id="como-funciona" className="bg-[#222222] py-24">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">Como funciona</h2>
+          <h2 className="text-4xl font-bold text-[#EEE6E4] mb-4">Como funciona</h2>
           <p className="text-gray-400 text-lg">Simples, direto e sem fricção.</p>
         </div>
 
         <div className="grid sm:grid-cols-3 gap-8 max-w-3xl mx-auto">
           {steps.map(({ step, title, desc, icon: Icon }) => (
             <div key={step} className="text-center">
-              <div className="w-14 h-14 bg-violet-500/10 border border-violet-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Icon className="w-6 h-6 text-violet-400" />
+              <div className="w-14 h-14 bg-[#006079]/10 border border-[#006079]/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Icon className="w-6 h-6 text-[#009CD9]" />
               </div>
-              <div className="text-violet-400 text-xs font-bold mb-2 tracking-widest">{step}</div>
-              <h4 className="text-gray-900 font-semibold mb-2">{title}</h4>
+              <div className="text-[#009CD9] text-xs font-bold mb-2 tracking-widest">{step}</div>
+              <h4 className="text-[#EEE6E4] font-semibold mb-2">{title}</h4>
               <p className="text-gray-400 text-sm leading-relaxed">{desc}</p>
             </div>
           ))}
@@ -399,27 +399,27 @@ function HowItWorksSection() {
 
 function PricingSection() {
   return (
-    <section id="preco" className="bg-[#F8F7FF] py-24">
+    <section id="preco" className="bg-[#1A1A1A] py-24">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">Um plano. Acesso a tudo.</h2>
+          <h2 className="text-4xl font-bold text-[#EEE6E4] mb-4">Um plano. Acesso a tudo.</h2>
           <p className="text-gray-400 text-lg">Sem tiers confusos. Sem surpresas.</p>
         </div>
 
         <div className="max-w-md mx-auto">
-          <div className="glass-card p-8 border-violet-500/30 relative overflow-hidden">
+          <div className="glass-card p-8 border-[#006079]/30 relative overflow-hidden">
             {/* Glow */}
-            <div className="absolute inset-0 bg-gradient-to-b from-violet-600/5 to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#006079]/5 to-transparent pointer-events-none" />
 
             <div className="relative">
               <div className="text-center mb-8">
-                <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/20 rounded-full px-3 py-1 text-xs text-violet-400 mb-4">
+                <div className="inline-flex items-center gap-2 bg-[#006079]/10 border border-[#006079]/20 rounded-full px-3 py-1 text-xs text-[#009CD9] mb-4">
                   <Car className="w-3 h-3" />
-                  DetailHub Anual
+                  Detailer&apos;HUB Anual
                 </div>
                 <div className="flex items-end justify-center gap-1">
                   <span className="text-gray-400 text-xl">R$</span>
-                  <span className="text-6xl font-bold text-gray-900">837</span>
+                  <span className="text-6xl font-bold text-[#EEE6E4]">837</span>
                   <span className="text-gray-400 text-xl mb-2">/ano</span>
                 </div>
                 <p className="text-gray-500 text-sm mt-2">R$69,75 por mês</p>
@@ -427,7 +427,7 @@ function PricingSection() {
 
               <ul className="space-y-3 mb-8">
                 {pricingFeatures.map((feature) => (
-                  <li key={feature} className="flex items-center gap-3 text-sm text-gray-600">
+                  <li key={feature} className="flex items-center gap-3 text-sm text-gray-400">
                     <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
                     {feature}
                   </li>
@@ -440,7 +440,7 @@ function PricingSection() {
               >
                 Começar agora <ArrowRight className="w-4 h-4" />
               </Link>
-              <p className="text-center text-xs text-gray-600 mt-4">
+              <p className="text-center text-xs text-gray-400 mt-4">
                 Pagamento seguro via Stripe. Cancele quando quiser.
               </p>
             </div>
@@ -453,10 +453,10 @@ function PricingSection() {
 
 function TestimonialsSection() {
   return (
-    <section className="bg-[#F0EEFF] py-24">
+    <section className="bg-[#222222] py-24">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl font-bold text-[#EEE6E4] mb-4">
             O que dizem nossos usuários
           </h2>
           <p className="text-gray-400 text-lg">Milhares de criadores e membros satisfeitos.</p>
@@ -471,16 +471,16 @@ function TestimonialsSection() {
                 ))}
               </div>
 
-              <p className="text-gray-600 text-sm leading-relaxed flex-1">&quot;{text}&quot;</p>
+              <p className="text-gray-400 text-sm leading-relaxed flex-1">&quot;{text}&quot;</p>
 
-              <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
+              <div className="flex items-center gap-3 pt-2 border-t border-white/10">
                 <div className={`w-11 h-11 rounded-full bg-gradient-to-br ${avatarColor} flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
                   {initials}
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <p className="text-gray-900 font-semibold text-sm">{name}</p>
-                    <BadgeCheck className="w-4 h-4 text-violet-400 flex-shrink-0" />
+                    <p className="text-[#EEE6E4] font-semibold text-sm">{name}</p>
+                    <BadgeCheck className="w-4 h-4 text-[#009CD9] flex-shrink-0" />
                   </div>
                   <p className="text-gray-400 text-xs">{role}</p>
                 </div>
@@ -495,10 +495,10 @@ function TestimonialsSection() {
 
 function CTASection() {
   return (
-    <section className="bg-[#F8F7FF] py-24">
+    <section className="bg-[#1A1A1A] py-24">
       <div className="container mx-auto px-4">
         <div className="relative rounded-3xl overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-purple-600" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#006079] to-[#009CD9]" />
           <div className="absolute inset-0 grid-pattern opacity-20" />
           <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
 
@@ -512,20 +512,20 @@ function CTASection() {
               R$837/ano. Acesso a tudo. Cancele quando quiser.
             </h2>
 
-            <p className="text-violet-100 text-lg mb-10 max-w-xl mx-auto">
+            <p className="text-white/80 text-lg mb-10 max-w-xl mx-auto">
               Junte-se a milhares de apaixonados por automóveis que já fazem parte da plataforma.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 href="/register"
-                className="flex items-center gap-2 bg-white text-violet-600 hover:bg-violet-50 px-8 py-4 rounded-xl font-bold text-lg transition-all hover:shadow-xl active:scale-95 w-full sm:w-auto justify-center"
+                className="flex items-center gap-2 bg-white text-[#006079] hover:bg-white/90 px-8 py-4 rounded-xl font-bold text-lg transition-all hover:shadow-xl active:scale-95 w-full sm:w-auto justify-center"
               >
                 Começar agora <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
 
-            <p className="text-violet-200 text-sm mt-6">
+            <p className="text-white/60 text-sm mt-6">
               Pagamento seguro via Stripe. Sem cartão para testar.
             </p>
           </div>
@@ -539,7 +539,7 @@ function CTASection() {
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-[#F8F7FF]">
+    <div className="min-h-screen bg-[#1A1A1A]">
       <NavBar />
       <HeroSection />
       <StatsBar />

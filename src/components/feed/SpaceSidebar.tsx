@@ -35,13 +35,13 @@ export default function SpaceSidebar({
   activeSpaceSlug,
 }: SpaceSidebarProps) {
   return (
-    <aside className="bg-white border border-gray-200 rounded-xl p-3 flex flex-col gap-1 min-w-[180px]">
+    <aside className="bg-white/5 border border-white/10 rounded-xl p-3 flex flex-col gap-1 min-w-[180px]">
       <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 px-2 py-1 mb-1">
         Canais
       </p>
 
       {spaces.length === 0 && (
-        <p className="text-xs text-gray-600 px-2 py-2">Nenhum canal</p>
+        <p className="text-xs text-gray-400 px-2 py-2">Nenhum canal</p>
       )}
 
       {spaces.map((space) => {
@@ -53,8 +53,8 @@ export default function SpaceSidebar({
             className={[
               "flex items-center gap-2 px-2 py-2 rounded-lg text-sm transition-all group",
               isActive
-                ? "bg-violet-500/20 text-violet-300 font-medium"
-                : "text-gray-400 hover:bg-violet-50 hover:text-gray-700",
+                ? "bg-[#009CD9]/20 text-[#009CD9] font-medium"
+                : "text-gray-400 hover:bg-[#006079]/10 hover:text-gray-300",
             ].join(" ")}
             title={space.type ? SPACE_TYPE_LABELS[space.type] ?? space.type : undefined}
           >
@@ -66,7 +66,7 @@ export default function SpaceSidebar({
               <Hash
                 className={[
                   "w-4 h-4 flex-shrink-0",
-                  isActive ? "text-violet-400" : "text-gray-600 group-hover:text-gray-400",
+                  isActive ? "text-[#009CD9]" : "text-gray-400 group-hover:text-gray-400",
                 ].join(" ")}
               />
             )}
@@ -76,8 +76,8 @@ export default function SpaceSidebar({
                 className={[
                   "ml-auto text-[10px] rounded px-1 py-0.5 flex-shrink-0 hidden sm:block",
                   isActive
-                    ? "bg-violet-500/20 text-violet-300"
-                    : "bg-white text-gray-600",
+                    ? "bg-[#009CD9]/20 text-[#009CD9]"
+                    : "bg-white/5 text-gray-400",
                 ].join(" ")}
               >
                 {SPACE_TYPE_LABELS[space.type]}

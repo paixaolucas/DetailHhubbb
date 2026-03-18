@@ -70,12 +70,12 @@ export function MembershipSection({
 
   if (isLoading) {
     return (
-      <div className="bg-white border border-gray-200 rounded-2xl p-8 animate-pulse">
-        <div className="h-5 bg-gray-50 rounded w-1/3 mb-4" />
-        <div className="h-3 bg-white rounded w-1/2 mb-6" />
+      <div className="bg-white/5 border border-white/10 rounded-2xl p-8 animate-pulse">
+        <div className="h-5 bg-white/5 rounded w-1/3 mb-4" />
+        <div className="h-3 bg-white/5 rounded w-1/2 mb-6" />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="h-44 bg-white rounded-2xl" />
-          <div className="h-44 bg-white rounded-2xl" />
+          <div className="h-44 bg-white/5 rounded-2xl" />
+          <div className="h-44 bg-white/5 rounded-2xl" />
         </div>
       </div>
     );
@@ -87,7 +87,7 @@ export function MembershipSection({
         <div className="w-16 h-16 bg-green-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
           <CheckCircle className="w-8 h-8 text-green-400" />
         </div>
-        <h3 className="text-xl font-bold text-gray-900 mb-2">Você já tem acesso!</h3>
+        <h3 className="text-xl font-bold text-[#EEE6E4] mb-2">Você já tem acesso!</h3>
         <p className="text-gray-400 text-sm mb-6">
           Sua assinatura está ativa. Explore o conteúdo exclusivo da comunidade.
         </p>
@@ -104,8 +104,8 @@ export function MembershipSection({
   if (plans.length === 0) return null;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-8">
-      <h2 className="text-xl font-bold text-gray-900 mb-2">Planos de acesso</h2>
+    <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
+      <h2 className="text-xl font-bold text-[#EEE6E4] mb-2">Planos de acesso</h2>
       <p className="text-gray-400 text-sm mb-6">Escolha o plano ideal para você.</p>
       <div
         className={`grid gap-4 ${
@@ -121,24 +121,24 @@ export function MembershipSection({
               key={plan.id}
               className={`relative rounded-2xl p-6 border transition-all ${
                 plan.isDefault
-                  ? "border-violet-500/50 bg-violet-500/5"
-                  : "border-gray-200 bg-white/[0.02]"
+                  ? "border-[#009CD9]/50 bg-[#009CD9]/5"
+                  : "border-white/10 bg-white/[0.02]"
               }`}
             >
               {plan.isDefault && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="flex items-center gap-1 text-xs bg-violet-600 text-white px-3 py-0.5 rounded-full font-semibold">
+                  <span className="flex items-center gap-1 text-xs bg-[#006079] text-white px-3 py-0.5 rounded-full font-semibold">
                     <Zap className="w-3 h-3" />
                     Mais popular
                   </span>
                 </div>
               )}
-              <h3 className="font-semibold text-gray-900 text-lg mb-1">{plan.name}</h3>
+              <h3 className="font-semibold text-[#EEE6E4] text-lg mb-1">{plan.name}</h3>
               {plan.description && (
                 <p className="text-gray-500 text-xs mb-3">{plan.description}</p>
               )}
               <div className="mb-5">
-                <span className="text-3xl font-bold text-gray-900">
+                <span className="text-3xl font-bold text-[#EEE6E4]">
                   R${" "}
                   {plan.price.toLocaleString("pt-BR", {
                     minimumFractionDigits: 2,
@@ -156,7 +156,7 @@ export function MembershipSection({
                   {plan.features.map((f, i) => (
                     <li
                       key={i}
-                      className="flex items-center gap-2 text-sm text-gray-600"
+                      className="flex items-center gap-2 text-sm text-gray-400"
                     >
                       <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
                       {f}
@@ -174,7 +174,7 @@ export function MembershipSection({
         })}
       </div>
       <p className="text-center text-gray-500 text-xs mt-4">
-        🔒 Cancelamento a qualquer momento. Sem multa.
+        Cancelamento a qualquer momento. Sem multa.
       </p>
     </div>
   );

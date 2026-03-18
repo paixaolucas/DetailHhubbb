@@ -141,7 +141,7 @@ export function NotificationBell() {
       <button
         onClick={handleToggle}
         aria-label="Notificações"
-        className="relative p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-colors"
+        className="relative p-2 text-gray-400 hover:text-[#EEE6E4] hover:bg-white/10 rounded-xl transition-colors"
       >
         <Bell className="w-5 h-5" />
 
@@ -155,8 +155,8 @@ export function NotificationBell() {
       {isOpen && (
         <div className="absolute right-0 top-full mt-2 z-50">
           {loadingNotifications ? (
-            <div className="w-80 bg-[#F0EEFF] border border-gray-200 rounded-2xl shadow-2xl flex items-center justify-center py-10">
-              <div className="w-5 h-5 border-[2px] border-violet-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-80 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl flex items-center justify-center py-10">
+              <div className="w-5 h-5 border-[2px] border-[#009CD9] border-t-transparent rounded-full animate-spin" />
             </div>
           ) : (
             <NotificationDropdown

@@ -85,12 +85,12 @@ export default function SearchBar() {
       {/* Trigger button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-400 flex items-center gap-2 hover:bg-gray-100 hover:border-violet-200 transition-colors"
+        className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-400 flex items-center gap-2 hover:bg-white/10 hover:border-[#006079]/40 transition-colors"
         aria-label="Abrir busca"
       >
         <Search className="w-4 h-4 flex-shrink-0" />
         <span className="hidden sm:inline">Buscar...</span>
-        <kbd className="hidden sm:inline-flex items-center gap-0.5 text-xs text-gray-600 bg-white border border-gray-200 rounded px-1.5 py-0.5 font-mono">
+        <kbd className="hidden sm:inline-flex items-center gap-0.5 text-xs text-gray-400 bg-white/5 border border-white/10 rounded px-1.5 py-0.5 font-mono">
           Ctrl+K
         </kbd>
       </button>
@@ -104,11 +104,11 @@ export default function SearchBar() {
             if (e.target === e.currentTarget) close();
           }}
         >
-          <div className="w-full max-w-xl bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
+          <div className="w-full max-w-xl bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
             {/* Search input */}
-            <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200">
+            <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10">
               {isLoading ? (
-                <div className="w-4 h-4 border-[2px] border-violet-500 border-t-transparent rounded-full animate-spin flex-shrink-0" />
+                <div className="w-4 h-4 border-[2px] border-[#009CD9] border-t-transparent rounded-full animate-spin flex-shrink-0" />
               ) : (
                 <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
               )}
@@ -118,12 +118,12 @@ export default function SearchBar() {
                 value={query}
                 onChange={(e) => handleQueryChange(e.target.value)}
                 placeholder="Buscar comunidades, posts, membros..."
-                className="flex-1 bg-transparent text-gray-900 placeholder-gray-400 text-sm focus:outline-none"
+                className="flex-1 bg-transparent text-[#EEE6E4] placeholder-gray-400 text-sm focus:outline-none"
               />
               {query && (
                 <button
                   onClick={() => handleQueryChange("")}
-                  className="p-1 hover:bg-gray-100 rounded transition-colors"
+                  className="p-1 hover:bg-white/10 rounded transition-colors"
                   aria-label="Limpar busca"
                 >
                   <X className="w-4 h-4 text-gray-400" />
@@ -131,7 +131,7 @@ export default function SearchBar() {
               )}
               <button
                 onClick={close}
-                className="hidden sm:flex items-center gap-1 text-xs text-gray-600 bg-white border border-gray-200 rounded px-1.5 py-0.5 font-mono hover:bg-gray-100 transition-colors"
+                className="hidden sm:flex items-center gap-1 text-xs text-gray-400 bg-white/5 border border-white/10 rounded px-1.5 py-0.5 font-mono hover:bg-white/10 transition-colors"
               >
                 Esc
               </button>
@@ -141,7 +141,7 @@ export default function SearchBar() {
             {showResults ? (
               <SearchResults results={results} query={query} onClose={close} />
             ) : (
-              <div className="px-4 py-6 text-center text-xs text-gray-600">
+              <div className="px-4 py-6 text-center text-xs text-gray-400">
                 Digite pelo menos 2 caracteres para buscar
               </div>
             )}

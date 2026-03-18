@@ -21,15 +21,15 @@ interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 const variants: Record<BadgeVariant, string> = {
-  default: "bg-violet-500/20 text-violet-300 border border-violet-500/30",
+  default: "bg-[#009CD9]/20 text-[#009CD9] border border-[#009CD9]/30",
   success: "bg-green-500/20 text-green-300 border border-green-500/30",
   warning: "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30",
   destructive: "bg-red-500/20 text-red-300 border border-red-500/30",
   info: "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30",
-  chrome: "bg-gray-500/20 text-gray-600 border border-gray-500/30",
+  chrome: "bg-gray-500/20 text-gray-400 border border-gray-500/30",
   admin: "bg-red-600/20 text-red-400 border border-red-500/30",
-  influencer: "bg-purple-600/20 text-purple-400 border border-purple-500/30",
-  member: "bg-violet-600/20 text-violet-400 border border-violet-500/30",
+  influencer: "bg-[#009CD9]/20 text-[#009CD9] border border-[#009CD9]/30",
+  member: "bg-[#006079]/20 text-[#007A99] border border-[#007A99]/30",
   partner: "bg-green-600/20 text-green-400 border border-green-500/30",
   live: "bg-red-600/20 text-red-400 border border-red-500/30 animate-pulse",
   premium: "bg-gradient-to-r from-yellow-600/20 to-orange-600/20 text-yellow-300 border border-yellow-500/30",

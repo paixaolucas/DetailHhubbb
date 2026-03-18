@@ -8,7 +8,7 @@ export function Footer() {
   return (
     <footer>
       {/* CTA Banner */}
-      <div className="bg-[#111827] py-16 px-4">
+      <div className="bg-[#1A1A1A] py-16 px-4">
         <div className="container mx-auto text-center">
           <h2 className="text-white text-2xl md:text-3xl font-bold mb-3">
             Pronto para entrar na maior plataforma automotiva do Brasil?
@@ -18,7 +18,7 @@ export function Footer() {
           </p>
           <Link
             href="/register"
-            className="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-3 rounded-xl transition-colors"
+            className="inline-block bg-[#009CD9] hover:bg-[#006079] text-white font-semibold px-8 py-3 rounded-xl transition-colors"
           >
             Criar conta grátis
           </Link>
@@ -26,14 +26,14 @@ export function Footer() {
       </div>
 
       {/* Main Footer */}
-      <div className="bg-[#0F172A] border-t border-white/10">
+      <div className="bg-[#111111] border-t border-white/10">
         <div className="container mx-auto px-4 py-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
             {/* Brand */}
             <div className="lg:col-span-2">
               <Link href="/" className="flex items-center gap-2 mb-4">
                 <Logo size="md" />
-                <span className="text-white font-bold text-lg">DetailHub</span>
+                <span className="text-white font-bold text-lg">Detailer&apos;HUB</span>
               </Link>
               <p className="text-gray-400 text-sm leading-relaxed max-w-xs">
                 A plataforma premium para comunidades automotivas. Conecte-se com
@@ -129,7 +129,7 @@ export function Footer() {
           {/* Bottom bar */}
           <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-gray-400 text-sm">
-              © {currentYear} DetailHub. Todos os direitos reservados.
+              © {currentYear} Detailer&apos;HUB. Todos os direitos reservados.
             </p>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">

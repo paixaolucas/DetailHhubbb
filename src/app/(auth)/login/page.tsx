@@ -61,26 +61,26 @@ function LoginFormContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F7FF] flex">
+    <div className="min-h-screen bg-[#1A1A1A] flex">
       {/* Left panel - decorative */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-[#F0EEFF]">
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-[#1A1A1A]">
         <div className="absolute inset-0 grid-pattern opacity-30" />
-        <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-violet-600/20 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-[#006079]/20 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-60 h-60 bg-cyan-600/15 rounded-full blur-3xl" />
 
         <div className="relative flex flex-col justify-center px-16 py-12">
           <Link href="/" className="flex items-center gap-2.5 mb-16">
             <Logo size="lg" />
-            <span className="text-gray-900 font-bold text-xl">DetailHub</span>
+            <span className="text-[#EEE6E4] font-bold text-xl">Detailer&apos;HUB</span>
           </Link>
 
           <div className="space-y-8">
             <div>
-              <h1 className="text-4xl font-bold text-gray-900 leading-tight mb-4">
+              <h1 className="text-4xl font-bold text-[#EEE6E4] leading-tight mb-4">
                 Bem-vindo de volta à sua
-                <span className="bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent"> comunidade</span>
+                <span className="bg-gradient-to-r from-[#009CD9] to-[#007A99] bg-clip-text text-transparent"> comunidade</span>
               </h1>
-              <p className="text-gray-500 text-lg leading-relaxed">
+              <p className="text-gray-400 text-lg leading-relaxed">
                 Acesse suas comunidades, conteúdos exclusivos e ferramentas premium.
               </p>
             </div>
@@ -91,9 +91,9 @@ function LoginFormContent() {
                 { icon: Bot, text: "IA Mecânica para diagnosticar e criar" },
                 { icon: Video, text: "Lives, cursos e marketplace" },
               ].map(({ icon: Icon, text }) => (
-                <div key={text} className="flex items-center gap-3 text-gray-600">
-                  <div className="w-8 h-8 bg-violet-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Icon className="w-4 h-4 text-violet-400" />
+                <div key={text} className="flex items-center gap-3 text-gray-400">
+                  <div className="w-8 h-8 bg-[#006079]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Icon className="w-4 h-4 text-[#009CD9]" />
                   </div>
                   <span className="text-sm">{text}</span>
                 </div>
@@ -108,12 +108,12 @@ function LoginFormContent() {
         {/* Mobile logo */}
         <Link href="/" className="flex items-center gap-2.5 mb-8 lg:hidden">
           <Logo size="md" />
-          <span className="text-gray-900 font-bold text-lg">DetailHub</span>
+          <span className="text-[#EEE6E4] font-bold text-lg">Detailer&apos;HUB</span>
         </Link>
 
         <div className="w-full max-w-md">
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">Entrar na sua conta</h2>
+            <h2 className="text-2xl font-bold text-[#EEE6E4] mb-1">Entrar na sua conta</h2>
             <p className="text-gray-400">Digite suas credenciais para continuar.</p>
           </div>
 
@@ -127,7 +127,7 @@ function LoginFormContent() {
           {/* Google Login */}
           <a
             href={`/api/auth/google?redirect=${encodeURIComponent(searchParams.get("redirect") || "/dashboard")}`}
-            className="w-full flex items-center justify-center gap-3 bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50 rounded-xl px-4 py-3.5 text-gray-700 font-medium transition-all active:scale-[0.98] mb-6"
+            className="w-full flex items-center justify-center gap-3 bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/10 rounded-xl px-4 py-3.5 text-gray-300 font-medium transition-all active:scale-[0.98] mb-6"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
@@ -140,17 +140,17 @@ function LoginFormContent() {
 
           <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200"></div>
+              <div className="w-full border-t border-white/10"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="bg-[#F8F7FF] px-3 text-gray-400">ou</span>
+              <span className="bg-[#1A1A1A] px-3 text-gray-400">ou</span>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">
+              <label className="block text-sm font-medium text-gray-400 mb-1.5">
                 Email
               </label>
               <input
@@ -158,7 +158,7 @@ function LoginFormContent() {
                 required
                 value={form.email}
                 onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                className="w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all"
+                className="w-full bg-white/5 border border-white/10 hover:border-[#007A99] focus:border-[#009CD9] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 transition-all"
                 placeholder="seu@email.com"
                 autoComplete="email"
               />
@@ -167,10 +167,10 @@ function LoginFormContent() {
             {/* Password */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-sm font-medium text-gray-600">Senha</label>
+                <label className="block text-sm font-medium text-gray-400">Senha</label>
                 <Link
                   href="/forgot-password"
-                  className="text-xs text-violet-400 hover:text-violet-300 transition-colors"
+                  className="text-xs text-[#009CD9] hover:text-[#007A99] transition-colors"
                 >
                   Esqueceu a senha?
                 </Link>
@@ -181,14 +181,14 @@ function LoginFormContent() {
                   required
                   value={form.password}
                   onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                  className="w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 pr-12 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all"
+                  className="w-full bg-white/5 border border-white/10 hover:border-[#007A99] focus:border-[#009CD9] rounded-xl px-4 py-3 pr-12 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 transition-all"
                   placeholder="••••••••"
                   autoComplete="current-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-600 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-400 transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -199,7 +199,7 @@ function LoginFormContent() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-violet-500/30 active:scale-[0.98]"
+              className="w-full bg-gradient-to-r from-[#006079] to-[#009CD9] hover:from-[#007A99] hover:to-[#009CD9] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-[#006079]/30 active:scale-[0.98]"
             >
               {isLoading ? (
                 <>
@@ -214,7 +214,7 @@ function LoginFormContent() {
 
           <p className="text-center text-gray-500 text-sm mt-6">
             Não tem conta?{" "}
-            <Link href="/register" className="text-violet-400 hover:text-violet-300 font-medium transition-colors">
+            <Link href="/register" className="text-[#009CD9] hover:text-[#007A99] font-medium transition-colors">
               Criar conta grátis
             </Link>
           </p>

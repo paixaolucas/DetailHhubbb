@@ -31,14 +31,14 @@ export default function PostDetailPage() {
   if (!ready) {
     // Minimal loading state while checking auth
     return (
-      <div className="min-h-screen bg-[#F8F7FF] flex items-center justify-center">
-        <span className="w-8 h-8 border-[3px] border-violet-500 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#1A1A1A] flex items-center justify-center">
+        <span className="w-8 h-8 border-[3px] border-[#009CD9] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F7FF]">
+    <div className="min-h-screen bg-[#1A1A1A]">
       <Suspense>
         <PostDetail postId={postId} communitySlug={communitySlug} />
       </Suspense>

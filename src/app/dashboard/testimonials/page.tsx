@@ -41,7 +41,7 @@ function Stars({ rating }: { rating: number }) {
       {[1, 2, 3, 4, 5].map((n) => (
         <Star
           key={n}
-          className={`w-3.5 h-3.5 ${n <= rating ? "text-yellow-400 fill-yellow-400" : "text-gray-600"}`}
+          className={`w-3.5 h-3.5 ${n <= rating ? "text-yellow-400 fill-yellow-400" : "text-gray-400"}`}
         />
       ))}
     </div>
@@ -54,14 +54,14 @@ function Skeleton() {
       {[...Array(4)].map((_, i) => (
         <div key={i} className="glass-card p-4 space-y-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gray-50" />
+            <div className="w-10 h-10 rounded-full bg-white/5" />
             <div className="flex-1 space-y-1.5">
-              <div className="h-4 bg-gray-50 rounded w-24" />
-              <div className="h-3 bg-gray-50 rounded w-16" />
+              <div className="h-4 bg-white/5 rounded w-24" />
+              <div className="h-3 bg-white/5 rounded w-16" />
             </div>
           </div>
-          <div className="h-3 bg-gray-50 rounded w-full" />
-          <div className="h-3 bg-gray-50 rounded w-3/4" />
+          <div className="h-3 bg-white/5 rounded w-full" />
+          <div className="h-3 bg-white/5 rounded w-3/4" />
         </div>
       ))}
     </div>
@@ -209,14 +209,14 @@ export default function TestimonialsPage() {
             <Star className="w-5 h-5 text-yellow-400" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Depoimentos</h1>
+            <h1 className="text-2xl font-bold text-[#EEE6E4]">Depoimentos</h1>
             <p className="text-gray-400 text-sm mt-0.5">Gerencie os depoimentos das suas comunidades</p>
           </div>
         </div>
         <button
           onClick={openCreate}
           disabled={!selectedId}
-          className="flex items-center gap-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-colors"
+          className="flex items-center gap-2 bg-[#006079] hover:bg-[#007A99] disabled:opacity-50 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-colors"
         >
           <Plus className="w-4 h-4" /> Novo Depoimento
         </button>
@@ -227,19 +227,19 @@ export default function TestimonialsPage() {
         value={selectedId}
         onChange={(e) => setSelectedId(e.target.value)}
         disabled={commLoading}
-        className="w-full sm:w-72 bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-gray-900 text-sm focus:outline-none focus:ring-1 focus:ring-violet-500/50 disabled:opacity-50"
+        className="w-full sm:w-72 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-[#EEE6E4] text-sm focus:outline-none focus:ring-1 focus:ring-[#007A99]/50 disabled:opacity-50"
       >
         {commLoading && <option>Carregando...</option>}
         {communities.map((c) => (
-          <option key={c.id} value={c.id} className="bg-white">{c.name}</option>
+          <option key={c.id} value={c.id} className="bg-white/5">{c.name}</option>
         ))}
         {!commLoading && communities.length === 0 && <option disabled>Nenhuma comunidade</option>}
       </select>
 
       {/* Form */}
       {showForm && (
-        <div className="glass-card p-5 space-y-4 border-violet-500/20">
-          <p className="text-sm font-semibold text-gray-900">{editing ? "Editar Depoimento" : "Novo Depoimento"}</p>
+        <div className="glass-card p-5 space-y-4 border-[#007A99]/20">
+          <p className="text-sm font-semibold text-[#EEE6E4]">{editing ? "Editar Depoimento" : "Novo Depoimento"}</p>
           <form onSubmit={handleSubmit} className="space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
@@ -249,7 +249,7 @@ export default function TestimonialsPage() {
                   value={form.authorName}
                   onChange={(e) => setForm((p) => ({ ...p, authorName: e.target.value }))}
                   placeholder="Ex: João Silva"
-                  className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-violet-500/50"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-[#EEE6E4] text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#007A99]/50"
                 />
               </div>
               <div>
@@ -258,7 +258,7 @@ export default function TestimonialsPage() {
                   value={form.authorTitle}
                   onChange={(e) => setForm((p) => ({ ...p, authorTitle: e.target.value }))}
                   placeholder="Ex: Empreendedor"
-                  className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-violet-500/50"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-[#EEE6E4] text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#007A99]/50"
                 />
               </div>
             </div>
@@ -269,7 +269,7 @@ export default function TestimonialsPage() {
                 value={form.avatarUrl}
                 onChange={(e) => setForm((p) => ({ ...p, avatarUrl: e.target.value }))}
                 placeholder="https://..."
-                className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-violet-500/50"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-[#EEE6E4] text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#007A99]/50"
               />
             </div>
             <div>
@@ -280,7 +280,7 @@ export default function TestimonialsPage() {
                 value={form.body}
                 onChange={(e) => setForm((p) => ({ ...p, body: e.target.value }))}
                 placeholder="O que o membro disse sobre a comunidade..."
-                className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-violet-500/50 resize-none"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-[#EEE6E4] text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#007A99]/50 resize-none"
               />
             </div>
             <div className="flex items-center gap-4">
@@ -294,7 +294,7 @@ export default function TestimonialsPage() {
                       onClick={() => setForm((p) => ({ ...p, rating: n }))}
                       className="p-0.5"
                     >
-                      <Star className={`w-5 h-5 ${n <= form.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-600"} transition-colors`} />
+                      <Star className={`w-5 h-5 ${n <= form.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-400"} transition-colors`} />
                     </button>
                   ))}
                 </div>
@@ -306,10 +306,10 @@ export default function TestimonialsPage() {
                   min={0}
                   value={form.sortOrder}
                   onChange={(e) => setForm((p) => ({ ...p, sortOrder: Number(e.target.value) }))}
-                  className="w-20 bg-white border border-gray-200 rounded-xl px-3 py-2 text-gray-900 text-sm focus:outline-none"
+                  className="w-20 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-[#EEE6E4] text-sm focus:outline-none"
                 />
               </div>
-              <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer mt-5">
+              <label className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer mt-5">
                 <input
                   type="checkbox"
                   checked={form.isActive}
@@ -319,10 +319,10 @@ export default function TestimonialsPage() {
                 Ativo
               </label>
               <div className="flex gap-2 ml-auto mt-5">
-                <button type="button" onClick={cancelForm} className="flex items-center gap-1.5 px-3 py-2 text-xs text-gray-400 hover:text-gray-900 border border-gray-200 rounded-xl transition-colors">
+                <button type="button" onClick={cancelForm} className="flex items-center gap-1.5 px-3 py-2 text-xs text-gray-400 hover:text-[#EEE6E4] border border-white/10 rounded-xl transition-colors">
                   <X className="w-3.5 h-3.5" /> Cancelar
                 </button>
-                <button type="submit" disabled={saving} className="flex items-center gap-1.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white px-4 py-2 rounded-xl text-xs font-semibold transition-colors">
+                <button type="submit" disabled={saving} className="flex items-center gap-1.5 bg-[#006079] hover:bg-[#007A99] disabled:opacity-50 text-white px-4 py-2 rounded-xl text-xs font-semibold transition-colors">
                   <Check className="w-3.5 h-3.5" /> {saving ? "Salvando..." : "Salvar"}
                 </button>
               </div>
@@ -336,7 +336,7 @@ export default function TestimonialsPage() {
         <Skeleton />
       ) : testimonials.length === 0 ? (
         <div className="glass-card p-12 text-center">
-          <Star className="w-10 h-10 text-gray-600 mx-auto mb-3" />
+          <Star className="w-10 h-10 text-gray-400 mx-auto mb-3" />
           <p className="text-gray-400 text-sm">
             {communities.length === 0
               ? "Crie uma comunidade para adicionar depoimentos."
@@ -355,12 +355,12 @@ export default function TestimonialsPage() {
                 {t.avatarUrl ? (
                   <Image src={t.avatarUrl} alt={t.authorName} width={40} height={40} className="w-10 h-10 rounded-full object-cover" />
                 ) : (
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-600 to-purple-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#006079] to-[#009CD9] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                     {t.authorName[0]?.toUpperCase()}
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 truncate">{t.authorName}</p>
+                  <p className="text-sm font-semibold text-[#EEE6E4] truncate">{t.authorName}</p>
                   {t.authorTitle && <p className="text-xs text-gray-500 truncate">{t.authorTitle}</p>}
                 </div>
                 <Stars rating={t.rating} />
@@ -371,14 +371,14 @@ export default function TestimonialsPage() {
 
               {/* Footer */}
               <div className="flex items-center gap-2 pt-1">
-                <span className={`text-xs px-2 py-0.5 rounded-full border ${t.isActive ? "bg-green-500/10 text-green-400 border-green-500/20" : "bg-gray-500/10 text-gray-500 border-gray-500/20"}`}>
+                <span className={`text-xs px-2 py-0.5 rounded-full border ${t.isActive ? "bg-green-500/10 text-green-400 border-green-500/20" : "bg-white/50/10 text-gray-500 border-gray-500/20"}`}>
                   {t.isActive ? "Ativo" : "Inativo"}
                 </span>
-                <span className="text-xs text-gray-600 ml-auto">Ordem: {t.sortOrder}</span>
-                <button onClick={() => toggleActive(t)} className="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors" title={t.isActive ? "Desativar" : "Ativar"}>
+                <span className="text-xs text-gray-400 ml-auto">Ordem: {t.sortOrder}</span>
+                <button onClick={() => toggleActive(t)} className="p-1.5 text-gray-500 hover:text-[#EEE6E4] hover:bg-white/5 rounded-lg transition-colors" title={t.isActive ? "Desativar" : "Ativar"}>
                   {t.isActive ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                 </button>
-                <button onClick={() => openEdit(t)} className="p-1.5 text-gray-500 hover:text-violet-400 hover:bg-violet-500/10 rounded-lg transition-colors">
+                <button onClick={() => openEdit(t)} className="p-1.5 text-gray-500 hover:text-[#009CD9] hover:bg-[#007A99]/10 rounded-lg transition-colors">
                   <Pencil className="w-3.5 h-3.5" />
                 </button>
                 <button onClick={() => setDeleteTarget(t)} className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">

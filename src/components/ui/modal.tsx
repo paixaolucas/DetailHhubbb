@@ -58,17 +58,17 @@ export function Modal({ open, onClose, title, description, children, size = "md"
       <div
         className={`
           relative w-full ${sizes[size]}
-          bg-white border border-gray-200 rounded-2xl shadow-2xl
+          bg-white/5 border border-white/10 rounded-2xl shadow-2xl backdrop-blur-md
           animate-slide-up
         `}
       >
         {/* Header */}
         {(title || description) && (
-          <div className="p-6 border-b border-gray-200">
+          <div className="p-6 border-b border-white/10">
             <div className="flex items-start justify-between gap-4">
               <div>
                 {title && (
-                  <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+                  <h2 className="text-lg font-semibold text-[#EEE6E4]">{title}</h2>
                 )}
                 {description && (
                   <p className="text-sm text-gray-400 mt-1">{description}</p>
@@ -76,7 +76,7 @@ export function Modal({ open, onClose, title, description, children, size = "md"
               </div>
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-900 p-1 rounded-lg hover:bg-gray-100 transition-colors flex-shrink-0"
+                className="text-gray-400 hover:text-[#EEE6E4] p-1 rounded-lg hover:bg-white/5 transition-colors flex-shrink-0"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -88,7 +88,7 @@ export function Modal({ open, onClose, title, description, children, size = "md"
         {!title && !description && (
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-900 p-1 rounded-lg hover:bg-gray-100 transition-colors z-10"
+            className="absolute top-4 right-4 text-gray-400 hover:text-[#EEE6E4] p-1 rounded-lg hover:bg-white/5 transition-colors z-10"
           >
             <X className="w-5 h-5" />
           </button>
@@ -124,7 +124,7 @@ export function ConfirmModal({
 }: ConfirmModalProps) {
   const confirmStyles = {
     destructive: "bg-red-600 hover:bg-red-700 text-white",
-    default: "bg-violet-600 hover:bg-violet-700 text-white",
+    default: "bg-[#006079] hover:bg-[#007A99] text-white",
   };
 
   return (
@@ -132,7 +132,7 @@ export function ConfirmModal({
       <div className="p-6 pt-0 flex justify-end gap-3">
         <button
           onClick={onClose}
-          className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-200 hover:border-gray-300 rounded-xl transition-colors"
+          className="px-4 py-2 text-sm text-gray-400 hover:text-[#EEE6E4] border border-white/10 hover:border-white/20 rounded-xl transition-colors"
         >
           Cancelar
         </button>

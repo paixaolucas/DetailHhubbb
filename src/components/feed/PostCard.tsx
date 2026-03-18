@@ -91,7 +91,7 @@ function ImageGrid({ urls }: { urls: string[] }) {
         alt=""
         width={800}
         height={288}
-        className="w-full max-h-72 object-cover rounded-lg mt-3 border border-gray-200"
+        className="w-full max-h-72 object-cover rounded-lg mt-3 border border-white/10"
       />
     );
   }
@@ -99,7 +99,7 @@ function ImageGrid({ urls }: { urls: string[] }) {
     return (
       <div className="grid grid-cols-2 gap-1 mt-3">
         {urls.map((url, i) => (
-          <Image key={i} src={url} alt="" width={400} height={144} className="w-full h-36 object-cover rounded-lg border border-gray-200" />
+          <Image key={i} src={url} alt="" width={400} height={144} className="w-full h-36 object-cover rounded-lg border border-white/10" />
         ))}
       </div>
     );
@@ -110,7 +110,7 @@ function ImageGrid({ urls }: { urls: string[] }) {
     <div className="grid grid-cols-2 gap-1 mt-3">
       {shown.map((url, i) => (
         <div key={i} className="relative">
-          <Image src={url} alt="" width={400} height={144} className="w-full h-36 object-cover rounded-lg border border-gray-200" />
+          <Image src={url} alt="" width={400} height={144} className="w-full h-36 object-cover rounded-lg border border-white/10" />
           {i === 3 && extra > 0 && (
             <div className="absolute inset-0 bg-black/60 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">+{extra}</span>
@@ -251,8 +251,8 @@ export default function PostCard({
         tabIndex={0}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
-        className={`bg-white border rounded-xl p-4 hover:bg-gray-50 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-400/30 relative ${
-          post.isHidden ? "opacity-50 border-gray-100" : "border-gray-200"
+        className={`bg-white/5 border rounded-xl p-4 hover:bg-white/10 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 relative ${
+          post.isHidden ? "opacity-50 border-white/5" : "border-white/10"
         } ${post.isPinned ? "border-l-4 border-l-amber-400" : ""}`}
       >
         {/* Pinned badge */}
@@ -279,15 +279,15 @@ export default function PostCard({
               alt={authorName}
               width={32}
               height={32}
-              className="w-8 h-8 rounded-full object-cover flex-shrink-0 border border-gray-200"
+              className="w-8 h-8 rounded-full object-cover flex-shrink-0 border border-white/10"
             />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-violet-600/70 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-[#006079]/70 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
               {initials}
             </div>
           )}
           <div className="flex flex-col min-w-0">
-            <span className="text-sm font-semibold text-gray-700 leading-tight">{authorName}</span>
+            <span className="text-sm font-semibold text-gray-300 leading-tight">{authorName}</span>
             <span className="text-xs text-gray-500">{timeAgo(post.createdAt)}</span>
           </div>
 
@@ -302,18 +302,18 @@ export default function PostCard({
                 type="button"
                 disabled={actionLoading}
                 onClick={() => setMenuOpen((v) => !v)}
-                className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-40"
+                className="p-1.5 text-gray-400 hover:text-gray-400 hover:bg-white/10 rounded-lg transition-colors disabled:opacity-40"
               >
                 <MoreHorizontal className="w-4 h-4" />
               </button>
               {menuOpen && (
-                <div className="absolute right-0 top-8 w-48 bg-white border border-gray-200 rounded-xl shadow-xl z-20 py-1 overflow-hidden">
+                <div className="absolute right-0 top-8 w-48 bg-white/5 backdrop-blur-md border border-white/10 rounded-xl shadow-xl z-20 py-1 overflow-hidden">
                   {/* Pin — owner only */}
                   {isOwner && (
                     <button
                       type="button"
                       onClick={handlePin}
-                      className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                      className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-gray-400 hover:bg-white/10 hover:text-[#EEE6E4] transition-colors"
                     >
                       <Pin className="w-4 h-4 text-amber-500" />
                       {post.isPinned ? "Desafixar post" : "Fixar post"}
@@ -324,7 +324,7 @@ export default function PostCard({
                     <button
                       type="button"
                       onClick={handleHide}
-                      className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                      className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-gray-400 hover:bg-white/10 hover:text-[#EEE6E4] transition-colors"
                     >
                       {post.isHidden ? (
                         <><Eye className="w-4 h-4 text-green-500" /> Mostrar post</>
@@ -334,12 +334,12 @@ export default function PostCard({
                     </button>
                   )}
                   {/* Divider before delete */}
-                  {isOwner && <div className="border-t border-gray-100 my-1" />}
+                  {isOwner && <div className="border-t border-white/10 my-1" />}
                   {/* Delete — author or owner */}
                   <button
                     type="button"
                     onClick={() => { setMenuOpen(false); setConfirmDelete(true); }}
-                    className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors"
+                    className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-red-500 hover:bg-red-500/10 transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                     Excluir post
@@ -352,7 +352,7 @@ export default function PostCard({
 
         {/* Title */}
         {post.title && (
-          <h2 className="text-base font-semibold text-gray-900 mb-1.5 leading-snug">
+          <h2 className="text-base font-semibold text-[#EEE6E4] mb-1.5 leading-snug">
             {post.title}
           </h2>
         )}
@@ -371,7 +371,7 @@ export default function PostCard({
 
         {/* Footer: reactions + comments */}
         <div
-          className="flex items-center gap-3 mt-4 pt-3 border-t border-gray-100"
+          className="flex items-center gap-3 mt-4 pt-3 border-t border-white/10"
           onClick={(e) => e.stopPropagation()}
         >
           {post.reactionCounts && onReact ? (
@@ -389,7 +389,7 @@ export default function PostCard({
           )}
           <button
             onClick={handleCommentClick}
-            className="flex items-center gap-1.5 text-xs text-gray-500 ml-auto hover:text-violet-500 transition-colors"
+            className="flex items-center gap-1.5 text-xs text-gray-500 ml-auto hover:text-[#009CD9] transition-colors"
             title="Comentar"
           >
             <MessageCircle className="w-3.5 h-3.5" />

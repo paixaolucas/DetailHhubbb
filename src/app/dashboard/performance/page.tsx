@@ -84,12 +84,12 @@ function ppLabel(score: number) {
 }
 
 const chartStyle = {
-  grid: { strokeDasharray: "3 3", stroke: "rgba(0,0,0,0.06)" },
+  grid: { strokeDasharray: "3 3", stroke: "rgba(255,255,255,0.05)" },
   axis: { tick: { fontSize: 11, fill: "#9ca3af" }, tickLine: false, axisLine: false },
   tooltip: {
     contentStyle: {
-      backgroundColor: "#fff",
-      border: "1px solid #e5e7eb",
+      backgroundColor: "#1A1A1A",
+      border: "1px solid rgba(255,255,255,0.1)",
       borderRadius: "12px",
       fontSize: "13px",
     },
@@ -116,11 +116,11 @@ function ComponentBar({
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-violet-50 flex items-center justify-center">
-            <Icon className="w-3.5 h-3.5 text-violet-500" />
+          <div className="w-7 h-7 rounded-lg bg-[#006079]/10 flex items-center justify-center">
+            <Icon className="w-3.5 h-3.5 text-[#007A99]" />
           </div>
           <div>
-            <span className="text-sm font-medium text-gray-900">{label}</span>
+            <span className="text-sm font-medium text-[#EEE6E4]">{label}</span>
             <span className="text-xs text-gray-400 ml-2">peso {(weight * 100).toFixed(0)}%</span>
           </div>
         </div>
@@ -132,7 +132,7 @@ function ComponentBar({
           </span>
         </div>
       </div>
-      <div className="w-full bg-gray-100 rounded-full h-2">
+      <div className="w-full bg-white/5 rounded-full h-2">
         <div
           className="h-2 rounded-full transition-all duration-700"
           style={{ width: `${Math.min(score, 100)}%`, backgroundColor: color }}
@@ -156,12 +156,12 @@ function DeliveryItem({
 }) {
   const ok = done >= required;
   return (
-    <div className={`flex items-center gap-3 p-3 rounded-xl border ${ok ? "border-green-200 bg-green-50" : "border-gray-100 bg-gray-50"}`}>
-      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${ok ? "bg-green-100" : "bg-gray-100"}`}>
+    <div className={`flex items-center gap-3 p-3 rounded-xl border ${ok ? "border-green-200 bg-green-50" : "border-white/10 bg-white/5"}`}>
+      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${ok ? "bg-green-100" : "bg-white/5"}`}>
         <Icon className={`w-4 h-4 ${ok ? "text-green-600" : "text-gray-400"}`} />
       </div>
       <div className="flex-1">
-        <p className="text-sm font-medium text-gray-900">{label}</p>
+        <p className="text-sm font-medium text-[#EEE6E4]">{label}</p>
         <p className="text-xs text-gray-400">
           {done} de {required} {ok ? "✓ concluído" : "pendente"}
         </p>
@@ -197,13 +197,13 @@ export default function PerformancePage() {
   if (loading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-8 bg-gray-100 rounded-xl w-48" />
+        <div className="h-8 bg-white/5 rounded-xl w-48" />
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="glass-card p-5 h-28 bg-gray-50" />
+            <div key={i} className="glass-card p-5 h-28 bg-white/5" />
           ))}
         </div>
-        <div className="glass-card p-6 h-80 bg-gray-50" />
+        <div className="glass-card p-6 h-80 bg-white/5" />
       </div>
     );
   }
@@ -236,12 +236,12 @@ export default function PerformancePage() {
       {/* Header */}
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Pontuação de Performance</h1>
+          <h1 className="text-2xl font-bold text-[#EEE6E4]">Pontuação de Performance</h1>
           <p className="text-gray-400 text-sm mt-1 capitalize">{monthName} — dados em tempo real</p>
         </div>
         <div className="flex items-center gap-2 glass-card px-4 py-2">
           <Trophy className="w-4 h-4 text-yellow-500" />
-          <span className="text-sm font-semibold text-gray-900">
+          <span className="text-sm font-semibold text-[#EEE6E4]">
             #{current.rank}
             <span className="text-gray-400 font-normal"> de {current.totalInfluencers}</span>
           </span>
@@ -259,7 +259,7 @@ export default function PerformancePage() {
             </p>
             <p className="text-gray-400 text-sm mb-1">/100</p>
           </div>
-          <div className="w-full bg-gray-100 rounded-full h-2 mt-3">
+          <div className="w-full bg-white/5 rounded-full h-2 mt-3">
             <div
               className="h-2 rounded-full transition-all"
               style={{ width: `${current.totalPP}%`, backgroundColor: ppColor_ }}
@@ -273,7 +273,7 @@ export default function PerformancePage() {
           <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
             Fatia da Caixa
           </p>
-          <p className="text-4xl font-bold text-blue-600">{current.poolSharePct.toFixed(1)}%</p>
+          <p className="text-4xl font-bold text-[#009CD9]">{current.poolSharePct.toFixed(1)}%</p>
           <p className="text-xs text-gray-400 mt-3">
             Sua % do pool de performance deste mês.
             Baseado nos scores já registrados.
@@ -301,10 +301,10 @@ export default function PerformancePage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Radar chart */}
         <div className="glass-card p-6">
-          <h2 className="text-base font-semibold text-gray-900 mb-4">Perfil de Performance</h2>
+          <h2 className="text-base font-semibold text-[#EEE6E4] mb-4">Perfil de Performance</h2>
           <ResponsiveContainer width="100%" height={260}>
             <RadarChart data={radarData}>
-              <PolarGrid stroke="rgba(0,0,0,0.08)" />
+              <PolarGrid stroke="rgba(255,255,255,0.05)" />
               <PolarAngleAxis
                 dataKey="label"
                 tick={{ fontSize: 11, fill: "#6b7280" }}
@@ -312,8 +312,8 @@ export default function PerformancePage() {
               <Radar
                 name="PP"
                 dataKey="value"
-                stroke="#8b5cf6"
-                fill="#8b5cf6"
+                stroke="#009CD9"
+                fill="#009CD9"
                 fillOpacity={0.25}
                 strokeWidth={2}
               />
@@ -323,7 +323,7 @@ export default function PerformancePage() {
 
         {/* Component breakdown */}
         <div className="glass-card p-6 space-y-5">
-          <h2 className="text-base font-semibold text-gray-900">Componentes do PP</h2>
+          <h2 className="text-base font-semibold text-[#EEE6E4]">Componentes do PP</h2>
           <ComponentBar
             label="Views Qualificados"
             score={current.scoreViews}
@@ -365,8 +365,8 @@ export default function PerformancePage() {
       {/* Deliveries detail */}
       <div className="glass-card p-6">
         <div className="flex items-center gap-2 mb-4">
-          <CheckSquare className="w-4 h-4 text-violet-500" />
-          <h2 className="text-base font-semibold text-gray-900">Entregas Contratuais do Mês</h2>
+          <CheckSquare className="w-4 h-4 text-[#007A99]" />
+          <h2 className="text-base font-semibold text-[#EEE6E4]">Entregas Contratuais do Mês</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <DeliveryItem
@@ -388,9 +388,9 @@ export default function PerformancePage() {
             required={4}
           />
         </div>
-        <div className="mt-3 flex items-start gap-2 p-3 bg-blue-50 rounded-xl border border-blue-100">
-          <Info className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
-          <p className="text-xs text-blue-600">
+        <div className="mt-3 flex items-start gap-2 p-3 bg-[#006079]/10 rounded-xl border border-[#006079]/20">
+          <Info className="w-4 h-4 text-[#009CD9] mt-0.5 flex-shrink-0" />
+          <p className="text-xs text-[#009CD9]">
             Menções externas (stories, links na bio) não são contabilizadas automaticamente — apenas ações dentro da plataforma geram pontuação.
           </p>
         </div>
@@ -399,7 +399,7 @@ export default function PerformancePage() {
       {/* Historical PP trend */}
       {history.length > 0 && (
         <div className="glass-card p-6">
-          <h2 className="text-base font-semibold text-gray-900 mb-5">Evolução do PP — histórico</h2>
+          <h2 className="text-base font-semibold text-[#EEE6E4] mb-5">Evolução do PP — histórico</h2>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={history}>
               <CartesianGrid {...chartStyle.grid} />
@@ -409,9 +409,9 @@ export default function PerformancePage() {
               <Line
                 type="monotone"
                 dataKey="totalPP"
-                stroke="#8b5cf6"
+                stroke="#009CD9"
                 strokeWidth={2.5}
-                dot={{ fill: "#8b5cf6", r: 4 }}
+                dot={{ fill: "#009CD9", r: 4 }}
                 name="PP Total"
               />
               <Line type="monotone" dataKey="scoreViews" stroke="#3b82f6" strokeWidth={1.5} strokeDasharray="4 2" dot={false} name="Views" />
@@ -426,8 +426,8 @@ export default function PerformancePage() {
 
       {/* Formula explanation */}
       <div className="glass-card p-5">
-        <p className="text-xs font-semibold text-gray-600 mb-2">Fórmula do PP</p>
-        <code className="text-xs text-violet-600 bg-violet-50 px-3 py-2 rounded-lg block leading-relaxed">
+        <p className="text-xs font-semibold text-gray-400 mb-2">Fórmula do PP</p>
+        <code className="text-xs text-[#006079] bg-[#006079]/10 px-3 py-2 rounded-lg block leading-relaxed">
           PP = (Views × 0,30) + (Engajamento × 0,25) + (Novos Membros × 0,20) + (Retenção × 0,15) + (Entregas × 0,10)
         </code>
         <p className="text-xs text-gray-400 mt-2">

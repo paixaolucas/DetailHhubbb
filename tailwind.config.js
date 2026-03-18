@@ -50,47 +50,47 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // DetailHub brand colors — Lavender Light
+        // Detailer'HUB brand colors — Teal Dark
         detailhub: {
-          50:  "#F5F3FF",
-          100: "#EDE9FE",
-          200: "#DDD6FE",
-          300: "#C4B5FD",
-          400: "#A78BFA",
-          500: "#8B5CF6",
-          600: "#7C3AED",
-          700: "#6D28D9",
-          800: "#5B21B6",
-          900: "#4C1D95",
-          950: "#2E1065",
+          50:  "#E6F4F7",
+          100: "#CCE9EF",
+          200: "#99D3DF",
+          300: "#66BDCF",
+          400: "#33A7BF",
+          500: "#007A99",
+          600: "#006079",
+          700: "#004D61",
+          800: "#003A49",
+          900: "#002731",
+          950: "#001419",
         },
-        // chrome — light neutral scale (body bg is chrome-50)
+        // chrome — dark neutral scale
         chrome: {
-          50:  "#F8F7FF",  // page background — barely-there violet on white
-          100: "#F0EEFF",  // sidebar / panel background
-          200: "#E4DFFE",  // subtle section tint
-          300: "#C9BFFC",
-          400: "#A99BF5",
-          500: "#8470E8",
-          600: "#6150CB",
-          700: "#4A3AA8",
-          800: "#352880",
-          900: "#221A58",
-          950: "#120E32",
+          50:  "#1A1A1A",
+          100: "#222222",
+          200: "#2A2A2A",
+          300: "#333333",
+          400: "#555555",
+          500: "#777777",
+          600: "#999999",
+          700: "#BBBBBB",
+          800: "#DDDDDD",
+          900: "#EEE6E4",
+          950: "#F5F0EE",
         },
-        // Legacy hub alias
+        // Hub alias — mirrors detailhub
         hub: {
-          50:  "#F5F3FF",
-          100: "#EDE9FE",
-          200: "#DDD6FE",
-          300: "#C4B5FD",
-          400: "#A78BFA",
-          500: "#8B5CF6",
-          600: "#7C3AED",
-          700: "#6D28D9",
-          800: "#5B21B6",
-          900: "#4C1D95",
-          950: "#2E1065",
+          50:  "#E6F4F7",
+          100: "#CCE9EF",
+          200: "#99D3DF",
+          300: "#66BDCF",
+          400: "#33A7BF",
+          500: "#007A99",
+          600: "#006079",
+          700: "#004D61",
+          800: "#003A49",
+          900: "#002731",
+          950: "#001419",
         },
       },
       borderRadius: {
@@ -99,7 +99,7 @@ module.exports = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+        sans: ["Titillium Web", "system-ui", "sans-serif"],
       },
       keyframes: {
         "accordion-down": {
@@ -111,8 +111,8 @@ module.exports = {
           to: { height: "0" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 0 0 rgba(124, 58, 237, 0)" },
-          "50%": { boxShadow: "0 0 20px 4px rgba(124, 58, 237, 0.25)" },
+          "0%, 100%": { boxShadow: "0 0 0 0 rgba(0, 96, 121, 0)" },
+          "50%": { boxShadow: "0 0 20px 4px rgba(0, 96, 121, 0.25)" },
         },
         "slide-up": {
           from: { opacity: "0", transform: "translateY(20px)" },
@@ -151,10 +151,10 @@ module.exports = {
         "spin-slow": "spin-slow 8s linear infinite",
       },
       backgroundImage: {
-        "detailhub-gradient": "linear-gradient(135deg, #7C3AED, #8B5CF6, #A78BFA)",
-        "chrome-gradient": "linear-gradient(135deg, #F0EEFF, #E4DFFE, #C9BFFC)",
-        "dark-gradient": "linear-gradient(180deg, #F8F7FF 0%, #F0EEFF 100%)",
-        "glass-gradient": "linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.6))",
+        "detailhub-gradient": "linear-gradient(135deg, #006079, #007A99, #009CD9)",
+        "chrome-gradient": "linear-gradient(135deg, #222222, #2A2A2A, #333333)",
+        "dark-gradient": "linear-gradient(180deg, #1A1A1A 0%, #222222 100%)",
+        "glass-gradient": "linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))",
       },
     },
   },

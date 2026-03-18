@@ -169,7 +169,7 @@ export default function CommentItem({
   // ---- Render --------------------------------------------------------------
 
   return (
-    <div className={isReply ? "pl-4 border-l border-gray-200" : ""}>
+    <div className={isReply ? "pl-4 border-l border-white/10" : ""}>
       <div className="flex gap-3">
         {/* Avatar */}
         {comment.author.avatarUrl ? (
@@ -178,10 +178,10 @@ export default function CommentItem({
             alt={authorName}
             width={32}
             height={32}
-            className="w-8 h-8 rounded-full object-cover flex-shrink-0 border border-gray-200 mt-0.5"
+            className="w-8 h-8 rounded-full object-cover flex-shrink-0 border border-white/10 mt-0.5"
           />
         ) : (
-          <div className="w-8 h-8 rounded-full bg-violet-600/60 flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">
+          <div className="w-8 h-8 rounded-full bg-[#006079]/60 flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">
             {initials}
           </div>
         )}
@@ -189,8 +189,8 @@ export default function CommentItem({
         <div className="flex-1 min-w-0">
           {/* Header */}
           <div className="flex items-baseline gap-2 mb-1">
-            <span className="text-sm font-semibold text-gray-700">{authorName}</span>
-            <span className="text-xs text-gray-600">{timeAgo(comment.createdAt)}</span>
+            <span className="text-sm font-semibold text-gray-300">{authorName}</span>
+            <span className="text-xs text-gray-400">{timeAgo(comment.createdAt)}</span>
           </div>
 
           {/* Body */}
@@ -206,8 +206,8 @@ export default function CommentItem({
               className={[
                 "inline-flex items-center gap-1 text-xs transition-colors",
                 liked
-                  ? "text-violet-400 hover:text-violet-300"
-                  : "text-gray-600 hover:text-gray-600",
+                  ? "text-[#009CD9] hover:text-[#009CD9]"
+                  : "text-gray-400 hover:text-gray-400",
               ].join(" ")}
             >
               <ThumbsUp className="w-3.5 h-3.5" />
@@ -217,7 +217,7 @@ export default function CommentItem({
             {!isReply && (
               <button
                 onClick={() => setShowReplyBox((v) => !v)}
-                className="inline-flex items-center gap-1 text-xs text-gray-600 hover:text-gray-600 transition-colors"
+                className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-gray-400 transition-colors"
               >
                 <CornerDownRight className="w-3.5 h-3.5" />
                 Responder
@@ -245,7 +245,7 @@ export default function CommentItem({
                 placeholder="Escreva uma resposta..."
                 rows={2}
                 required
-                className="w-full bg-white border border-gray-200 focus:border-violet-500/40 rounded-lg px-3 py-2 text-sm text-gray-700 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-violet-500/20 resize-none transition-all"
+                className="w-full bg-white/5 border border-white/10 focus:border-[#009CD9]/40 rounded-lg px-3 py-2 text-sm text-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/20 resize-none transition-all"
               />
               {replyError && (
                 <p className="text-xs text-red-400">{replyError}</p>
@@ -254,14 +254,14 @@ export default function CommentItem({
                 <button
                   type="submit"
                   disabled={replyLoading || !replyBody.trim()}
-                  className="text-xs bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white px-3 py-1.5 rounded-lg font-medium transition-all"
+                  className="text-xs bg-[#006079] hover:bg-[#007A99] disabled:opacity-50 text-white px-3 py-1.5 rounded-lg font-medium transition-all"
                 >
                   {replyLoading ? "Enviando..." : "Responder"}
                 </button>
                 <button
                   type="button"
                   onClick={() => { setShowReplyBox(false); setReplyBody(""); }}
-                  className="text-xs text-gray-500 hover:text-gray-600 px-2 py-1.5 transition-colors"
+                  className="text-xs text-gray-500 hover:text-gray-400 px-2 py-1.5 transition-colors"
                 >
                   Cancelar
                 </button>

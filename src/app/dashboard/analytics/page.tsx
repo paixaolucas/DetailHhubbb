@@ -127,12 +127,12 @@ function KpiCard({
   icon: React.ElementType; trend?: string; trendPositive?: boolean;
 }) {
   return (
-    <div className="glass-card p-5 hover:border-violet-200 transition-all group">
+    <div className="glass-card p-5 hover:border-[#009CD9]/20 transition-all group">
       <div className="flex items-center justify-between mb-3">
         <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</p>
-        <Icon className="w-4 h-4 text-violet-400" />
+        <Icon className="w-4 h-4 text-[#009CD9]" />
       </div>
-      <p className="text-2xl font-bold text-gray-900 mb-1">{value}</p>
+      <p className="text-2xl font-bold text-[#EEE6E4] mb-1">{value}</p>
       <div className="flex items-center gap-1">
         {trend && (
           <span className={`text-xs font-medium flex items-center gap-0.5 ${trendPositive ? "text-green-400" : "text-red-400"}`}>
@@ -165,7 +165,7 @@ function PeriodSelector({
             key={key}
             onClick={() => { onChange(key); setShowCal(false); }}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-              period === key ? "bg-violet-600 text-white" : "text-gray-400 hover:text-gray-900"
+              period === key ? "bg-[#006079] text-white" : "text-gray-400 hover:text-[#EEE6E4]"
             }`}
           >
             {label}
@@ -174,7 +174,7 @@ function PeriodSelector({
         <button
           onClick={() => setShowCal((v) => !v)}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-            period === "custom" ? "bg-violet-600 text-white" : "text-gray-400 hover:text-gray-900"
+            period === "custom" ? "bg-[#006079] text-white" : "text-gray-400 hover:text-[#EEE6E4]"
           }`}
         >
           <Calendar className="w-3 h-3" />
@@ -189,24 +189,24 @@ function PeriodSelector({
             <span className="text-xs text-gray-500">De</span>
             <input type="date" value={tmpStart} max={tmpEnd || undefined}
               onChange={(e) => setTmpStart(e.target.value)}
-              className="text-xs bg-white border border-gray-200 rounded-lg px-2 py-1.5 text-gray-900 focus:outline-none focus:border-violet-500"
+              className="text-xs bg-white/5 border border-white/10 rounded-lg px-2 py-1.5 text-[#EEE6E4] focus:outline-none focus:border-[#007A99]"
             />
           </div>
           <div className="flex items-center gap-1.5">
             <span className="text-xs text-gray-500">até</span>
             <input type="date" value={tmpEnd} min={tmpStart || undefined}
               onChange={(e) => setTmpEnd(e.target.value)}
-              className="text-xs bg-white border border-gray-200 rounded-lg px-2 py-1.5 text-gray-900 focus:outline-none focus:border-violet-500"
+              className="text-xs bg-white/5 border border-white/10 rounded-lg px-2 py-1.5 text-[#EEE6E4] focus:outline-none focus:border-[#007A99]"
             />
           </div>
           <button
             onClick={() => { if (tmpStart && tmpEnd) { onCustomApply(tmpStart, tmpEnd); onChange("custom"); setShowCal(false); } }}
             disabled={!tmpStart || !tmpEnd}
-            className="bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+            className="bg-[#006079] hover:bg-[#007A99] disabled:opacity-40 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
           >
             Aplicar
           </button>
-          <button onClick={() => setShowCal(false)} className="p-1.5 text-gray-400 hover:text-gray-900">
+          <button onClick={() => setShowCal(false)} className="p-1.5 text-gray-400 hover:text-[#EEE6E4]">
             <X className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -286,20 +286,20 @@ export default function AnalyticsPage() {
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-8 bg-gray-50 rounded-xl w-32" />
+        <div className="h-8 bg-white/5 rounded-xl w-32" />
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="glass-card p-5 space-y-3">
               <div className="flex justify-between">
-                <div className="h-3 bg-gray-50 rounded w-20" />
-                <div className="w-4 h-4 bg-gray-50 rounded" />
+                <div className="h-3 bg-white/5 rounded w-20" />
+                <div className="w-4 h-4 bg-white/5 rounded" />
               </div>
-              <div className="h-7 bg-gray-50 rounded w-28" />
-              <div className="h-3 bg-gray-50 rounded w-24" />
+              <div className="h-7 bg-white/5 rounded w-28" />
+              <div className="h-3 bg-white/5 rounded w-24" />
             </div>
           ))}
         </div>
-        <div className="glass-card p-6 h-64 bg-white" />
+        <div className="glass-card p-6 h-64 bg-white/5" />
       </div>
     );
   }
@@ -352,11 +352,11 @@ export default function AnalyticsPage() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
+          <h1 className="text-2xl font-bold text-[#EEE6E4]">Analytics</h1>
           <p className="text-gray-400 text-sm mt-1">
-            {role === "SUPER_ADMIN" ? "Métricas da plataforma" : "Sua comunidade"} · <span className="text-violet-400">{periodLabel}</span>
+            {role === "SUPER_ADMIN" ? "Métricas da plataforma" : "Sua comunidade"} · <span className="text-[#009CD9]">{periodLabel}</span>
             {communityId && data?.communities && (
-              <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400">
+              <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-[#007A99]/10 border border-[#007A99]/20 text-[#009CD9]">
                 {data.communities.find((c: any) => c.id === communityId)?.name ?? "Comunidade"}
               </span>
             )}
@@ -367,7 +367,7 @@ export default function AnalyticsPage() {
             customStart={customStart} customEnd={customEnd}
             onCustomApply={(s, e) => { setCustomStart(s); setCustomEnd(e); }} />
           <button onClick={exportCSV}
-            className="flex items-center gap-2 px-4 py-2 glass-card hover:border-violet-200 text-gray-600 hover:text-gray-900 text-sm font-medium transition-all rounded-xl">
+            className="flex items-center gap-2 px-4 py-2 glass-card hover:border-[#009CD9]/20 text-gray-400 hover:text-[#EEE6E4] text-sm font-medium transition-all rounded-xl">
             <Download className="w-4 h-4" /> CSV
           </button>
         </div>
@@ -412,31 +412,31 @@ export default function AnalyticsPage() {
       {/* ── Pagamentos por Tipo (INFLUENCER_ADMIN) ─────────────────────────────── */}
       {role !== "SUPER_ADMIN" && (
         <div>
-          <h2 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
-            <span className="w-1.5 h-5 bg-violet-500 rounded-full" />
-            Pagamentos por Tipo — <span className="text-violet-400 font-normal">{periodLabel}</span>
+          <h2 className="text-base font-semibold text-[#EEE6E4] mb-3 flex items-center gap-2">
+            <span className="w-1.5 h-5 bg-[#007A99] rounded-full" />
+            Pagamentos por Tipo — <span className="text-[#009CD9] font-normal">{periodLabel}</span>
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
             {/* Anual */}
-            <div className="glass-card p-5 border-l-4 border-blue-500/50">
+            <div className="glass-card p-5 border-l-4 border-[#007A99]/50">
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 bg-blue-500/10 rounded-xl flex items-center justify-center">
-                  <CreditCard className="w-4 h-4 text-blue-400" />
+                <div className="w-8 h-8 bg-[#007A99]/10 rounded-xl flex items-center justify-center">
+                  <CreditCard className="w-4 h-4 text-[#009CD9]" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">Plano Anual</p>
+                  <p className="text-sm font-semibold text-[#EEE6E4]">Plano Anual</p>
                   <p className="text-xs text-gray-500">R$ {PRECO_ANUAL.toLocaleString("pt-BR")}/ano · {myAnual} membros</p>
                 </div>
               </div>
               <div className="space-y-2.5">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Assinantes ativos</span>
-                  <span className="font-semibold text-gray-900">{myAnual}</span>
+                  <span className="font-semibold text-[#EEE6E4]">{myAnual}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">{isMonthly ? "Receita bruta (MRR)" : `Receita bruta (${days}d)`}</span>
-                  <span className="font-semibold text-blue-400">
+                  <span className="font-semibold text-[#009CD9]">
                     R$ {myRevAnual.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                   </span>
                 </div>
@@ -448,13 +448,13 @@ export default function AnalyticsPage() {
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-900 font-semibold">Seu repasse líquido</span>
-                  <span className="text-blue-400 font-bold">
+                  <span className="text-[#EEE6E4] font-semibold">Seu repasse líquido</span>
+                  <span className="text-[#009CD9] font-bold">
                     R$ {myNetAnual.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                   </span>
                 </div>
-                <div className="mt-3 p-2.5 bg-blue-500/5 rounded-xl border border-blue-500/10">
-                  <p className="text-xs text-blue-400 text-center">
+                <div className="mt-3 p-2.5 bg-[#007A99]/5 rounded-xl border border-[#007A99]/10">
+                  <p className="text-xs text-[#009CD9] text-center">
                     Equivalente mensal por membro: <strong>R$ {(PRECO_ANUAL / 12).toFixed(2)}</strong>
                   </p>
                 </div>
@@ -468,14 +468,14 @@ export default function AnalyticsPage() {
                   <Smartphone className="w-4 h-4 text-emerald-400" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">PIX Mensal</p>
+                  <p className="text-sm font-semibold text-[#EEE6E4]">PIX Mensal</p>
                   <p className="text-xs text-gray-500">R$ {PRECO_PIX.toFixed(2).replace(".", ",")}/mês · {myPix} membros</p>
                 </div>
               </div>
               <div className="space-y-2.5">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Assinantes ativos</span>
-                  <span className="font-semibold text-gray-900">{myPix}</span>
+                  <span className="font-semibold text-[#EEE6E4]">{myPix}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">{isMonthly ? "Receita bruta (MRR)" : `Receita bruta (${days}d)`}</span>
@@ -491,7 +491,7 @@ export default function AnalyticsPage() {
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-900 font-semibold">Seu repasse líquido</span>
+                  <span className="text-[#EEE6E4] font-semibold">Seu repasse líquido</span>
                   <span className="text-emerald-400 font-bold">
                     R$ {myNetPix.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                   </span>
@@ -506,14 +506,14 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Resumo total */}
-          <div className="mt-4 glass-card p-4 flex flex-wrap items-center justify-between gap-4 border-violet-500/20">
+          <div className="mt-4 glass-card p-4 flex flex-wrap items-center justify-between gap-4 border-[#007A99]/20">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-violet-500/10 rounded-xl flex items-center justify-center">
-                <Percent className="w-4 h-4 text-violet-400" />
+              <div className="w-8 h-8 bg-[#007A99]/10 rounded-xl flex items-center justify-center">
+                <Percent className="w-4 h-4 text-[#009CD9]" />
               </div>
               <div>
                 <p className="text-xs text-gray-500">{isMonthly ? "Receita bruta total (MRR)" : `Receita bruta (${days}d)`}</p>
-                <p className="text-sm font-bold text-gray-900">
+                <p className="text-sm font-bold text-[#EEE6E4]">
                   R$ {myRevTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                 </p>
               </div>
@@ -526,7 +526,7 @@ export default function AnalyticsPage() {
             </div>
             <div className="text-right">
               <p className="text-xs text-gray-500">{isMonthly ? "Repasse líquido total" : `Repasse líquido (${days}d)`}</p>
-              <p className="text-xl font-bold text-violet-400">
+              <p className="text-xl font-bold text-[#009CD9]">
                 R$ {myNetTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
               </p>
               <p className="text-xs text-gray-500">{myAnual + myPix} membros · {myAnual} anuais + {myPix} PIX</p>
@@ -538,11 +538,11 @@ export default function AnalyticsPage() {
       {/* Stacked Revenue Chart */}
       <div className="glass-card p-6">
         <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
-          <h2 className="text-base font-semibold text-gray-900">
+          <h2 className="text-base font-semibold text-[#EEE6E4]">
             Receita por Tipo de Pagamento — {periodLabel}
           </h2>
           <div className="flex items-center gap-4 text-xs text-gray-500">
-            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-blue-500 inline-block" /> Anual</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-[#007A99] inline-block" /> Anual</span>
             <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-emerald-500 inline-block" /> PIX Mensal</span>
           </div>
         </div>
@@ -550,8 +550,8 @@ export default function AnalyticsPage() {
           <AreaChart data={timeSeries}>
             <defs>
               <linearGradient id="gradAnual" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                <stop offset="5%" stopColor="#009CD9" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#009CD9" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="gradPix" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
@@ -570,7 +570,7 @@ export default function AnalyticsPage() {
               ]}
               labelFormatter={(v) => new Date(v).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}
             />
-            <Area type="monotone" dataKey="revenueAnual" stackId="1" stroke="#3b82f6" fill="url(#gradAnual)" strokeWidth={2} name="revenueAnual" />
+            <Area type="monotone" dataKey="revenueAnual" stackId="1" stroke="#009CD9" fill="url(#gradAnual)" strokeWidth={2} name="revenueAnual" />
             <Area type="monotone" dataKey="revenuePix"   stackId="1" stroke="#10b981" fill="url(#gradPix)"   strokeWidth={2} name="revenuePix" />
           </AreaChart>
         </ResponsiveContainer>
@@ -578,7 +578,7 @@ export default function AnalyticsPage() {
 
       {/* Members growth chart */}
       <div className="glass-card p-6">
-        <h2 className="text-base font-semibold text-gray-900 mb-6">Crescimento de Membros</h2>
+        <h2 className="text-base font-semibold text-[#EEE6E4] mb-6">Crescimento de Membros</h2>
         <ResponsiveContainer width="100%" height={220}>
           <AreaChart data={timeSeries}>
             <defs>
@@ -599,7 +599,7 @@ export default function AnalyticsPage() {
 
       {/* Novas assinaturas por dia */}
       <div className="glass-card p-6">
-        <h2 className="text-base font-semibold text-gray-900 mb-6">Novas Assinaturas por Dia</h2>
+        <h2 className="text-base font-semibold text-[#EEE6E4] mb-6">Novas Assinaturas por Dia</h2>
         <ResponsiveContainer width="100%" height={180}>
           <BarChart data={timeSeries}>
             <CartesianGrid {...chartStyle.grid} />
@@ -607,7 +607,7 @@ export default function AnalyticsPage() {
               tickFormatter={(v) => new Date(v).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })} />
             <YAxis {...chartStyle.axis} />
             <Tooltip {...chartStyle.tooltip} formatter={(v: number) => [v, "Novas assinaturas"]} />
-            <Bar dataKey="newSubscriptions" fill="#8b5cf6" radius={[3, 3, 0, 0]} name="Novas assinaturas" />
+            <Bar dataKey="newSubscriptions" fill="#009CD9" radius={[3, 3, 0, 0]} name="Novas assinaturas" />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -615,27 +615,27 @@ export default function AnalyticsPage() {
       {/* Analytics Events (SUPER_ADMIN) */}
       {role === "SUPER_ADMIN" && (
         <div className="glass-card overflow-hidden">
-          <div className="p-5 border-b border-gray-200 flex items-center justify-between flex-wrap gap-3">
+          <div className="p-5 border-b border-white/10 flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-2">
               <Zap className="w-4 h-4 text-yellow-400" />
-              <h2 className="text-base font-semibold text-gray-900">Eventos Recentes</h2>
+              <h2 className="text-base font-semibold text-[#EEE6E4]">Eventos Recentes</h2>
             </div>
             <select value={eventFilter} onChange={(e) => setEventFilter(e.target.value)}
-              className="bg-white border border-gray-200 rounded-xl px-3 py-1.5 text-sm text-gray-900 focus:outline-none focus:border-violet-400">
-              <option value="" className="bg-white">Todos os tipos</option>
+              className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-sm text-[#EEE6E4] focus:outline-none focus:border-[#009CD9]">
+              <option value="" className="bg-white/5">Todos os tipos</option>
               {events.map((e) => (
-                <option key={e.type} value={e.type} className="bg-white">{e.type} ({e.count})</option>
+                <option key={e.type} value={e.type} className="bg-white/5">{e.type} ({e.count})</option>
               ))}
             </select>
           </div>
           {events.length > 0 && (
-            <div className="p-4 border-b border-gray-100 flex flex-wrap gap-2">
+            <div className="p-4 border-b border-white/10 flex flex-wrap gap-2">
               {events.slice(0, 8).map((e) => (
                 <span key={e.type} onClick={() => setEventFilter(eventFilter === e.type ? "" : e.type)}
                   className={`text-xs px-2.5 py-1 rounded-full border cursor-pointer transition-colors ${
                     eventFilter === e.type
-                      ? "bg-violet-600/30 border-violet-500/50 text-violet-300"
-                      : "bg-white border-gray-200 text-gray-400 hover:border-violet-200 hover:text-gray-900"
+                      ? "bg-[#006079]/30 border-[#007A99]/50 text-[#009CD9]"
+                      : "bg-white/5 border-white/10 text-gray-400 hover:border-[#009CD9]/20 hover:text-[#EEE6E4]"
                   }`}>
                   {e.type} · {e.count}
                 </span>
@@ -644,18 +644,18 @@ export default function AnalyticsPage() {
           )}
           {eventsLoading ? (
             <div className="p-8 text-center">
-              <div className="w-6 h-6 border-[3px] border-violet-500 border-t-transparent rounded-full animate-spin mx-auto" />
+              <div className="w-6 h-6 border-[3px] border-[#007A99] border-t-transparent rounded-full animate-spin mx-auto" />
             </div>
           ) : (
             <div className="divide-y divide-white/5">
               {recentEvents.filter((e) => !eventFilter || e.type === eventFilter).slice(0, 15).map((e) => (
-                <div key={e.id} className="flex items-center gap-3 px-5 py-3 hover:bg-violet-50 transition-colors">
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 font-medium flex-shrink-0">
+                <div key={e.id} className="flex items-center gap-3 px-5 py-3 hover:bg-[#006079]/10 transition-colors">
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-[#007A99]/10 border border-[#007A99]/20 text-[#009CD9] font-medium flex-shrink-0">
                     {e.type}
                   </span>
                   <div className="flex-1 min-w-0">
                     {e.user && (
-                      <span className="text-sm text-gray-600">
+                      <span className="text-sm text-gray-400">
                         {e.user.firstName} {e.user.lastName}
                         <span className="text-gray-500 text-xs ml-1">({e.user.email})</span>
                       </span>
@@ -678,8 +678,8 @@ export default function AnalyticsPage() {
       {/* Tabela de influencers (SUPER_ADMIN) — com breakdown anual/PIX escalado pelo período */}
       {role === "SUPER_ADMIN" && (
         <div className="glass-card overflow-hidden">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-base font-semibold text-gray-900">Receita por Influenciador — Anual vs PIX Mensal</h2>
+          <div className="p-6 border-b border-white/10">
+            <h2 className="text-base font-semibold text-[#EEE6E4]">Receita por Influenciador — Anual vs PIX Mensal</h2>
             <p className="text-xs text-gray-500 mt-1">
               Comissão de 15% · período de {days} dias · {isMonthly ? "valores mensais (MRR)" : `receita proporcional a ${days}d`}
             </p>
@@ -687,11 +687,11 @@ export default function AnalyticsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-white">
+                <tr className="bg-white/5">
                   <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wide px-5 py-3">Influenciador</th>
                   <th className="text-right text-xs font-medium text-gray-500 uppercase tracking-wide px-5 py-3 hidden sm:table-cell">Anuais</th>
                   <th className="text-right text-xs font-medium text-gray-500 uppercase tracking-wide px-5 py-3 hidden sm:table-cell">PIX</th>
-                  <th className="text-right text-xs font-medium text-blue-500 uppercase tracking-wide px-5 py-3">Repasse Anual</th>
+                  <th className="text-right text-xs font-medium text-[#007A99] uppercase tracking-wide px-5 py-3">Repasse Anual</th>
                   <th className="text-right text-xs font-medium text-emerald-500 uppercase tracking-wide px-5 py-3 hidden md:table-cell">Repasse PIX</th>
                   <th className="text-right text-xs font-medium text-gray-500 uppercase tracking-wide px-5 py-3">Total Líquido</th>
                 </tr>
@@ -703,31 +703,31 @@ export default function AnalyticsPage() {
                   influencerStats.map((inf: any, i: number) => {
                     const c = calcInfluencer(inf, periodScale);
                     return (
-                      <tr key={i} className="hover:bg-violet-50 transition-colors">
+                      <tr key={i} className="hover:bg-[#006079]/10 transition-colors">
                         <td className="px-5 py-3.5">
                           <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 bg-gradient-to-br from-violet-600 to-purple-500 rounded-xl flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                            <div className="w-8 h-8 bg-gradient-to-br from-[#006079] to-[#009CD9] rounded-xl flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                               {inf.displayName.charAt(0)}
                             </div>
                             <div>
-                              <p className="text-sm font-medium text-gray-900">{inf.displayName}</p>
+                              <p className="text-sm font-medium text-[#EEE6E4]">{inf.displayName}</p>
                               <p className="text-xs text-gray-500">{inf.communityName}</p>
                             </div>
                           </div>
                         </td>
                         <td className="px-5 py-3.5 text-right hidden sm:table-cell">
-                          <span className="text-xs px-2 py-0.5 bg-blue-500/10 text-blue-400 rounded-full">{inf.annualMembers}</span>
+                          <span className="text-xs px-2 py-0.5 bg-[#007A99]/10 text-[#009CD9] rounded-full">{inf.annualMembers}</span>
                         </td>
                         <td className="px-5 py-3.5 text-right hidden sm:table-cell">
                           <span className="text-xs px-2 py-0.5 bg-emerald-500/10 text-emerald-400 rounded-full">{inf.pixMembers}</span>
                         </td>
-                        <td className="px-5 py-3.5 text-right text-blue-400 font-medium">
+                        <td className="px-5 py-3.5 text-right text-[#009CD9] font-medium">
                           R$ {c.netAnual.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                         </td>
                         <td className="px-5 py-3.5 text-right text-emerald-400 font-medium hidden md:table-cell">
                           R$ {c.netPix.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                         </td>
-                        <td className="px-5 py-3.5 text-right font-bold text-violet-400">
+                        <td className="px-5 py-3.5 text-right font-bold text-[#009CD9]">
                           R$ {c.netTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                         </td>
                       </tr>
@@ -735,15 +735,15 @@ export default function AnalyticsPage() {
                   })
                 )}
                 {influencerStats.length > 0 && (
-                  <tr className="bg-violet-500/5 font-semibold">
-                    <td className="px-5 py-3 text-sm text-gray-900">Total Geral</td>
-                    <td className="px-5 py-3 text-right text-blue-400 hidden sm:table-cell">
+                  <tr className="bg-[#007A99]/5 font-semibold">
+                    <td className="px-5 py-3 text-sm text-[#EEE6E4]">Total Geral</td>
+                    <td className="px-5 py-3 text-right text-[#009CD9] hidden sm:table-cell">
                       {influencerStats.reduce((s: number, inf: any) => s + (inf.annualMembers ?? 0), 0)}
                     </td>
                     <td className="px-5 py-3 text-right text-emerald-400 hidden sm:table-cell">
                       {influencerStats.reduce((s: number, inf: any) => s + (inf.pixMembers ?? 0), 0)}
                     </td>
-                    <td className="px-5 py-3 text-right text-blue-400">
+                    <td className="px-5 py-3 text-right text-[#009CD9]">
                       R$ {influencerStats.reduce((s: number, inf: any) => s + calcInfluencer(inf, periodScale).netAnual, 0)
                         .toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     </td>
@@ -751,7 +751,7 @@ export default function AnalyticsPage() {
                       R$ {influencerStats.reduce((s: number, inf: any) => s + calcInfluencer(inf, periodScale).netPix, 0)
                         .toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     </td>
-                    <td className="px-5 py-3 text-right text-violet-400 text-base">
+                    <td className="px-5 py-3 text-right text-[#009CD9] text-base">
                       R$ {influencerStats.reduce((s: number, inf: any) => s + calcInfluencer(inf, periodScale).netTotal, 0)
                         .toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     </td>

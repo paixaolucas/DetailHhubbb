@@ -359,20 +359,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className={`h-16 flex items-center border-b border-gray-200 flex-shrink-0 ${collapsed ? "px-3 justify-center" : "px-4"}`}>
+      <div className={`h-16 flex items-center border-b border-white/10 flex-shrink-0 ${collapsed ? "px-3 justify-center" : "px-4"}`}>
         {!collapsed && (
           <Link href="/" className="flex items-center gap-2.5 flex-1 min-w-0">
             <Logo size="md" />
             <div className="min-w-0">
-              <span className="text-gray-900 font-bold text-sm leading-none block">DetailHub</span>
-              <span className="text-violet-400 font-bold text-xs leading-none block">Pro</span>
+              <span className="text-[#EEE6E4] font-bold text-sm leading-none block">Detailer&apos;HUB</span>
             </div>
           </Link>
         )}
         {collapsed && <Logo size="md" />}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className={`text-gray-500 hover:text-gray-900 transition-colors p-1 rounded-lg hover:bg-gray-100 ${collapsed ? "hidden md:flex" : "ml-auto"}`}
+          className={`text-gray-500 hover:text-[#EEE6E4] transition-colors p-1 rounded-lg hover:bg-white/5 ${collapsed ? "hidden md:flex" : "ml-auto"}`}
           title={collapsed ? "Expandir" : "Recolher"}
         >
           <ChevronLeft className={`w-4 h-4 transition-transform duration-300 ${collapsed ? "rotate-180" : ""}`} />
@@ -381,21 +380,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* User info */}
       {!collapsed && (
-        <div className="px-4 py-3 border-b border-gray-200 flex-shrink-0">
+        <div className="px-4 py-3 border-b border-white/10 flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-gradient-to-br from-violet-600 to-purple-500 rounded-xl flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+            <div className="w-9 h-9 bg-gradient-to-br from-[#006079] to-[#009CD9] rounded-xl flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
               {userInitials || "U"}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-gray-900 text-sm font-medium truncate">{userName || "Usuário"}</p>
+              <p className="text-[#EEE6E4] text-sm font-medium truncate">{userName || "Usuário"}</p>
               <RoleBadge role={role} />
             </div>
           </div>
         </div>
       )}
       {collapsed && (
-        <div className="flex justify-center py-3 border-b border-gray-200 flex-shrink-0">
-          <div className="w-8 h-8 bg-gradient-to-br from-violet-600 to-purple-500 rounded-xl flex items-center justify-center text-white font-bold text-xs">
+        <div className="flex justify-center py-3 border-b border-white/10 flex-shrink-0">
+          <div className="w-8 h-8 bg-gradient-to-br from-[#006079] to-[#009CD9] rounded-xl flex items-center justify-center text-white font-bold text-xs">
             {userInitials || "U"}
           </div>
         </div>
@@ -417,13 +416,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 title={collapsed ? item.label : undefined}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all group ${
                   isActive
-                    ? "bg-violet-100 text-violet-600 border border-violet-200"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-violet-50"
+                    ? "bg-[#006079]/20 text-[#009CD9] border border-[#006079]/30"
+                    : "text-gray-400 hover:text-[#EEE6E4] hover:bg-white/5"
                 }`}
               >
-                <item.icon className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-violet-600" : "text-gray-500 group-hover:text-gray-900"}`} />
+                <item.icon className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-[#009CD9]" : "text-gray-500 group-hover:text-[#EEE6E4]"}`} />
                 {!collapsed && <span className="truncate">{item.label}</span>}
-                {!collapsed && isActive && <div className="ml-auto w-1.5 h-1.5 bg-violet-400 rounded-full" />}
+                {!collapsed && isActive && <div className="ml-auto w-1.5 h-1.5 bg-[#009CD9] rounded-full" />}
               </Link>
             );
           }
@@ -442,22 +441,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 title={collapsed ? group.label : undefined}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all group ${
                   isGroupActive
-                    ? "bg-violet-100 text-violet-600 border border-violet-200"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-violet-50"
+                    ? "bg-[#006079]/20 text-[#009CD9] border border-[#006079]/30"
+                    : "text-gray-400 hover:text-[#EEE6E4] hover:bg-white/5"
                 }`}
               >
-                <group.icon className={`w-5 h-5 flex-shrink-0 ${isGroupActive ? "text-violet-600" : "text-gray-500 group-hover:text-gray-900"}`} />
+                <group.icon className={`w-5 h-5 flex-shrink-0 ${isGroupActive ? "text-[#009CD9]" : "text-gray-500 group-hover:text-[#EEE6E4]"}`} />
                 {!collapsed && (
                   <>
                     <span className="truncate flex-1 text-left">{group.label}</span>
                     <ChevronDown
-                      className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""} ${isGroupActive ? "text-violet-400" : "text-gray-400"}`}
+                      className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""} ${isGroupActive ? "text-[#009CD9]" : "text-gray-400"}`}
                     />
                   </>
                 )}
               </button>
               {!collapsed && isOpen && (
-                <div className="ml-3 pl-3 border-l border-gray-200 mt-0.5 space-y-0.5">
+                <div className="ml-3 pl-3 border-l border-white/10 mt-0.5 space-y-0.5">
                   {group.items.map((item) => {
                     const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
                     return (
@@ -467,13 +466,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         onClick={() => setMobileOpen(false)}
                         className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs transition-all group ${
                           isActive
-                            ? "bg-violet-100 text-violet-600 font-medium"
-                            : "text-gray-500 hover:text-gray-900 hover:bg-violet-50"
+                            ? "bg-[#006079]/20 text-[#009CD9] font-medium"
+                            : "text-gray-500 hover:text-[#EEE6E4] hover:bg-white/5"
                         }`}
                       >
-                        <item.icon className={`w-4 h-4 flex-shrink-0 ${isActive ? "text-violet-600" : "text-gray-400 group-hover:text-gray-700"}`} />
+                        <item.icon className={`w-4 h-4 flex-shrink-0 ${isActive ? "text-[#009CD9]" : "text-gray-400 group-hover:text-gray-300"}`} />
                         <span className="truncate">{item.label}</span>
-                        {isActive && <div className="ml-auto w-1 h-1 bg-violet-400 rounded-full" />}
+                        {isActive && <div className="ml-auto w-1 h-1 bg-[#009CD9] rounded-full" />}
                       </Link>
                     );
                   })}
@@ -485,7 +484,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </nav>
 
       {/* Footer */}
-      <div className="p-2 border-t border-gray-200 flex-shrink-0 space-y-0.5">
+      <div className="p-2 border-t border-white/10 flex-shrink-0 space-y-0.5">
         <button
           onClick={handleLogout}
           title={collapsed ? "Sair" : undefined}
@@ -500,19 +499,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (!authChecked) {
     return (
-      <div className="min-h-screen bg-[#F8F7FF] flex items-center justify-center">
-        <div className="w-8 h-8 border-[3px] border-violet-500 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#1A1A1A] flex items-center justify-center">
+        <div className="w-8 h-8 border-[3px] border-[#009CD9] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F7FF] flex">
+    <div className="min-h-screen bg-[#1A1A1A] flex">
       {/* Desktop sidebar */}
       <aside
         className={`${
           collapsed ? "w-16" : "w-60"
-        } hidden md:flex flex-col bg-[#F0EEFF] border-r border-gray-200 transition-all duration-300 fixed h-full z-30`}
+        } hidden md:flex flex-col bg-[#222222] border-r border-white/10 transition-all duration-300 fixed h-full z-30`}
       >
         <SidebarContent />
       </aside>
@@ -527,14 +526,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Mobile sidebar */}
       <aside
-        className={`md:hidden fixed top-0 left-0 h-full w-60 bg-[#F0EEFF] border-r border-gray-200 z-50 flex flex-col transition-transform duration-300 ${
+        className={`md:hidden fixed top-0 left-0 h-full w-60 bg-[#222222] border-r border-white/10 z-50 flex flex-col transition-transform duration-300 ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="absolute top-3 right-3">
           <button
             onClick={() => setMobileOpen(false)}
-            className="text-gray-500 hover:text-gray-900 p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+            className="text-gray-500 hover:text-[#EEE6E4] p-1.5 rounded-lg hover:bg-white/5 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -545,7 +544,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Main */}
       <main className={`flex-1 ${collapsed ? "md:ml-16" : "md:ml-60"} transition-all duration-300 flex flex-col min-h-screen`}>
         {/* Top header with search + notifications */}
-        <div className="hidden md:flex h-14 bg-white/90 border-b border-gray-200 items-center px-6 gap-4 flex-shrink-0 sticky top-0 z-20 backdrop-blur-sm">
+        <div className="hidden md:flex h-14 bg-[#1A1A1A]/90 border-b border-white/10 items-center px-6 gap-4 flex-shrink-0 sticky top-0 z-20 backdrop-blur-sm">
           <div className="flex-1">
             <SearchBar />
           </div>
@@ -553,7 +552,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <NotificationBell />
             <Link
               href="/dashboard/settings"
-              className="w-8 h-8 bg-gradient-to-br from-violet-600 to-purple-500 rounded-xl flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity"
+              className="w-8 h-8 bg-gradient-to-br from-[#006079] to-[#009CD9] rounded-xl flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity"
               title={userName}
             >
               {userInitials || "U"}
@@ -562,16 +561,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         {/* Mobile header */}
-        <div className="md:hidden h-14 bg-white border-b border-gray-200 flex items-center px-4 gap-3 flex-shrink-0">
+        <div className="md:hidden h-14 bg-[#1A1A1A] border-b border-white/10 flex items-center px-4 gap-3 flex-shrink-0">
           <button
             onClick={() => setMobileOpen(true)}
-            className="text-gray-500 hover:text-gray-900 transition-colors"
+            className="text-gray-500 hover:text-[#EEE6E4] transition-colors"
           >
             <Menu className="w-5 h-5" />
           </button>
           <Link href="/" className="flex items-center gap-2 flex-1">
             <Logo size="sm" />
-            <span className="text-gray-900 font-bold text-sm">DetailHub</span>
+            <span className="text-[#EEE6E4] font-bold text-sm">Detailer&apos;HUB</span>
           </Link>
           <NotificationBell />
           <RoleBadge role={role} />

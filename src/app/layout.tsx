@@ -1,20 +1,21 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Titillium_Web } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/toast-provider";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
-const inter = Inter({
+const titillium = Titillium_Web({
   subsets: ["latin"],
-  variable: "--font-inter",
+  weight: ["300", "400", "600", "700"],
+  variable: "--font-titillium",
   display: "swap",
 });
 
 export const metadata: Metadata = {
   title: {
-    default: "DetailHub",
-    template: "%s | DetailHub",
+    default: "Detailer'HUB",
+    template: "%s | Detailer'HUB",
   },
   description:
     "A plataforma premium para comunidades automotivas. Conecte-se, aprenda e cresça com os melhores entusiastas de automóveis do Brasil.",
@@ -28,14 +29,14 @@ export const metadata: Metadata = {
     "influencer automotivo",
   ],
   openGraph: {
-    title: "DetailHub",
+    title: "Detailer'HUB",
     description: "A plataforma premium para comunidades automotivas",
     type: "website",
     locale: "pt_BR",
   },
   twitter: {
     card: "summary_large_image",
-    title: "DetailHub",
+    title: "Detailer'HUB",
     description: "A plataforma premium para comunidades automotivas",
   },
 };
@@ -47,7 +48,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={`${titillium.variable} font-sans antialiased`}>
         <ToastProvider>
           {children}
         </ToastProvider>

@@ -72,8 +72,8 @@ const MILESTONES = [
     bonus: 800,
     unique: false,
     icon: Star,
-    color: "#8b5cf6",
-    bg: "#8b5cf615",
+    color: "#009CD9",
+    bg: "#009CD915",
   },
   {
     type: "CRESCIMENTO_ACELERADO",
@@ -107,7 +107,7 @@ function fmt(v: number) {
 
 function ProgressBar({ pct, color }: { pct: number; color: string }) {
   return (
-    <div className="w-full bg-gray-100 rounded-full h-2 mt-2">
+    <div className="w-full bg-white/5 rounded-full h-2 mt-2">
       <div
         className="h-2 rounded-full transition-all duration-700"
         style={{ width: `${pct}%`, backgroundColor: color }}
@@ -133,7 +133,7 @@ function MilestoneCard({
   return (
     <div
       className={`glass-card p-5 border transition-all ${
-        isAchieved ? "border-opacity-40" : "border-gray-100 opacity-80"
+        isAchieved ? "border-opacity-40" : "border-white/10 opacity-80"
       }`}
       style={isAchieved ? { borderColor: config.color, backgroundColor: config.bg } : {}}
     >
@@ -147,7 +147,7 @@ function MilestoneCard({
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="text-sm font-semibold text-gray-900">{config.name}</h3>
+            <h3 className="text-sm font-semibold text-[#EEE6E4]">{config.name}</h3>
             {!config.unique && achievedInstances.length > 0 && (
               <span
                 className="text-xs px-2 py-0.5 rounded-full font-medium"
@@ -260,10 +260,10 @@ export default function MilestonesPage() {
   if (loading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-8 bg-gray-100 rounded-xl w-40" />
+        <div className="h-8 bg-white/5 rounded-xl w-40" />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="glass-card p-5 h-32 bg-gray-50" />
+            <div key={i} className="glass-card p-5 h-32 bg-white/5" />
           ))}
         </div>
       </div>
@@ -287,7 +287,7 @@ export default function MilestonesPage() {
     <div className="space-y-6 max-w-4xl">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Marcos & Bônus</h1>
+        <h1 className="text-2xl font-bold text-[#EEE6E4]">Marcos & Bônus</h1>
         <p className="text-gray-400 text-sm mt-1">
           Conquiste marcos para receber bônus pagos da caixa de performance
         </p>
@@ -296,11 +296,11 @@ export default function MilestonesPage() {
       {/* Summary row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="glass-card p-4 flex items-center gap-3">
-          <div className="w-10 h-10 bg-violet-50 rounded-xl flex items-center justify-center">
-            <Trophy className="w-5 h-5 text-violet-500" />
+          <div className="w-10 h-10 bg-[#006079]/10 rounded-xl flex items-center justify-center">
+            <Trophy className="w-5 h-5 text-[#007A99]" />
           </div>
           <div>
-            <p className="text-xl font-bold text-gray-900">{achievedCount} / {uniqueTotal}</p>
+            <p className="text-xl font-bold text-[#EEE6E4]">{achievedCount} / {uniqueTotal}</p>
             <p className="text-xs text-gray-400">Marcos únicos conquistados</p>
           </div>
         </div>
@@ -340,9 +340,9 @@ export default function MilestonesPage() {
 
       {/* Payment rules */}
       <div className="glass-card p-4 flex items-start gap-3">
-        <Clock className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+        <Clock className="w-4 h-4 text-[#009CD9] mt-0.5 flex-shrink-0" />
         <p className="text-xs text-gray-500 leading-relaxed">
-          <strong className="text-gray-700">Pagamento dos bônus:</strong> registrados assim que o marco é conquistado e pagos junto com a caixa de performance do mês. Se a caixa do mês não comportar todos os bônus, pagamentos são priorizados por ordem de conquista. Bônus recorrentes (Top Creator, Crescimento) são pagos mensalmente enquanto o marco se mantiver.
+          <strong className="text-gray-300">Pagamento dos bônus:</strong> registrados assim que o marco é conquistado e pagos junto com a caixa de performance do mês. Se a caixa do mês não comportar todos os bônus, pagamentos são priorizados por ordem de conquista. Bônus recorrentes (Top Creator, Crescimento) são pagos mensalmente enquanto o marco se mantiver.
         </p>
       </div>
     </div>

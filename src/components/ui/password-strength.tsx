@@ -25,7 +25,7 @@ const LEVELS = [
   { label: "Muito fraca", color: "bg-red-500", textColor: "text-red-400" },
   { label: "Fraca", color: "bg-orange-500", textColor: "text-orange-400" },
   { label: "Razoável", color: "bg-yellow-500", textColor: "text-yellow-400" },
-  { label: "Boa", color: "bg-violet-500", textColor: "text-violet-400" },
+  { label: "Boa", color: "bg-[#009CD9]", textColor: "text-[#009CD9]" },
   { label: "Forte", color: "bg-green-500", textColor: "text-green-400" },
 ];
 
@@ -45,7 +45,7 @@ export function PasswordStrength({ password }: PasswordStrengthProps) {
           <div
             key={i}
             className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
-              i < filled ? level.color : "bg-gray-50"
+              i < filled ? level.color : "bg-white/10"
             }`}
           />
         ))}

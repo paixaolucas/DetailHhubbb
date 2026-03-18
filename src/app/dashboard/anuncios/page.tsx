@@ -81,7 +81,7 @@ const STATUS_CONFIG: Record<
   PENDING_REVIEW: { label: "Em Revisão", color: "text-yellow-400 bg-yellow-400/10", icon: Clock },
   ACTIVE: { label: "Ativa", color: "text-green-400 bg-green-400/10", icon: CheckCircle },
   PAUSED: { label: "Pausada", color: "text-orange-400 bg-orange-400/10", icon: PauseCircle },
-  COMPLETED: { label: "Concluída", color: "text-blue-400 bg-blue-400/10", icon: CheckCircle },
+  COMPLETED: { label: "Concluída", color: "text-[#009CD9] bg-[#009CD9]/10", icon: CheckCircle },
   REJECTED: { label: "Rejeitada", color: "text-red-400 bg-red-400/10", icon: XCircle },
 };
 
@@ -175,7 +175,7 @@ function CreateModal({
           <div>
             <label className="block text-sm text-gray-400 mb-1">Título *</label>
             <input
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-[#009CD9]"
               placeholder="Ex: Lançamento Kit Premium Detailing"
               value={form.title}
               onChange={(e) => set("title", e.target.value)}
@@ -185,7 +185,7 @@ function CreateModal({
           <div>
             <label className="block text-sm text-gray-400 mb-1">Formato *</label>
             <select
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]"
               value={form.format}
               onChange={(e) => set("format", e.target.value as AdFormat)}
             >
@@ -201,7 +201,7 @@ function CreateModal({
               type="number"
               min="100"
               step="50"
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-[#009CD9]"
               placeholder="Ex: 1500"
               value={form.budget}
               onChange={(e) => set("budget", e.target.value)}
@@ -213,7 +213,7 @@ function CreateModal({
               <label className="block text-sm text-gray-400 mb-1">Data Início</label>
               <input
                 type="datetime-local"
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]"
                 value={form.startDate}
                 onChange={(e) => set("startDate", e.target.value)}
               />
@@ -222,7 +222,7 @@ function CreateModal({
               <label className="block text-sm text-gray-400 mb-1">Data Fim</label>
               <input
                 type="datetime-local"
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]"
                 value={form.endDate}
                 onChange={(e) => set("endDate", e.target.value)}
               />
@@ -232,7 +232,7 @@ function CreateModal({
           <div>
             <label className="block text-sm text-gray-400 mb-1">URL do Criativo (imagem)</label>
             <input
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-[#009CD9]"
               placeholder="https://..."
               value={form.creativeUrl}
               onChange={(e) => set("creativeUrl", e.target.value)}
@@ -242,7 +242,7 @@ function CreateModal({
           <div>
             <label className="block text-sm text-gray-400 mb-1">URL de Destino (clique)</label>
             <input
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-[#009CD9]"
               placeholder="https://seusite.com.br"
               value={form.targetUrl}
               onChange={(e) => set("targetUrl", e.target.value)}
@@ -252,7 +252,7 @@ function CreateModal({
           <div>
             <label className="block text-sm text-gray-400 mb-1">Texto do Botão (CTA)</label>
             <input
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-[#009CD9]"
               placeholder="Ex: Compre Agora"
               value={form.ctaText}
               onChange={(e) => set("ctaText", e.target.value)}
@@ -263,7 +263,7 @@ function CreateModal({
             <label className="block text-sm text-gray-400 mb-1">Descrição</label>
             <textarea
               rows={3}
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-[#009CD9] resize-none"
               placeholder="Descreva sua campanha..."
               value={form.description}
               onChange={(e) => set("description", e.target.value)}
@@ -349,7 +349,7 @@ function ProfileModal({
           <div>
             <label className="block text-sm text-gray-400 mb-1">Nome da Empresa *</label>
             <input
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]"
               value={form.companyName}
               onChange={(e) => set("companyName", e.target.value)}
             />
@@ -357,7 +357,7 @@ function ProfileModal({
           <div>
             <label className="block text-sm text-gray-400 mb-1">Website</label>
             <input
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]"
               placeholder="https://..."
               value={form.website}
               onChange={(e) => set("website", e.target.value)}
@@ -366,7 +366,7 @@ function ProfileModal({
           <div>
             <label className="block text-sm text-gray-400 mb-1">Logo (URL)</label>
             <input
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]"
               placeholder="https://..."
               value={form.logoUrl}
               onChange={(e) => set("logoUrl", e.target.value)}
@@ -375,7 +375,7 @@ function ProfileModal({
           <div>
             <label className="block text-sm text-gray-400 mb-1">Telefone</label>
             <input
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9]"
               placeholder="(11) 9 9999-9999"
               value={form.phone}
               onChange={(e) => set("phone", e.target.value)}
@@ -385,7 +385,7 @@ function ProfileModal({
             <label className="block text-sm text-gray-400 mb-1">Sobre a empresa</label>
             <textarea
               rows={3}
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500 resize-none"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#009CD9] resize-none"
               value={form.bio}
               onChange={(e) => set("bio", e.target.value)}
             />
@@ -433,8 +433,8 @@ function CampaignCard({
     <div className="glass-card p-5 space-y-4">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center flex-shrink-0">
-            <FormatIcon size={16} className="text-blue-400" />
+          <div className="w-9 h-9 rounded-lg bg-[#009CD9]/10 border border-[#009CD9]/20 flex items-center justify-center flex-shrink-0">
+            <FormatIcon size={16} className="text-[#009CD9]" />
           </div>
           <div className="min-w-0">
             <p className="text-white text-sm font-medium truncate">{campaign.title}</p>
@@ -466,7 +466,7 @@ function CampaignCard({
         </div>
         <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
           <div
-            className="h-full bg-blue-500 rounded-full transition-all"
+            className="h-full bg-[#009CD9] rounded-full transition-all"
             style={{ width: `${spentPct}%` }}
           />
         </div>
@@ -492,7 +492,7 @@ function CampaignCard({
         {campaign.status === "DRAFT" && (
           <button
             onClick={() => onSubmit(campaign.id)}
-            className="flex-1 flex items-center justify-center gap-1.5 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-lg text-blue-400 text-xs hover:bg-blue-500/20 transition-colors"
+            className="flex-1 flex items-center justify-center gap-1.5 py-1.5 bg-[#009CD9]/10 border border-[#009CD9]/20 rounded-lg text-[#009CD9] text-xs hover:bg-[#009CD9]/20 transition-colors"
           >
             <Send size={12} />
             Enviar para Revisão
@@ -611,7 +611,7 @@ export default function AnunciosPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <Megaphone size={24} className="text-blue-400" />
+            <Megaphone size={24} className="text-[#009CD9]" />
             Meus Anúncios
           </h1>
           <p className="text-gray-400 text-sm mt-1">
@@ -665,8 +665,8 @@ export default function AnunciosPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: "Campanhas Ativas", value: activeCampaigns.toString(), icon: PlayCircle, color: "text-green-400" },
-          { label: "Total Impressões", value: fmtNum(totalImpressions), icon: Eye, color: "text-blue-400" },
-          { label: "Total Cliques", value: fmtNum(totalClicks), icon: MousePointerClick, color: "text-purple-400" },
+          { label: "Total Impressões", value: fmtNum(totalImpressions), icon: Eye, color: "text-[#009CD9]" },
+          { label: "Total Cliques", value: fmtNum(totalClicks), icon: MousePointerClick, color: "text-[#009CD9]" },
           { label: "Total Investido", value: fmtBrl(totalSpent), icon: DollarSign, color: "text-yellow-400" },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="glass-card p-4">
@@ -682,7 +682,7 @@ export default function AnunciosPage() {
       {/* Format info */}
       <div className="glass-card p-4">
         <p className="text-sm font-medium text-white mb-3 flex items-center gap-2">
-          <BarChart2 size={16} className="text-blue-400" />
+          <BarChart2 size={16} className="text-[#009CD9]" />
           Formatos disponíveis
         </p>
         <div className="grid md:grid-cols-3 gap-3">
@@ -690,7 +690,7 @@ export default function AnunciosPage() {
             const Icon = FORMAT_ICON[key];
             return (
               <div key={key} className="flex items-center gap-3 bg-white/3 rounded-lg p-3">
-                <Icon size={18} className="text-blue-400 flex-shrink-0" />
+                <Icon size={18} className="text-[#009CD9] flex-shrink-0" />
                 <div>
                   <p className="text-white text-sm font-medium">{label}</p>
                   <p className="text-gray-500 text-xs">
@@ -712,7 +712,7 @@ export default function AnunciosPage() {
             Campanhas ({filtered.length})
           </h2>
           <select
-            className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-gray-300 text-sm focus:outline-none focus:border-blue-500"
+            className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-gray-300 text-sm focus:outline-none focus:border-[#009CD9]"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
@@ -728,7 +728,7 @@ export default function AnunciosPage() {
 
         {filtered.length === 0 ? (
           <div className="glass-card p-12 text-center">
-            <Megaphone size={40} className="text-gray-600 mx-auto mb-3" />
+            <Megaphone size={40} className="text-gray-400 mx-auto mb-3" />
             <p className="text-gray-400 text-sm">
               {campaigns.length === 0
                 ? "Você ainda não criou nenhuma campanha."
