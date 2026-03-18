@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/toast-provider";
 import { Trophy, Star, Zap, Users, TrendingUp, Award, CheckCircle2, Clock, DollarSign } from "lucide-react";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -234,7 +235,7 @@ export default function MilestonesPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     fetch("/api/influencers/me/milestones", {
       headers: { Authorization: `Bearer ${token}` },
     })

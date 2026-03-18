@@ -13,6 +13,7 @@ import {
   Pencil,
 } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 const STATUS_COLORS: Record<string, string> = {
   SCHEDULED: "bg-[#007A99]/10 text-[#009CD9] border-[#007A99]/20",
@@ -73,7 +74,7 @@ export default function LivePage() {
   const [editingSession, setEditingSession] = useState<LiveSession | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     Promise.all([
       fetch("/api/communities/mine", { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json()),
       fetch("/api/live-sessions", { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json()),
@@ -93,7 +94,7 @@ export default function LivePage() {
     setError("");
     setSaving(true);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch("/api/live-sessions", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -143,7 +144,7 @@ export default function LivePage() {
     setError("");
     setSaving(true);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(`/api/live-sessions/${editingSession.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -166,7 +167,7 @@ export default function LivePage() {
   }
 
   async function updateStatus(sessionId: string, status: string) {
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     const res = await fetch(`/api/live-sessions/${sessionId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -184,7 +185,7 @@ export default function LivePage() {
       variant: "danger",
       onConfirm: async () => {
         setConfirmState((s) => ({ ...s, open: false }));
-        const token = localStorage.getItem("detailhub_access_token");
+        const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
         await fetch(`/api/live-sessions/${sessionId}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
         setSessions((prev) => prev.filter((s) => s.id !== sessionId));
       },

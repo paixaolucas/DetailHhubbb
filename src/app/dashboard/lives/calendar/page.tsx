@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Calendar, X, Video } from "lucide-react";
 import { EventCard } from "@/components/events/EventCard";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -86,7 +87,7 @@ export default function CalendarPage() {
   const [isModalLoading, setIsModalLoading] = useState(false);
 
   const token =
-    typeof window !== "undefined" ? localStorage.getItem("detailhub_access_token") : null;
+    typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN) : null;
 
   // Fetch memberships → communities
   useEffect(() => {

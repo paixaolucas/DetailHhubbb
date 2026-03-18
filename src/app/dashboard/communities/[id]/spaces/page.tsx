@@ -24,6 +24,7 @@ import {
   GripVertical,
 } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -382,7 +383,7 @@ export default function CommunitySpacesPage() {
     setLoading(true);
     setError("");
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(`/api/communities/${communityId}/spaces`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -432,7 +433,7 @@ export default function CommunitySpacesPage() {
     setModalLoading(true);
     setModalError("");
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
 
       if (modalMode === "create") {
         const res = await fetch(`/api/communities/${communityId}/spaces`, {
@@ -501,7 +502,7 @@ export default function CommunitySpacesPage() {
   async function toggleLock(space: Space) {
     setLockLoading(space.id);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(
         `/api/communities/${communityId}/spaces/${space.id}`,
         {
@@ -549,7 +550,7 @@ export default function CommunitySpacesPage() {
 
     setDeleteLoading(space.id);
     try {
-      const token = localStorage.getItem("detailhub_access_token") as string;
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN) as string;
       const res = await fetch(
         `/api/communities/${communityId}/spaces/${space.id}`,
         {

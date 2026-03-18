@@ -17,6 +17,7 @@ import {
   MessageSquare,
   Heart,
 } from "lucide-react";
+import { STORAGE_KEYS } from "@/lib/constants";
 // date-fns is not in this project — using inline helper below
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -151,7 +152,7 @@ export default function MemberProfilePage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    setIsLoggedIn(!!localStorage.getItem("detailhub_access_token"));
+    setIsLoggedIn(!!localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN));
   }, []);
 
   useEffect(() => {

@@ -7,6 +7,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 export default function SlugPage() {
   const params = useParams();
@@ -16,8 +17,8 @@ export default function SlugPage() {
 
   useEffect(() => {
     async function resolve() {
-      const token = localStorage.getItem("detailhub_access_token");
-      const refreshToken = localStorage.getItem("detailhub_refresh_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+      const refreshToken = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
 
       // Not logged in
       if (!token && !refreshToken) {
@@ -37,7 +38,7 @@ export default function SlugPage() {
           const data = await res.json();
           if (res.ok && data.data?.accessToken) {
             activeToken = data.data.accessToken;
-            localStorage.setItem("detailhub_access_token", activeToken!);
+            localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, activeToken!);
           }
         } catch {
           // ignore

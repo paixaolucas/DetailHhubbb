@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Plus, Save, X } from "lucide-react";
 import StepEditor, { EmailStep } from "./StepEditor";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 type TriggerType = "ON_JOIN" | "ON_SUBSCRIPTION" | "ON_LESSON_COMPLETE" | "MANUAL";
 
@@ -82,7 +83,7 @@ export default function SequenceEditor({
     }
     setIsSaving(true);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),

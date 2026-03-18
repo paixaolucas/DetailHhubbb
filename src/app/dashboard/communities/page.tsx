@@ -10,6 +10,7 @@ import {
   BarChart2,
 } from "lucide-react";
 import { CommunityThumbnail } from "@/components/community/CommunityThumbnail";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 interface Community {
   id: string;
@@ -29,8 +30,8 @@ export default function CommunitiesPage() {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("detailhub_access_token");
-    const role = localStorage.getItem("detailhub_user_role");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+    const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
     setIsAdmin(role === "SUPER_ADMIN");
     fetch("/api/communities/mine", { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.json())

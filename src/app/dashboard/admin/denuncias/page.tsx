@@ -9,6 +9,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { AlertTriangle, CheckCircle, EyeOff, Filter, RefreshCw, Clock, Eye, X, Ban } from "lucide-react";
 import { useToast } from "@/components/ui/toast-provider";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -98,7 +99,7 @@ function ContentPreviewModal({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
 
     async function load() {
@@ -237,7 +238,7 @@ export default function AdminDenunciasPage() {
   const fetchReports = useCallback(async (p: number, status: string) => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const params = new URLSearchParams({ page: String(p), pageSize: "20" });
       if (status !== "ALL") params.set("status", status);
       const res = await fetch(`/api/admin/reports?${params}`, {
@@ -263,7 +264,7 @@ export default function AdminDenunciasPage() {
   async function handleAction(id: string, status: "RESOLVED" | "IGNORED") {
     setActionLoading(id);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(`/api/admin/reports/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },

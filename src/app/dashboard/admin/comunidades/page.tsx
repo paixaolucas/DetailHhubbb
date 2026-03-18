@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Globe, Search, Users, CheckCircle, Archive, UserCheck, X, ExternalLink } from "lucide-react";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 interface Community {
   id: string;
@@ -41,7 +42,7 @@ export default function AdminComunidadesPage() {
   const modalDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     fetch("/api/communities?admin=true", { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.json())
       .then((d) => {
@@ -68,7 +69,7 @@ export default function AdminComunidadesPage() {
     modalDebounceRef.current = setTimeout(async () => {
       setModalSearchLoading(true);
       try {
-        const token = localStorage.getItem("detailhub_access_token");
+        const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
         const res = await fetch(`/api/users?search=${encodeURIComponent(modalSearch)}&pageSize=6`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -85,7 +86,7 @@ export default function AdminComunidadesPage() {
   async function togglePublish(id: string, currentlyPublished: boolean) {
     setActionLoading(id);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(`/api/communities/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -111,7 +112,7 @@ export default function AdminComunidadesPage() {
     if (!changeInfluencerModal || !modalSelectedUser) return;
     setModalSaving(true);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(`/api/communities/${changeInfluencerModal.communityId}/influencer`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },

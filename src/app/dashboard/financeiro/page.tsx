@@ -8,6 +8,7 @@ import {
   DollarSign, Users, TrendingUp, TrendingDown, Trophy,
   ArrowUpRight, UserPlus, Award, CreditCard, Repeat,
 } from "lucide-react";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -123,7 +124,7 @@ export default function FinanceiroPage() {
   const [tab, setTab] = useState<"visao-geral" | "pagamentos">("visao-geral");
 
   useEffect(() => {
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     fetch("/api/influencers/me/financeiro", {
       headers: { Authorization: `Bearer ${token}` },
     })

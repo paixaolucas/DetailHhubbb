@@ -6,6 +6,7 @@ import { TrendingUp, DollarSign, ShoppingBag, Package, ArrowUpRight, ArrowDownRi
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 const chartStyle = {
   grid: { strokeDasharray: "3 3", stroke: "rgba(255,255,255,0.05)" },
@@ -44,7 +45,7 @@ export default function VendasPage() {
   const [purchasesTotal, setPurchasesTotal] = useState(0);
 
   useEffect(() => {
-    const role = localStorage.getItem("detailhub_user_role");
+    const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
     if (
       !role ||
       (role !== "INFLUENCER_ADMIN" &&
@@ -54,7 +55,7 @@ export default function VendasPage() {
       router.push("/dashboard");
       return;
     }
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     const headers = { Authorization: `Bearer ${token}` };
     Promise.all([
       fetch("/api/marketplace/listings?mine=true&pageSize=50", { headers }).then((r) => r.json()),

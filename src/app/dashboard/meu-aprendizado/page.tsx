@@ -6,6 +6,7 @@ import {
   BookOpen, PlayCircle, CheckCircle2, Clock, FileText,
   Headphones, Award, Star, ChevronDown, ChevronRight,
 } from "lucide-react";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 const LESSON_TYPE_ICONS: Record<string, React.ElementType> = {
   VIDEO: PlayCircle, AUDIO: Headphones, TEXT: FileText,
@@ -139,7 +140,7 @@ export default function MeuAprendizadoPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     if (!token) return;
     fetch("/api/users/me/learning", { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.json())

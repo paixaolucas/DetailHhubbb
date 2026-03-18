@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 interface BuyButtonProps {
   listingId: string;
@@ -16,7 +17,7 @@ export function BuyButton({ listingId, price, title }: BuyButtonProps) {
   const [error, setError] = useState<string | null>(null);
 
   async function handleBuy() {
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     if (!token) {
       router.push("/login");
       return;

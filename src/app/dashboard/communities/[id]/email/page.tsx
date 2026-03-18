@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import SequenceEditor, { EmailSequence } from "@/components/email/SequenceEditor";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 type TriggerType = "ON_JOIN" | "ON_SUBSCRIPTION" | "ON_LESSON_COMPLETE" | "MANUAL";
 
@@ -72,7 +73,7 @@ export default function EmailSequencesPage() {
   const fetchSequences = useCallback(async () => {
     setIsLoading(true);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(`/api/communities/${communityId}/email-sequences`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
@@ -98,7 +99,7 @@ export default function EmailSequencesPage() {
         setConfirmState((s) => ({ ...s, open: false }));
         setDeletingId(seqId);
         try {
-          const token = localStorage.getItem("detailhub_access_token");
+          const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
           const res = await fetch(
             `/api/communities/${communityId}/email-sequences/${seqId}`,
             {
@@ -121,7 +122,7 @@ export default function EmailSequencesPage() {
   const handleToggleActive = async (seq: SequenceWithMeta) => {
     setTogglingId(seq.id);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(
         `/api/communities/${communityId}/email-sequences/${seq.id}`,
         {

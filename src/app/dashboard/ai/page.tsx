@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Send, Bot, User, Loader2, Zap, Car, Wrench, Gauge } from "lucide-react";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 interface Message {
   role: "user" | "assistant";
@@ -40,7 +41,7 @@ export default function AutoAIPage() {
     setIsLoading(true);
 
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch("/api/ai/chat", {
         method: "POST",
         headers: {

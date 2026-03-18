@@ -22,6 +22,7 @@ import {
 import { RoleBadge } from "@/components/ui/badge";
 import { useUploadThing } from "@/utils/uploadthing";
 import { useToast } from "@/components/ui/toast-provider";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 interface UserData {
   id: string;
@@ -158,8 +159,8 @@ export default function SettingsPage() {
   const [inviteStats, setInviteStats] = useState<{ totalReferred: number; activeReferred: number } | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("detailhub_access_token");
-    const role = localStorage.getItem("detailhub_user_role");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+    const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
 
     fetch("/api/users/me/settings", { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.json())
@@ -217,7 +218,7 @@ export default function SettingsPage() {
   useEffect(() => {
     if (activeTab !== "subscription" || membership !== undefined) return;
     setMembershipLoading(true);
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     fetch("/api/platform-membership/me", { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.json())
       .then((d) => {
@@ -235,7 +236,7 @@ export default function SettingsPage() {
   useEffect(() => {
     if (activeTab !== "subscription" || membership === undefined) return;
     setPaymentsLoading(true);
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     fetch(`/api/users/me/payments?page=${paymentsPage}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -253,7 +254,7 @@ export default function SettingsPage() {
   async function openBillingPortal() {
     setBillingPortalLoading(true);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const returnUrl = `${window.location.origin}/dashboard/settings`;
       const res = await fetch("/api/stripe/billing-portal", {
         method: "POST",
@@ -310,7 +311,7 @@ export default function SettingsPage() {
     setProfileMsg(null);
     setIsSaving(true);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch("/api/users/me/settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -326,7 +327,7 @@ export default function SettingsPage() {
         setProfileMsg({ type: "error", text: data.error ?? "Erro ao salvar perfil" });
         return;
       }
-      localStorage.setItem("detailhub_user_name", `${profileForm.firstName} ${profileForm.lastName}`);
+      localStorage.setItem(STORAGE_KEYS.USER_NAME, `${profileForm.firstName} ${profileForm.lastName}`);
       setProfileMsg({ type: "success", text: "Perfil atualizado com sucesso!" });
       setUser((prev) => prev ? { ...prev, ...data.data } : null);
     } finally {
@@ -347,7 +348,7 @@ export default function SettingsPage() {
     }
     setIsSaving(true);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch("/api/users/me/settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -373,7 +374,7 @@ export default function SettingsPage() {
     setNotifPrefs(next);
     if (notifDebounce.current) clearTimeout(notifDebounce.current);
     notifDebounce.current = setTimeout(() => {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       fetch("/api/users/me/settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -392,7 +393,7 @@ export default function SettingsPage() {
       if (influencerForm.youtube) socialLinks.youtube = influencerForm.youtube;
       if (influencerForm.twitter) socialLinks.twitter = influencerForm.twitter;
       if (influencerForm.website) socialLinks.website = influencerForm.website;
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch("/api/influencers/me", {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },

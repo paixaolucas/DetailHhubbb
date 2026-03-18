@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ShoppingBag, Star, Sparkles, Search, ChevronDown } from "lucide-react";
 import { SellButton } from "@/components/marketplace/sell-button";
 import { Pagination } from "@/components/ui/pagination";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 interface Listing {
   id: string;
@@ -72,7 +73,7 @@ export default function MarketplacePage() {
   const [total, setTotal] = useState(0);
 
   const fetchListings = useCallback(async (p: number, q: string, type: string, s: string) => {
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     if (!token) { setIsLoading(false); return; }
 
     const params = new URLSearchParams();

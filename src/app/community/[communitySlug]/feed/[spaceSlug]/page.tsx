@@ -14,6 +14,7 @@ import { AlertCircle, RefreshCw } from "lucide-react";
 import { SpaceItem } from "@/components/feed/SpaceSidebar";
 import PostComposer from "@/components/feed/PostComposer";
 import PostCard from "@/components/feed/PostCard";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -109,7 +110,7 @@ export default function SpaceFeedPage() {
       isLoadMore ? setLoadingMore(true) : setPostsLoading(true);
 
       try {
-        const token = localStorage.getItem("detailhub_access_token");
+        const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
         const url = cursor
           ? `/api/spaces/${spaceId}/posts?cursor=${cursor}&limit=20`
           : `/api/spaces/${spaceId}/posts?limit=20`;
@@ -145,8 +146,8 @@ export default function SpaceFeedPage() {
       setLoading(true);
       setError("");
       try {
-        const token = localStorage.getItem("detailhub_access_token");
-        const uid = localStorage.getItem("detailhub_user_id");
+        const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+        const uid = localStorage.getItem(STORAGE_KEYS.USER_ID);
         setCurrentUserId(uid ?? undefined);
 
         if (!token) {
@@ -167,7 +168,7 @@ export default function SpaceFeedPage() {
 
         // Fallback: role-based access for members and admins
         if (!found) {
-          const role = localStorage.getItem("detailhub_user_role");
+          const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
           const pubRes = await fetch("/api/communities?published=true", {
             headers: { Authorization: `Bearer ${token}` },
           });
@@ -187,7 +188,7 @@ export default function SpaceFeedPage() {
         setCommunity(found);
 
         // 2. Check if current user is the community owner or SUPER_ADMIN
-        const role = localStorage.getItem("detailhub_user_role");
+        const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
         if (role === "SUPER_ADMIN") {
           setIsOwner(true);
         } else {
@@ -238,7 +239,7 @@ export default function SpaceFeedPage() {
   }
 
   async function handleReact(postId: string, type: string) {
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     const res = await fetch(`/api/posts/${postId}/reactions`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },

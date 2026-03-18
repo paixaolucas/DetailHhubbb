@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { GraduationCap, Award } from "lucide-react";
 import { CertificateCard } from "@/components/certificates/CertificateCard";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 interface Certificate {
   id: string;
@@ -46,7 +47,7 @@ export default function CertificadosPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     if (!token) {
       setError("Sessão expirada. Faça login novamente.");
       setIsLoading(false);

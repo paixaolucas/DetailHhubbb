@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Package, Plus, Eye, EyeOff, Star, TrendingUp, DollarSign, ShoppingBag, Trash2 } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 const LISTING_TYPES = [
   { value: "COURSE", label: "Curso" },
@@ -58,7 +59,7 @@ export default function MeusProdutosPage() {
   });
 
   useEffect(() => {
-    const role = localStorage.getItem("detailhub_user_role");
+    const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
     if (
       !role ||
       (role !== "INFLUENCER_ADMIN" &&
@@ -68,7 +69,7 @@ export default function MeusProdutosPage() {
       router.push("/dashboard");
       return;
     }
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     fetch("/api/marketplace/listings?mine=true", { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.json())
       .then((d) => d.success && setListings(d.data ?? []))
@@ -80,7 +81,7 @@ export default function MeusProdutosPage() {
     setError("");
     setSaving(true);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch("/api/marketplace/listings", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -104,7 +105,7 @@ export default function MeusProdutosPage() {
 
   async function toggleStatus(listingId: string, currentStatus: string) {
     const newStatus = currentStatus === "ACTIVE" ? "PAUSED" : "ACTIVE";
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     const res = await fetch(`/api/marketplace/listings/${listingId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -122,7 +123,7 @@ export default function MeusProdutosPage() {
       variant: "danger",
       onConfirm: async () => {
         setConfirmState((s) => ({ ...s, open: false }));
-        const token = localStorage.getItem("detailhub_access_token");
+        const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
         await fetch(`/api/marketplace/listings/${listingId}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
         setListings((prev) => prev.filter((l) => l.id !== listingId));
       },

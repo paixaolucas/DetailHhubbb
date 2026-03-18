@@ -18,6 +18,7 @@ import {
   Info,
 } from "lucide-react";
 import { useToast } from "@/components/ui/toast-provider";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -177,7 +178,7 @@ export default function EntregasPage() {
 
   const fetchData = useCallback(() => {
     setLoading(true);
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     fetch(`/api/influencers/me/entregas?year=${year}&month=${month}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -204,7 +205,7 @@ export default function EntregasPage() {
   async function toggleBioLink() {
     if (!data) return;
     setBioUpdating(true);
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     try {
       const res = await fetch("/api/influencers/me/entregas/bio-link", {
         method: "PATCH",
@@ -224,7 +225,7 @@ export default function EntregasPage() {
     e.preventDefault();
     if (!mentionForm.description.trim()) return;
     setMentionSaving(true);
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     try {
       const res = await fetch("/api/influencers/me/entregas/mencoes", {
         method: "POST",
@@ -246,7 +247,7 @@ export default function EntregasPage() {
   }
 
   async function deleteMention(id: string) {
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     const res = await fetch(`/api/influencers/me/entregas/mencoes/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },

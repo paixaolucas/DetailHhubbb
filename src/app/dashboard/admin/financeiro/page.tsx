@@ -9,6 +9,7 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 const chartStyle = {
   grid: { strokeDasharray: "3 3", stroke: "rgba(255,255,255,0.05)" },
@@ -201,7 +202,7 @@ export default function FinanceiroPage() {
   const [ruleSaving, setRuleSaving] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     const headers = { Authorization: `Bearer ${token}` };
     Promise.all([
       fetch("/api/admin/commissions?pageSize=10", { headers }).then((r) => r.json()),
@@ -232,7 +233,7 @@ export default function FinanceiroPage() {
   async function loadRules(communityId: string) {
     if (!communityId) return;
     setRulesLoading(true);
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     try {
       const res = await fetch(`/api/communities/${communityId}/commission-rules`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -246,7 +247,7 @@ export default function FinanceiroPage() {
     e.preventDefault();
     if (!selectedCommunity) return;
     setRuleSaving(true);
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     try {
       const url = editingRule
         ? `/api/communities/${selectedCommunity}/commission-rules/${editingRule.id}`
@@ -263,7 +264,7 @@ export default function FinanceiroPage() {
 
   async function deleteRule(ruleId: string) {
     if (!selectedCommunity) return;
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     await fetch(`/api/communities/${selectedCommunity}/commission-rules/${ruleId}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },

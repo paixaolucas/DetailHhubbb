@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { PlayCircle, Calendar, Users, Video, Clock, Check, HelpCircle, X as XIcon } from "lucide-react";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 interface LiveSession {
   id: string;
@@ -45,7 +46,7 @@ export default function LivesPage() {
   const [rsvps, setRsvps] = useState<RsvpMap>({});
   const [rsvpLoading, setRsvpLoading] = useState<Record<string, boolean>>({});
 
-  const token = () => localStorage.getItem("detailhub_access_token") ?? "";
+  const token = () => localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN) ?? "";
 
   useEffect(() => {
     fetch("/api/live-sessions", { headers: { Authorization: `Bearer ${token()}` } })

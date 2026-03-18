@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Wrench, Plus, Pencil, Trash2, Star, ExternalLink, ToggleLeft, ToggleRight } from "lucide-react";
 import { useToast } from "@/components/ui/toast-provider";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 interface SaasTool {
   id: string;
@@ -57,7 +58,7 @@ export default function AdminFerramentasPage() {
   const [saving, setSaving] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<SaasTool | null>(null);
 
-  const token = () => localStorage.getItem("detailhub_access_token") ?? "";
+  const token = () => localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN) ?? "";
   const headers = () => ({ "Content-Type": "application/json", Authorization: `Bearer ${token()}` });
 
   const load = useCallback(() => {

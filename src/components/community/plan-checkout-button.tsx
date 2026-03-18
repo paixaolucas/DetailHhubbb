@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 interface PlanCheckoutButtonProps {
   planId: string;
@@ -15,7 +16,7 @@ export function PlanCheckoutButton({ planId, communitySlug, primaryColor }: Plan
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleClick() {
-    const token = typeof window !== "undefined" ? localStorage.getItem("detailhub_access_token") : null;
+    const token = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN) : null;
     if (!token) {
       router.push(`/register?community=${communitySlug}&plan=${planId}`);
       return;

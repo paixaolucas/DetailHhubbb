@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Info, Search, X, UserCheck, AlertTriangle } from "lucide-react";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 const COLORS = [
   "#6366f1", "#8b5cf6", "#ec4899", "#ef4444",
@@ -93,7 +94,7 @@ export default function NewCommunityPage() {
     debounceRef.current = setTimeout(async () => {
       setUserSearchLoading(true);
       try {
-        const token = localStorage.getItem("detailhub_access_token");
+        const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
         const res = await fetch(`/api/users?search=${encodeURIComponent(userSearch)}&pageSize=8`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -132,7 +133,7 @@ export default function NewCommunityPage() {
     setError("");
     setIsLoading(true);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch("/api/communities", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },

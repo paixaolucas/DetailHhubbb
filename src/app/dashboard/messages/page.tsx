@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { MessageSquare, Send, ArrowLeft, Search, User, PenSquare, X } from "lucide-react";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -117,8 +118,8 @@ export default function MessagesPage() {
 
   // Load auth
   useEffect(() => {
-    const t = localStorage.getItem("detailhub_access_token") ?? "";
-    const id = localStorage.getItem("detailhub_user_id") ?? "";
+    const t = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN) ?? "";
+    const id = localStorage.getItem(STORAGE_KEYS.USER_ID) ?? "";
     setToken(t);
     setMyId(id);
   }, []);

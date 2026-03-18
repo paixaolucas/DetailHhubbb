@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Mail, Plus, Trash2, Send, ToggleLeft, ToggleRight, X, ChevronDown } from "lucide-react";
 import { useToast } from "@/components/ui/toast-provider";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 interface Community { id: string; name: string; primaryColor: string }
 interface Sequence {
@@ -59,7 +60,7 @@ export default function EmailSequencesPage() {
   // Delete confirm
   const [deleteTarget, setDeleteTarget] = useState<Sequence | null>(null);
 
-  const token = () => localStorage.getItem("detailhub_access_token") ?? "";
+  const token = () => localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN) ?? "";
 
   useEffect(() => {
     fetch("/api/communities/mine", { headers: { Authorization: `Bearer ${token()}` } })

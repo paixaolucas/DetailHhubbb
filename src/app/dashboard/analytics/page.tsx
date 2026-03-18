@@ -12,6 +12,7 @@ import {
   ArrowUpRight, ArrowDownRight, Zap, Calendar, X,
   CreditCard, Smartphone, Percent,
 } from "lucide-react";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 const chartStyle = {
   grid: { strokeDasharray: "3 3", stroke: "rgba(255,255,255,0.05)" },
@@ -232,14 +233,14 @@ export default function AnalyticsPage() {
   const [eventFilter,  setEventFilter]  = useState("");
 
   useEffect(() => {
-    const storedRole = localStorage.getItem("detailhub_user_role") ?? "INFLUENCER_ADMIN";
+    const storedRole = localStorage.getItem(STORAGE_KEYS.USER_ROLE) ?? "INFLUENCER_ADMIN";
     if (storedRole === "COMMUNITY_MEMBER" || storedRole === "MARKETPLACE_PARTNER") {
       router.replace("/dashboard");
       return;
     }
     setRole(storedRole);
     if (storedRole === "SUPER_ADMIN") {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       setEventsLoading(true);
       fetch("/api/admin/analytics/events?pageSize=20", { headers: { Authorization: `Bearer ${token}` } })
         .then((r) => r.json())
@@ -252,7 +253,7 @@ export default function AnalyticsPage() {
 
   useEffect(() => {
     if (!role) return;
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     const days  = getDays(period, customStart, customEnd);
 
     const endpoint = role === "SUPER_ADMIN"

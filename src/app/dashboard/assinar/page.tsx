@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle, Zap, Car, BookOpen, Video, ShoppingBag, Bot, Trophy } from "lucide-react";
 import { useToast } from "@/components/ui/toast-provider";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 const FEATURES = [
   "Acesso a todas as comunidades automotivas da plataforma",
@@ -44,7 +45,7 @@ export default function AssinarPage() {
 
   async function handleCheckout() {
     if (!plan) return;
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     if (!token) { router.push("/login"); return; }
 
     setSubmitting(true);

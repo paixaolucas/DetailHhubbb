@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Bell, Trash2, CheckCheck } from "lucide-react";
+import { STORAGE_KEYS } from "@/lib/constants";
 // date-fns is not in this project — using inline helpers below
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -149,7 +150,7 @@ export default function NotificationsPage() {
 
   function getToken(): string | null {
     return typeof window !== "undefined"
-      ? localStorage.getItem("detailhub_access_token")
+      ? localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN)
       : null;
   }
 

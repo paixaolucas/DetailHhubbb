@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Server, Save, AlertTriangle, Download, RefreshCw } from "lucide-react";
 import { useToast } from "@/components/ui/toast-provider";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 interface FeatureFlags {
   cadastros: boolean;
@@ -49,7 +50,7 @@ export default function PlataformaPage() {
   const [resetting, setResetting] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     if (!token) return;
     fetch("/api/admin/platform-config", { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.json())
@@ -73,7 +74,7 @@ export default function PlataformaPage() {
   async function saveSettings() {
     setSaving(true);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch("/api/admin/platform-config", {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -113,7 +114,7 @@ export default function PlataformaPage() {
   async function resetCache() {
     setResetting(true);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch("/api/admin/revalidate", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },

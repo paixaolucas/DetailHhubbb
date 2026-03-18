@@ -8,13 +8,14 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ShoppingBag } from "lucide-react";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 export function SellButton() {
   const [isSeller, setIsSeller] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const role = localStorage.getItem("detailhub_user_role");
+    const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
     setIsSeller(
       role === "INFLUENCER_ADMIN" ||
         role === "MARKETPLACE_PARTNER" ||

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { Users, Search, Ban, CheckCircle, ShieldAlert, ShieldCheck, UserX, ChevronLeft, ChevronRight } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { useToast } from "@/components/ui/toast-provider";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 const ALL_ROLES = ["SUPER_ADMIN", "INFLUENCER_ADMIN", "COMMUNITY_MEMBER", "MARKETPLACE_PARTNER"] as const;
 
@@ -67,13 +68,13 @@ export default function UsuariosPage() {
   const searchRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    setCurrentUserId(localStorage.getItem("detailhub_user_id"));
+    setCurrentUserId(localStorage.getItem(STORAGE_KEYS.USER_ID));
   }, []);
 
   const fetchUsers = useCallback(async (p: number, q: string, role: string, status: string) => {
     setIsLoading(true);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const params = new URLSearchParams({ page: String(p), pageSize: String(PAGE_SIZE) });
       if (q) params.set("search", q);
       if (role !== "ALL") params.set("role", role);
@@ -124,7 +125,7 @@ export default function UsuariosPage() {
     if (userId === currentUserId) return;
     setRoleLoading(userId);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(`/api/users/${userId}/role`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -148,7 +149,7 @@ export default function UsuariosPage() {
   async function updateStatus(userId: string, action: "ban" | "unban" | "deactivate" | "activate") {
     setActionLoading(userId);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const body =
         action === "ban" ? { isBanned: true }
         : action === "unban" ? { isBanned: false }
@@ -194,7 +195,7 @@ export default function UsuariosPage() {
     const ids = Array.from(selected);
     if (!ids.length) return;
     setBulkLoading(true);
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     const body = action === "ban" ? { isBanned: true } : { isActive: true, isBanned: false };
     let done = 0;
     const results = await Promise.allSettled(

@@ -1,4 +1,4 @@
-# DetailHub — Instruções do Projeto para Claude Code
+# Detailer'HUB — Instruções do Projeto para Claude Code
 
 > Este arquivo é lido automaticamente pelo Claude Code a cada sessão.
 > Ele contém TODO o contexto necessário para continuar o desenvolvimento sem perder informações.
@@ -7,9 +7,9 @@
 
 ## Visão Geral
 
-**DetailHub** é uma plataforma de comunidades automotivas premium.
+**Detailer'HUB** é uma plataforma de comunidades automotivas premium.
 - Influencers criam comunidades
-- Membros assinam a **plataforma** (assinatura única R$600/ano) e acessam TUDO
+- Membros assinam a **plataforma** (assinatura única R$837/ano = R$69,75/mês) e acessam TUDO
 - Inspirado no modelo Circle (uma assinatura, acesso a todas as comunidades)
 
 **Stack**: Next.js 14 App Router, TypeScript, Prisma, PostgreSQL (Neon), Stripe, OpenAI, Resend, UploadThing
@@ -133,16 +133,21 @@ Todos em `src/middleware/auth.middleware.ts`.
 
 ## Design System
 
-- **Background**: `#111827` (gray-900) — dark por padrão, definido no `:root`
-- **Accent**: `#3B82F6` (blue-500)
+- **Background**: `#1A1A1A` — dark por padrão, definido no `:root`
+- **Cores brand**: `#006079` (teal escuro), `#007A99` (teal médio), `#009CD9` (teal claro)
+- **Texto principal**: `#EEE6E4` | secundário: `text-gray-300` | muted: `text-gray-400`
 - **Glass cards**: `.glass-card` = `bg-white/5 backdrop-blur-md border border-white/10 rounded-xl`
-- **Botão primário**: `.btn-premium`
-- **Logo**: `<Logo size="sm|md|lg|xl" />` em `src/components/ui/logo.tsx` — SVG steering wheel em fundo azul (SEM ícone Zap!)
+- **Botão primário**: `.btn-premium` = `bg-gradient-to-r from-[#006079] to-[#009CD9]`
+- **Logo**: `<Logo size="sm|md|lg|xl" />` em `src/components/ui/logo.tsx` — SVG dois personagens em fundo teal (NÃO é steering wheel, NÃO tem Zap!)
+- **Fonte**: Titillium Web (via `next/font/google`, variável CSS `--font-titillium`)
 - **Skeletons**: `animate-pulse` com blocos `bg-white/10 rounded` (NÃO use spinners em loading de página)
-- **Spinner inline**: `border-[3px] border-blue-500 border-t-transparent rounded-full animate-spin`
+- **Spinner inline**: `border-[3px] border-[#009CD9] border-t-transparent rounded-full animate-spin`
 - **Toasts**: `useToast()` de `src/components/ui/toast-provider.tsx`
-- **Tailwind cores custom**: `detailhub` (azul), `chrome` (cinza), `hub` (azul legado)
+- **Tailwind cores custom**: `detailhub` (teal scale), `chrome` (dark neutrals)
 - **Animações**: `.animate-slide-up`, `.animate-fade-in`, `.delay-75/150/225/300/450` em `globals.css`
+- **Inputs dark**: `bg-white/5 border border-white/10` — NUNCA `bg-white` ou `border-gray-200` em páginas dark
+- **NUNCA usar**: `text-gray-900`, `text-gray-800`, `bg-gray-50`, `violet-*`, `purple-*` — usar teal equivalente
+- **Cores violet → teal**: `violet-600`→`[#006079]`, `violet-500`→`[#007A99]`, `violet-400`→`[#009CD9]`
 
 ---
 
@@ -297,7 +302,7 @@ return NextResponse.json({ success: false, error: "mensagem" }, { status: 400 })
 - `SkeletonTable` — skeleton para tabelas
 - `Breadcrumb` — navegação por migalhas
 - `PasswordStrength` — indicador de força de senha
-- `Logo` — SVG steering wheel em fundo azul
+- `Logo` — SVG dois personagens em fundo teal gradient (NÃO é steering wheel)
 - `NavBar` — com hamburger mobile
 - `Footer`
 
@@ -317,11 +322,14 @@ return NextResponse.json({ success: false, error: "mensagem" }, { status: 400 })
 ## Padrões a Seguir
 
 ### Nunca fazer
-- Usar strings literais para localStorage — sempre usar `STORAGE_KEYS`
+- Usar strings literais para localStorage — sempre usar `STORAGE_KEYS` de `src/lib/constants.ts`
 - Usar `coverUrl` ou `isActive` no model Community
 - Usar `category` no model Community
 - Criar spinner de loading para páginas inteiras — usar skeleton animate-pulse
-- Adicionar `Pro` ao lado do nome DetailHub — o nome é só **DetailHub**
+- Escrever o nome como "DetailHub" — o nome correto é **Detailer'HUB**
+- Usar cores `violet-*` ou `purple-*` — usar teal: `[#006079]`, `[#007A99]`, `[#009CD9]`
+- Usar `text-gray-900` ou `bg-white` (sem opacidade) em páginas dark
+- Usar `bg-gray-50`, `border-gray-200` em contexto dark — usar `bg-white/5`, `border-white/10`
 
 ### Sempre fazer
 - Usar `withAuth` ou `withRole` em todas as rotas de API protegidas
@@ -329,3 +337,4 @@ return NextResponse.json({ success: false, error: "mensagem" }, { status: 400 })
 - Usar `useToast()` para feedback ao usuário
 - Verificar `npx tsc --noEmit` após mudanças (deve retornar 0 erros)
 - Usar `db.$transaction` em operações com múltiplas escritas
+- Inputs em dark: `bg-white/5 border border-white/10 text-[#EEE6E4] placeholder-gray-500`

@@ -26,6 +26,7 @@ import {
   Users,
   Info,
 } from "lucide-react";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -181,7 +182,7 @@ export default function PerformancePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     fetch("/api/influencers/me/performance", {
       headers: { Authorization: `Bearer ${token}` },
     })

@@ -7,6 +7,7 @@ import { useParams } from "next/navigation";
 import { ArrowLeft, Star, ShoppingBag, Sparkles, User } from "lucide-react";
 import { BuyButton } from "@/components/marketplace/buy-button";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 interface Seller {
   id: string;
@@ -76,7 +77,7 @@ export default function MarketplaceListingPage() {
 
   useEffect(() => {
     if (!listingId) return;
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     fetch(`/api/marketplace/listings/${listingId}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     })

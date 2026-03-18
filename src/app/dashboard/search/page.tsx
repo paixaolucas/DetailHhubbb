@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Search, Users, FileText, User, ArrowLeft, Filter } from "lucide-react";
 import SearchResultItem from "@/components/search/SearchResultItem";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 type FilterType = "all" | "communities" | "posts" | "members";
 
@@ -53,7 +54,7 @@ export default function SearchPage() {
     setIsLoading(true);
     setHasSearched(true);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(
         `/api/search?q=${encodeURIComponent(q)}&types=communities,posts,members`,
         {

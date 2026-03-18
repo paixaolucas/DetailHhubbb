@@ -11,6 +11,7 @@ import {
 import { useToast } from "@/components/ui/toast-provider";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import OnboardingChecklist from "@/components/community/OnboardingChecklist";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 const TABS = [
   { id: "general", label: "Geral", icon: Settings },
@@ -113,8 +114,8 @@ export default function CommunitySettingsPage() {
   const [broadcastSending, setBroadcastSending] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("detailhub_access_token");
-    const role = localStorage.getItem("detailhub_user_role");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+    const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
     setIsAdmin(role === "SUPER_ADMIN");
     Promise.all([
       fetch(`/api/communities/${communityId}`, { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json()),
@@ -142,7 +143,7 @@ export default function CommunitySettingsPage() {
   async function save(body: Record<string, unknown>) {
     setSaving(true); setError(""); setSuccess("");
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(`/api/communities/${communityId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -161,7 +162,7 @@ export default function CommunitySettingsPage() {
       variant: "danger", confirmLabel: "Remover",
       onConfirm: async () => {
         setConfirmState((s) => ({ ...s, open: false }));
-        const token = localStorage.getItem("detailhub_access_token");
+        const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
         await fetch(`/api/communities/${communityId}/members/${membershipId}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
         setMembers((m) => m.filter((mb) => mb.id !== membershipId));
       },
@@ -172,7 +173,7 @@ export default function CommunitySettingsPage() {
     e.preventDefault();
     setPointsSaving(true);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(`/api/communities/${communityId}/members/${pointsModal.userId}/points`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -196,7 +197,7 @@ export default function CommunitySettingsPage() {
   // -------------------------------------------------------------------------
   async function loadFaqs() {
     if (faqsLoaded) return;
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     const res = await fetch(`/api/communities/${communityId}/faqs`, {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -208,7 +209,7 @@ export default function CommunitySettingsPage() {
   async function createFaq() {
     setSaving(true); setError("");
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(`/api/communities/${communityId}/faqs`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -230,7 +231,7 @@ export default function CommunitySettingsPage() {
   async function updateFaq(faq: FAQ) {
     setSaving(true); setError("");
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(`/api/communities/${communityId}/faqs/${faq.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -256,7 +257,7 @@ export default function CommunitySettingsPage() {
       variant: "danger", confirmLabel: "Excluir",
       onConfirm: async () => {
         setConfirmState((s) => ({ ...s, open: false }));
-        const token = localStorage.getItem("detailhub_access_token");
+        const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
         await fetch(`/api/communities/${communityId}/faqs/${faqId}`, {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
@@ -271,7 +272,7 @@ export default function CommunitySettingsPage() {
   // -------------------------------------------------------------------------
   async function loadTestimonials() {
     if (testimonialsLoaded) return;
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     const res = await fetch(`/api/communities/${communityId}/testimonials`, {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -283,7 +284,7 @@ export default function CommunitySettingsPage() {
   async function createTestimonial() {
     setSaving(true); setError("");
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(`/api/communities/${communityId}/testimonials`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -308,7 +309,7 @@ export default function CommunitySettingsPage() {
   async function updateTestimonial(t: Testimonial) {
     setSaving(true); setError("");
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(`/api/communities/${communityId}/testimonials/${t.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -337,7 +338,7 @@ export default function CommunitySettingsPage() {
       variant: "danger", confirmLabel: "Excluir",
       onConfirm: async () => {
         setConfirmState((s) => ({ ...s, open: false }));
-        const token = localStorage.getItem("detailhub_access_token");
+        const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
         await fetch(`/api/communities/${communityId}/testimonials/${testimonialId}`, {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
@@ -881,7 +882,7 @@ export default function CommunitySettingsPage() {
             onClick={async () => {
               setBroadcastSending(true);
               try {
-                const token = localStorage.getItem("detailhub_access_token");
+                const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
                 const res = await fetch(`/api/communities/${communityId}/broadcast`, {
                   method: "POST",
                   headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -947,7 +948,7 @@ export default function CommunitySettingsPage() {
                 variant: "danger", confirmLabel: "Excluir definitivamente",
                 onConfirm: () => {
                   setConfirmState((s) => ({ ...s, open: false }));
-                  const token = localStorage.getItem("detailhub_access_token");
+                  const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
                   fetch(`/api/communities/${communityId}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } })
                     .then(() => router.push("/dashboard/communities"));
                 },

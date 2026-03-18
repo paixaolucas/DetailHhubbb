@@ -6,6 +6,7 @@ import {
   Headphones, Star, Award, Trash2, Eye, EyeOff, GripVertical, Video, Pencil, Check, X,
 } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 const LESSON_ICONS: Record<string, React.ElementType> = {
   VIDEO: PlayCircle, AUDIO: Headphones, TEXT: FileText,
@@ -62,7 +63,7 @@ export default function ContentPage() {
   const [editLessonForm, setEditLessonForm] = useState({ title: "", type: "VIDEO", videoUrl: "", isFree: false, unlockAfterDays: "" });
 
   useEffect(() => {
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     fetch("/api/communities/mine", { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.json())
       .then((d) => {
@@ -76,7 +77,7 @@ export default function ContentPage() {
   useEffect(() => {
     if (!selectedCommunity) return;
     setIsLoading(true);
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     fetch(`/api/content/modules?communityId=${selectedCommunity}`, { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.json())
       .then((d) => d.success && setModules(d.data ?? []))
@@ -95,7 +96,7 @@ export default function ContentPage() {
     if (!newModuleTitle.trim() || !selectedCommunity) return;
     setSaving(true);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch("/api/content/modules", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -114,7 +115,7 @@ export default function ContentPage() {
     if (!newLesson.title.trim()) return;
     setSaving(true);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch("/api/content/lessons", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -139,7 +140,7 @@ export default function ContentPage() {
     if (!editModuleForm.title.trim()) return;
     setSaving(true);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(`/api/content/modules/${moduleId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -157,7 +158,7 @@ export default function ContentPage() {
     if (!editLessonForm.title.trim()) return;
     setSaving(true);
     try {
-      const token = localStorage.getItem("detailhub_access_token");
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       const res = await fetch(`/api/content/lessons/${lessonId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -181,7 +182,7 @@ export default function ContentPage() {
   }
 
   async function toggleModulePublish(moduleId: string, isPublished: boolean) {
-    const token = localStorage.getItem("detailhub_access_token");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     await fetch(`/api/content/modules/${moduleId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -198,7 +199,7 @@ export default function ContentPage() {
       variant: "danger",
       onConfirm: async () => {
         setConfirmState((s) => ({ ...s, open: false }));
-        const token = localStorage.getItem("detailhub_access_token");
+        const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
         await fetch(`/api/content/modules/${moduleId}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
         setModules((prev) => prev.filter((m) => m.id !== moduleId));
       },
@@ -213,7 +214,7 @@ export default function ContentPage() {
       variant: "danger",
       onConfirm: async () => {
         setConfirmState((s) => ({ ...s, open: false }));
-        const token = localStorage.getItem("detailhub_access_token");
+        const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
         await fetch(`/api/content/lessons/${lessonId}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
         setModules((prev) => prev.map((m) =>
           m.id === moduleId

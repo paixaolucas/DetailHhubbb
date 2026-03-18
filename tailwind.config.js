@@ -99,7 +99,7 @@ module.exports = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["Titillium Web", "system-ui", "sans-serif"],
+        sans: ["var(--font-titillium)", "Titillium Web", "system-ui", "sans-serif"],
       },
       keyframes: {
         "accordion-down": {
