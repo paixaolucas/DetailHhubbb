@@ -26,7 +26,7 @@ export function PasswordResetEmail({
       <Body style={body}>
         <Container style={container}>
           <Section style={header}>
-            <Heading style={logo}>DetailHub</Heading>
+            <Heading style={logo}>Detailer'HUB</Heading>
           </Section>
 
           <Section style={content}>
@@ -50,7 +50,7 @@ export function PasswordResetEmail({
 
           <Hr style={hr} />
           <Text style={footer}>
-            © {new Date().getFullYear()} DetailHub. Todos os direitos
+            © {new Date().getFullYear()} Detailer'HUB. Todos os direitos
             reservados.
           </Text>
         </Container>

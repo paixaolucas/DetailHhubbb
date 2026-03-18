@@ -28,8 +28,8 @@ interface Listing {
 }
 
 const TYPE_LABELS: Record<string, { label: string; color: string }> = {
-  COURSE: { label: "Curso", color: "bg-violet-500/10 text-violet-400 border-violet-500/20" },
-  TEMPLATE: { label: "Templates", color: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
+  COURSE: { label: "Curso", color: "bg-[#007A99]/10 text-[#009CD9] border-[#007A99]/20" },
+  TEMPLATE: { label: "Templates", color: "bg-[#007A99]/10 text-[#009CD9] border-[#007A99]/20" },
   EBOOK: { label: "E-book", color: "bg-green-500/10 text-green-400 border-green-500/20" },
   COACHING: { label: "Coaching", color: "bg-orange-500/10 text-orange-400 border-orange-500/20" },
   TOOL: { label: "Ferramenta", color: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" },
@@ -112,7 +112,7 @@ export default function MarketplacePage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Marketplace</h1>
+          <h1 className="text-2xl font-bold text-[#EEE6E4]">Marketplace</h1>
           <p className="text-gray-400 text-sm mt-1">Produtos e serviços premium das suas comunidades</p>
         </div>
         <SellButton />
@@ -120,20 +120,20 @@ export default function MarketplacePage() {
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
-        <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3 py-2 flex-1">
+        <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2 flex-1">
           <Search className="w-4 h-4 text-gray-500 flex-shrink-0" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar produtos…"
-            className="bg-transparent text-sm text-gray-900 placeholder-gray-600 outline-none flex-1"
+            className="bg-transparent text-sm text-[#EEE6E4] placeholder-gray-500 outline-none flex-1"
           />
         </div>
         <div className="relative">
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="appearance-none bg-white border border-gray-200 rounded-xl px-3 py-2 pr-8 text-sm text-gray-600 outline-none"
+            className="appearance-none bg-white/5 border border-white/10 rounded-xl px-3 py-2 pr-8 text-sm text-gray-400 outline-none"
           >
             <option value="">Todos os tipos</option>
             {Object.entries(TYPE_LABELS).map(([key, { label }]) => (
@@ -146,7 +146,7 @@ export default function MarketplacePage() {
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value)}
-            className="appearance-none bg-white border border-gray-200 rounded-xl px-3 py-2 pr-8 text-sm text-gray-600 outline-none"
+            className="appearance-none bg-white/5 border border-white/10 rounded-xl px-3 py-2 pr-8 text-sm text-gray-400 outline-none"
           >
             {SORT_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
@@ -163,10 +163,10 @@ export default function MarketplacePage() {
         </div>
       ) : listings.length === 0 ? (
         <div className="glass-card p-16 text-center">
-          <div className="w-20 h-20 bg-violet-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <ShoppingBag className="w-10 h-10 text-violet-400" />
+          <div className="w-20 h-20 bg-[#007A99]/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <ShoppingBag className="w-10 h-10 text-[#009CD9]" />
           </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">Nenhum produto disponível</h3>
+          <h3 className="text-xl font-semibold text-[#EEE6E4] mb-2">Nenhum produto disponível</h3>
           <p className="text-gray-400 text-sm">
             {search || typeFilter
               ? "Nenhum resultado para os filtros selecionados."
@@ -185,7 +185,7 @@ export default function MarketplacePage() {
               <Link
                 key={listing.id}
                 href={`/dashboard/marketplace/${listing.id}`}
-                className="glass-card overflow-hidden hover:border-violet-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-violet-500/10 group relative block"
+                className="glass-card overflow-hidden hover:border-[#99D3DF] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#007A99]/10 group relative block"
               >
                 {/* Cover */}
                 {listing.coverImageUrl ? (
@@ -199,9 +199,9 @@ export default function MarketplacePage() {
                     />
                   </div>
                 ) : (
-                  <div className="h-40 bg-gradient-to-br from-violet-600/20 to-purple-600/10 flex items-center justify-center relative overflow-hidden">
+                  <div className="h-40 bg-gradient-to-br from-[#006079]/20 to-[#006079]/10 flex items-center justify-center relative overflow-hidden">
                     <div className="absolute inset-0 grid-pattern opacity-20" />
-                    <ShoppingBag className="w-12 h-12 text-violet-400/50 relative" />
+                    <ShoppingBag className="w-12 h-12 text-[#009CD9]/50 relative" />
                   </div>
                 )}
 
@@ -221,7 +221,7 @@ export default function MarketplacePage() {
                     </span>
                   </div>
 
-                  <h3 className="font-semibold text-gray-900 mb-1.5 line-clamp-2 group-hover:text-violet-300 transition-colors">
+                  <h3 className="font-semibold text-[#EEE6E4] mb-1.5 line-clamp-2 group-hover:text-[#33A7BF] transition-colors">
                     {listing.title}
                   </h3>
 
@@ -231,12 +231,12 @@ export default function MarketplacePage() {
 
                   <div className="flex items-center gap-2 mb-4">
                     <span className="text-xs text-gray-500">por</span>
-                    <span className="text-xs font-medium text-gray-600">
+                    <span className="text-xs font-medium text-gray-400">
                       {listing.seller.firstName} {listing.seller.lastName}
                     </span>
                     {listing.averageRating && (
                       <>
-                        <span className="text-gray-700">•</span>
+                        <span className="text-gray-300">•</span>
                         <div className="flex items-center gap-1 text-xs text-gray-400">
                           <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
                           {listing.averageRating} ({listing.reviewCount})
@@ -245,8 +245,8 @@ export default function MarketplacePage() {
                     )}
                   </div>
 
-                  <div className="pt-3 border-t border-gray-200">
-                    <span className="text-xl font-bold text-gray-900">
+                  <div className="pt-3 border-t border-white/10">
+                    <span className="text-xl font-bold text-[#EEE6E4]">
                       R${" "}
                       {Number(listing.price).toLocaleString("pt-BR", {
                         minimumFractionDigits: 2,

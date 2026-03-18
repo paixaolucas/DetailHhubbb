@@ -536,7 +536,7 @@ function MemberDashboardInner({ userName }: { userName: string }) {
         {/* Geometric accents */}
         <div className="absolute -top-10 -right-10 w-64 h-64 bg-[#006079]/20 rounded-full blur-3xl" />
         <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-[#009CD9]/20 rounded-full blur-3xl" />
-        <div className="absolute top-0 right-0 w-1 h-full bg-gradient-to-b from-[#007A99]/0 via-violet-500/40 to-[#007A99]/0" />
+        <div className="absolute top-0 right-0 w-1 h-full bg-gradient-to-b from-[#007A99]/0 via-[#007A99]/40 to-[#007A99]/0" />
         {/* Content */}
         <div className="relative p-6 sm:p-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div>
@@ -552,7 +552,7 @@ function MemberDashboardInner({ userName }: { userName: string }) {
           </div>
         </div>
         {/* Bottom accent line */}
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-[#007A99]/0 via-violet-500/60 to-[#007A99]/0" />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-[#007A99]/0 via-[#007A99]/60 to-[#007A99]/0" />
       </div>
 
       {/* Main layout: communities + leaderboard side by side */}

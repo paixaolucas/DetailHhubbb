@@ -138,12 +138,12 @@ function ContentPreviewModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white border border-gray-200 rounded-2xl shadow-2xl w-full max-w-lg animate-slide-up">
-        <div className="p-5 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-gray-900">
+      <div className="relative bg-white/5 border border-white/10 rounded-2xl shadow-2xl w-full max-w-lg animate-slide-up">
+        <div className="p-5 border-b border-white/10 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-[#EEE6E4]">
             Conteúdo reportado — {TARGET_LABELS[report.targetType] ?? report.targetType}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-900 p-1 rounded-lg hover:bg-gray-100 transition-colors">
+          <button onClick={onClose} className="text-gray-400 hover:text-[#EEE6E4] p-1 rounded-lg hover:bg-white/10 transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -151,20 +151,20 @@ function ContentPreviewModal({
         <div className="p-5">
           {loading ? (
             <div className="space-y-2 animate-pulse">
-              <div className="h-4 bg-gray-100 rounded w-3/4" />
-              <div className="h-4 bg-gray-100 rounded w-full" />
-              <div className="h-4 bg-gray-100 rounded w-2/3" />
+              <div className="h-4 bg-white/10 rounded w-3/4" />
+              <div className="h-4 bg-white/10 rounded w-full" />
+              <div className="h-4 bg-white/10 rounded w-2/3" />
             </div>
           ) : content ? (
             <div className="space-y-3">
               {content.type === "USER" ? (
                 <div className="space-y-1">
-                  <p className="text-sm font-semibold text-gray-900">{content.firstName} {content.lastName}</p>
+                  <p className="text-sm font-semibold text-[#EEE6E4]">{content.firstName} {content.lastName}</p>
                   {content.email && <p className="text-xs text-gray-500">{content.email}</p>}
-                  {content.role && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md">{content.role}</span>}
+                  {content.role && <span className="text-xs bg-white/10 text-gray-400 px-2 py-0.5 rounded-md">{content.role}</span>}
                 </div>
               ) : (
-                <div className="bg-gray-50 rounded-xl p-4 text-sm text-gray-700 leading-relaxed whitespace-pre-wrap break-words max-h-48 overflow-y-auto">
+                <div className="bg-white/5 rounded-xl p-4 text-sm text-gray-300 leading-relaxed whitespace-pre-wrap break-words max-h-48 overflow-y-auto">
                   {content.body ?? "Sem conteúdo"}
                 </div>
               )}
@@ -174,7 +174,7 @@ function ContentPreviewModal({
         </div>
 
         {report.status === "PENDING" && (
-          <div className="p-5 border-t border-gray-200 flex items-center gap-2">
+          <div className="p-5 border-t border-white/10 flex items-center gap-2">
             <button
               onClick={() => { onAction(report.id, "RESOLVED"); onClose(); }}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 hover:bg-green-100 border border-green-200 text-green-700 text-xs font-medium rounded-lg transition-colors"
@@ -184,7 +184,7 @@ function ContentPreviewModal({
             </button>
             <button
               onClick={() => { onAction(report.id, "IGNORED"); onClose(); }}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 text-xs font-medium rounded-lg transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 text-gray-400 text-xs font-medium rounded-lg transition-colors"
             >
               <EyeOff className="w-3.5 h-3.5" />
               Ignorar
@@ -202,19 +202,19 @@ function ContentPreviewModal({
 
 function ReportSkeleton() {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4 animate-pulse">
+    <div className="bg-white/5 border border-white/10 rounded-xl p-4 animate-pulse">
       <div className="flex items-start gap-3">
-        <div className="w-8 h-8 bg-gray-100 rounded-full flex-shrink-0" />
+        <div className="w-8 h-8 bg-white/10 rounded-full flex-shrink-0" />
         <div className="flex-1 space-y-2">
-          <div className="h-4 bg-gray-100 rounded w-2/3" />
-          <div className="h-3 bg-gray-100 rounded w-1/2" />
-          <div className="h-3 bg-gray-100 rounded w-3/4" />
+          <div className="h-4 bg-white/10 rounded w-2/3" />
+          <div className="h-3 bg-white/10 rounded w-1/2" />
+          <div className="h-3 bg-white/10 rounded w-3/4" />
         </div>
-        <div className="h-6 bg-gray-100 rounded-full w-20" />
+        <div className="h-6 bg-white/10 rounded-full w-20" />
       </div>
       <div className="flex gap-2 mt-4">
-        <div className="h-8 bg-gray-100 rounded-lg w-28" />
-        <div className="h-8 bg-gray-100 rounded-lg w-24" />
+        <div className="h-8 bg-white/10 rounded-lg w-28" />
+        <div className="h-8 bg-white/10 rounded-lg w-24" />
       </div>
     </div>
   );
@@ -293,12 +293,12 @@ export default function AdminDenunciasPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Fila de Denúncias</h1>
+          <h1 className="text-2xl font-bold text-[#EEE6E4]">Fila de Denúncias</h1>
           <p className="text-sm text-gray-500 mt-0.5">Gerencie conteúdo reportado pela comunidade</p>
         </div>
         <button
           onClick={() => fetchReports(page, statusFilter)}
-          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors"
+          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#EEE6E4] transition-colors"
         >
           <RefreshCw className="w-4 h-4" />
           Atualizar
@@ -319,7 +319,7 @@ export default function AdminDenunciasPage() {
             className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium border transition-all ${
               statusFilter === key
                 ? "bg-gray-900 text-white border-gray-900"
-                : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+                : "bg-white text-gray-400 border-white/10 hover:border-gray-400"
             }`}
           >
             <Icon className="w-3.5 h-3.5" />
@@ -338,7 +338,7 @@ export default function AdminDenunciasPage() {
         {loading ? (
           Array.from({ length: 5 }).map((_, i) => <ReportSkeleton key={i} />)
         ) : reports.length === 0 ? (
-          <div className="bg-white border border-gray-200 rounded-xl p-12 text-center">
+          <div className="bg-white/5 border border-white/10 rounded-xl p-12 text-center">
             <AlertTriangle className="w-8 h-8 text-gray-300 mx-auto mb-3" />
             <p className="text-gray-500 text-sm">Nenhuma denúncia encontrada.</p>
           </div>
@@ -351,18 +351,18 @@ export default function AdminDenunciasPage() {
             return (
               <div
                 key={report.id}
-                className="bg-white border border-gray-200 rounded-xl p-4 space-y-3"
+                className="bg-white/5 border border-white/10 rounded-xl p-4 space-y-3"
               >
                 {/* Top row */}
                 <div className="flex items-start gap-3">
                   {/* Avatar */}
-                  <div className="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center text-xs font-bold text-violet-600 flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-[#CCE9EF] flex items-center justify-center text-xs font-bold text-[#006079] flex-shrink-0">
                     {report.reportedBy.firstName[0]}{report.reportedBy.lastName[0]}
                   </div>
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-900">
+                    <p className="text-sm font-semibold text-[#EEE6E4]">
                       {report.reportedBy.firstName} {report.reportedBy.lastName}
                       <span className="text-gray-400 font-normal ml-1.5">· {timeAgo(report.createdAt)}</span>
                     </p>
@@ -378,14 +378,14 @@ export default function AdminDenunciasPage() {
                 {/* Target + Reason */}
                 <div className="space-y-1.5 pl-11">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md font-medium">
+                    <span className="text-xs bg-white/10 text-gray-400 px-2 py-0.5 rounded-md font-medium">
                       {TARGET_LABELS[report.targetType] ?? report.targetType}
                     </span>
                     <span className="text-xs text-gray-500 font-mono truncate max-w-[200px]">
                       {report.targetId}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-700 font-medium">{report.reason}</p>
+                  <p className="text-sm text-gray-300 font-medium">{report.reason}</p>
                   {report.description && (
                     <p className="text-sm text-gray-500 leading-relaxed">{report.description}</p>
                   )}
@@ -413,7 +413,7 @@ export default function AdminDenunciasPage() {
                       <button
                         onClick={() => handleAction(report.id, "IGNORED")}
                         disabled={isActing}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 text-xs font-medium rounded-lg transition-colors disabled:opacity-50"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 text-gray-400 text-xs font-medium rounded-lg transition-colors disabled:opacity-50"
                       >
                         <EyeOff className="w-3.5 h-3.5" />
                         Ignorar
@@ -453,14 +453,14 @@ export default function AdminDenunciasPage() {
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={pagination.page <= 1}
-              className="px-3 py-1.5 text-sm bg-white border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 disabled:opacity-40 transition-colors"
+              className="px-3 py-1.5 text-sm bg-white/5 border border-white/10 rounded-lg text-gray-400 hover:bg-white/5 disabled:opacity-40 transition-colors"
             >
               Anterior
             </button>
             <button
               onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
               disabled={pagination.page >= pagination.totalPages}
-              className="px-3 py-1.5 text-sm bg-white border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 disabled:opacity-40 transition-colors"
+              className="px-3 py-1.5 text-sm bg-white/5 border border-white/10 rounded-lg text-gray-400 hover:bg-white/5 disabled:opacity-40 transition-colors"
             >
               Próxima
             </button>

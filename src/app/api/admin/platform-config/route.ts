@@ -18,7 +18,7 @@ const DEFAULT_FLAGS = {
 };
 
 const DEFAULT_CONFIG = {
-  nomePlataforma: "DetailHub",
+  nomePlataforma: "Detailer'HUB",
   emailSuporte: "suporte@detailhub.com",
   comissao: "15",
 };

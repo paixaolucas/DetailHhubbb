@@ -34,8 +34,8 @@ interface ListingDetail {
 }
 
 const TYPE_LABELS: Record<string, { label: string; color: string }> = {
-  COURSE: { label: "Curso", color: "bg-violet-500/10 text-violet-400 border-violet-500/20" },
-  TEMPLATE: { label: "Templates", color: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
+  COURSE: { label: "Curso", color: "bg-[#007A99]/10 text-[#009CD9] border-[#007A99]/20" },
+  TEMPLATE: { label: "Templates", color: "bg-[#007A99]/10 text-[#009CD9] border-[#007A99]/20" },
   EBOOK: { label: "E-book", color: "bg-green-500/10 text-green-400 border-green-500/20" },
   COACHING: { label: "Coaching", color: "bg-orange-500/10 text-orange-400 border-orange-500/20" },
   TOOL: { label: "Ferramenta", color: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" },
@@ -231,7 +231,7 @@ export default function MarketplaceListingPage() {
                   className="w-10 h-10 rounded-xl object-cover"
                 />
               ) : (
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-violet-600 rounded-xl flex items-center justify-center text-white font-bold text-sm">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-[#006079] rounded-xl flex items-center justify-center text-white font-bold text-sm">
                   {listing.seller.firstName[0]}{listing.seller.lastName[0]}
                 </div>
               )}
@@ -262,12 +262,12 @@ export default function MarketplaceListingPage() {
                 <Link
                   key={other.id}
                   href={`/dashboard/marketplace/${other.id}`}
-                  className="glass-card p-4 hover:border-violet-200/30 transition-all group"
+                  className="glass-card p-4 hover:border-[#99D3DF]/30 transition-all group"
                 >
                   <span className={`text-xs px-2 py-0.5 rounded-full font-medium border ${otherType.color}`}>
                     {otherType.label}
                   </span>
-                  <p className="mt-2 text-sm font-medium text-white group-hover:text-violet-300 transition-colors line-clamp-2">
+                  <p className="mt-2 text-sm font-medium text-white group-hover:text-[#33A7BF] transition-colors line-clamp-2">
                     {other.title}
                   </p>
                   <p className="mt-2 text-base font-bold text-gray-200">

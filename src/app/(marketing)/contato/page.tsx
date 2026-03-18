@@ -22,7 +22,7 @@ export default function ContatoPage() {
                 <input
                   type="text"
                   placeholder="Seu nome completo"
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400/30 focus:border-violet-400 transition-all"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 focus:border-[#009CD9] transition-all"
                 />
               </div>
               <div>
@@ -30,12 +30,12 @@ export default function ContatoPage() {
                 <input
                   type="email"
                   placeholder="seu@email.com"
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400/30 focus:border-violet-400 transition-all"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 focus:border-[#009CD9] transition-all"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Assunto</label>
-                <select className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-400/30 focus:border-violet-400 transition-all bg-white">
+                <select className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 focus:border-[#009CD9] transition-all bg-white">
                   <option value="">Selecione um assunto</option>
                   <option value="suporte">Suporte técnico</option>
                   <option value="parceria">Parceria</option>
@@ -48,12 +48,12 @@ export default function ContatoPage() {
                 <textarea
                   rows={4}
                   placeholder="Escreva sua mensagem..."
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400/30 focus:border-violet-400 transition-all resize-none"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 focus:border-[#009CD9] transition-all resize-none"
                 />
               </div>
               <button
                 type="submit"
-                className="w-full bg-violet-600 hover:bg-violet-500 text-white py-3 rounded-xl font-semibold transition-all"
+                className="w-full bg-[#006079] hover:bg-[#007A99] text-white py-3 rounded-xl font-semibold transition-all"
               >
                 Enviar mensagem
               </button>
@@ -76,7 +76,7 @@ export default function ContatoPage() {
                 </div>
               </div>
             ))}
-            <div className="bg-violet-500/5 border border-violet-200 rounded-2xl p-5">
+            <div className="bg-[#007A99]/5 border border-[#99D3DF] rounded-2xl p-5">
               <p className="text-sm text-gray-600 leading-relaxed">
                 Respondemos todos os e-mails em até <strong>2 dias úteis</strong>. Para suporte urgente, acesse o chat dentro da plataforma.
               </p>

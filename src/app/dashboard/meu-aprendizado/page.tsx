@@ -50,22 +50,22 @@ function LessonRow({ lesson, communitySlug }: { lesson: LessonData; communitySlu
     <div
       onClick={handleClick}
       className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all ${
-        isCurrent ? "bg-violet-500/10 border border-violet-500/20" : "hover:bg-violet-50"
+        isCurrent ? "bg-[#007A99]/10 border border-[#007A99]/20" : "hover:bg-[#E6F4F7]"
       }`}
     >
       <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
-        lesson.completed ? "bg-green-500/20" : isCurrent ? "bg-violet-500/20" : "bg-white"
+        lesson.completed ? "bg-green-500/20" : isCurrent ? "bg-[#007A99]/20" : "bg-white"
       }`}>
         {lesson.completed ? (
           <CheckCircle2 className="w-3.5 h-3.5 text-green-400" />
         ) : (
-          <Icon className={`w-3.5 h-3.5 ${isCurrent ? "text-violet-400" : "text-gray-500"}`} />
+          <Icon className={`w-3.5 h-3.5 ${isCurrent ? "text-[#009CD9]" : "text-gray-500"}`} />
         )}
       </div>
 
       <div className="flex-1 min-w-0">
         <p className={`text-sm font-medium truncate ${
-          lesson.completed ? "text-gray-500 line-through" : isCurrent ? "text-gray-900" : "text-gray-600"
+          lesson.completed ? "text-gray-500 line-through" : isCurrent ? "text-[#EEE6E4]" : "text-gray-400"
         }`}>
           {lesson.title}
         </p>
@@ -76,7 +76,7 @@ function LessonRow({ lesson, communitySlug }: { lesson: LessonData; communitySlu
           <span className="text-xs text-gray-500 hidden sm:block">{lesson.duration}</span>
         )}
         {isCurrent && (
-          <span className="text-xs bg-violet-600 text-white px-2 py-0.5 rounded-full font-medium">
+          <span className="text-xs bg-[#006079] text-white px-2 py-0.5 rounded-full font-medium">
             Continuar
           </span>
         )}
@@ -95,10 +95,10 @@ function ModuleAccordion({ module, communitySlug }: { module: ModuleData; commun
   const completedCount = module.lessons.filter((l) => l.completed).length;
 
   return (
-    <div className="border border-gray-200 rounded-xl overflow-hidden">
+    <div className="border border-white/10 rounded-xl overflow-hidden">
       <button
         onClick={() => setOpen((p) => !p)}
-        className="flex items-center gap-3 p-4 w-full hover:bg-violet-50 transition-colors text-left"
+        className="flex items-center gap-3 p-4 w-full hover:bg-[#E6F4F7] transition-colors text-left"
       >
         <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${
           module.progress === 100 ? "bg-green-500/20" : "bg-white"
@@ -106,11 +106,11 @@ function ModuleAccordion({ module, communitySlug }: { module: ModuleData; commun
           {module.progress === 100 ? (
             <CheckCircle2 className="w-4 h-4 text-green-400" />
           ) : (
-            <BookOpen className="w-4 h-4 text-violet-400" />
+            <BookOpen className="w-4 h-4 text-[#009CD9]" />
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-gray-900">{module.title}</p>
+          <p className="text-sm font-semibold text-[#EEE6E4]">{module.title}</p>
           <p className="text-xs text-gray-500 mt-0.5">
             {completedCount}/{module.lessons.length} aulas concluídas
           </p>
@@ -122,7 +122,7 @@ function ModuleAccordion({ module, communitySlug }: { module: ModuleData; commun
       </button>
 
       {open && (
-        <div className="border-t border-gray-200 p-2 space-y-1">
+        <div className="border-t border-white/10 p-2 space-y-1">
           {module.lessons.map((lesson) => (
             <LessonRow key={lesson.id} lesson={lesson} communitySlug={communitySlug} />
           ))}
@@ -156,7 +156,7 @@ export default function MeuAprendizadoPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-[3px] border-violet-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-[3px] border-[#007A99] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -164,7 +164,7 @@ export default function MeuAprendizadoPage() {
   if (error) {
     return (
       <div className="space-y-6 max-w-4xl">
-        <h1 className="text-2xl font-bold text-gray-900">Meu Aprendizado</h1>
+        <h1 className="text-2xl font-bold text-[#EEE6E4]">Meu Aprendizado</h1>
         <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-xl">{error}</div>
       </div>
     );
@@ -173,7 +173,7 @@ export default function MeuAprendizadoPage() {
   return (
     <div className="space-y-6 max-w-4xl">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Meu Aprendizado</h1>
+        <h1 className="text-2xl font-bold text-[#EEE6E4]">Meu Aprendizado</h1>
         <p className="text-gray-400 text-sm mt-1">Continue seus cursos e acompanhe seu progresso</p>
       </div>
 
@@ -181,15 +181,15 @@ export default function MeuAprendizadoPage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
           { label: "Aulas concluídas", value: stats.completedLessons, icon: CheckCircle2, color: "text-green-400 bg-green-500/10" },
-          { label: "Horas estudadas", value: `${stats.hoursWatched}h`, icon: Clock, color: "text-violet-400 bg-violet-500/10" },
-          { label: "Comunidades", value: stats.totalCommunities, icon: BookOpen, color: "text-purple-400 bg-purple-500/10" },
+          { label: "Horas estudadas", value: `${stats.hoursWatched}h`, icon: Clock, color: "text-[#009CD9] bg-[#007A99]/10" },
+          { label: "Comunidades", value: stats.totalCommunities, icon: BookOpen, color: "text-[#009CD9] bg-[#007A99]/10" },
           { label: "Total de aulas", value: stats.totalLessons, icon: Award, color: "text-yellow-400 bg-yellow-500/10" },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="glass-card p-5">
             <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-3 ${color.split(" ")[1]}`}>
               <Icon className={`w-4 h-4 ${color.split(" ")[0]}`} />
             </div>
-            <p className="text-xl font-bold text-gray-900">{value}</p>
+            <p className="text-xl font-bold text-[#EEE6E4]">{value}</p>
             <p className="text-xs text-gray-500 mt-0.5">{label}</p>
           </div>
         ))}
@@ -198,12 +198,12 @@ export default function MeuAprendizadoPage() {
       {/* Empty state */}
       {communities.length === 0 ? (
         <div className="glass-card p-16 text-center">
-          <div className="w-20 h-20 bg-violet-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <BookOpen className="w-10 h-10 text-violet-400" />
+          <div className="w-20 h-20 bg-[#007A99]/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <BookOpen className="w-10 h-10 text-[#009CD9]" />
           </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">Nenhuma comunidade ainda</h3>
+          <h3 className="text-xl font-semibold text-[#EEE6E4] mb-2">Nenhuma comunidade ainda</h3>
           <p className="text-gray-400 text-sm mb-6">Você ainda não está inscrito em nenhuma comunidade.</p>
-          <a href="/communities" className="bg-violet-600 hover:bg-violet-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all inline-block">
+          <a href="/communities" className="bg-[#006079] hover:bg-[#007A99] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all inline-block">
             Explorar comunidades
           </a>
         </div>
@@ -211,17 +211,17 @@ export default function MeuAprendizadoPage() {
         communities.map((community) => (
           <div key={community.communityId} className="glass-card overflow-hidden">
             {/* Community header */}
-            <div className="p-5 border-b border-gray-200">
+            <div className="p-5 border-b border-white/10">
               <div className="flex items-center justify-between flex-wrap gap-3">
                 <div className="flex items-center gap-3">
                   <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-900 font-bold text-sm"
+                    className="w-10 h-10 rounded-xl flex items-center justify-center text-[#EEE6E4] font-bold text-sm"
                     style={{ backgroundColor: community.communityColor }}
                   >
                     {community.communityName.charAt(0)}
                   </div>
                   <div>
-                    <h2 className="text-base font-semibold text-gray-900">{community.communityName}</h2>
+                    <h2 className="text-base font-semibold text-[#EEE6E4]">{community.communityName}</h2>
                     <p className="text-xs text-gray-500">
                       {community.completedLessons} de {community.totalLessons} aulas concluídas
                     </p>
@@ -229,7 +229,7 @@ export default function MeuAprendizadoPage() {
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <p className="text-lg font-bold text-gray-900">{community.progress}%</p>
+                    <p className="text-lg font-bold text-[#EEE6E4]">{community.progress}%</p>
                     <p className="text-xs text-gray-500">completo</p>
                   </div>
                   <div className="w-12 h-12 relative flex-shrink-0">
@@ -245,7 +245,7 @@ export default function MeuAprendizadoPage() {
                   </div>
                 </div>
               </div>
-              <div className="mt-3 h-1.5 bg-gray-50 rounded-full overflow-hidden">
+              <div className="mt-3 h-1.5 bg-white/5 rounded-full overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all"
                   style={{ width: `${community.progress}%`, backgroundColor: community.communityColor }}

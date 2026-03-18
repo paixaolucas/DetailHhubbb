@@ -29,7 +29,7 @@ export async function sendWelcomeEmail(user: {
 }) {
   await send(
     user.email,
-    "Bem-vindo ao DetailHub!",
+    "Bem-vindo ao Detailer'HUB!",
     WelcomeEmail({
       firstName: user.firstName,
       dashboardUrl: `${APP_URL}/dashboard`,
@@ -46,7 +46,7 @@ export async function sendPasswordResetEmail(
   const resetLink = `${APP_URL}/reset-password/${resetToken}`;
   await send(
     user.email,
-    "Redefinição de senha — DetailHub",
+    "Redefinição de senha — Detailer'HUB",
     PasswordResetEmail({ firstName: user.firstName, resetLink })
   );
 }
@@ -60,7 +60,7 @@ export async function sendEmailVerificationEmail(
   const verificationLink = `${APP_URL}/verify-email?token=${verificationToken}`;
   await send(
     user.email,
-    "Confirme seu e-mail — DetailHub",
+    "Confirme seu e-mail — Detailer'HUB",
     EmailVerificationEmail({ firstName: user.firstName, verificationLink })
   );
 }
@@ -73,7 +73,7 @@ export async function sendPaymentConfirmationEmail(
 ) {
   await send(
     user.email,
-    "Pagamento confirmado — DetailHub",
+    "Pagamento confirmado — Detailer'HUB",
     PaymentConfirmationEmail({
       firstName: user.firstName,
       dashboardUrl: `${APP_URL}/dashboard`,

@@ -158,15 +158,15 @@ export default function GaragePage() {
   }
 
   const fieldClass =
-    "w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm";
+    "w-full bg-white/5 border border-white/10 hover:border-[#99D3DF] focus:border-[#009CD9] rounded-xl px-4 py-3 text-[#EEE6E4] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 transition-all text-sm";
 
   if (loading) {
     return (
       <div className="max-w-2xl animate-pulse space-y-4">
-        <div className="h-8 bg-gray-50 rounded w-48" />
+        <div className="h-8 bg-white/5 rounded w-48" />
         <div className="glass-card p-6 space-y-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-10 bg-gray-50 rounded-xl" />
+            <div key={i} className="h-10 bg-white/5 rounded-xl" />
           ))}
         </div>
       </div>
@@ -180,9 +180,9 @@ export default function GaragePage() {
     <div className="max-w-2xl space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-          <div className="w-10 h-10 bg-violet-500/15 rounded-xl flex items-center justify-center">
-            <Car className="w-5 h-5 text-violet-400" />
+        <h1 className="text-2xl font-bold text-[#EEE6E4] flex items-center gap-3">
+          <div className="w-10 h-10 bg-[#007A99]/15 rounded-xl flex items-center justify-center">
+            <Car className="w-5 h-5 text-[#009CD9]" />
           </div>
           Minha Garagem
         </h1>
@@ -205,10 +205,10 @@ export default function GaragePage() {
 
       {/* Car info form */}
       <div className="glass-card p-6 space-y-4">
-        <h2 className="text-base font-semibold text-gray-900">Dados do Veículo</h2>
+        <h2 className="text-base font-semibold text-[#EEE6E4]">Dados do Veículo</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1.5">Marca</label>
+            <label className="block text-sm font-medium text-gray-400 mb-1.5">Marca</label>
             <input
               type="text"
               value={form.carBrand}
@@ -218,7 +218,7 @@ export default function GaragePage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1.5">Modelo</label>
+            <label className="block text-sm font-medium text-gray-400 mb-1.5">Modelo</label>
             <input
               type="text"
               value={form.carModel}
@@ -228,7 +228,7 @@ export default function GaragePage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1.5">Ano</label>
+            <label className="block text-sm font-medium text-gray-400 mb-1.5">Ano</label>
             <input
               type="number"
               value={form.carYear}
@@ -240,7 +240,7 @@ export default function GaragePage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1.5">Cor</label>
+            <label className="block text-sm font-medium text-gray-400 mb-1.5">Cor</label>
             <input
               type="text"
               value={form.carColor}
@@ -250,7 +250,7 @@ export default function GaragePage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1.5">Potência (cv)</label>
+            <label className="block text-sm font-medium text-gray-400 mb-1.5">Potência (cv)</label>
             <input
               type="text"
               value={form.carPower}
@@ -260,7 +260,7 @@ export default function GaragePage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1.5">Combustível</label>
+            <label className="block text-sm font-medium text-gray-400 mb-1.5">Combustível</label>
             <select
               value={form.carFuel}
               onChange={(e) => setForm((p) => ({ ...p, carFuel: e.target.value }))}
@@ -280,7 +280,7 @@ export default function GaragePage() {
 
       {/* Photos */}
       <div className="glass-card p-6 space-y-4">
-        <h2 className="text-base font-semibold text-gray-900">Fotos do Carro</h2>
+        <h2 className="text-base font-semibold text-[#EEE6E4]">Fotos do Carro</h2>
 
         {/* Existing photos */}
         {form.carPhotos.length > 0 && (
@@ -292,14 +292,14 @@ export default function GaragePage() {
                   alt=""
                   width={200}
                   height={112}
-                  className="w-full h-28 object-cover rounded-xl border border-gray-200"
+                  className="w-full h-28 object-cover rounded-xl border border-white/10"
                 />
                 <button
                   type="button"
                   onClick={() => removeExistingPhoto(i)}
                   className="absolute top-1.5 right-1.5 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                 >
-                  <X className="w-3 h-3 text-gray-900" />
+                  <X className="w-3 h-3 text-[#EEE6E4]" />
                 </button>
               </div>
             ))}
@@ -316,17 +316,17 @@ export default function GaragePage() {
                   alt=""
                   width={200}
                   height={112}
-                  className="w-full h-28 object-cover rounded-xl border border-violet-500/30 opacity-70"
+                  className="w-full h-28 object-cover rounded-xl border border-[#007A99]/30 opacity-70"
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-xs text-violet-400 bg-[#F8F7FF]/80 rounded-lg px-2 py-0.5">Pendente</span>
+                  <span className="text-xs text-[#009CD9] bg-[#F8F7FF]/80 rounded-lg px-2 py-0.5">Pendente</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => removeNewPhoto(i)}
                   className="absolute top-1.5 right-1.5 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                 >
-                  <X className="w-3 h-3 text-gray-900" />
+                  <X className="w-3 h-3 text-[#EEE6E4]" />
                 </button>
               </div>
             ))}
@@ -337,7 +337,7 @@ export default function GaragePage() {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-2 text-sm text-gray-400 hover:text-violet-400 transition-colors border border-dashed border-gray-200 hover:border-violet-500/30 rounded-xl px-4 py-3 w-full justify-center"
+            className="flex items-center gap-2 text-sm text-gray-400 hover:text-[#009CD9] transition-colors border border-dashed border-white/10 hover:border-[#007A99]/30 rounded-xl px-4 py-3 w-full justify-center"
           >
             <ImageIcon className="w-4 h-4" />
             Adicionar fotos ({form.carPhotos.length + selectedFiles.length}/10)
@@ -358,7 +358,7 @@ export default function GaragePage() {
         <button
           onClick={handleSave}
           disabled={busy}
-          className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all"
+          className="inline-flex items-center gap-2 bg-[#006079] hover:bg-[#007A99] disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all"
         >
           {busy ? (
             <>
@@ -376,7 +376,7 @@ export default function GaragePage() {
         {hasCar && (
           <a
             href="/dashboard/minhas-comunidades"
-            className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-gray-700 border border-gray-200 hover:border-violet-200 px-5 py-2.5 rounded-xl transition-all"
+            className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-gray-300 border border-white/10 hover:border-[#99D3DF] px-5 py-2.5 rounded-xl transition-all"
           >
             <Share2 className="w-4 h-4" />
             Ir para feed e compartilhar

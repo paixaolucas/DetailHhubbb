@@ -39,7 +39,7 @@ interface Listing {
 }
 
 function fieldClass() {
-  return "w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm";
+  return "w-full bg-white/5 border border-white/10 hover:border-[#99D3DF] focus:border-[#009CD9] rounded-xl px-4 py-3 text-[#EEE6E4] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 transition-all text-sm";
 }
 
 export default function MeusProdutosPage() {
@@ -137,7 +137,7 @@ export default function MeusProdutosPage() {
     return (
       <div className="space-y-4 animate-pulse max-w-4xl">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="bg-white border border-gray-200 rounded-2xl h-24" />
+          <div key={i} className="bg-white/5 border border-white/10 rounded-2xl h-24" />
         ))}
       </div>
     );
@@ -147,12 +147,12 @@ export default function MeusProdutosPage() {
     <div className="space-y-6 max-w-4xl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Meus Produtos</h1>
+          <h1 className="text-2xl font-bold text-[#EEE6E4]">Meus Produtos</h1>
           <p className="text-gray-400 text-sm mt-1">Gerencie seus produtos no marketplace</p>
         </div>
         <button
           onClick={() => setShowNewForm(!showNewForm)}
-          className="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-purple-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-violet-500/30"
+          className="flex items-center gap-2 bg-gradient-to-r from-[#006079] to-[#007A99] hover:from-[#007A99] hover:to-[#007A99] text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-[#007A99]/30"
         >
           <Plus className="w-4 h-4" />
           Novo Produto
@@ -163,14 +163,14 @@ export default function MeusProdutosPage() {
       <div className="grid grid-cols-3 gap-4">
         {[
           { label: "Produtos Ativos", value: activeCount, icon: Package, color: "text-green-400 bg-green-500/10" },
-          { label: "Total de Vendas", value: totalSales, icon: ShoppingBag, color: "text-violet-400 bg-violet-500/10" },
-          { label: "Receita Total", value: `R$ ${totalRevenue.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`, icon: DollarSign, color: "text-purple-400 bg-purple-500/10" },
+          { label: "Total de Vendas", value: totalSales, icon: ShoppingBag, color: "text-[#009CD9] bg-[#007A99]/10" },
+          { label: "Receita Total", value: `R$ ${totalRevenue.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`, icon: DollarSign, color: "text-[#009CD9] bg-[#007A99]/10" },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="glass-card p-5">
             <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-3 ${color.split(" ")[1]}`}>
               <Icon className={`w-4 h-4 ${color.split(" ")[0]}`} />
             </div>
-            <p className="text-xl font-bold text-gray-900">{value}</p>
+            <p className="text-xl font-bold text-[#EEE6E4]">{value}</p>
             <p className="text-xs text-gray-500 mt-0.5">{label}</p>
           </div>
         ))}
@@ -179,53 +179,53 @@ export default function MeusProdutosPage() {
       {/* New form */}
       {showNewForm && (
         <form onSubmit={handleCreate} className="glass-card p-6 space-y-4">
-          <h2 className="text-base font-semibold text-gray-900">Novo Produto</h2>
+          <h2 className="text-base font-semibold text-[#EEE6E4]">Novo Produto</h2>
           {error && <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-xl">{error}</div>}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Título *</label>
+              <label className="block text-sm font-medium text-gray-400 mb-1.5">Título *</label>
               <input type="text" value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} placeholder="Ex: Pack de Templates para Mecânicos" className={fieldClass()} required />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Tipo</label>
+              <label className="block text-sm font-medium text-gray-400 mb-1.5">Tipo</label>
               <select value={form.type} onChange={(e) => setForm((p) => ({ ...p, type: e.target.value }))} className={`${fieldClass()} bg-white`}>
                 {LISTING_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Preço (R$) *</label>
+              <label className="block text-sm font-medium text-gray-400 mb-1.5">Preço (R$) *</label>
               <input type="number" value={form.price} onChange={(e) => setForm((p) => ({ ...p, price: e.target.value }))} placeholder="0.00" min="0.01" step="0.01" className={fieldClass()} required />
             </div>
 
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Descrição curta</label>
+              <label className="block text-sm font-medium text-gray-400 mb-1.5">Descrição curta</label>
               <input type="text" value={form.shortDesc} onChange={(e) => setForm((p) => ({ ...p, shortDesc: e.target.value }))} placeholder="Uma frase de impacto" className={fieldClass()} maxLength={300} />
             </div>
 
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Descrição completa *</label>
+              <label className="block text-sm font-medium text-gray-400 mb-1.5">Descrição completa *</label>
               <textarea value={form.description} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} placeholder="Descreva o produto em detalhes..." rows={3} className={`${fieldClass()} resize-none`} required minLength={10} />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Tags</label>
+              <label className="block text-sm font-medium text-gray-400 mb-1.5">Tags</label>
               <input type="text" value={form.tags} onChange={(e) => setForm((p) => ({ ...p, tags: e.target.value }))} placeholder="tuning, motor, diagnóstico" className={fieldClass()} />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">O que está incluso (uma por linha)</label>
+              <label className="block text-sm font-medium text-gray-400 mb-1.5">O que está incluso (uma por linha)</label>
               <textarea value={form.features} onChange={(e) => setForm((p) => ({ ...p, features: e.target.value }))} placeholder={"100 templates\nSuporte por email"} rows={3} className={`${fieldClass()} resize-none`} />
             </div>
           </div>
 
           <div className="flex gap-3">
-            <button type="submit" disabled={saving} className="bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
+            <button type="submit" disabled={saving} className="bg-[#006079] hover:bg-[#007A99] disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
               {saving ? "Criando..." : "Criar Produto"}
             </button>
-            <button type="button" onClick={() => setShowNewForm(false)} className="px-5 py-2.5 border border-gray-200 hover:border-gray-300 rounded-xl text-sm text-gray-600 hover:text-gray-900 transition-all">
+            <button type="button" onClick={() => setShowNewForm(false)} className="px-5 py-2.5 border border-white/10 hover:border-gray-300 rounded-xl text-sm text-gray-400 hover:text-[#EEE6E4] transition-all">
               Cancelar
             </button>
           </div>
@@ -238,16 +238,16 @@ export default function MeusProdutosPage() {
           <div className="w-20 h-20 bg-green-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Package className="w-10 h-10 text-green-400" />
           </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">Nenhum produto ainda</h3>
+          <h3 className="text-xl font-semibold text-[#EEE6E4] mb-2">Nenhum produto ainda</h3>
           <p className="text-gray-400 text-sm mb-6">Crie seu primeiro produto automotivo e comece a vender.</p>
-          <button onClick={() => setShowNewForm(true)} className="bg-violet-600 hover:bg-violet-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
+          <button onClick={() => setShowNewForm(true)} className="bg-[#006079] hover:bg-[#007A99] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
             Criar produto
           </button>
         </div>
       ) : (
         <div className="space-y-3">
           {listings.map((listing) => (
-            <div key={listing.id} className="glass-card p-5 hover:border-violet-200 transition-all group">
+            <div key={listing.id} className="glass-card p-5 hover:border-[#99D3DF] transition-all group">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -256,10 +256,10 @@ export default function MeusProdutosPage() {
                     </span>
                     <span className="text-xs text-gray-500">{LISTING_TYPES.find((t) => t.value === listing.type)?.label ?? listing.type}</span>
                   </div>
-                  <h3 className="font-semibold text-gray-900 group-hover:text-violet-300 transition-colors">{listing.title}</h3>
+                  <h3 className="font-semibold text-[#EEE6E4] group-hover:text-[#33A7BF] transition-colors">{listing.title}</h3>
                   {listing.shortDesc && <p className="text-sm text-gray-400 mt-0.5">{listing.shortDesc}</p>}
                   <div className="flex items-center gap-4 mt-2">
-                    <span className="text-base font-bold text-gray-900">R$ {Number(listing.price).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
+                    <span className="text-base font-bold text-[#EEE6E4]">R$ {Number(listing.price).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
                     <span className="flex items-center gap-1 text-sm text-gray-500">
                       <TrendingUp className="w-3.5 h-3.5" />
                       {listing.totalSales} vendas
@@ -274,7 +274,7 @@ export default function MeusProdutosPage() {
                 </div>
                 <div className="flex items-center gap-1 flex-shrink-0">
                   {listing.status !== "ARCHIVED" && (
-                    <button onClick={() => toggleStatus(listing.id, listing.status)} className="p-1.5 text-gray-500 hover:text-violet-400 hover:bg-violet-500/10 rounded-lg transition-colors" title={listing.status === "ACTIVE" ? "Pausar" : "Ativar"}>
+                    <button onClick={() => toggleStatus(listing.id, listing.status)} className="p-1.5 text-gray-500 hover:text-[#009CD9] hover:bg-[#007A99]/10 rounded-lg transition-colors" title={listing.status === "ACTIVE" ? "Pausar" : "Ativar"}>
                       {listing.status === "ACTIVE" ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   )}

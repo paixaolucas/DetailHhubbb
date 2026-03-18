@@ -405,7 +405,7 @@ export default function EntregasPage() {
 
             {/* Add form */}
             {showForm && (
-              <form onSubmit={addMention} className="border border-violet-100 rounded-xl p-4 bg-[#006079]/10/50 space-y-3">
+              <form onSubmit={addMention} className="border border-[#CCE9EF] rounded-xl p-4 bg-[#006079]/10/50 space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-medium text-gray-400 mb-1">Plataforma</label>

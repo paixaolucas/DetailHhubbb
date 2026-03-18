@@ -75,19 +75,19 @@ export default async function CertificatePage({
       <div className="w-full max-w-2xl mb-6">
         <Link
           href="/"
-          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-600 transition-colors w-fit"
+          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-400 transition-colors w-fit"
         >
-          <span>←</span> DetailHub
+          <span>←</span> Detailer'HUB
         </Link>
       </div>
 
       {/* Main card */}
-      <div className="w-full max-w-2xl bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-2xl relative">
+      <div className="w-full max-w-2xl bg-white/5 border border-white/10 rounded-3xl overflow-hidden shadow-2xl relative">
         {/* Top accent bar */}
         <div
           className={`h-1.5 w-full ${
             isValid
-              ? "bg-gradient-to-r from-violet-600 via-violet-400 to-purple-500"
+              ? "bg-gradient-to-r from-[#006079] via-[#009CD9] to-[#007A99]"
               : "bg-gradient-to-r from-red-600 to-red-400"
           }`}
         />
@@ -98,8 +98,8 @@ export default async function CertificatePage({
             <div className="flex items-center gap-3">
               <Logo size="md" />
               <div>
-                <p className="text-gray-900 font-bold text-lg leading-tight">
-                  DetailHub
+                <p className="text-[#EEE6E4] font-bold text-lg leading-tight">
+                  Detailer'HUB
                 </p>
                 <p className="text-gray-500 text-xs">Plataforma de Comunidades</p>
               </div>
@@ -131,36 +131,36 @@ export default async function CertificatePage({
                 </div>
                 <div>
                   <p className="text-sm text-gray-400 mb-1">Certificamos que</p>
-                  <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
+                  <h1 className="text-3xl md:text-4xl font-bold text-[#EEE6E4]">
                     {certificate.user.firstName} {certificate.user.lastName}
                   </h1>
                 </div>
                 <p className="text-gray-400 text-sm max-w-md mx-auto leading-relaxed">
                   concluiu com sucesso o curso/programa
                 </p>
-                <h2 className="text-xl font-semibold text-violet-300 px-4">
+                <h2 className="text-xl font-semibold text-[#33A7BF] px-4">
                   &ldquo;{certificate.title}&rdquo;
                 </h2>
               </div>
 
               {/* Community info */}
-              <div className="flex items-center justify-center gap-3 py-3 border-t border-b border-gray-200">
+              <div className="flex items-center justify-center gap-3 py-3 border-t border-b border-white/10">
                 {certificate.community.logoUrl ? (
                   <Image
                     src={certificate.community.logoUrl}
                     alt={certificate.community.name}
                     width={36}
                     height={36}
-                    className="w-9 h-9 rounded-xl object-cover border border-gray-200"
+                    className="w-9 h-9 rounded-xl object-cover border border-white/10"
                   />
                 ) : (
-                  <div className="w-9 h-9 rounded-xl bg-violet-600/30 flex items-center justify-center text-violet-300 font-bold text-sm">
+                  <div className="w-9 h-9 rounded-xl bg-[#006079]/30 flex items-center justify-center text-[#33A7BF] font-bold text-sm">
                     {certificate.community.name.charAt(0)}
                   </div>
                 )}
                 <div className="text-left">
                   <p className="text-xs text-gray-500">Oferecido por</p>
-                  <p className="text-sm font-semibold text-gray-900">
+                  <p className="text-sm font-semibold text-[#EEE6E4]">
                     {certificate.community.name}
                   </p>
                 </div>
@@ -190,12 +190,12 @@ export default async function CertificatePage({
                 <XCircle className="w-10 h-10 text-red-400" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-2">
+                <h2 className="text-xl font-bold text-[#EEE6E4] mb-2">
                   Este certificado é inválido
                 </h2>
                 <p className="text-gray-400 text-sm max-w-sm mx-auto">
                   O código{" "}
-                  <span className="font-mono text-gray-600 bg-gray-50 px-2 py-0.5 rounded text-xs">
+                  <span className="font-mono text-gray-400 bg-white/5 px-2 py-0.5 rounded text-xs">
                     {params.code}
                   </span>{" "}
                   não corresponde a nenhum certificado emitido pela plataforma.
@@ -203,7 +203,7 @@ export default async function CertificatePage({
               </div>
               <Link
                 href="/"
-                className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all"
+                className="inline-flex items-center gap-2 bg-[#006079] hover:bg-[#007A99] text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all"
               >
                 Ir para o início
               </Link>
@@ -212,8 +212,8 @@ export default async function CertificatePage({
         </div>
 
         {/* Bottom watermark */}
-        <div className="px-8 md:px-12 py-4 bg-white/[0.02] border-t border-gray-200 text-center">
-          <p className="text-xs text-gray-600">
+        <div className="px-8 md:px-12 py-4 bg-white/[0.02] border-t border-white/10 text-center">
+          <p className="text-xs text-gray-400">
             Verifique a autenticidade em{" "}
             <span className="text-gray-500 font-mono">
               {(process.env.NEXT_PUBLIC_APP_URL ?? "detailhub.com").replace(/\/$/, "")}/certificates/{params.code}

@@ -28,7 +28,7 @@ export function SellButton() {
   return (
     <Link
       href="/dashboard/meus-produtos"
-      className="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-purple-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-violet-500/30"
+      className="flex items-center gap-2 bg-gradient-to-r from-[#006079] to-[#007A99] hover:from-[#007A99] hover:to-[#007A99] text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-[#007A99]/30"
     >
       <ShoppingBag className="w-4 h-4" />
       Vender produto

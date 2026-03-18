@@ -13,4 +13,4 @@ export const resend = process.env.RESEND_API_KEY
   : null;
 
 export const FROM_EMAIL =
-  process.env.EMAIL_FROM ?? "DetailHub <noreply@detailhub.com>";
+  process.env.EMAIL_FROM ?? "Detailer'HUB <noreply@detailhub.com>";

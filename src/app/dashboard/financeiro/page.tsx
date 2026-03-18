@@ -91,11 +91,11 @@ function KpiCard({
     <div className={`glass-card p-5 ${highlight ? "border-green-200 bg-green-50/50" : ""}`}>
       <div className="flex items-center justify-between mb-3">
         <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</p>
-        <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${accent ? "bg-blue-500/10" : highlight ? "bg-green-500/10" : "bg-violet-500/10"}`}>
-          <Icon className={`w-4 h-4 ${accent ? "text-blue-500" : highlight ? "text-green-500" : "text-violet-500"}`} />
+        <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${accent ? "bg-blue-500/10" : highlight ? "bg-green-500/10" : "bg-[#007A99]/10"}`}>
+          <Icon className={`w-4 h-4 ${accent ? "text-blue-500" : highlight ? "text-green-500" : "text-[#007A99]"}`} />
         </div>
       </div>
-      <p className={`text-2xl font-bold mb-1 ${highlight ? "text-green-600" : "text-gray-900"}`}>{value}</p>
+      <p className={`text-2xl font-bold mb-1 ${highlight ? "text-green-600" : "text-[#EEE6E4]"}`}>{value}</p>
       <p className="text-xs text-gray-500">{sub}</p>
     </div>
   );
@@ -105,11 +105,11 @@ function SkeletonCard() {
   return (
     <div className="glass-card p-5 animate-pulse space-y-3">
       <div className="flex justify-between">
-        <div className="h-3 bg-gray-100 rounded w-20" />
-        <div className="w-8 h-8 bg-gray-100 rounded-xl" />
+        <div className="h-3 bg-white/10 rounded w-20" />
+        <div className="w-8 h-8 bg-white/10 rounded-xl" />
       </div>
-      <div className="h-7 bg-gray-100 rounded w-28" />
-      <div className="h-3 bg-gray-100 rounded w-24" />
+      <div className="h-7 bg-white/10 rounded w-28" />
+      <div className="h-3 bg-white/10 rounded w-24" />
     </div>
   );
 }
@@ -139,11 +139,11 @@ export default function FinanceiroPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="h-8 bg-gray-100 rounded-xl w-40 animate-pulse" />
+        <div className="h-8 bg-white/10 rounded-xl w-40 animate-pulse" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => <SkeletonCard key={i} />)}
         </div>
-        <div className="glass-card p-6 h-64 animate-pulse bg-gray-50" />
+        <div className="glass-card p-6 h-64 animate-pulse bg-white/5" />
       </div>
     );
   }
@@ -162,12 +162,12 @@ export default function FinanceiroPage() {
       {/* Header */}
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard Financeiro</h1>
+          <h1 className="text-2xl font-bold text-[#EEE6E4]">Dashboard Financeiro</h1>
           <p className="text-gray-400 text-sm mt-1">Sua comissão, membros captados e posição no ranking</p>
         </div>
         <div className="flex items-center gap-2 glass-card px-4 py-2">
           <Trophy className="w-4 h-4 text-yellow-500" />
-          <span className="text-sm font-semibold text-gray-900">
+          <span className="text-sm font-semibold text-[#EEE6E4]">
             #{summary.rank}
             <span className="text-gray-400 font-normal"> de {summary.totalInfluencers} influenciadores</span>
           </span>
@@ -181,7 +181,7 @@ export default function FinanceiroPage() {
             key={t}
             onClick={() => setTab(t)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              tab === t ? "bg-violet-600 text-white shadow-sm" : "text-gray-500 hover:text-gray-900"
+              tab === t ? "bg-[#006079] text-white shadow-sm" : "text-gray-500 hover:text-[#EEE6E4]"
             }`}
           >
             {t === "visao-geral" ? "Visão Geral" : "Pagamentos"}
@@ -232,7 +232,7 @@ export default function FinanceiroPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="glass-card p-5">
               <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Total Ganho (histórico)</p>
-              <p className="text-3xl font-bold text-gray-900">{fmt(summary.totalEarnings)}</p>
+              <p className="text-3xl font-bold text-[#EEE6E4]">{fmt(summary.totalEarnings)}</p>
               <p className="text-xs text-gray-400 mt-1">Acumulado desde o início</p>
             </div>
             <div className="glass-card p-5">
@@ -244,7 +244,7 @@ export default function FinanceiroPage() {
 
           {/* Monthly history chart */}
           <div className="glass-card p-6">
-            <h2 className="text-base font-semibold text-gray-900 mb-5">
+            <h2 className="text-base font-semibold text-[#EEE6E4] mb-5">
               Novos Membros & Comissão — últimos 6 meses
             </h2>
             <ResponsiveContainer width="100%" height={280}>
@@ -268,8 +268,8 @@ export default function FinanceiroPage() {
           {/* Badge progress */}
           <div className="glass-card p-6">
             <div className="flex items-center gap-2 mb-4">
-              <Award className="w-4 h-4 text-violet-500" />
-              <h2 className="text-base font-semibold text-gray-900">Progresso de Badge</h2>
+              <Award className="w-4 h-4 text-[#007A99]" />
+              <h2 className="text-base font-semibold text-[#EEE6E4]">Progresso de Badge</h2>
             </div>
             <div className="flex items-center gap-6 flex-wrap">
               <div className="text-center">
@@ -282,17 +282,17 @@ export default function FinanceiroPage() {
                     {badge.current.name === "Bronze" ? "🥉" : badge.current.name === "Prata" ? "🥈" : "🥇"}
                   </div>
                 ) : (
-                  <div className="w-16 h-16 rounded-2xl bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center text-2xl mx-auto">—</div>
+                  <div className="w-16 h-16 rounded-2xl bg-white/10 border-2 border-dashed border-gray-300 flex items-center justify-center text-2xl mx-auto">—</div>
                 )}
-                <p className="text-xs font-medium text-gray-600 mt-1.5">{badge.current?.name ?? "Nenhum"}</p>
+                <p className="text-xs font-medium text-gray-400 mt-1.5">{badge.current?.name ?? "Nenhum"}</p>
               </div>
               {badge.next && (
                 <div className="flex-1 min-w-48">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-sm font-medium text-gray-900">Próximo: {badge.next.name}</p>
+                    <p className="text-sm font-medium text-[#EEE6E4]">Próximo: {badge.next.name}</p>
                     <p className="text-xs text-gray-500">{summary.activeReferred} / {badge.next.threshold} membros</p>
                   </div>
-                  <div className="w-full bg-gray-100 rounded-full h-2.5">
+                  <div className="w-full bg-white/10 rounded-full h-2.5">
                     <div
                       className="h-2.5 rounded-full transition-all duration-500"
                       style={{ width: `${Math.min(badge.next.progress, 100)}%`, backgroundColor: badge.next.color }}
@@ -318,7 +318,7 @@ export default function FinanceiroPage() {
                 return (
                   <div
                     key={b.name}
-                    className={`rounded-xl p-3 text-center border transition-all ${achieved ? "border-opacity-50 bg-opacity-10" : "border-gray-100 bg-gray-50 opacity-50"}`}
+                    className={`rounded-xl p-3 text-center border transition-all ${achieved ? "border-opacity-50 bg-opacity-10" : "border-white/5 bg-white/5 opacity-50"}`}
                     style={achieved ? { borderColor: b.color, backgroundColor: `${b.color}10` } : {}}
                   >
                     <span className="text-2xl">{b.emoji}</span>
@@ -335,9 +335,9 @@ export default function FinanceiroPage() {
           <div className="glass-card p-4 flex items-start gap-3">
             <ArrowUpRight className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
             <p className="text-xs text-gray-500 leading-relaxed">
-              <strong className="text-gray-700">Como funciona:</strong> você recebe 35% de cada pagamento dos membros que indicou.{" "}
-              <strong className="text-gray-600">Plano anual (cartão à vista):</strong> comissão de {fmt(annualCommissionPerMember)} entra de uma vez por membro (35% de {fmt(summary.annualTicket)}).{" "}
-              <strong className="text-gray-600">Plano mensal (PIX/recorrente):</strong> comissão de {fmt(monthlyCommissionPerMember)}/mês por membro ativo (35% de {fmt(summary.monthlyTicket)}).{" "}
+              <strong className="text-gray-300">Como funciona:</strong> você recebe 35% de cada pagamento dos membros que indicou.{" "}
+              <strong className="text-gray-400">Plano anual (cartão à vista):</strong> comissão de {fmt(annualCommissionPerMember)} entra de uma vez por membro (35% de {fmt(summary.annualTicket)}).{" "}
+              <strong className="text-gray-400">Plano mensal (PIX/recorrente):</strong> comissão de {fmt(monthlyCommissionPerMember)}/mês por membro ativo (35% de {fmt(summary.monthlyTicket)}).{" "}
               Pagamento no dia 15 do mês seguinte. Holdback de 20% retido por 30 dias (proteção contra chargebacks).
             </p>
           </div>
@@ -357,22 +357,22 @@ export default function FinanceiroPage() {
                   <CreditCard className="w-4 h-4 text-blue-500" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">Cartão à Vista (Anual)</p>
+                  <p className="text-sm font-semibold text-[#EEE6E4]">Cartão à Vista (Anual)</p>
                   <p className="text-xs text-gray-400">Pagamento único por ano</p>
                 </div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 mb-1">{summary.annualMembersCount}</p>
+              <p className="text-3xl font-bold text-[#EEE6E4] mb-1">{summary.annualMembersCount}</p>
               <p className="text-xs text-gray-500 mb-4">membros ativos nesse plano</p>
-              <div className="space-y-2 text-sm border-t border-gray-100 pt-3">
+              <div className="space-y-2 text-sm border-t border-white/5 pt-3">
                 <div className="flex justify-between">
                   <span className="text-gray-500">Ticket por membro</span>
-                  <span className="font-semibold text-gray-900">{fmt(summary.annualTicket)}/ano</span>
+                  <span className="font-semibold text-[#EEE6E4]">{fmt(summary.annualTicket)}/ano</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Comissão por membro</span>
                   <span className="font-semibold text-blue-600">{fmt(annualCommissionPerMember)}</span>
                 </div>
-                <div className="flex justify-between border-t border-gray-100 pt-2">
+                <div className="flex justify-between border-t border-white/5 pt-2">
                   <span className="text-gray-500">Comissão total na renovação</span>
                   <span className="font-bold text-blue-600">{fmt(summary.annualRenewalCommission)}</span>
                 </div>
@@ -383,30 +383,30 @@ export default function FinanceiroPage() {
             </div>
 
             {/* PIX / Mensal (Recorrente) */}
-            <div className="glass-card p-5 border-violet-200/50">
+            <div className="glass-card p-5 border-[#99D3DF]/50">
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 rounded-xl bg-violet-500/10 flex items-center justify-center">
-                  <Repeat className="w-4 h-4 text-violet-500" />
+                <div className="w-8 h-8 rounded-xl bg-[#007A99]/10 flex items-center justify-center">
+                  <Repeat className="w-4 h-4 text-[#007A99]" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">PIX / Mensal (Recorrente)</p>
+                  <p className="text-sm font-semibold text-[#EEE6E4]">PIX / Mensal (Recorrente)</p>
                   <p className="text-xs text-gray-400">Cobrança todo mês</p>
                 </div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 mb-1">{summary.monthlyMembersCount}</p>
+              <p className="text-3xl font-bold text-[#EEE6E4] mb-1">{summary.monthlyMembersCount}</p>
               <p className="text-xs text-gray-500 mb-4">membros ativos nesse plano</p>
-              <div className="space-y-2 text-sm border-t border-gray-100 pt-3">
+              <div className="space-y-2 text-sm border-t border-white/5 pt-3">
                 <div className="flex justify-between">
                   <span className="text-gray-500">Ticket por membro</span>
-                  <span className="font-semibold text-gray-900">{fmt(summary.monthlyTicket)}/mês</span>
+                  <span className="font-semibold text-[#EEE6E4]">{fmt(summary.monthlyTicket)}/mês</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Comissão por membro/mês</span>
-                  <span className="font-semibold text-violet-600">{fmt(monthlyCommissionPerMember)}</span>
+                  <span className="font-semibold text-[#006079]">{fmt(monthlyCommissionPerMember)}</span>
                 </div>
-                <div className="flex justify-between border-t border-gray-100 pt-2">
+                <div className="flex justify-between border-t border-white/5 pt-2">
                   <span className="text-gray-500">Comissão mensal total</span>
-                  <span className="font-bold text-violet-600">{fmt(summary.projectedMonthlyCommission)}</span>
+                  <span className="font-bold text-[#006079]">{fmt(summary.projectedMonthlyCommission)}</span>
                 </div>
               </div>
               <p className="text-xs text-gray-400 mt-3">
@@ -416,11 +416,11 @@ export default function FinanceiroPage() {
           </div>
 
           {/* Resumo combinado */}
-          <div className="glass-card p-4 bg-gray-50/50">
+          <div className="glass-card p-4 bg-white/5/50">
             <div className="flex flex-wrap gap-6 items-center justify-between">
               <div className="text-sm">
                 <span className="text-gray-500">Total membros ativos: </span>
-                <span className="font-semibold text-gray-900">{summary.activeReferred}</span>
+                <span className="font-semibold text-[#EEE6E4]">{summary.activeReferred}</span>
                 <span className="text-gray-400 ml-2">
                   ({summary.annualMembersCount} anuais + {summary.monthlyMembersCount} mensais)
                 </span>
@@ -438,8 +438,8 @@ export default function FinanceiroPage() {
 
           {/* Tabela de pagamentos recentes */}
           <div className="glass-card overflow-hidden">
-            <div className="p-5 border-b border-gray-100">
-              <h2 className="text-base font-semibold text-gray-900">Pagamentos Recentes</h2>
+            <div className="p-5 border-b border-white/5">
+              <h2 className="text-base font-semibold text-[#EEE6E4]">Pagamentos Recentes</h2>
               <p className="text-xs text-gray-400 mt-0.5">Últimos 20 pagamentos dos membros que você indicou</p>
             </div>
             {recentPayments.length === 0 ? (
@@ -448,7 +448,7 @@ export default function FinanceiroPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="bg-gray-50/50">
+                    <tr className="bg-white/5/50">
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Data</th>
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Membro</th>
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Tipo</th>
@@ -458,14 +458,14 @@ export default function FinanceiroPage() {
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {recentPayments.map((p) => (
-                      <tr key={p.id} className="hover:bg-gray-50 transition-colors">
+                      <tr key={p.id} className="hover:bg-white/5 transition-colors">
                         <td className="px-5 py-3 text-gray-400 whitespace-nowrap">{fmtDate(p.createdAt)}</td>
-                        <td className="px-5 py-3 font-medium text-gray-900">{p.memberName}</td>
+                        <td className="px-5 py-3 font-medium text-[#EEE6E4]">{p.memberName}</td>
                         <td className="px-5 py-3">
                           <span className={`inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-full font-medium ${
                             p.type === "annual"
                               ? "bg-blue-50 text-blue-600 border border-blue-100"
-                              : "bg-violet-50 text-violet-600 border border-violet-100"
+                              : "bg-[#E6F4F7] text-[#006079] border border-[#CCE9EF]"
                           }`}>
                             {p.type === "annual"
                               ? <><CreditCard className="w-3 h-3" /> Anual (cartão)</>
@@ -473,7 +473,7 @@ export default function FinanceiroPage() {
                             }
                           </span>
                         </td>
-                        <td className="px-5 py-3 text-right font-semibold text-gray-900">{fmt(p.amount)}</td>
+                        <td className="px-5 py-3 text-right font-semibold text-[#EEE6E4]">{fmt(p.amount)}</td>
                         <td className="px-5 py-3 text-right font-semibold text-green-600">{fmt(p.commission)}</td>
                       </tr>
                     ))}
@@ -487,8 +487,8 @@ export default function FinanceiroPage() {
           <div className="glass-card p-4 flex items-start gap-3">
             <ArrowUpRight className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
             <p className="text-xs text-gray-500 leading-relaxed">
-              <strong className="text-gray-700">Cartão à Vista (Anual):</strong> o membro paga {fmt(summary.annualTicket)} de uma vez. Você recebe {fmt(annualCommissionPerMember)} na entrada e novamente a cada renovação anual.{" "}
-              <strong className="text-gray-700">PIX / Mensal:</strong> o membro paga {fmt(summary.monthlyTicket)}/mês. Você recebe {fmt(monthlyCommissionPerMember)} todo mês enquanto ele estiver ativo.{" "}
+              <strong className="text-gray-300">Cartão à Vista (Anual):</strong> o membro paga {fmt(summary.annualTicket)} de uma vez. Você recebe {fmt(annualCommissionPerMember)} na entrada e novamente a cada renovação anual.{" "}
+              <strong className="text-gray-300">PIX / Mensal:</strong> o membro paga {fmt(summary.monthlyTicket)}/mês. Você recebe {fmt(monthlyCommissionPerMember)} todo mês enquanto ele estiver ativo.{" "}
               Holdback de 20% retido por 30 dias. Pagamento no dia 15 do mês seguinte.
             </p>
           </div>

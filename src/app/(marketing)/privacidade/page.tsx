@@ -1,4 +1,4 @@
-export const metadata = { title: "Política de Privacidade — DetailHub" };
+export const metadata = { title: "Política de Privacidade — Detailer'HUB" };
 
 export default function PrivacidadePage() {
   return (
@@ -15,7 +15,7 @@ export default function PrivacidadePage() {
         <section className="prose prose-gray max-w-none">
           <h2 className="text-xl font-bold text-gray-900 mb-3">1. Introdução</h2>
           <p className="text-gray-600 leading-relaxed">
-            O DetailHub (&quot;Plataforma&quot;, &quot;nós&quot;, &quot;nosso&quot;) valoriza a privacidade dos seus usuários. Esta Política de Privacidade descreve como
+            O Detailer'HUB (&quot;Plataforma&quot;, &quot;nós&quot;, &quot;nosso&quot;) valoriza a privacidade dos seus usuários. Esta Política de Privacidade descreve como
             coletamos, usamos, armazenamos e protegemos suas informações pessoais em conformidade com a Lei Geral de Proteção de Dados
             (LGPD — Lei nº 13.709/2018) e demais legislações aplicáveis.
           </p>

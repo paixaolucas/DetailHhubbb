@@ -18,7 +18,7 @@ interface StepEditorProps {
 }
 
 function inputClass() {
-  return "w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm";
+  return "w-full bg-white/5 border border-white/10 hover:border-[#99D3DF] focus:border-[#009CD9] rounded-xl px-4 py-3 text-[#EEE6E4] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 transition-all text-sm";
 }
 
 export default function StepEditor({ step, index, onChange, onRemove }: StepEditorProps) {
@@ -26,10 +26,10 @@ export default function StepEditor({ step, index, onChange, onRemove }: StepEdit
     onChange({ ...step, [field]: value });
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-4 space-y-4">
+    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold text-gray-900">
+        <span className="text-sm font-semibold text-[#EEE6E4]">
           Passo {index + 1}
         </span>
         <button
@@ -55,7 +55,7 @@ export default function StepEditor({ step, index, onChange, onRemove }: StepEdit
           className={`${inputClass()} w-32`}
           placeholder="0"
         />
-        <p className="text-xs text-gray-600 mt-1">
+        <p className="text-xs text-gray-400 mt-1">
           {step.delayDays === 0
             ? "Envio imediato após o gatilho"
             : `Enviado ${step.delayDays} dia${step.delayDays === 1 ? "" : "s"} após o gatilho`}
@@ -80,7 +80,7 @@ export default function StepEditor({ step, index, onChange, onRemove }: StepEdit
       <div>
         <label className="block text-xs text-gray-400 mb-1.5">
           Corpo do email{" "}
-          <span className="text-gray-600">(HTML suportado: &lt;p&gt;, &lt;b&gt;, &lt;a&gt;, &lt;br&gt;)</span>
+          <span className="text-gray-400">(HTML suportado: &lt;p&gt;, &lt;b&gt;, &lt;a&gt;, &lt;br&gt;)</span>
         </label>
         <textarea
           value={step.bodyHtml}

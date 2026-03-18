@@ -64,13 +64,13 @@ export default function CommunitiesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Comunidades</h1>
+          <h1 className="text-2xl font-bold text-[#EEE6E4]">Comunidades</h1>
           <p className="text-gray-400 text-sm mt-1">Gerencie suas comunidades automotivas</p>
         </div>
         {isAdmin && (
           <Link
             href="/dashboard/communities/new"
-            className="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-purple-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-violet-500/30"
+            className="flex items-center gap-2 bg-gradient-to-r from-[#006079] to-[#007A99] hover:from-[#007A99] hover:to-[#007A99] text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-[#007A99]/30"
           >
             <Plus className="w-4 h-4" />
             Nova comunidade
@@ -80,10 +80,10 @@ export default function CommunitiesPage() {
 
       {communities.length === 0 ? (
         <div className="glass-card p-16 text-center">
-          <div className="w-20 h-20 bg-violet-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <Users className="w-10 h-10 text-violet-400" />
+          <div className="w-20 h-20 bg-[#007A99]/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <Users className="w-10 h-10 text-[#009CD9]" />
           </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          <h3 className="text-xl font-semibold text-[#EEE6E4] mb-2">
             Nenhuma comunidade ainda
           </h3>
           <p className="text-gray-400 text-sm mb-8 max-w-sm mx-auto">
@@ -95,7 +95,7 @@ export default function CommunitiesPage() {
           {communities.map((community) => (
             <div
               key={community.id}
-              className="glass-card overflow-hidden hover:border-violet-200 transition-all group"
+              className="glass-card overflow-hidden hover:border-[#99D3DF] transition-all group"
             >
               {/* Compact thumbnail */}
               <div className="h-20 overflow-hidden">
@@ -113,7 +113,7 @@ export default function CommunitiesPage() {
                   {/* Info */}
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-semibold text-gray-900 group-hover:text-violet-600 transition-colors">
+                      <h3 className="font-semibold text-[#EEE6E4] group-hover:text-[#006079] transition-colors">
                         {community.name}
                       </h3>
                       <span
@@ -138,7 +138,7 @@ export default function CommunitiesPage() {
                 <div className="flex items-center gap-4 flex-shrink-0">
                   {/* Member count */}
                   <div className="text-right hidden sm:block">
-                    <p className="text-xl font-bold text-gray-900">{community.memberCount}</p>
+                    <p className="text-xl font-bold text-[#EEE6E4]">{community.memberCount}</p>
                     <p className="text-xs text-gray-500">membros</p>
                   </div>
 
@@ -146,21 +146,21 @@ export default function CommunitiesPage() {
                   <div className="flex items-center gap-1">
                     <Link
                       href={`/community/${community.slug}/feed`}
-                      className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="p-2 text-gray-500 hover:text-[#EEE6E4] hover:bg-white/10 rounded-lg transition-colors"
                       title="Acessar feed"
                     >
                       <ExternalLink className="w-4 h-4" />
                     </Link>
                     <Link
                       href={`/dashboard/analytics?communityId=${community.id}`}
-                      className="p-2 text-gray-500 hover:text-violet-400 hover:bg-violet-500/10 rounded-lg transition-colors"
+                      className="p-2 text-gray-500 hover:text-[#009CD9] hover:bg-[#007A99]/10 rounded-lg transition-colors"
                       title="Analytics"
                     >
                       <BarChart2 className="w-4 h-4" />
                     </Link>
                     <Link
                       href={`/dashboard/communities/${community.id}/settings`}
-                      className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="p-2 text-gray-500 hover:text-[#EEE6E4] hover:bg-white/10 rounded-lg transition-colors"
                       title="Configurações"
                     >
                       <Settings className="w-4 h-4" />

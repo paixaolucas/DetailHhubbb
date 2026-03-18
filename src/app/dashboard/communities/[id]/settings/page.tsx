@@ -53,7 +53,7 @@ interface Testimonial {
 }
 
 function fieldClass() {
-  return "w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm";
+  return "w-full bg-white/5 border border-white/10 hover:border-[#99D3DF] focus:border-[#009CD9] rounded-xl px-4 py-3 text-[#EEE6E4] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 transition-all text-sm";
 }
 
 export default function CommunitySettingsPage() {
@@ -350,7 +350,7 @@ export default function CommunitySettingsPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-[3px] border-violet-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-[3px] border-[#007A99] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -359,7 +359,7 @@ export default function CommunitySettingsPage() {
     return (
       <div className="glass-card p-8 text-center">
         <p className="text-gray-400">Comunidade não encontrada.</p>
-        <Link href="/dashboard/communities" className="text-violet-400 hover:text-violet-300 text-sm mt-2 inline-block">← Voltar</Link>
+        <Link href="/dashboard/communities" className="text-[#009CD9] hover:text-[#33A7BF] text-sm mt-2 inline-block">← Voltar</Link>
       </div>
     );
   }
@@ -367,11 +367,11 @@ export default function CommunitySettingsPage() {
   return (
     <div className="max-w-3xl">
       <div className="flex items-center gap-3 mb-6">
-        <Link href="/dashboard/communities" className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all">
+        <Link href="/dashboard/communities" className="p-2 text-gray-500 hover:text-[#EEE6E4] hover:bg-white/10 rounded-xl transition-all">
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Configurações</h1>
+          <h1 className="text-2xl font-bold text-[#EEE6E4]">Configurações</h1>
           <p className="text-gray-400 text-sm mt-0.5">{community.name}</p>
         </div>
       </div>
@@ -389,8 +389,8 @@ export default function CommunitySettingsPage() {
           }}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 ${
               activeTab === id
-                ? id === "danger" ? "bg-red-600 text-white" : "bg-violet-600 text-white shadow-lg shadow-violet-500/20"
-                : id === "danger" ? "text-red-400 hover:text-red-300 hover:bg-red-500/10" : "text-gray-400 hover:text-gray-900 hover:bg-gray-100"
+                ? id === "danger" ? "bg-red-600 text-white" : "bg-[#006079] text-white shadow-lg shadow-[#007A99]/20"
+                : id === "danger" ? "text-red-400 hover:text-red-300 hover:bg-red-500/10" : "text-gray-400 hover:text-[#EEE6E4] hover:bg-white/10"
             }`}
           >
             <Icon className="w-4 h-4" />
@@ -413,46 +413,46 @@ export default function CommunitySettingsPage() {
             <OnboardingChecklist community={community} />
           )}
         <div className="glass-card p-6 space-y-4">
-          <h2 className="text-base font-semibold text-gray-900">Informações Gerais</h2>
+          <h2 className="text-base font-semibold text-[#EEE6E4]">Informações Gerais</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Nome *</label>
+              <label className="block text-sm font-medium text-gray-400 mb-1.5">Nome *</label>
               <input type="text" value={generalForm.name} onChange={(e) => setGeneralForm((p) => ({ ...p, name: e.target.value }))} className={fieldClass()} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Slug (URL)</label>
+              <label className="block text-sm font-medium text-gray-400 mb-1.5">Slug (URL)</label>
               <input type="text" value={generalForm.slug} onChange={(e) => setGeneralForm((p) => ({ ...p, slug: e.target.value }))} className={fieldClass()} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Tags</label>
+              <label className="block text-sm font-medium text-gray-400 mb-1.5">Tags</label>
               <input type="text" value={generalForm.tags} onChange={(e) => setGeneralForm((p) => ({ ...p, tags: e.target.value }))} placeholder="tuning, racing" className={fieldClass()} />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Descrição curta</label>
+              <label className="block text-sm font-medium text-gray-400 mb-1.5">Descrição curta</label>
               <input type="text" value={generalForm.shortDescription} onChange={(e) => setGeneralForm((p) => ({ ...p, shortDescription: e.target.value }))} className={fieldClass()} maxLength={160} />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Descrição completa</label>
+              <label className="block text-sm font-medium text-gray-400 mb-1.5">Descrição completa</label>
               <textarea value={generalForm.description} onChange={(e) => setGeneralForm((p) => ({ ...p, description: e.target.value }))} rows={4} className={`${fieldClass()} resize-none`} />
             </div>
             <div className="flex items-center gap-3 pt-6">
               <label className="flex items-center gap-2 cursor-pointer">
-                <div onClick={() => setGeneralForm((p) => ({ ...p, isPrivate: !p.isPrivate }))} className={`w-11 h-6 rounded-full transition-colors relative ${generalForm.isPrivate ? "bg-violet-600" : "bg-gray-50"}`}>
+                <div onClick={() => setGeneralForm((p) => ({ ...p, isPrivate: !p.isPrivate }))} className={`w-11 h-6 rounded-full transition-colors relative ${generalForm.isPrivate ? "bg-[#006079]" : "bg-white/5"}`}>
                   <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${generalForm.isPrivate ? "translate-x-5" : "translate-x-0.5"}`} />
                 </div>
-                <span className="text-sm text-gray-600">Privada</span>
+                <span className="text-sm text-gray-400">Privada</span>
               </label>
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Mensagem de boas-vindas</label>
+              <label className="block text-sm font-medium text-gray-400 mb-1.5">Mensagem de boas-vindas</label>
               <textarea value={generalForm.welcomeMessage} onChange={(e) => setGeneralForm((p) => ({ ...p, welcomeMessage: e.target.value }))} rows={3} className={`${fieldClass()} resize-none`} />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Regras</label>
+              <label className="block text-sm font-medium text-gray-400 mb-1.5">Regras</label>
               <textarea value={generalForm.rules} onChange={(e) => setGeneralForm((p) => ({ ...p, rules: e.target.value }))} rows={3} className={`${fieldClass()} resize-none`} />
             </div>
           </div>
-          <button onClick={() => save({ name: generalForm.name, slug: generalForm.slug, description: generalForm.description || undefined, shortDescription: generalForm.shortDescription || undefined, tags: generalForm.tags ? generalForm.tags.split(",").map((t) => t.trim()).filter(Boolean) : [], welcomeMessage: generalForm.welcomeMessage || undefined, rules: generalForm.rules || undefined, isPrivate: generalForm.isPrivate })} disabled={saving} className="flex items-center gap-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
+          <button onClick={() => save({ name: generalForm.name, slug: generalForm.slug, description: generalForm.description || undefined, shortDescription: generalForm.shortDescription || undefined, tags: generalForm.tags ? generalForm.tags.split(",").map((t) => t.trim()).filter(Boolean) : [], welcomeMessage: generalForm.welcomeMessage || undefined, rules: generalForm.rules || undefined, isPrivate: generalForm.isPrivate })} disabled={saving} className="flex items-center gap-2 bg-[#006079] hover:bg-[#007A99] disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
             {saving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Save className="w-4 h-4" />}
             {saving ? "Salvando..." : "Salvar"}
           </button>
@@ -463,9 +463,9 @@ export default function CommunitySettingsPage() {
       {/* APPEARANCE */}
       {activeTab === "appearance" && (
         <div className="glass-card p-6 space-y-5">
-          <h2 className="text-base font-semibold text-gray-900">Aparência</h2>
+          <h2 className="text-base font-semibold text-[#EEE6E4]">Aparência</h2>
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-3">Cor principal</label>
+            <label className="block text-sm font-medium text-gray-400 mb-3">Cor principal</label>
             <div className="flex flex-wrap gap-2">
               {COLORS.map((color) => (
                 <button key={color} type="button" onClick={() => setAppearanceForm((p) => ({ ...p, primaryColor: color }))}
@@ -477,17 +477,17 @@ export default function CommunitySettingsPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">URL do Logo</label>
+              <label className="block text-sm font-medium text-gray-400 mb-1.5">URL do Logo</label>
               <input type="url" value={appearanceForm.logoUrl} onChange={(e) => setAppearanceForm((p) => ({ ...p, logoUrl: e.target.value }))} placeholder="https://..." className={fieldClass()} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">URL da Capa</label>
+              <label className="block text-sm font-medium text-gray-400 mb-1.5">URL da Capa</label>
               <input type="url" value={appearanceForm.bannerUrl} onChange={(e) => setAppearanceForm((p) => ({ ...p, bannerUrl: e.target.value }))} placeholder="https://..." className={fieldClass()} />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-3">Preview</label>
-            <div className="border border-gray-200 rounded-xl overflow-hidden max-w-xs">
+            <label className="block text-sm font-medium text-gray-400 mb-3">Preview</label>
+            <div className="border border-white/10 rounded-xl overflow-hidden max-w-xs">
               {appearanceForm.bannerUrl ? (
                 <Image src={appearanceForm.bannerUrl} alt="cover" width={320} height={80} className="h-20 w-full object-cover" />
               ) : (
@@ -495,15 +495,15 @@ export default function CommunitySettingsPage() {
               )}
               <div className="p-4 bg-white">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-900 font-bold -mt-6 border-2 border-gray-900" style={{ backgroundColor: appearanceForm.primaryColor }}>
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-[#EEE6E4] font-bold -mt-6 border-2 border-gray-900" style={{ backgroundColor: appearanceForm.primaryColor }}>
                     {community.name.charAt(0)}
                   </div>
-                  <p className="font-semibold text-sm text-gray-900">{community.name}</p>
+                  <p className="font-semibold text-sm text-[#EEE6E4]">{community.name}</p>
                 </div>
               </div>
             </div>
           </div>
-          <button onClick={() => save({ primaryColor: appearanceForm.primaryColor, logoUrl: appearanceForm.logoUrl || undefined, bannerUrl: appearanceForm.bannerUrl || undefined })} disabled={saving} className="flex items-center gap-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
+          <button onClick={() => save({ primaryColor: appearanceForm.primaryColor, logoUrl: appearanceForm.logoUrl || undefined, bannerUrl: appearanceForm.bannerUrl || undefined })} disabled={saving} className="flex items-center gap-2 bg-[#006079] hover:bg-[#007A99] disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
             {saving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Save className="w-4 h-4" />}
             {saving ? "Salvando..." : "Salvar"}
           </button>
@@ -513,7 +513,7 @@ export default function CommunitySettingsPage() {
       {/* MEMBERS */}
       {activeTab === "members" && (
         <div className="space-y-4">
-          <h2 className="text-base font-semibold text-gray-900">Membros ({members.length})</h2>
+          <h2 className="text-base font-semibold text-[#EEE6E4]">Membros ({members.length})</h2>
           {members.length === 0 ? (
             <div className="glass-card p-12 text-center">
               <Users className="w-10 h-10 text-gray-500 mx-auto mb-3" />
@@ -523,12 +523,12 @@ export default function CommunitySettingsPage() {
             <div className="glass-card overflow-hidden">
               <div className="divide-y divide-white/5">
                 {members.map((member) => (
-                  <div key={member.id} className="flex items-center gap-3 p-4 hover:bg-violet-50 transition-colors">
-                    <div className="w-9 h-9 bg-violet-500/20 rounded-xl flex items-center justify-center text-violet-400 font-semibold text-sm flex-shrink-0">
+                  <div key={member.id} className="flex items-center gap-3 p-4 hover:bg-[#E6F4F7] transition-colors">
+                    <div className="w-9 h-9 bg-[#007A99]/20 rounded-xl flex items-center justify-center text-[#009CD9] font-semibold text-sm flex-shrink-0">
                       {member.user.firstName.charAt(0)}{member.user.lastName.charAt(0)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900">{member.user.firstName} {member.user.lastName}</p>
+                      <p className="text-sm font-medium text-[#EEE6E4]">{member.user.firstName} {member.user.lastName}</p>
                       <p className="text-xs text-gray-500">{member.user.email}</p>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
@@ -568,10 +568,10 @@ export default function CommunitySettingsPage() {
       {activeTab === "faq" && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-gray-900">Perguntas Frequentes</h2>
+            <h2 className="text-base font-semibold text-[#EEE6E4]">Perguntas Frequentes</h2>
             <button
               onClick={() => { setShowNewFaq(true); setEditingFaq(null); setFaqForm({ question: "", answer: "", sortOrder: "0" }); }}
-              className="flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all"
+              className="flex items-center gap-2 bg-[#006079] hover:bg-[#007A99] text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all"
             >
               <Plus className="w-4 h-4" /> Nova Pergunta
             </button>
@@ -579,9 +579,9 @@ export default function CommunitySettingsPage() {
 
           {(showNewFaq || editingFaq) && (
             <div className="glass-card p-6 space-y-4">
-              <h3 className="text-sm font-semibold text-gray-900">{editingFaq ? "Editar Pergunta" : "Nova Pergunta"}</h3>
+              <h3 className="text-sm font-semibold text-[#EEE6E4]">{editingFaq ? "Editar Pergunta" : "Nova Pergunta"}</h3>
               <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1.5">Pergunta *</label>
+                <label className="block text-sm font-medium text-gray-400 mb-1.5">Pergunta *</label>
                 <input
                   type="text"
                   value={faqForm.question}
@@ -591,7 +591,7 @@ export default function CommunitySettingsPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1.5">Resposta *</label>
+                <label className="block text-sm font-medium text-gray-400 mb-1.5">Resposta *</label>
                 <textarea
                   value={faqForm.answer}
                   onChange={(e) => setFaqForm((p) => ({ ...p, answer: e.target.value }))}
@@ -601,7 +601,7 @@ export default function CommunitySettingsPage() {
                 />
               </div>
               <div className="w-32">
-                <label className="block text-sm font-medium text-gray-600 mb-1.5">Ordem</label>
+                <label className="block text-sm font-medium text-gray-400 mb-1.5">Ordem</label>
                 <input
                   type="number"
                   value={faqForm.sortOrder}
@@ -614,13 +614,13 @@ export default function CommunitySettingsPage() {
                 <button
                   onClick={() => (editingFaq ? updateFaq(editingFaq) : createFaq())}
                   disabled={saving || !faqForm.question || !faqForm.answer}
-                  className="bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all"
+                  className="bg-[#006079] hover:bg-[#007A99] disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all"
                 >
                   {saving ? "Salvando..." : editingFaq ? "Atualizar" : "Adicionar"}
                 </button>
                 <button
                   onClick={() => { setShowNewFaq(false); setEditingFaq(null); setFaqForm({ question: "", answer: "", sortOrder: "0" }); }}
-                  className="px-5 py-2.5 border border-gray-200 hover:border-gray-300 rounded-xl text-sm text-gray-600 hover:text-gray-900 transition-all"
+                  className="px-5 py-2.5 border border-white/10 hover:border-gray-300 rounded-xl text-sm text-gray-400 hover:text-[#EEE6E4] transition-all"
                 >
                   Cancelar
                 </button>
@@ -639,7 +639,7 @@ export default function CommunitySettingsPage() {
                 <div key={faq.id} className="glass-card p-5">
                   <div className="flex items-start gap-3">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 mb-1">{faq.question}</p>
+                      <p className="text-sm font-semibold text-[#EEE6E4] mb-1">{faq.question}</p>
                       <p className="text-xs text-gray-400 leading-relaxed">{faq.answer}</p>
                     </div>
                     <div className="flex items-center gap-1 flex-shrink-0">
@@ -649,7 +649,7 @@ export default function CommunitySettingsPage() {
                           setShowNewFaq(false);
                           setFaqForm({ question: faq.question, answer: faq.answer, sortOrder: String(faq.sortOrder) });
                         }}
-                        className="p-1.5 text-gray-500 hover:text-violet-400 hover:bg-violet-500/10 rounded-lg transition-colors"
+                        className="p-1.5 text-gray-500 hover:text-[#009CD9] hover:bg-[#007A99]/10 rounded-lg transition-colors"
                       >
                         <Pencil className="w-4 h-4" />
                       </button>
@@ -672,10 +672,10 @@ export default function CommunitySettingsPage() {
       {activeTab === "testimonials" && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-gray-900">Depoimentos</h2>
+            <h2 className="text-base font-semibold text-[#EEE6E4]">Depoimentos</h2>
             <button
               onClick={() => { setShowNewTestimonial(true); setEditingTestimonial(null); setTestimonialForm({ authorName: "", authorTitle: "", avatarUrl: "", body: "", rating: "5", sortOrder: "0" }); }}
-              className="flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all"
+              className="flex items-center gap-2 bg-[#006079] hover:bg-[#007A99] text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all"
             >
               <Plus className="w-4 h-4" /> Novo Depoimento
             </button>
@@ -683,10 +683,10 @@ export default function CommunitySettingsPage() {
 
           {(showNewTestimonial || editingTestimonial) && (
             <div className="glass-card p-6 space-y-4">
-              <h3 className="text-sm font-semibold text-gray-900">{editingTestimonial ? "Editar Depoimento" : "Novo Depoimento"}</h3>
+              <h3 className="text-sm font-semibold text-[#EEE6E4]">{editingTestimonial ? "Editar Depoimento" : "Novo Depoimento"}</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1.5">Nome do autor *</label>
+                  <label className="block text-sm font-medium text-gray-400 mb-1.5">Nome do autor *</label>
                   <input
                     type="text"
                     value={testimonialForm.authorName}
@@ -696,7 +696,7 @@ export default function CommunitySettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1.5">Cargo / Título</label>
+                  <label className="block text-sm font-medium text-gray-400 mb-1.5">Cargo / Título</label>
                   <input
                     type="text"
                     value={testimonialForm.authorTitle}
@@ -706,7 +706,7 @@ export default function CommunitySettingsPage() {
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-gray-600 mb-1.5">URL do Avatar</label>
+                  <label className="block text-sm font-medium text-gray-400 mb-1.5">URL do Avatar</label>
                   <input
                     type="url"
                     value={testimonialForm.avatarUrl}
@@ -716,7 +716,7 @@ export default function CommunitySettingsPage() {
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-gray-600 mb-1.5">Depoimento *</label>
+                  <label className="block text-sm font-medium text-gray-400 mb-1.5">Depoimento *</label>
                   <textarea
                     value={testimonialForm.body}
                     onChange={(e) => setTestimonialForm((p) => ({ ...p, body: e.target.value }))}
@@ -726,7 +726,7 @@ export default function CommunitySettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1.5">Avaliação (1–5)</label>
+                  <label className="block text-sm font-medium text-gray-400 mb-1.5">Avaliação (1–5)</label>
                   <select
                     value={testimonialForm.rating}
                     onChange={(e) => setTestimonialForm((p) => ({ ...p, rating: e.target.value }))}
@@ -738,7 +738,7 @@ export default function CommunitySettingsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1.5">Ordem</label>
+                  <label className="block text-sm font-medium text-gray-400 mb-1.5">Ordem</label>
                   <input
                     type="number"
                     value={testimonialForm.sortOrder}
@@ -752,13 +752,13 @@ export default function CommunitySettingsPage() {
                 <button
                   onClick={() => (editingTestimonial ? updateTestimonial(editingTestimonial) : createTestimonial())}
                   disabled={saving || !testimonialForm.authorName || !testimonialForm.body}
-                  className="bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all"
+                  className="bg-[#006079] hover:bg-[#007A99] disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all"
                 >
                   {saving ? "Salvando..." : editingTestimonial ? "Atualizar" : "Adicionar"}
                 </button>
                 <button
                   onClick={() => { setShowNewTestimonial(false); setEditingTestimonial(null); setTestimonialForm({ authorName: "", authorTitle: "", avatarUrl: "", body: "", rating: "5", sortOrder: "0" }); }}
-                  className="px-5 py-2.5 border border-gray-200 hover:border-gray-300 rounded-xl text-sm text-gray-600 hover:text-gray-900 transition-all"
+                  className="px-5 py-2.5 border border-white/10 hover:border-gray-300 rounded-xl text-sm text-gray-400 hover:text-[#EEE6E4] transition-all"
                 >
                   Cancelar
                 </button>
@@ -778,7 +778,7 @@ export default function CommunitySettingsPage() {
                   <div className="flex items-start gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <p className="text-sm font-semibold text-gray-900">{t.authorName}</p>
+                        <p className="text-sm font-semibold text-[#EEE6E4]">{t.authorName}</p>
                         {t.authorTitle && <span className="text-xs text-gray-500">{t.authorTitle}</span>}
                         {t.rating && (
                           <span className="text-xs text-yellow-400 flex items-center gap-0.5">
@@ -805,7 +805,7 @@ export default function CommunitySettingsPage() {
                             sortOrder: String(t.sortOrder),
                           });
                         }}
-                        className="p-1.5 text-gray-500 hover:text-violet-400 hover:bg-violet-500/10 rounded-lg transition-colors"
+                        className="p-1.5 text-gray-500 hover:text-[#009CD9] hover:bg-[#007A99]/10 rounded-lg transition-colors"
                       >
                         <Pencil className="w-4 h-4" />
                       </button>
@@ -826,10 +826,10 @@ export default function CommunitySettingsPage() {
 
       {/* BROADCAST */}
       {activeTab === "broadcast" && (
-        <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-5">
+        <div className="bg-white/5 border border-white/10 rounded-xl p-6 space-y-5">
           <div>
-            <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-              <Megaphone className="w-5 h-5 text-violet-500" />
+            <h2 className="text-base font-semibold text-[#EEE6E4] flex items-center gap-2">
+              <Megaphone className="w-5 h-5 text-[#007A99]" />
               Broadcast para Membros
             </h2>
             <p className="text-xs text-gray-500 mt-1">
@@ -839,39 +839,39 @@ export default function CommunitySettingsPage() {
 
           <div className="space-y-3">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1.5">Título *</label>
+              <label className="block text-xs font-medium text-gray-400 mb-1.5">Título *</label>
               <input
                 type="text"
                 maxLength={100}
                 placeholder="Ex: Nova aula disponível!"
                 value={broadcastForm.title}
                 onChange={(e) => setBroadcastForm((f) => ({ ...f, title: e.target.value }))}
-                className="w-full bg-gray-50 border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm"
+                className="w-full bg-white/5 border border-white/10 hover:border-[#99D3DF] focus:border-[#009CD9] rounded-xl px-4 py-3 text-[#EEE6E4] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 transition-all text-sm"
               />
               <p className="text-xs text-gray-400 mt-1 text-right">{broadcastForm.title.length}/100</p>
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1.5">Mensagem *</label>
+              <label className="block text-xs font-medium text-gray-400 mb-1.5">Mensagem *</label>
               <textarea
                 rows={4}
                 maxLength={500}
                 placeholder="Escreva sua mensagem para os membros..."
                 value={broadcastForm.body}
                 onChange={(e) => setBroadcastForm((f) => ({ ...f, body: e.target.value }))}
-                className="w-full bg-gray-50 border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm resize-none"
+                className="w-full bg-white/5 border border-white/10 hover:border-[#99D3DF] focus:border-[#009CD9] rounded-xl px-4 py-3 text-[#EEE6E4] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 transition-all text-sm resize-none"
               />
               <p className="text-xs text-gray-400 mt-1 text-right">{broadcastForm.body.length}/500</p>
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1.5">Link (opcional)</label>
+              <label className="block text-xs font-medium text-gray-400 mb-1.5">Link (opcional)</label>
               <input
                 type="text"
                 placeholder="Ex: /community/minha-comunidade/feed"
                 value={broadcastForm.link}
                 onChange={(e) => setBroadcastForm((f) => ({ ...f, link: e.target.value }))}
-                className="w-full bg-gray-50 border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm"
+                className="w-full bg-white/5 border border-white/10 hover:border-[#99D3DF] focus:border-[#009CD9] rounded-xl px-4 py-3 text-[#EEE6E4] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 transition-all text-sm"
               />
             </div>
           </div>
@@ -904,7 +904,7 @@ export default function CommunitySettingsPage() {
                 setBroadcastSending(false);
               }
             }}
-            className="flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-all"
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#006079] hover:bg-[#004D61] disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-all"
           >
             <Megaphone className="w-4 h-4" />
             {broadcastSending ? "Enviando..." : "Enviar Broadcast"}
@@ -920,7 +920,7 @@ export default function CommunitySettingsPage() {
           </h2>
           <div className="flex items-start justify-between gap-4 p-4 bg-red-500/5 border border-red-500/20 rounded-xl">
             <div>
-              <h3 className="text-sm font-semibold text-gray-900">Arquivar comunidade</h3>
+              <h3 className="text-sm font-semibold text-[#EEE6E4]">Arquivar comunidade</h3>
               <p className="text-xs text-gray-400 mt-0.5">A comunidade ficará invisível para novos membros.</p>
             </div>
             <button
@@ -937,7 +937,7 @@ export default function CommunitySettingsPage() {
           </div>
           <div className="flex items-start justify-between gap-4 p-4 bg-red-500/5 border border-red-500/20 rounded-xl">
             <div>
-              <h3 className="text-sm font-semibold text-gray-900">Excluir comunidade</h3>
+              <h3 className="text-sm font-semibold text-[#EEE6E4]">Excluir comunidade</h3>
               <p className="text-xs text-gray-400 mt-0.5">Ação irreversível. Todos os dados serão perdidos.</p>
             </div>
             <button
@@ -975,11 +975,11 @@ export default function CommunitySettingsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="glass-card w-full max-w-sm p-6 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+              <h3 className="text-base font-semibold text-[#EEE6E4] flex items-center gap-2">
                 <Zap className="w-4 h-4 text-yellow-400" />
                 Dar Pontos — {pointsModal.userName}
               </h3>
-              <button onClick={() => setPointsModal({ open: false, userId: "", userName: "" })} className="text-gray-500 hover:text-gray-900 transition-colors">
+              <button onClick={() => setPointsModal({ open: false, userId: "", userName: "" })} className="text-gray-500 hover:text-[#EEE6E4] transition-colors">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -992,7 +992,7 @@ export default function CommunitySettingsPage() {
                   value={pointsForm.amount}
                   onChange={(e) => setPointsForm((p) => ({ ...p, amount: e.target.value }))}
                   placeholder="Ex: 50"
-                  className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[#EEE6E4] text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30"
                 />
               </div>
               <div>
@@ -1000,7 +1000,7 @@ export default function CommunitySettingsPage() {
                 <select
                   value={pointsForm.type}
                   onChange={(e) => setPointsForm((p) => ({ ...p, type: e.target.value }))}
-                  className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 text-sm focus:outline-none"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[#EEE6E4] text-sm focus:outline-none"
                 >
                   <option value="EARNED" className="bg-white">Ganho (+)</option>
                   <option value="SPENT" className="bg-white">Gasto (−)</option>
@@ -1014,14 +1014,14 @@ export default function CommunitySettingsPage() {
                   value={pointsForm.reason}
                   onChange={(e) => setPointsForm((p) => ({ ...p, reason: e.target.value }))}
                   placeholder="Ex: Participação em desafio"
-                  className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[#EEE6E4] text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30"
                 />
               </div>
               <div className="flex gap-2 pt-1">
-                <button type="button" onClick={() => setPointsModal({ open: false, userId: "", userName: "" })} className="flex-1 px-4 py-2.5 text-sm text-gray-400 border border-gray-200 rounded-xl hover:bg-violet-50 transition-colors">
+                <button type="button" onClick={() => setPointsModal({ open: false, userId: "", userName: "" })} className="flex-1 px-4 py-2.5 text-sm text-gray-400 border border-white/10 rounded-xl hover:bg-[#E6F4F7] transition-colors">
                   Cancelar
                 </button>
-                <button type="submit" disabled={pointsSaving} className="flex-1 flex items-center justify-center gap-2 bg-yellow-600 hover:bg-yellow-500 disabled:opacity-50 text-gray-900 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all">
+                <button type="submit" disabled={pointsSaving} className="flex-1 flex items-center justify-center gap-2 bg-yellow-600 hover:bg-yellow-500 disabled:opacity-50 text-[#EEE6E4] px-4 py-2.5 rounded-xl text-sm font-semibold transition-all">
                   {pointsSaving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Zap className="w-4 h-4" />}
                   {pointsSaving ? "Salvando..." : "Confirmar"}
                 </button>

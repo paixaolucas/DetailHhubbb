@@ -48,7 +48,7 @@ export function PlanCheckoutButton({ planId, communitySlug, primaryColor }: Plan
     <button
       onClick={handleClick}
       disabled={isLoading}
-      className="w-full py-3 rounded-xl font-semibold text-gray-900 text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed hover:opacity-90 active:scale-95 flex items-center justify-center gap-2"
+      className="w-full py-3 rounded-xl font-semibold text-[#EEE6E4] text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed hover:opacity-90 active:scale-95 flex items-center justify-center gap-2"
       style={{ backgroundColor: primaryColor }}
     >
       {isLoading ? (

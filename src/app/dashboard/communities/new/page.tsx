@@ -24,7 +24,7 @@ function slugify(text: string) {
 }
 
 function fieldClass() {
-  return "w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm";
+  return "w-full bg-white/5 border border-white/10 hover:border-[#99D3DF] focus:border-[#009CD9] rounded-xl px-4 py-3 text-[#EEE6E4] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 transition-all text-sm";
 }
 
 const ROLE_LABELS: Record<string, string> = {
@@ -36,7 +36,7 @@ const ROLE_LABELS: Record<string, string> = {
 
 const ROLE_COLORS: Record<string, string> = {
   SUPER_ADMIN: "bg-red-500/10 text-red-500",
-  INFLUENCER_ADMIN: "bg-violet-500/10 text-violet-600",
+  INFLUENCER_ADMIN: "bg-[#007A99]/10 text-[#006079]",
   COMMUNITY_MEMBER: "bg-blue-500/10 text-blue-500",
   MARKETPLACE_PARTNER: "bg-green-500/10 text-green-600",
 };
@@ -158,11 +158,11 @@ export default function NewCommunityPage() {
   return (
     <div className="max-w-2xl">
       <div className="flex items-center gap-3 mb-6">
-        <Link href="/dashboard/communities" className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all">
+        <Link href="/dashboard/communities" className="p-2 text-gray-500 hover:text-[#EEE6E4] hover:bg-white/10 rounded-xl transition-all">
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Nova Comunidade</h1>
+          <h1 className="text-2xl font-bold text-[#EEE6E4]">Nova Comunidade</h1>
           <p className="text-gray-400 text-sm mt-0.5">Crie uma comunidade e atribua a um influencer</p>
         </div>
       </div>
@@ -174,16 +174,16 @@ export default function NewCommunityPage() {
 
         {/* Influencer search */}
         <div className="glass-card p-6 space-y-4">
-          <h2 className="text-base font-semibold text-gray-900">Influencer Responsável</h2>
+          <h2 className="text-base font-semibold text-[#EEE6E4]">Influencer Responsável</h2>
           <p className="text-xs text-gray-400">Pesquise qualquer membro da plataforma. Se não for Influencer, será promovido automaticamente.</p>
 
           {selectedUser ? (
-            <div className="flex items-center gap-3 p-3 bg-violet-50 border border-violet-200 rounded-xl">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-purple-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+            <div className="flex items-center gap-3 p-3 bg-[#E6F4F7] border border-[#99D3DF] rounded-xl">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#006079] to-[#007A99] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                 {selectedUser.firstName[0]}{selectedUser.lastName?.[0] ?? ""}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-gray-900">{selectedUser.firstName} {selectedUser.lastName}</p>
+                <p className="text-sm font-semibold text-[#EEE6E4]">{selectedUser.firstName} {selectedUser.lastName}</p>
                 <p className="text-xs text-gray-500">{selectedUser.email}</p>
               </div>
               <div className="flex items-center gap-2">
@@ -193,12 +193,12 @@ export default function NewCommunityPage() {
                     Será promovido a Influencer
                   </div>
                 ) : (
-                  <div className="flex items-center gap-1 text-xs text-violet-600 bg-violet-500/10 px-2 py-1 rounded-lg">
+                  <div className="flex items-center gap-1 text-xs text-[#006079] bg-[#007A99]/10 px-2 py-1 rounded-lg">
                     <UserCheck className="w-3 h-3" />
                     Já é Influencer
                   </div>
                 )}
-                <button type="button" onClick={clearUser} className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-colors">
+                <button type="button" onClick={clearUser} className="text-gray-400 hover:text-gray-400 p-1 rounded-lg hover:bg-white/10 transition-colors">
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -213,30 +213,30 @@ export default function NewCommunityPage() {
                   onChange={(e) => setUserSearch(e.target.value)}
                   onFocus={() => userResults.length > 0 && setShowDropdown(true)}
                   placeholder="Buscar por nome ou email..."
-                  className="w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl pl-10 pr-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm"
+                  className="w-full bg-white/5 border border-white/10 hover:border-[#99D3DF] focus:border-[#009CD9] rounded-xl pl-10 pr-4 py-3 text-[#EEE6E4] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 transition-all text-sm"
                 />
                 {userSearchLoading && (
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-violet-400 border-t-transparent rounded-full animate-spin" />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-[#009CD9] border-t-transparent rounded-full animate-spin" />
                 )}
               </div>
 
               {showDropdown && userResults.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-20 overflow-hidden">
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white/5 border border-white/10 rounded-xl shadow-lg z-20 overflow-hidden">
                   {userResults.map((user) => (
                     <button
                       key={user.id}
                       type="button"
                       onClick={() => selectUser(user)}
-                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-violet-50 transition-colors text-left border-b border-gray-100 last:border-0"
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#E6F4F7] transition-colors text-left border-b border-white/5 last:border-0"
                     >
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-purple-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#006079] to-[#007A99] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                         {user.firstName[0]}{user.lastName?.[0] ?? ""}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900">{user.firstName} {user.lastName}</p>
+                        <p className="text-sm font-medium text-[#EEE6E4]">{user.firstName} {user.lastName}</p>
                         <p className="text-xs text-gray-500 truncate">{user.email}</p>
                       </div>
-                      <span className={`text-xs font-medium px-2 py-0.5 rounded-lg flex-shrink-0 ${ROLE_COLORS[user.role] ?? "bg-gray-100 text-gray-500"}`}>
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-lg flex-shrink-0 ${ROLE_COLORS[user.role] ?? "bg-white/10 text-gray-500"}`}>
                         {ROLE_LABELS[user.role] ?? user.role}
                       </span>
                     </button>
@@ -245,7 +245,7 @@ export default function NewCommunityPage() {
               )}
 
               {showDropdown && userSearch && !userSearchLoading && userResults.length === 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-20 px-4 py-3 text-sm text-gray-400">
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white/5 border border-white/10 rounded-xl shadow-lg z-20 px-4 py-3 text-sm text-gray-400">
                   Nenhum usuário encontrado.
                 </div>
               )}
@@ -255,36 +255,36 @@ export default function NewCommunityPage() {
 
         {/* Informações básicas */}
         <div className="glass-card p-6 space-y-4">
-          <h2 className="text-base font-semibold text-gray-900">Informações Básicas</h2>
+          <h2 className="text-base font-semibold text-[#EEE6E4]">Informações Básicas</h2>
 
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1.5">Nome da comunidade <span className="text-red-400">*</span></label>
+            <label className="block text-sm font-medium text-gray-400 mb-1.5">Nome da comunidade <span className="text-red-400">*</span></label>
             <input type="text" value={form.name} onChange={(e) => handleNameChange(e.target.value)}
-              placeholder="Ex: DetailHub Racing Pro" className={fieldClass()} required minLength={3} maxLength={80} />
+              placeholder="Ex: Detailer'HUB Racing Pro" className={fieldClass()} required minLength={3} maxLength={80} />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1.5">URL da comunidade <span className="text-red-400">*</span></label>
-            <div className="flex items-center bg-white border border-gray-200 hover:border-violet-200 focus-within:border-violet-500/50 focus-within:ring-2 focus-within:ring-violet-500/30 rounded-xl overflow-hidden transition-all">
-              <span className="bg-white px-4 py-3 text-sm text-gray-500 border-r border-gray-200 shrink-0">detailhub.com/</span>
+            <label className="block text-sm font-medium text-gray-400 mb-1.5">URL da comunidade <span className="text-red-400">*</span></label>
+            <div className="flex items-center bg-white/5 border border-white/10 hover:border-[#99D3DF] focus-within:border-[#007A99]/50 focus-within:ring-2 focus-within:ring-[#007A99]/30 rounded-xl overflow-hidden transition-all">
+              <span className="bg-white px-4 py-3 text-sm text-gray-500 border-r border-white/10 shrink-0">detailhub.com/</span>
               <input type="text" value={form.slug}
                 onChange={(e) => { setSlugManuallyEdited(true); setForm((p) => ({ ...p, slug: slugify(e.target.value) })); }}
                 placeholder="minha-comunidade"
-                className="flex-1 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none"
+                className="flex-1 px-4 py-3 text-sm text-[#EEE6E4] placeholder-gray-500 bg-transparent focus:outline-none"
                 required minLength={3} maxLength={60} />
             </div>
             <p className="text-xs text-gray-500 mt-1.5 flex items-center gap-1"><Info className="w-3 h-3" />Apenas letras minúsculas, números e hífens</p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1.5">Descrição curta</label>
+            <label className="block text-sm font-medium text-gray-400 mb-1.5">Descrição curta</label>
             <input type="text" value={form.shortDescription}
               onChange={(e) => setForm((p) => ({ ...p, shortDescription: e.target.value }))}
               placeholder="Uma linha sobre a comunidade" className={fieldClass()} maxLength={160} />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1.5">Descrição completa</label>
+            <label className="block text-sm font-medium text-gray-400 mb-1.5">Descrição completa</label>
             <textarea value={form.description}
               onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
               placeholder="Descreva o propósito e benefícios da comunidade..." className={fieldClass()} rows={4} maxLength={2000} />
@@ -293,24 +293,24 @@ export default function NewCommunityPage() {
 
         {/* Aparência */}
         <div className="glass-card p-6 space-y-4">
-          <h2 className="text-base font-semibold text-gray-900">Aparência e Visibilidade</h2>
+          <h2 className="text-base font-semibold text-[#EEE6E4]">Aparência e Visibilidade</h2>
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-2">Cor principal</label>
+            <label className="block text-sm font-medium text-gray-400 mb-2">Cor principal</label>
             <div className="flex gap-2 flex-wrap">
               {COLORS.map((color) => (
                 <button key={color} type="button" onClick={() => setForm((p) => ({ ...p, primaryColor: color }))}
-                  className={`w-8 h-8 rounded-lg transition-all ${form.primaryColor === color ? "ring-2 ring-offset-2 ring-violet-400 scale-110" : "hover:scale-105"}`}
+                  className={`w-8 h-8 rounded-lg transition-all ${form.primaryColor === color ? "ring-2 ring-offset-2 ring-[#009CD9] scale-110" : "hover:scale-105"}`}
                   style={{ backgroundColor: color }} />
               ))}
             </div>
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-900">Comunidade privada</p>
+              <p className="text-sm font-medium text-[#EEE6E4]">Comunidade privada</p>
               <p className="text-xs text-gray-400">Apenas membros convidados podem entrar</p>
             </div>
             <button type="button" onClick={() => setForm((p) => ({ ...p, isPrivate: !p.isPrivate }))}
-              className={`relative w-11 h-6 rounded-full transition-colors ${form.isPrivate ? "bg-violet-500" : "bg-gray-200"}`}>
+              className={`relative w-11 h-6 rounded-full transition-colors ${form.isPrivate ? "bg-[#007A99]" : "bg-gray-200"}`}>
               <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${form.isPrivate ? "translate-x-5" : ""}`} />
             </button>
           </div>
@@ -318,18 +318,18 @@ export default function NewCommunityPage() {
 
         {/* Tags */}
         <div className="glass-card p-6">
-          <h2 className="text-base font-semibold text-gray-900 mb-4">Tags</h2>
+          <h2 className="text-base font-semibold text-[#EEE6E4] mb-4">Tags</h2>
           <input type="text" value={form.tags}
             onChange={(e) => setForm((p) => ({ ...p, tags: e.target.value }))}
             placeholder="racing, tuning, offroad (separadas por vírgula)" className={fieldClass()} />
         </div>
 
         <div className="flex gap-3 pt-2">
-          <Link href="/dashboard/communities" className="flex-1 px-4 py-3 border border-gray-200 text-gray-600 rounded-xl text-sm font-medium text-center hover:bg-gray-50 transition-colors">
+          <Link href="/dashboard/communities" className="flex-1 px-4 py-3 border border-white/10 text-gray-400 rounded-xl text-sm font-medium text-center hover:bg-white/5 transition-colors">
             Cancelar
           </Link>
           <button type="submit" disabled={isLoading}
-            className="flex-1 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-all text-sm">
+            className="flex-1 bg-[#006079] hover:bg-[#007A99] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-all text-sm">
             {isLoading ? "Criando..." : "Criar Comunidade"}
           </button>
         </div>

@@ -71,9 +71,9 @@ const SPACE_TYPES: { value: SpaceType; label: string; description: string }[] = 
 ];
 
 const TYPE_COLORS: Record<SpaceType, string> = {
-  DISCUSSION:   "bg-violet-500/10 text-violet-400 border-violet-500/20",
+  DISCUSSION:   "bg-[#007A99]/10 text-[#009CD9] border-[#007A99]/20",
   ANNOUNCEMENT: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  QA:           "bg-purple-500/10 text-purple-400 border-purple-500/20",
+  QA:           "bg-[#007A99]/10 text-[#009CD9] border-[#007A99]/20",
   SHOWCASE:     "bg-green-500/10 text-green-400 border-green-500/20",
 };
 
@@ -83,9 +83,9 @@ const TYPE_COLORS: Record<SpaceType, string> = {
 
 function fieldClass(extra?: string) {
   return [
-    "w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400",
-    "rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none",
-    "focus:ring-2 focus:ring-violet-400/30 transition-all text-sm",
+    "w-full bg-white/5 border border-white/10 hover:border-[#99D3DF] focus:border-[#009CD9]",
+    "rounded-xl px-4 py-3 text-[#EEE6E4] placeholder-gray-500 focus:outline-none",
+    "focus:ring-2 focus:ring-[#009CD9]/30 transition-all text-sm",
     extra ?? "",
   ].join(" ");
 }
@@ -107,15 +107,15 @@ function toSlug(str: string): string {
 
 function SpaceSkeleton() {
   return (
-    <div className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-xl animate-pulse">
-      <div className="w-4 h-4 bg-gray-50 rounded" />
-      <div className="w-10 h-10 bg-gray-50 rounded-lg" />
+    <div className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-xl animate-pulse">
+      <div className="w-4 h-4 bg-white/5 rounded" />
+      <div className="w-10 h-10 bg-white/5 rounded-lg" />
       <div className="flex-1 space-y-1.5">
-        <div className="h-4 bg-gray-50 rounded w-40" />
-        <div className="h-3 bg-gray-50 rounded w-56" />
+        <div className="h-4 bg-white/5 rounded w-40" />
+        <div className="h-3 bg-white/5 rounded w-56" />
       </div>
-      <div className="h-6 bg-gray-50 rounded w-20" />
-      <div className="h-8 bg-gray-50 rounded-lg w-16" />
+      <div className="h-6 bg-white/5 rounded w-20" />
+      <div className="h-8 bg-white/5 rounded-lg w-16" />
     </div>
   );
 }
@@ -159,15 +159,15 @@ function SpaceModal({
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="bg-[#1a2236] border border-gray-200 rounded-2xl w-full max-w-lg shadow-2xl">
+      <div className="bg-[#1a2236] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h2 className="text-base font-semibold text-gray-900">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+          <h2 className="text-base font-semibold text-[#EEE6E4]">
             {mode === "create" ? "Novo canal" : "Editar canal"}
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 transition-colors"
+            className="text-gray-500 hover:text-gray-300 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -189,7 +189,7 @@ function SpaceModal({
                 value={form.icon}
                 onChange={(e) => setField("icon", e.target.value.slice(0, 2))}
                 placeholder="🔥"
-                className="w-16 bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl px-3 py-3 text-center text-xl focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all"
+                className="w-16 bg-white/5 border border-white/10 hover:border-[#99D3DF] focus:border-[#009CD9] rounded-xl px-3 py-3 text-center text-xl focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 transition-all"
               />
             </div>
             <div className="flex-1">
@@ -226,7 +226,7 @@ function SpaceModal({
               pattern="[a-z0-9-]+"
               className={fieldClass("font-mono")}
             />
-            <p className="text-xs text-gray-600 mt-1">
+            <p className="text-xs text-gray-400 mt-1">
               Apenas letras minúsculas, números e hífens
             </p>
           </div>
@@ -260,34 +260,34 @@ function SpaceModal({
                   className={[
                     "text-left p-3 rounded-xl border transition-all",
                     form.type === t.value
-                      ? "border-violet-500/50 bg-violet-500/10"
-                      : "border-gray-200 bg-white hover:border-violet-200",
+                      ? "border-[#007A99]/50 bg-[#007A99]/10"
+                      : "border-white/10 bg-white hover:border-[#99D3DF]",
                   ].join(" ")}
                 >
                   <p className={[
                     "text-sm font-medium",
-                    form.type === t.value ? "text-violet-300" : "text-gray-600",
+                    form.type === t.value ? "text-[#33A7BF]" : "text-gray-400",
                   ].join(" ")}>
                     {t.label}
                   </p>
-                  <p className="text-xs text-gray-600 mt-0.5">{t.description}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">{t.description}</p>
                 </button>
               ))}
             </div>
           </div>
 
           {/* Visibility */}
-          <div className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-xl">
+          <div className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-xl">
             <div>
-              <p className="text-sm text-gray-600">Canal público</p>
-              <p className="text-xs text-gray-600">Visível para todos os membros</p>
+              <p className="text-sm text-gray-400">Canal público</p>
+              <p className="text-xs text-gray-400">Visível para todos os membros</p>
             </div>
             <button
               type="button"
               onClick={() => setField("isPublic", !form.isPublic)}
               className={[
                 "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none",
-                form.isPublic ? "bg-violet-600" : "bg-gray-50",
+                form.isPublic ? "bg-[#006079]" : "bg-white/5",
               ].join(" ")}
               role="switch"
               aria-checked={form.isPublic}
@@ -314,14 +314,14 @@ function SpaceModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-400 hover:text-gray-900 hover:border-violet-200 transition-all"
+              className="flex-1 py-2.5 rounded-xl border border-white/10 text-sm text-gray-400 hover:text-[#EEE6E4] hover:border-[#99D3DF] transition-all"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={loading || !form.name.trim() || !form.slug.trim()}
-              className="flex-1 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold transition-all flex items-center justify-center gap-2"
+              className="flex-1 py-2.5 rounded-xl bg-[#006079] hover:bg-[#007A99] disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold transition-all flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -583,13 +583,13 @@ export default function CommunitySpacesPage() {
         <div className="flex items-center gap-3">
           <Link
             href={`/dashboard/communities/${communityId}/settings`}
-            className="p-2 rounded-xl bg-white border border-gray-200 hover:bg-gray-100 transition-all text-gray-400 hover:text-gray-900"
+            className="p-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-gray-400 hover:text-[#EEE6E4]"
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
-            <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <Layers className="w-5 h-5 text-violet-400" />
+            <h1 className="text-xl font-bold text-[#EEE6E4] flex items-center gap-2">
+              <Layers className="w-5 h-5 text-[#009CD9]" />
               Canais
             </h1>
             <p className="text-sm text-gray-500 mt-0.5">
@@ -599,7 +599,7 @@ export default function CommunitySpacesPage() {
         </div>
         <button
           onClick={openCreate}
-          className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all hover:shadow-lg hover:shadow-violet-500/25 flex-shrink-0"
+          className="inline-flex items-center gap-2 bg-[#006079] hover:bg-[#007A99] text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all hover:shadow-lg hover:shadow-[#007A99]/25 flex-shrink-0"
         >
           <Plus className="w-4 h-4" />
           Novo canal
@@ -634,12 +634,12 @@ export default function CommunitySpacesPage() {
             return (
               <div
                 key={t.value}
-                className="bg-white border border-gray-200 rounded-xl p-4"
+                className="bg-white/5 border border-white/10 rounded-xl p-4"
               >
                 <p className={`text-xs font-medium border rounded px-1.5 py-0.5 inline-block mb-2 ${TYPE_COLORS[t.value]}`}>
                   {t.label}
                 </p>
-                <p className="text-2xl font-bold text-gray-900">{count}</p>
+                <p className="text-2xl font-bold text-[#EEE6E4]">{count}</p>
               </div>
             );
           })}
@@ -651,15 +651,15 @@ export default function CommunitySpacesPage() {
         {loading ? (
           Array.from({ length: 4 }).map((_, i) => <SpaceSkeleton key={i} />)
         ) : spaces.length === 0 ? (
-          <div className="bg-white border border-gray-200 rounded-xl p-12 text-center">
-            <Layers className="w-10 h-10 text-gray-600 mx-auto mb-3" />
+          <div className="bg-white/5 border border-white/10 rounded-xl p-12 text-center">
+            <Layers className="w-10 h-10 text-gray-400 mx-auto mb-3" />
             <p className="text-gray-400 font-medium mb-1">Nenhum canal criado</p>
-            <p className="text-gray-600 text-sm mb-4">
+            <p className="text-gray-400 text-sm mb-4">
               Crie canais para organizar as discussões da sua comunidade.
             </p>
             <button
               onClick={openCreate}
-              className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all"
+              className="inline-flex items-center gap-2 bg-[#006079] hover:bg-[#007A99] text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all"
             >
               <Plus className="w-4 h-4" />
               Criar primeiro canal
@@ -669,24 +669,24 @@ export default function CommunitySpacesPage() {
           spaces.map((space) => (
             <div
               key={space.id}
-              className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:bg-white/[0.07] transition-colors group"
+              className="flex items-center gap-3 p-4 bg-white/5 border border-white/10 rounded-xl hover:bg-white/[0.07] transition-colors group"
             >
               {/* Drag handle (visual only) */}
-              <GripVertical className="w-4 h-4 text-gray-700 flex-shrink-0" />
+              <GripVertical className="w-4 h-4 text-gray-300 flex-shrink-0" />
 
               {/* Icon */}
-              <div className="w-10 h-10 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-xl flex-shrink-0">
+              <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-xl flex-shrink-0">
                 {space.icon ?? <Hash className="w-5 h-5 text-gray-500" />}
               </div>
 
               {/* Info */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-semibold text-gray-700 text-sm">
+                  <span className="font-semibold text-gray-300 text-sm">
                     {space.name}
                   </span>
                   {space.isDefault && (
-                    <span className="text-[10px] bg-violet-500/10 text-violet-400 border border-violet-500/20 rounded px-1.5 py-0.5">
+                    <span className="text-[10px] bg-[#007A99]/10 text-[#009CD9] border border-[#007A99]/20 rounded px-1.5 py-0.5">
                       Padrão
                     </span>
                   )}
@@ -710,7 +710,7 @@ export default function CommunitySpacesPage() {
                 <p className="text-xs text-gray-500 font-mono mt-0.5">
                   /{space.slug}
                   {space.description && (
-                    <span className="font-sans ml-2 text-gray-600">
+                    <span className="font-sans ml-2 text-gray-400">
                       — {space.description}
                     </span>
                   )}
@@ -724,7 +724,7 @@ export default function CommunitySpacesPage() {
                   onClick={() => toggleLock(space)}
                   disabled={lockLoading === space.id}
                   title={space.isLocked ? "Desbloquear canal" : "Bloquear canal"}
-                  className="p-2 rounded-lg text-gray-600 hover:text-amber-400 hover:bg-amber-500/10 transition-all disabled:opacity-50"
+                  className="p-2 rounded-lg text-gray-400 hover:text-amber-400 hover:bg-amber-500/10 transition-all disabled:opacity-50"
                 >
                   {lockLoading === space.id ? (
                     <span className="w-4 h-4 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin block" />
@@ -739,7 +739,7 @@ export default function CommunitySpacesPage() {
                 <button
                   onClick={() => openEdit(space)}
                   title="Editar canal"
-                  className="p-2 rounded-lg text-gray-600 hover:text-violet-400 hover:bg-violet-500/10 transition-all"
+                  className="p-2 rounded-lg text-gray-400 hover:text-[#009CD9] hover:bg-[#007A99]/10 transition-all"
                 >
                   <Pencil className="w-4 h-4" />
                 </button>
@@ -749,7 +749,7 @@ export default function CommunitySpacesPage() {
                   onClick={() => deleteSpace(space)}
                   disabled={space.isDefault || deleteLoading === space.id}
                   title={space.isDefault ? "Não é possível excluir o canal padrão" : "Excluir canal"}
-                  className="p-2 rounded-lg text-gray-600 hover:text-red-400 hover:bg-red-500/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="p-2 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   {deleteLoading === space.id ? (
                     <span className="w-4 h-4 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin block" />

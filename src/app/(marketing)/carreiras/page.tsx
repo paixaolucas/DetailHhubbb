@@ -1,4 +1,4 @@
-export const metadata = { title: "Carreiras — DetailHub" };
+export const metadata = { title: "Carreiras — Detailer'HUB" };
 
 export default function CarreirasPage() {
   return (
@@ -14,7 +14,7 @@ export default function CarreirasPage() {
       <div className="max-w-3xl mx-auto px-4 py-16 space-y-12">
         {/* Por que trabalhar aqui */}
         <section>
-          <h2 className="text-2xl font-bold mb-4">Por que o DetailHub?</h2>
+          <h2 className="text-2xl font-bold mb-4">Por que o Detailer'HUB?</h2>
           <div className="grid md:grid-cols-3 gap-4">
             {[
               { emoji: "🚀", label: "Startup em crescimento", desc: "Faça parte de algo que está escalando rapidamente." },
@@ -52,7 +52,7 @@ export default function CarreirasPage() {
           </p>
           <a
             href="mailto:carreiras@detailhub.com.br"
-            className="inline-block bg-violet-600 hover:bg-violet-500 text-white px-6 py-3 rounded-xl font-semibold transition-all"
+            className="inline-block bg-[#006079] hover:bg-[#007A99] text-white px-6 py-3 rounded-xl font-semibold transition-all"
           >
             Enviar currículo
           </a>

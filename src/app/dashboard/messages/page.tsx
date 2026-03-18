@@ -69,13 +69,13 @@ function Avatar({ user, size = "md" }: { user: Participant; size?: "sm" | "md" }
         alt={user.firstName}
         width={40}
         height={40}
-        className={`${sz} rounded-xl object-cover flex-shrink-0 border border-gray-200`}
+        className={`${sz} rounded-xl object-cover flex-shrink-0 border border-white/10`}
       />
     );
   }
   return (
     <div
-      className={`${sz} bg-gradient-to-br from-violet-600 to-purple-500 rounded-xl flex items-center justify-center text-white font-bold flex-shrink-0`}
+      className={`${sz} bg-gradient-to-br from-[#006079] to-[#007A99] rounded-xl flex items-center justify-center text-white font-bold flex-shrink-0`}
     >
       {getInitials(user)}
     </div>
@@ -270,17 +270,17 @@ export default function MessagesPage() {
 
   return (
     <>
-    <div className="h-[calc(100vh-8rem)] flex gap-0 rounded-2xl overflow-hidden border border-gray-200 bg-[#F0EEFF]">
+    <div className="h-[calc(100vh-8rem)] flex gap-0 rounded-2xl overflow-hidden border border-white/10 bg-[#F0EEFF]">
       {/* ── Conversation list ── */}
       <div
         className={`${
           selected ? "hidden md:flex" : "flex"
-        } flex-col w-full md:w-72 border-r border-gray-200 flex-shrink-0`}
+        } flex-col w-full md:w-72 border-r border-white/10 flex-shrink-0`}
       >
         {/* Header */}
-        <div className="h-14 px-4 flex items-center gap-3 border-b border-gray-200 flex-shrink-0">
+        <div className="h-14 px-4 flex items-center gap-3 border-b border-white/10 flex-shrink-0">
           <MessageSquare className="w-5 h-5 text-[#009CD9]" />
-          <h1 className="text-gray-900 font-semibold text-sm flex-1">Mensagens</h1>
+          <h1 className="text-[#EEE6E4] font-semibold text-sm flex-1">Mensagens</h1>
           <button
             onClick={() => setShowNewConv(true)}
             className="p-1.5 text-gray-500 hover:text-[#006079] hover:bg-[#006079]/10 rounded-lg transition-colors"
@@ -291,14 +291,14 @@ export default function MessagesPage() {
         </div>
 
         {/* Search */}
-        <div className="px-3 py-2 border-b border-gray-200 flex-shrink-0">
-          <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3 py-2">
+        <div className="px-3 py-2 border-b border-white/10 flex-shrink-0">
+          <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2">
             <Search className="w-4 h-4 text-gray-500 flex-shrink-0" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Buscar conversa…"
-              className="bg-transparent text-sm text-gray-900 placeholder-gray-600 outline-none flex-1 min-w-0"
+              className="bg-transparent text-sm text-[#EEE6E4] placeholder-gray-500 outline-none flex-1 min-w-0"
             />
           </div>
         </div>
@@ -309,10 +309,10 @@ export default function MessagesPage() {
             <div className="space-y-1 p-2">
               {Array.from({ length: 5 }).map((_, i) => (
                 <div key={i} className="flex items-center gap-3 px-3 py-3 animate-pulse">
-                  <div className="w-10 h-10 rounded-xl bg-gray-50 flex-shrink-0" />
+                  <div className="w-10 h-10 rounded-xl bg-white/5 flex-shrink-0" />
                   <div className="flex-1 space-y-1.5">
-                    <div className="h-3 bg-gray-50 rounded w-24" />
-                    <div className="h-2.5 bg-gray-50 rounded w-36" />
+                    <div className="h-3 bg-white/5 rounded w-24" />
+                    <div className="h-2.5 bg-white/5 rounded w-36" />
                   </div>
                 </div>
               ))}
@@ -342,11 +342,11 @@ export default function MessagesPage() {
                   <Avatar user={other} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-sm font-medium text-gray-900 truncate">
+                      <span className="text-sm font-medium text-[#EEE6E4] truncate">
                         {other.firstName} {other.lastName}
                       </span>
                       {lastMsg && (
-                        <span className="text-[11px] text-gray-600 flex-shrink-0">
+                        <span className="text-[11px] text-gray-400 flex-shrink-0">
                           {formatTime(lastMsg.createdAt)}
                         </span>
                       )}
@@ -373,7 +373,7 @@ export default function MessagesPage() {
               <MessageSquare className="w-8 h-8 text-[#009CD9]" />
             </div>
             <div>
-              <p className="text-gray-900 font-semibold">Selecione uma conversa</p>
+              <p className="text-[#EEE6E4] font-semibold">Selecione uma conversa</p>
               <p className="text-gray-500 text-sm mt-1">
                 Escolha uma conversa à esquerda para começar
               </p>
@@ -382,16 +382,16 @@ export default function MessagesPage() {
         ) : (
           <>
             {/* Thread header */}
-            <div className="h-14 px-4 flex items-center gap-3 border-b border-gray-200 flex-shrink-0">
+            <div className="h-14 px-4 flex items-center gap-3 border-b border-white/10 flex-shrink-0">
               <button
-                className="md:hidden text-gray-400 hover:text-gray-900 transition-colors p-1"
+                className="md:hidden text-gray-400 hover:text-[#EEE6E4] transition-colors p-1"
                 onClick={() => setSelected(null)}
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <Avatar user={otherParticipant(selected, myId)} size="sm" />
               <div>
-                <p className="text-sm font-semibold text-gray-900">
+                <p className="text-sm font-semibold text-[#EEE6E4]">
                   {otherParticipant(selected, myId).firstName}{" "}
                   {otherParticipant(selected, myId).lastName}
                 </p>
@@ -406,7 +406,7 @@ export default function MessagesPage() {
                 </div>
               ) : messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full gap-2 text-center">
-                  <User className="w-10 h-10 text-gray-700" />
+                  <User className="w-10 h-10 text-gray-300" />
                   <p className="text-gray-500 text-sm">
                     Início da conversa — diga olá!
                   </p>
@@ -424,7 +424,7 @@ export default function MessagesPage() {
                         className={`max-w-[70%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                           isMine
                             ? "bg-[#006079] text-white rounded-tr-sm"
-                            : "bg-gray-50 text-gray-100 rounded-tl-sm"
+                            : "bg-white/5 text-gray-100 rounded-tl-sm"
                         }`}
                       >
                         <p className="whitespace-pre-wrap break-words">{msg.body}</p>
@@ -444,15 +444,15 @@ export default function MessagesPage() {
             </div>
 
             {/* Composer */}
-            <div className="p-3 border-t border-gray-200 flex-shrink-0">
-              <div className="flex items-end gap-2 bg-white border border-gray-200 rounded-xl px-3 py-2">
+            <div className="p-3 border-t border-white/10 flex-shrink-0">
+              <div className="flex items-end gap-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2">
                 <textarea
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="Digite uma mensagem… (Enter para enviar)"
                   rows={1}
-                  className="flex-1 bg-transparent text-sm text-gray-900 placeholder-gray-600 outline-none resize-none max-h-32 py-1"
+                  className="flex-1 bg-transparent text-sm text-[#EEE6E4] placeholder-gray-500 outline-none resize-none max-h-32 py-1"
                   style={{ fieldSizing: "content" } as React.CSSProperties}
                 />
                 <button
@@ -463,7 +463,7 @@ export default function MessagesPage() {
                   {sending ? (
                     <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   ) : (
-                    <Send className="w-3.5 h-3.5 text-gray-900" />
+                    <Send className="w-3.5 h-3.5 text-[#EEE6E4]" />
                   )}
                 </button>
               </div>
@@ -477,22 +477,22 @@ export default function MessagesPage() {
     {showNewConv && (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowNewConv(false)} />
-        <div className="relative bg-white border border-gray-200 rounded-2xl shadow-2xl w-full max-w-md animate-slide-up">
-          <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-            <h2 className="text-base font-semibold text-gray-900">Nova conversa</h2>
-            <button onClick={() => setShowNewConv(false)} className="text-gray-400 hover:text-gray-900 p-1 rounded-lg hover:bg-gray-100 transition-colors">
+        <div className="relative bg-white/5 border border-white/10 rounded-2xl shadow-2xl w-full max-w-md animate-slide-up">
+          <div className="p-6 border-b border-white/10 flex items-center justify-between">
+            <h2 className="text-base font-semibold text-[#EEE6E4]">Nova conversa</h2>
+            <button onClick={() => setShowNewConv(false)} className="text-gray-400 hover:text-[#EEE6E4] p-1 rounded-lg hover:bg-white/10 transition-colors">
               <X className="w-5 h-5" />
             </button>
           </div>
           <div className="p-4">
-            <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 mb-3">
+            <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2 mb-3">
               <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
               <input
                 autoFocus
                 value={userSearch}
                 onChange={(e) => handleUserSearch(e.target.value)}
                 placeholder="Buscar usuário por nome..."
-                className="bg-transparent text-sm text-gray-900 placeholder-gray-400 outline-none flex-1"
+                className="bg-transparent text-sm text-[#EEE6E4] placeholder-gray-500 outline-none flex-1"
               />
               {userSearching && (
                 <div className="w-3.5 h-3.5 border-2 border-[#007A99] border-t-transparent rounded-full animate-spin flex-shrink-0" />
@@ -509,10 +509,10 @@ export default function MessagesPage() {
                   disabled={creatingConv}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#006079]/10 transition-colors text-left disabled:opacity-50"
                 >
-                  <div className="w-8 h-8 bg-gradient-to-br from-violet-600 to-purple-500 rounded-xl flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
+                  <div className="w-8 h-8 bg-gradient-to-br from-[#006079] to-[#007A99] rounded-xl flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
                     {u.firstName[0]}{u.lastName[0]}
                   </div>
-                  <span className="text-sm font-medium text-gray-900">{u.firstName} {u.lastName}</span>
+                  <span className="text-sm font-medium text-[#EEE6E4]">{u.firstName} {u.lastName}</span>
                 </button>
               ))}
             </div>

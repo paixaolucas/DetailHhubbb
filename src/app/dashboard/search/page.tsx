@@ -27,10 +27,10 @@ const FILTERS: { id: FilterType; label: string; icon: React.ElementType }[] = [
 function SkeletonRow() {
   return (
     <div className="flex items-center gap-3 p-3 animate-pulse">
-      <div className="w-9 h-9 bg-gray-50 rounded-lg flex-shrink-0" />
+      <div className="w-9 h-9 bg-white/5 rounded-lg flex-shrink-0" />
       <div className="flex-1 space-y-2">
-        <div className="h-3 bg-gray-50 rounded w-2/5" />
-        <div className="h-2 bg-gray-50 rounded w-3/5" />
+        <div className="h-3 bg-white/5 rounded w-2/5" />
+        <div className="h-2 bg-white/5 rounded w-3/5" />
       </div>
     </div>
   );
@@ -100,11 +100,11 @@ export default function SearchPage() {
         <div className="flex items-center gap-3 mb-6">
           <Link
             href="/dashboard"
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-400 hover:text-gray-900"
+            className="p-2 hover:bg-white/10 rounded-lg transition-colors text-gray-400 hover:text-[#EEE6E4]"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
-          <h1 className="text-xl font-semibold text-gray-900">Busca</h1>
+          <h1 className="text-xl font-semibold text-[#EEE6E4]">Busca</h1>
         </div>
 
         {/* Search form */}
@@ -117,12 +117,12 @@ export default function SearchPage() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Buscar comunidades, posts, membros..."
-                className="w-full bg-white border border-gray-200 hover:border-violet-200 focus:border-violet-400 rounded-xl pl-10 pr-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all text-sm"
+                className="w-full bg-white/5 border border-white/10 hover:border-[#99D3DF] focus:border-[#009CD9] rounded-xl pl-10 pr-4 py-3 text-[#EEE6E4] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 transition-all text-sm"
               />
             </div>
             <button
               type="submit"
-              className="px-5 py-3 bg-violet-500 hover:bg-violet-600 text-white text-sm font-medium rounded-xl transition-colors"
+              className="px-5 py-3 bg-[#007A99] hover:bg-[#006079] text-white text-sm font-medium rounded-xl transition-colors"
             >
               Buscar
             </button>
@@ -137,8 +137,8 @@ export default function SearchPage() {
               onClick={() => setFilter(id)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                 filter === id
-                  ? "bg-violet-500 text-white"
-                  : "bg-white border border-gray-200 text-gray-400 hover:bg-gray-100 hover:text-gray-900"
+                  ? "bg-[#007A99] text-white"
+                  : "bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10 hover:text-[#EEE6E4]"
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
@@ -146,7 +146,7 @@ export default function SearchPage() {
               {id !== "all" && hasSearched && !isLoading && (
                 <span
                   className={`text-xs px-1.5 py-0.5 rounded-full ${
-                    filter === id ? "bg-violet-400" : "bg-gray-50"
+                    filter === id ? "bg-[#009CD9]" : "bg-white/5"
                   }`}
                 >
                   {id === "communities" && results.communities.length}
@@ -160,7 +160,7 @@ export default function SearchPage() {
 
         {/* Results */}
         {isLoading && (
-          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+          <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
             {Array.from({ length: 6 }).map((_, i) => (
               <SkeletonRow key={i} />
             ))}
@@ -169,10 +169,10 @@ export default function SearchPage() {
 
         {!isLoading && hasSearched && visibleTotal === 0 && (
           <div className="text-center py-16">
-            <Search className="w-12 h-12 text-gray-600 mx-auto mb-3" />
+            <Search className="w-12 h-12 text-gray-400 mx-auto mb-3" />
             <p className="text-gray-400">
               Nenhum resultado para{" "}
-              <span className="text-gray-900 font-medium">&quot;{query}&quot;</span>
+              <span className="text-[#EEE6E4] font-medium">&quot;{query}&quot;</span>
             </p>
           </div>
         )}
@@ -185,7 +185,7 @@ export default function SearchPage() {
                 <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1">
                   Comunidades ({getFilteredCommunities().length})
                 </h2>
-                <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+                <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
                   {getFilteredCommunities().map((item) => (
                     <SearchResultItem
                       key={item.id}
@@ -204,7 +204,7 @@ export default function SearchPage() {
                 <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1">
                   Posts ({getFilteredPosts().length})
                 </h2>
-                <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+                <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
                   {getFilteredPosts().map((item) => (
                     <SearchResultItem
                       key={item.id}
@@ -229,7 +229,7 @@ export default function SearchPage() {
                 <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1">
                   Membros ({getFilteredMembers().length})
                 </h2>
-                <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+                <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
                   {getFilteredMembers().map((item) => (
                     <SearchResultItem
                       key={item.id}
@@ -246,7 +246,7 @@ export default function SearchPage() {
 
         {!hasSearched && (
           <div className="text-center py-16">
-            <Search className="w-12 h-12 text-gray-600 mx-auto mb-3" />
+            <Search className="w-12 h-12 text-gray-400 mx-auto mb-3" />
             <p className="text-gray-500 text-sm">
               Digite um termo acima para começar a buscar
             </p>
