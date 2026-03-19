@@ -75,13 +75,6 @@ const steps = [
   { step: "03", title: "Explore e evolua", desc: "Acesse cursos, lives, marketplace e a IA mecânica sem limites.", icon: Trophy },
 ];
 
-const stats = [
-  { value: "500+", label: "Comunidades ativas", growth: "+240% em 12 meses" },
-  { value: "50k+", label: "Membros apaixonados", growth: "95% retenção" },
-  { value: "R$2M+", label: "Receita processada", growth: "+180% YoY" },
-  { value: "99.9%", label: "Uptime garantido", growth: "SLA enterprise" },
-];
-
 const testimonials = [
   {
     name: "Rafael Costa",
@@ -147,26 +140,6 @@ const pricingFeatures = [
 ];
 
 // ─── Sections ────────────────────────────────────────────────────────────────
-
-function StatsBar() {
-  return (
-    <section className="bg-[#222222] border-y border-white/10 py-12">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-          {stats.map(({ value, label, growth }, i) => (
-            <ScrollReveal key={label} delay={i * 80} direction="up" className="text-center">
-              <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#EEE6E4] mb-1">{value}</div>
-              <div className="text-gray-500 text-sm">{label}</div>
-              <div className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-medium">
-                {growth}
-              </div>
-            </ScrollReveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
 function FeaturedCommunitiesSection() {
   return (
@@ -441,7 +414,6 @@ export default function HomePage() {
     <div className="min-h-screen bg-[#1A1A1A]">
       <NavBar />
       <HeroSection />
-      <StatsBar />
       <FeaturesSection />
       <HowItWorksSection />
       <PricingSection />

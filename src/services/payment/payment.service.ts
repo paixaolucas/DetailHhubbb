@@ -440,7 +440,7 @@ async function handleInvoicePaymentSucceeded(
     if (!platformMembership) return;
 
     const amountPaid = invoice.amount_paid / 100;
-    await db.payment.create({
+    const payment = await db.payment.create({
       data: {
         userId,
         platformMembershipId: platformMembership.id,
@@ -461,6 +461,18 @@ async function handleInvoicePaymentSucceeded(
         currentPeriodEnd: new Date(subscription.current_period_end * 1000),
       },
     });
+    // Comissão de indicação
+    const membershipWithReferral = await db.platformMembership.findUnique({
+      where: { userId },
+      select: { referredByInfluencerId: true },
+    });
+    if (membershipWithReferral?.referredByInfluencerId) {
+      await commissionService.processPlatformReferralCommission(
+        payment.id,
+        membershipWithReferral.referredByInfluencerId,
+        amountPaid
+      );
+    }
     return;
   }
 

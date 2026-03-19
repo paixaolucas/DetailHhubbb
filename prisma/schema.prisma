@@ -730,8 +730,8 @@ model CommissionRule {
 model CommissionTransaction {
   id               String                      @id @default(cuid())
   paymentId        String
-  communityId      String
-  ruleId           String
+  communityId      String?
+  ruleId           String?
   recipientId      String
   grossAmount      Decimal
   platformFee      Decimal
@@ -742,10 +742,10 @@ model CommissionTransaction {
   notes            String?
   createdAt        DateTime                    @default(now())
   updatedAt        DateTime                    @updatedAt
-  community        Community                   @relation(fields: [communityId], references: [id])
+  community        Community?                  @relation(fields: [communityId], references: [id])
   payment          Payment                     @relation(fields: [paymentId], references: [id])
   recipient        User                        @relation("CommissionRecipient", fields: [recipientId], references: [id])
-  rule             CommissionRule              @relation(fields: [ruleId], references: [id])
+  rule             CommissionRule?             @relation(fields: [ruleId], references: [id])
 
   @@index([paymentId])
   @@index([communityId])

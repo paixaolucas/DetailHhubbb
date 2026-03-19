@@ -137,6 +137,49 @@ async function processPaymentCommission(
 }
 
 // =============================================================================
+// PROCESS PLATFORM REFERRAL COMMISSION (35% for influencer who referred member)
+// =============================================================================
+
+async function processPlatformReferralCommission(
+  paymentId: string,
+  influencerId: string,
+  grossAmount: number
+): Promise<void> {
+  const COMMISSION_RATE = 0.35;
+  const netAmount = parseFloat((grossAmount * COMMISSION_RATE).toFixed(2));
+
+  const influencer = await db.influencer.findUnique({
+    where: { id: influencerId },
+    select: { id: true, userId: true },
+  });
+
+  if (!influencer) return;
+
+  await db.$transaction(async (tx) => {
+    await tx.commissionTransaction.create({
+      data: {
+        paymentId,
+        communityId: null,
+        ruleId: null,
+        recipientId: influencer.userId,
+        grossAmount,
+        platformFee: 0,
+        netAmount,
+        status: "PENDING",
+      },
+    });
+
+    await tx.influencer.update({
+      where: { id: influencer.id },
+      data: {
+        totalEarnings: { increment: netAmount },
+        pendingPayout: { increment: netAmount },
+      },
+    });
+  });
+}
+
+// =============================================================================
 // PAYOUT TO INFLUENCER VIA STRIPE CONNECT
 // =============================================================================
 
@@ -291,6 +334,7 @@ async function confirmPendingCommissions(
 export const commissionService = {
   calculateCommission,
   processPaymentCommission,
+  processPlatformReferralCommission,
   payoutToInfluencer,
   getCommissionSummary,
   confirmPendingCommissions,

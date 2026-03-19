@@ -154,6 +154,46 @@ async function main() {
     },
   });
 
+  const gimenezUser = await db.user.create({
+    data: {
+      email: "gimenez@comunidade.com",
+      passwordHash: await bcrypt.hash("Influencer@123!", saltRounds),
+      firstName: "Gimenez",
+      lastName: "Oficial",
+      role: UserRole.INFLUENCER_ADMIN,
+      referralCode: "GIMENEZ001",
+    },
+  });
+
+  const gigiUser = await db.user.create({
+    data: {
+      email: "gigi@comunidade.com",
+      passwordHash: await bcrypt.hash("Influencer@123!", saltRounds),
+      firstName: "Gigi",
+      lastName: "Oficial",
+      role: UserRole.INFLUENCER_ADMIN,
+      referralCode: "GIGI001",
+    },
+  });
+
+  const influencerGimenez = await db.influencer.create({
+    data: {
+      userId: gimenezUser.id,
+      displayName: "Gimenez",
+      bio: "Apaixonado por carros e pelo universo automotivo. Na Garagem do Gimenez a gente transforma paixão em conteúdo de verdade.",
+      isVerified: true,
+    },
+  });
+
+  const influencerGigi = await db.influencer.create({
+    data: {
+      userId: gigiUser.id,
+      displayName: "Gigi",
+      bio: "Estética automotiva com estilo e precisão. Na Sala do Gigi cada detalhe importa.",
+      isVerified: true,
+    },
+  });
+
   console.log("✅ Influencers created");
 
   // =============================================================================
@@ -228,6 +268,36 @@ async function main() {
     },
   });
 
+  const communityGimenez = await db.community.create({
+    data: {
+      influencerId: influencerGimenez.id,
+      name: "Garagem do Gimenez",
+      slug: "garagem-do-gimenez",
+      shortDescription: "A garagem do Gimenez — onde a paixão por carros vira conteúdo.",
+      primaryColor: "#C0392B",
+      bannerUrl: null,
+      logoUrl: null,
+      isPublished: true,
+      isPrivate: false,
+      memberCount: 0,
+    },
+  });
+
+  const communityGigi = await db.community.create({
+    data: {
+      influencerId: influencerGigi.id,
+      name: "Sala do Gigi",
+      slug: "sala-do-gigi",
+      shortDescription: "A sala do Gigi — estética automotiva com estilo e precisão.",
+      primaryColor: "#8E44AD",
+      bannerUrl: null,
+      logoUrl: null,
+      isPublished: true,
+      isPrivate: false,
+      memberCount: 0,
+    },
+  });
+
   console.log("✅ Communities created");
 
   // =============================================================================
@@ -275,6 +345,34 @@ async function main() {
     },
   });
 
+  await db.subscriptionPlan.create({
+    data: {
+      communityId: communityGimenez.id,
+      name: "Membro Garagem",
+      price: 0,
+      currency: "brl",
+      interval: "month",
+      intervalCount: 1,
+      isDefault: true,
+      isActive: true,
+      features: ["Acesso ao feed", "Lives", "Conteúdo exclusivo"],
+    },
+  });
+
+  await db.subscriptionPlan.create({
+    data: {
+      communityId: communityGigi.id,
+      name: "Membro Sala",
+      price: 0,
+      currency: "brl",
+      interval: "month",
+      intervalCount: 1,
+      isDefault: true,
+      isActive: true,
+      features: ["Acesso ao feed", "Lives", "Conteúdo exclusivo"],
+    },
+  });
+
   // =============================================================================
   // SPACES
   // =============================================================================
@@ -314,6 +412,24 @@ async function main() {
       { communityId: communityNoMel.id, name: "Tira-Dúvidas", slug: "tira-duvidas", description: "Sua dúvida tem resposta.", icon: "❓", type: "QA", sortOrder: 4 },
       { communityId: communityNoMel.id, name: "Showcase", slug: "showcase", description: "Mostre seus trabalhos.", icon: "🏆", type: "SHOWCASE", sortOrder: 5 },
       { communityId: communityNoMel.id, name: "Avisos", slug: "avisos", description: "Comunicados oficiais.", icon: "📢", type: "ANNOUNCEMENT", sortOrder: 6 },
+    ],
+  });
+
+  // Gimenez spaces
+  await db.space.createMany({
+    data: [
+      { communityId: communityGimenez.id, name: "Feed", slug: "feed", description: "Tudo sobre carros aqui.", icon: "🚗", type: "DISCUSSION", sortOrder: 1, isDefault: true },
+      { communityId: communityGimenez.id, name: "Tira-Dúvidas", slug: "tira-duvidas", description: "Pergunta sem medo.", icon: "❓", type: "QA", sortOrder: 2 },
+      { communityId: communityGimenez.id, name: "Avisos", slug: "avisos", description: "Comunicados oficiais.", icon: "📢", type: "ANNOUNCEMENT", sortOrder: 3 },
+    ],
+  });
+
+  // Gigi spaces
+  await db.space.createMany({
+    data: [
+      { communityId: communityGigi.id, name: "Feed", slug: "feed", description: "Novidades e conteúdo.", icon: "✨", type: "DISCUSSION", sortOrder: 1, isDefault: true },
+      { communityId: communityGigi.id, name: "Tira-Dúvidas", slug: "tira-duvidas", description: "Pergunta sem medo.", icon: "❓", type: "QA", sortOrder: 2 },
+      { communityId: communityGigi.id, name: "Avisos", slug: "avisos", description: "Comunicados oficiais.", icon: "📢", type: "ANNOUNCEMENT", sortOrder: 3 },
     ],
   });
 
@@ -865,12 +981,14 @@ async function main() {
 ║               150 membros referidos · R$3.661,88/mês       ║
 ║ Neto          neto@comunidade.com / Influencer@123!        ║
 ║               150 membros referidos · R$3.661,88/mês       ║
+║ Gimenez       gimenez@comunidade.com / Influencer@123!     ║
+║ Gigi          gigi@comunidade.com / Influencer@123!        ║
 ╠═══════════════════════════════════════════════════════════╣
 ║ Member 1      membro1@email.com / Membro@123!              ║
 ║ Member 2      membro2@email.com / Membro@123!              ║
 ║ Demo members  demo1..500@detailhub.com / Membro@123!       ║
 ╠═══════════════════════════════════════════════════════════╣
-║ Total: 500 plataforma memberships + 3 comunidades +        ║
+║ Total: 500 plataforma memberships + 5 comunidades +        ║
 ║        7 events + posts + lives + content                  ║
 ╚═══════════════════════════════════════════════════════════╝
   `);
