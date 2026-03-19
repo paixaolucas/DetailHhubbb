@@ -7,7 +7,8 @@
 // Shows a motivational card if user score < 70 pts
 // =============================================================================
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import Image from "next/image";
 import { Send, Plus, Minus, ImageIcon, X, Lock, Rocket } from "lucide-react";
 import { useUploadThing } from "@/utils/uploadthing";
@@ -40,6 +41,25 @@ export default function PostComposer({ spaceId, communityId, onPost }: PostCompo
   const [userScore, setUserScore] = useState<number | null>(null);
   const [scoreLoading, setScoreLoading] = useState(true);
 
+  // Poll score silently (called on mount and every 10s)
+  const pollScore = useCallback(() => {
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+    const userId = localStorage.getItem(STORAGE_KEYS.USER_ID);
+    if (!token || !userId || !communityId) return;
+    fetch(`/api/communities/${communityId}/leaderboard?userId=${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && typeof d.data?.points === "number") {
+          setUserScore(d.data.points);
+        } else {
+          setUserScore(0);
+        }
+      })
+      .catch(() => setUserScore(0));
+  }, [communityId]);
+
   useEffect(() => {
     const name = localStorage.getItem(STORAGE_KEYS.USER_NAME) ?? "";
     setUserName(name);
@@ -50,7 +70,7 @@ export default function PostComposer({ spaceId, communityId, onPost }: PostCompo
       setInitials((first + last).toUpperCase() || "?");
     }
 
-    // Fetch user score for this community
+    // Initial fetch with loading indicator
     const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     const userId = localStorage.getItem(STORAGE_KEYS.USER_ID);
     if (!token || !userId || !communityId) {
@@ -71,6 +91,9 @@ export default function PostComposer({ spaceId, communityId, onPost }: PostCompo
       .catch(() => setUserScore(0))
       .finally(() => setScoreLoading(false));
   }, [communityId]);
+
+  // Re-poll score every 10s so reactions/comments update the gate in real-time
+  useAutoRefresh(pollScore, 10_000);
 
   const { startUpload } = useUploadThing("postAttachmentUploader");
 
