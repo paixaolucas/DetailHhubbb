@@ -141,7 +141,7 @@ export default function PlataformaPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-[#EEE6E4]">Configurações da Plataforma</h1>
-            <p className="text-gray-400 text-sm">Controle global do Detailer'HUB</p>
+            <p className="text-gray-400 text-sm">Controle global do Detailer&apos;HUB</p>
           </div>
         </div>
         <button

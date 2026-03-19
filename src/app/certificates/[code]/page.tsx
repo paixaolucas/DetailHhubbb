@@ -77,7 +77,7 @@ export default async function CertificatePage({
           href="/"
           className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-400 transition-colors w-fit"
         >
-          <span>←</span> Detailer'HUB
+          <span>←</span> Detailer&apos;HUB
         </Link>
       </div>
 
