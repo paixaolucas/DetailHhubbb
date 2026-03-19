@@ -89,7 +89,8 @@ export async function POST(req: NextRequest) {
         cleanup: { deletedAnalyticsEvents: deletedEvents.count, deletedNotifications: deletedNotifications.count },
       },
     });
-  } catch {
+  } catch (error) {
+    console.error("[Cron:MonthlyReset] Error:", error);
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
   }
 }

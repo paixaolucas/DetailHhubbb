@@ -146,7 +146,8 @@ export const GET = withAuth(async (req, { session, params }) => {
         nextCursor,
       },
     });
-  } catch {
+  } catch (error) {
+    console.error("[API] Error:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 }

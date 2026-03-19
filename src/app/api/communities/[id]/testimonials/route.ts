@@ -36,7 +36,8 @@ export async function GET(
     });
 
     return NextResponse.json({ success: true, data: testimonials });
-  } catch {
+  } catch (error) {
+    console.error("[API] Error:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 }
@@ -83,7 +84,8 @@ export const POST = withAuth(async (req, { session, params }) => {
     });
 
     return NextResponse.json({ success: true, data: testimonial }, { status: 201 });
-  } catch {
+  } catch (error) {
+    console.error("[API] Error:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 }

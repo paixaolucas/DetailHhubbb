@@ -36,7 +36,8 @@ export const PATCH = withAuth(async (req, { session, params }) => {
     });
 
     return NextResponse.json({ success: true, data: updated });
-  } catch {
+  } catch (error) {
+    console.error("[API] Error:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 }

@@ -39,7 +39,8 @@ export const GET = withAuth(async (_req: NextRequest, { session, params }) => {
     });
 
     return NextResponse.json({ success: true, data: rules });
-  } catch {
+  } catch (error) {
+    console.error("[API] Error:", error);
     return NextResponse.json({ success: false, error: "Erro interno" }, { status: 500 });
   }
 });
@@ -81,7 +82,8 @@ export const POST = withAuth(async (req: NextRequest, { session, params }) => {
     });
 
     return NextResponse.json({ success: true, data: rule }, { status: 201 });
-  } catch {
+  } catch (error) {
+    console.error("[API] Error:", error);
     return NextResponse.json({ success: false, error: "Erro interno" }, { status: 500 });
   }
 });

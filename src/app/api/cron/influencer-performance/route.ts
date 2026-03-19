@@ -137,7 +137,8 @@ export async function POST(req: NextRequest) {
         top3: scores.slice(0, 3).map((s) => ({ name: s.firstName, weekPts: s.weekPts })),
       },
     });
-  } catch {
+  } catch (error) {
+    console.error("[Cron:InfluencerPerformance] Error:", error);
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
   }
 }

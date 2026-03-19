@@ -81,7 +81,8 @@ export const GET = withAuth(async (req, { session, params }) => {
     }).catch(() => undefined);
 
     return NextResponse.json({ success: true, data: post });
-  } catch {
+  } catch (error) {
+    console.error("[API] Error:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 }
@@ -142,7 +143,8 @@ export const PATCH = withAuth(async (req, { session, params }) => {
     });
 
     return NextResponse.json({ success: true, data: updated });
-  } catch {
+  } catch (error) {
+    console.error("[API] Error:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 }
@@ -178,7 +180,8 @@ export const DELETE = withAuth(async (req, { session, params }) => {
     await db.post.delete({ where: { id: postId } });
 
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (error) {
+    console.error("[API] Error:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 }

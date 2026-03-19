@@ -65,7 +65,8 @@ export const GET = withAuth(async (req, { session, params }) => {
     });
 
     return NextResponse.json({ success: true, data: comments });
-  } catch {
+  } catch (error) {
+    console.error("[API] Error:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 }
@@ -207,7 +208,8 @@ export const POST = withAuth(async (req, { session, params }) => {
     }
 
     return NextResponse.json({ success: true, data: comment }, { status: 201 });
-  } catch {
+  } catch (error) {
+    console.error("[API] Error:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 }

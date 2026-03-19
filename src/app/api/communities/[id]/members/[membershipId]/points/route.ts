@@ -89,7 +89,8 @@ export const POST = withAuth(async (req: NextRequest, { session, params }) => {
     });
 
     return NextResponse.json({ success: true, data: userPoints }, { status: 201 });
-  } catch {
+  } catch (error) {
+    console.error("[API] Error:", error);
     return NextResponse.json({ success: false, error: "Erro interno" }, { status: 500 });
   }
 });

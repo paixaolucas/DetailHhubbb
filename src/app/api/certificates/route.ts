@@ -98,7 +98,8 @@ export const POST = withAuth(async (req, { session }) => {
     }).catch(() => {});
 
     return NextResponse.json({ success: true, data: cert }, { status: 201 });
-  } catch {
+  } catch (error) {
+    console.error("[API] Error:", error);
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
   }
 });

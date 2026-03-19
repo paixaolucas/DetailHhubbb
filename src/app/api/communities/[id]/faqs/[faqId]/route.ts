@@ -44,7 +44,8 @@ export const PATCH = withAuth(async (req, { session, params }) => {
     });
 
     return NextResponse.json({ success: true, data: updated });
-  } catch {
+  } catch (error) {
+    console.error("[API] Error:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 }
@@ -79,7 +80,8 @@ export const DELETE = withAuth(async (_req, { session, params }) => {
     await db.communityFAQ.delete({ where: { id: faqId } });
 
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (error) {
+    console.error("[API] Error:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 }

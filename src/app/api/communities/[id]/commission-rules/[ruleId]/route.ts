@@ -58,7 +58,8 @@ export const PUT = withAuth(async (req: NextRequest, { session, params }) => {
     });
 
     return NextResponse.json({ success: true, data: updated });
-  } catch {
+  } catch (error) {
+    console.error("[API] Error:", error);
     return NextResponse.json({ success: false, error: "Erro interno" }, { status: 500 });
   }
 });
@@ -72,7 +73,8 @@ export const DELETE = withAuth(async (_req: NextRequest, { session, params }) =>
 
     await db.commissionRule.delete({ where: { id: resolved.ruleId } });
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (error) {
+    console.error("[API] Error:", error);
     return NextResponse.json({ success: false, error: "Erro interno" }, { status: 500 });
   }
 });

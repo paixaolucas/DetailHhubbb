@@ -79,7 +79,8 @@ export const POST = withAuth(async (_req, { session, params }) => {
     }
 
     return NextResponse.json({ success: true, data: { joined: true, optInId: optIn.id } });
-  } catch {
+  } catch (error) {
+    console.error("[API] Error:", error);
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
   }
 });
@@ -96,7 +97,8 @@ export const DELETE = withAuth(async (_req, { session, params }) => {
     });
 
     return NextResponse.json({ success: true, data: { joined: false } });
-  } catch {
+  } catch (error) {
+    console.error("[API] Error:", error);
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
   }
 });
@@ -116,7 +118,8 @@ export const GET = withAuth(async (_req, { session, params }) => {
     const count = await db.communityOptIn.count({ where: { communityId } });
 
     return NextResponse.json({ success: true, data: { joined: !!optIn, joinedAt: optIn?.joinedAt ?? null, memberCount: count } });
-  } catch {
+  } catch (error) {
+    console.error("[API] Error:", error);
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
   }
 });

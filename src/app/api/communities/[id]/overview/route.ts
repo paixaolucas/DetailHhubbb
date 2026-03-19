@@ -68,7 +68,8 @@ export const GET = withAuth(async (req, { params }) => {
         headers: { "Cache-Control": "private, max-age=30, stale-while-revalidate=60" },
       }
     );
-  } catch {
+  } catch (error) {
+    console.error("[API] Error:", error);
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
   }
 });

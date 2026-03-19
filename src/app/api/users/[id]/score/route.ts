@@ -34,7 +34,8 @@ export const GET = withAuth(async (_req, { session, params }) => {
         level: agg._max.level ?? 1,
       },
     });
-  } catch {
+  } catch (error) {
+    console.error("[API] Error:", error);
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
   }
 });
