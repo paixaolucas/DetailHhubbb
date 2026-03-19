@@ -106,6 +106,9 @@ export default function SpaceFeedPage() {
   const [pendingPosts, setPendingPosts] = useState<Post[]>([]);
   const postsRef = useRef<Post[]>([]);
 
+  // Triggers instant score re-fetch in PostComposer after a reaction
+  const [scoreTrigger, setScoreTrigger] = useState(0);
+
   // ---------------------------------------------------------------------------
 
   const fetchPosts = useCallback(
@@ -152,6 +155,7 @@ export default function SpaceFeedPage() {
       try {
         const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
         const uid = localStorage.getItem(STORAGE_KEYS.USER_ID);
+        const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
         setCurrentUserId(uid ?? undefined);
 
         if (!token) {
@@ -159,26 +163,21 @@ export default function SpaceFeedPage() {
           return;
         }
 
-        // 1. Find community by slug from mine (influencer-owned)
-        const mineRes = await fetch("/api/communities/mine", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const mineJson = await mineRes.json();
-        let found: Community | null = null;
+        const headers = { Authorization: `Bearer ${token}` };
 
+        // Round 1: fetch mine + public communities in parallel
+        const [mineJson, pubJson] = await Promise.all([
+          fetch("/api/communities/mine", { headers }).then((r) => r.json()),
+          fetch("/api/communities?published=true", { headers }).then((r) => r.json()),
+        ]);
+
+        let found: Community | null = null;
         if (mineJson.success && Array.isArray(mineJson.data)) {
           found = mineJson.data.find((c: Community) => c.slug === communitySlug) ?? null;
         }
-
-        // Fallback: role-based access for members and admins
         if (!found) {
-          const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
-          const pubRes = await fetch("/api/communities?published=true", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          const pubJson = await pubRes.json();
-          const allCommunities: Community[] = pubJson.success ? (pubJson.communities ?? []) : [];
-          const candidate = allCommunities.find((c: Community) => c.slug === communitySlug);
+          const all: Community[] = pubJson.success ? (pubJson.communities ?? []) : [];
+          const candidate = all.find((c: Community) => c.slug === communitySlug);
           if (candidate && (role === "SUPER_ADMIN" || role === "COMMUNITY_MEMBER" || role === "INFLUENCER_ADMIN")) {
             found = candidate;
           }
@@ -191,42 +190,30 @@ export default function SpaceFeedPage() {
         }
         setCommunity(found);
 
-        // 2. Check if current user is the community owner or SUPER_ADMIN
-        const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
+        // Round 2: fetch spaces + owner detail in parallel
+        const [spacesJson, detailJson] = await Promise.all([
+          fetch(`/api/communities/${found.id}/spaces`, { headers }).then((r) => r.json()),
+          role !== "SUPER_ADMIN"
+            ? fetch(`/api/communities/${found.id}`, { headers }).then((r) => r.json())
+            : Promise.resolve(null),
+        ]);
+
         if (role === "SUPER_ADMIN") {
           setIsOwner(true);
-        } else {
-          try {
-            const detailRes = await fetch(`/api/communities/${found.id}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-            const detailJson = await detailRes.json();
-            if (detailJson.success && detailJson.data?.influencer?.userId === uid) {
-              setIsOwner(true);
-            }
-          } catch {
-            // non-critical
-          }
+        } else if (detailJson?.success && detailJson.data?.influencer?.userId === uid) {
+          setIsOwner(true);
         }
 
-        // 2. Fetch spaces
-        const spacesRes = await fetch(`/api/communities/${found.id}/spaces`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const spacesJson = await spacesRes.json();
         const spaceList: SpaceItem[] = spacesJson.data ?? [];
         setSpaces(spaceList);
-
-        // 3. Find active space
         const space = spaceList.find((s) => s.slug === spaceSlug) ?? null;
         setActiveSpace(space);
 
-        if (space) {
-          await fetchPosts(space.id);
-        }
+        // Show UI immediately, then load posts
+        setLoading(false);
+        if (space) fetchPosts(space.id);
       } catch {
         setError("Erro de conexão. Tente novamente.");
-      } finally {
         setLoading(false);
       }
     }
@@ -313,6 +300,8 @@ export default function SpaceFeedPage() {
           };
         })
       );
+      // Trigger instant score refresh in PostComposer
+      setScoreTrigger((n) => n + 1);
     }
   }
 
@@ -430,7 +419,7 @@ export default function SpaceFeedPage() {
 
           {/* Composer */}
           {!loading && activeSpace && (
-            <PostComposer spaceId={activeSpace.id} communityId={community?.id ?? ""} onPost={handleNewPost} />
+            <PostComposer spaceId={activeSpace.id} communityId={community?.id ?? ""} onPost={handleNewPost} scoreTrigger={scoreTrigger} />
           )}
 
           {/* Posts */}
