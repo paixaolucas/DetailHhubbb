@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DetailerHub — Plano Técnico e Financeiro</title>
+  <style>
+    :root {
+      --teal: #006079;
+      --teal-light: #009cd9;
+      --black: #1a1a1a;
+      --off-white: #eee6e4;
+      --gray: #2e2e2e;
+      --gray-mid: #444;
+      --gray-light: #888;
+      --green: #2ecc71;
+      --yellow: #f1c40f;
+      --red: #e74c3c;
+      --border: #333;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--black);
+      color: var(--off-white);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    /* COVER */
+    .cover {
+      background: linear-gradient(135deg, #0a0a0a 0%, #0d2a33 60%, #006079 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cover::before {
+      content: '';
+      position: absolute;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(0,156,217,0.08) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .cover-badge {
+      background: rgba(0,96,121,0.4);
+      border: 1px solid var(--teal);
+      color: var(--teal-light);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 6px 18px;
+      border-radius: 20px;
+      margin-bottom: 32px;
+    }
+
+    .cover h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1.05;
+      margin-bottom: 16px;
+    }
+
+    .cover h1 span { color: var(--teal-light); }
+
+    .cover-subtitle {
+      font-size: 1.1rem;
+      color: var(--gray-light);
+      max-width: 520px;
+      margin: 0 auto 48px;
+    }
+
+    .cover-meta {
+      display: flex;
+      gap: 48px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .cover-meta-item { text-align: center; }
+    .cover-meta-item .label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gray-light); margin-bottom: 4px; }
+    .cover-meta-item .value { font-size: 1.1rem; font-weight: 700; color: var(--teal-light); }
+
+    /* LAYOUT */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    /* SECTIONS */
+    .section {
+      padding: 80px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section:last-child { border-bottom: none; }
+
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--teal);
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+
+    .section-intro {
+      color: var(--gray-light);
+      max-width: 680px;
+      margin-bottom: 40px;
+      font-size: 1rem;
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 8px;
+      color: var(--off-white);
+    }
+
+    .card p { color: #bbb; font-size: 0.92rem; }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    /* TABLES */
+    .table-wrap { overflow-x: auto; margin: 24px 0; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    th {
+      background: var(--gray);
+      color: var(--teal-light);
+      font-weight: 700;
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 11px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      color: #ccc;
+      vertical-align: top;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    td strong { color: var(--off-white); }
+    td .ok { color: var(--green); font-weight: 700; }
+    td .no { color: var(--red); font-weight: 700; }
+    td .warn { color: var(--yellow); font-weight: 700; }
+
+    /* CODE BLOCKS */
+    pre {
+      background: #111;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      overflow-x: auto;
+      font-size: 0.8rem;
+      line-height: 1.6;
+      margin: 24px 0;
+    }
+
+    code { font-family: 'SF Mono', 'Fira Code', monospace; }
+
+    .comment { color: #555; }
+    .keyword { color: var(--teal-light); }
+    .string { color: #a8ff78; }
+    .type { color: #f0a500; }
+
+    /* SPRINT CARDS */
+    .sprint {
+      border-left: 3px solid var(--teal);
+      background: var(--gray);
+      border-radius: 0 12px 12px 0;
+      padding: 24px 28px;
+      margin-bottom: 20px;
+    }
+
+    .sprint.critical { border-left-color: var(--red); }
+    .sprint.done { border-left-color: var(--green); }
+
+    .sprint-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .sprint-number {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--teal);
+      font-weight: 700;
+    }
+
+    .sprint.critical .sprint-number { color: var(--red); }
+
+    .sprint-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 4px 0 2px;
+    }
+
+    .sprint-duration {
+      background: rgba(0,96,121,0.3);
+      border: 1px solid var(--teal);
+      color: var(--teal-light);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    .sprint.critical .sprint-duration {
+      background: rgba(231,76,60,0.15);
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .checklist { list-style: none; padding: 0; }
+
+    .checklist li {
+      padding: 5px 0;
+      color: #bbb;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .checklist li::before {
+      content: '☐';
+      color: var(--teal);
+      font-size: 1rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .sprint-checkpoint {
+      margin-top: 16px;
+      background: rgba(0,156,217,0.08);
+      border: 1px solid rgba(0,156,217,0.2);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      color: var(--teal-light);
+    }
+
+    .sprint-checkpoint strong { display: block; margin-bottom: 2px; font-size: 0.78rem; letter-spacing: 1px; text-transform: uppercase; }
+
+    .sprint.critical .sprint-checkpoint {
+      background: rgba(231,76,60,0.08);
+      border-color: rgba(231,76,60,0.2);
+      color: #f1948a;
+    }
+
+    /* FINANCIAL */
+    .finance-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .finance-row:last-child { border-bottom: none; }
+
+    .finance-label { color: #bbb; font-size: 0.9rem; }
+    .finance-value { font-weight: 700; font-size: 1rem; }
+    .finance-value.teal { color: var(--teal-light); }
+    .finance-value.green { color: var(--green); }
+    .finance-value.yellow { color: var(--yellow); }
+    .finance-value.red { color: var(--red); }
+
+    .finance-bar-wrap { margin: 32px 0; }
+
+    .finance-bar-item { margin-bottom: 14px; }
+    .finance-bar-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 0.85rem;
+    }
+    .finance-bar-meta .name { color: #ccc; }
+    .finance-bar-meta .pct { color: var(--teal-light); font-weight: 700; }
+
+    .bar-bg {
+      background: #222;
+      border-radius: 4px;
+      height: 8px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+
+    /* RISK */
+    .risk-item {
+      display: flex;
+      gap: 16px;
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      align-items: flex-start;
+    }
+
+    .risk-item:last-child { border-bottom: none; }
+
+    .risk-icon {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .risk-icon.high { background: rgba(231,76,60,0.15); }
+    .risk-icon.med { background: rgba(241,196,15,0.15); }
+    .risk-icon.low { background: rgba(46,204,113,0.15); }
+
+    .risk-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; }
+    .risk-desc { color: #999; font-size: 0.88rem; }
+    .risk-mit { color: var(--teal-light); font-size: 0.85rem; margin-top: 6px; }
+
+    /* STACK */
+    .stack-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 18px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .stack-item:last-child { border-bottom: none; }
+    .stack-layer {
+      width: 110px;
+      flex-shrink: 0;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--gray-light);
+      padding-top: 2px;
+    }
+    .stack-tool { font-weight: 700; font-size: 0.95rem; color: var(--teal-light); }
+    .stack-reason { font-size: 0.85rem; color: #999; margin-top: 2px; }
+
+    /* HIGHLIGHT BOX */
+    .highlight {
+      background: rgba(0,96,121,0.15);
+      border: 1px solid rgba(0,96,121,0.4);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin: 24px 0;
+    }
+
+    .highlight p { color: #ccc; font-size: 0.92rem; }
+    .highlight strong { color: var(--teal-light); }
+
+    .warning-box {
+      background: rgba(241,196,15,0.08);
+      border: 1px solid rgba(241,196,15,0.3);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin: 24px 0;
+    }
+
+    .warning-box p { color: #ccc; font-size: 0.92rem; }
+    .warning-box strong { color: var(--yellow); }
+
+    /* HORIZONS */
+    .horizon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .horizon-card {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .horizon-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+
+    .horizon-card.h1::before { background: var(--teal-light); }
+    .horizon-card.h2::before { background: var(--yellow); }
+    .horizon-card.h3::before { background: var(--green); }
+
+    .horizon-num {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gray-light);
+      margin-bottom: 8px;
+    }
+
+    .horizon-title {
+      font-weight: 800;
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+    }
+
+    .horizon-triggers { list-style: none; padding: 0; }
+    .horizon-triggers li {
+      font-size: 0.83rem;
+      color: #999;
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      display: flex;
+      gap: 8px;
+    }
+    .horizon-triggers li::before { content: '→'; color: var(--teal); flex-shrink: 0; }
+    .horizon-triggers li:last-child { border-bottom: none; }
+
+    .status-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-top: 12px;
+    }
+
+    .status-tag.active { background: rgba(0,156,217,0.2); color: var(--teal-light); }
+    .status-tag.waiting { background: rgba(255,255,255,0.06); color: #666; }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 60px 32px;
+      color: var(--gray-light);
+      font-size: 0.82rem;
+      border-top: 1px solid var(--border);
+    }
+
+    footer .logo { font-size: 1.2rem; font-weight: 800; color: var(--teal-light); margin-bottom: 8px; }
+
+    /* DIVIDER */
+    .divider {
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--teal), transparent);
+      margin: 40px 0;
+      opacity: 0.3;
+    }
+
+    /* TOC */
+    .toc {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-bottom: 0;
+    }
+
+    .toc-title {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--teal);
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .toc ol {
+      padding-left: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 32px;
+    }
+
+    @media (max-width: 600px) {
+      .toc ol { grid-template-columns: 1fr; }
+      .cover-meta { gap: 28px; }
+    }
+
+    .toc li { color: #bbb; font-size: 0.88rem; }
+    .toc li a { color: #bbb; text-decoration: none; }
+    .toc li a:hover { color: var(--teal-light); }
+
+    /* PRINT */
+    @media print {
+      body { background: white; color: #1a1a1a; }
+      .cover { background: #1a1a1a; }
+      pre { border: 1px solid #ccc; }
+    }
+
+    /* DB schema syntax highlight helpers */
+    .db-table { color: var(--teal-light); font-weight: 700; }
+    .db-field { color: var(--off-white); }
+    .db-type { color: #f0a500; }
+    .db-comment { color: #555; font-style: italic; }
+    .db-pk { color: var(--green); }
+    .db-fk { color: #c39bd3; }
+  </style>
+</head>
+<body>
+
+<!-- ===== COVER ===== -->
+<div class="cover">
+  <div class="cover-badge">Documento Interno · Confidencial · 2025</div>
+  <h1>Detailer<span>Hub</span></h1>
+  <p class="cover-subtitle">Plano técnico, financeiro e de implementação para apresentação entre fundadores.</p>
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <div class="label">Versão</div>
+      <div class="value">1.0</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Fase atual</div>
+      <div class="value">Phase 1 — MVP</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Prazo estimado</div>
+      <div class="value">10 semanas</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Break-even</div>
+      <div class="value">~150 membros</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SUMÁRIO ===== -->
+<div class="container">
+  <div class="section">
+    <div class="toc">
+      <div class="toc-title">Índice</div>
+      <ol>
+        <li><a href="#visao">Visão do Produto</a></li>
+        <li><a href="#modelo">Modelo de Negócio</a></li>
+        <li><a href="#financeiro">Financeiro Revisado</a></li>
+        <li><a href="#stack">Stack Tecnológica</a></li>
+        <li><a href="#banco">Banco de Dados</a></li>
+        <li><a href="#sprints">Sprints de Implementação</a></li>
+        <li><a href="#riscos">Riscos e Mitigações</a></li>
+        <li><a href="#horizontes">Horizontes de Crescimento</a></li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ===== VISÃO ===== -->
+<div class="container" id="visao">
+  <div class="section">
+    <div class="section-label">01 — Visão</div>
+    <h2 class="section-title">Arquitetura de dois produtos</h2>
+    <p class="section-intro">O DetailerHub conquista uma praia específica com profundidade antes de atacar o oceano. O aprendizado do primeiro produto financia e informa a construção do segundo.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-title" style="color: var(--teal-light)">DetailerHub — Produto 1</div>
+        <p>Plataforma fechada e paga para a comunidade de estética automotiva. Influenciadores trazem sua audiência. Uma assinatura dá acesso a todos os criadores da plataforma.</p>
+        <div style="margin-top:14px; font-size:0.82rem; color: var(--teal); font-weight:700; letter-spacing:1px; text-transform:uppercase">Lançar agora</div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:#888">CrewHouse / Pitcrew — Produto 2</div>
+        <p>Plataforma mãe gratuita para toda a cultura automotiva brasileira. O DetailerHub vive dentro dela como produto premium. Monetização por anunciantes, eventos e marketplace.</p>
+        <div style="margin-top:14px; font-size:0.82rem; color:#555; font-weight:700; letter-spacing:1px; text-transform:uppercase">Aguarda Horizonte 1</div>
+      </div>
+    </div>
+
+    <div class="highlight" style="margin-top:28px">
+      <p><strong>Lógica central:</strong> "O YouTube é sua vitrine. O WhatsApp é sua praça. O DetailerHub é a sua casa." — O membro pertence ao influenciador que o trouxe. A comissão é perpétua enquanto ele permanecer ativo. O influenciador não paga nada para estar na plataforma.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODELO ===== -->
+<div class="container" id="modelo">
+  <div class="section">
+    <div class="section-label">02 — Modelo de Negócio</div>
+    <h2 class="section-title">O "dono do membro" e a caixa de performance</h2>
+    <p class="section-intro">Dois mecanismos que criam alinhamento total entre a plataforma e os influenciadores.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Critério</th>
+            <th>YouTube / Instagram</th>
+            <th>WhatsApp / Grupo</th>
+            <th>DetailerHub</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Receita</td>
+            <td>CPM variável + publis</td>
+            <td class="no">Nenhuma</td>
+            <td class="ok">35% fixo por membro + caixa mensal</td>
+          </tr>
+          <tr>
+            <td>Previsibilidade</td>
+            <td class="no">Zero — depende do algoritmo</td>
+            <td class="no">Zero</td>
+            <td class="ok">Alta — base recorrente</td>
+          </tr>
+          <tr>
+            <td>Propriedade da audiência</td>
+            <td class="no">Plataforma é dona</td>
+            <td class="warn">Parcial</td>
+            <td class="ok">Total — dados e contato direto</td>
+          </tr>
+          <tr>
+            <td>Custo para o criador</td>
+            <td class="ok">Zero</td>
+            <td class="ok">Zero</td>
+            <td class="ok">Zero</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="font-size:1.05rem; font-weight:700; margin: 36px 0 16px; color: var(--off-white)">Caixa de Performance — Composição da Pontuação (PP)</h3>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Métrica</th>
+            <th>Peso</th>
+            <th>Como é medida</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Views qualificados</strong></td>
+            <td style="color: var(--teal-light); font-weight:700">30%</td>
+            <td>Vídeos assistidos ≥60% dentro da plataforma</td>
+          </tr>
+          <tr>
+            <td><strong>Engajamento na comunidade</strong></td>
+            <td style="color: var(--teal-light); font-weight:700">25%</td>
+            <td>Comentários + reações gerados pelos membros na plataforma</td>
+          </tr>
+          <tr>
+            <td><strong>Novos membros ativos</strong></td>
+            <td style="color: var(--teal-light); font-weight:700">20%</td>
+            <td>Membros novos que completaram 30 dias sem cancelar</td>
+          </tr>
+          <tr>
+            <td><strong>Retenção de membros</strong></td>
+            <td style="color: var(--teal-light); font-weight:700">15%</td>
+            <td>Taxa de renovação mensal dos membros do influenciador</td>
+          </tr>
+          <tr>
+            <td><strong>Entregas contratuais</strong></td>
+            <td style="color: var(--teal-light); font-weight:700">10%</td>
+            <td>% das entregas mínimas cumpridas (verificadas na plataforma)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="warning-box">
+      <p><strong>⚠ Regra fundamental:</strong> Somente ações realizadas <strong>dentro da plataforma</strong> contam para o cálculo da PP. Engajamento no WhatsApp, Instagram, YouTube ou qualquer canal externo <strong>não é contabilizado</strong>. Isso cria alinhamento natural — o influenciador tem motivação financeira para puxar sua audiência para dentro da plataforma.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FINANCEIRO ===== -->
+<div class="container" id="financeiro">
+  <div class="section">
+    <div class="section-label">03 — Financeiro</div>
+    <h2 class="section-title">Modelo financeiro revisado</h2>
+    <p class="section-intro">O split original calculava sobre receita bruta, ignorando pass-throughs. O modelo abaixo é mais honesto e protege a plataforma nos primeiros meses.</p>
+
+    <div class="card" style="margin-bottom:32px">
+      <div class="card-title">Fluxo por membro — R$79/mês</div>
+      <div style="margin-top:16px">
+        <div class="finance-row">
+          <span class="finance-label">Receita bruta</span>
+          <span class="finance-value teal">R$79,00</span>
+        </div>
+        <div class="finance-row">
+          <span class="finance-label">(-) Gateway Asaas — PIX R$0,99 · Cartão ~2,49%</span>
+          <span class="finance-value red">~−R$3,00</span>
+        </div>
+        <div class="finance-row">
+          <span class="finance-label">(-) Simples Nacional — faixa inicial ~6%</span>
+          <span class="finance-value red">~−R$4,74</span>
+        </div>
+        <div class="finance-row" style="border-top: 1px solid var(--teal); padding-top:16px; margin-top:4px">
+          <span class="finance-label" style="font-weight:700; color: var(--off-white)">Receita líquida real</span>
+          <span class="finance-value green">~R$71,00</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-size:1rem; font-weight:700; margin-bottom:20px; color:var(--off-white)">Distribuição da receita líquida</h3>
+
+    <div class="finance-bar-wrap">
+      <div class="finance-bar-item">
+        <div class="finance-bar-meta">
+          <span class="name">Influenciador — dono do membro</span>
+          <span class="pct">35% · ~R$24,85</span>
+        </div>
+        <div class="bar-bg"><div class="bar-fill" style="width:35%; background: var(--teal-light)"></div></div>
+      </div>
+      <div class="finance-bar-item">
+        <div class="finance-bar-meta">
+          <span class="name">Caixa de Performance</span>
+          <span class="pct">15% · ~R$10,65</span>
+        </div>
+        <div class="bar-bg"><div class="bar-fill" style="width:15%; background: var(--teal)"></div></div>
+      </div>
+      <div class="finance-bar-item">
+        <div class="finance-bar-meta">
+          <span class="name">Plataforma (operação + produto)</span>
+          <span class="pct">50% · ~R$35,50</span>
+        </div>
+        <div class="bar-bg"><div class="bar-fill" style="width:50%; background: #444"></div></div>
+      </div>
+    </div>
+
+    <div class="highlight">
+      <p><strong>Por que 50% para a plataforma no Phase 1?</strong> Nos primeiros 12 meses, 100% da aquisição vem dos influenciadores. O budget de marketing se torna investimento em produto. Após atingir o Horizonte 1, o split é revisado com os influenciadores com dados reais em mãos. Os fundadores trabalham sem salário fixo até o break-even.</p>
+    </div>
+
+    <h3 style="font-size:1rem; font-weight:700; margin: 32px 0 16px; color:var(--off-white)">Projeção de sustentabilidade</h3>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Membros</th>
+            <th>MRR Bruto</th>
+            <th>Líquido (~91%)</th>
+            <th>Plataforma (50%)</th>
+            <th>Situação</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>100</strong></td>
+            <td>R$7.900</td>
+            <td>R$7.189</td>
+            <td>R$3.594</td>
+            <td class="warn">Cobre custos fixos no limite</td>
+          </tr>
+          <tr>
+            <td><strong>150</strong></td>
+            <td>R$11.850</td>
+            <td>R$10.783</td>
+            <td>R$5.391</td>
+            <td class="ok">Break-even operacional</td>
+          </tr>
+          <tr>
+            <td><strong>250</strong></td>
+            <td>R$19.750</td>
+            <td>R$17.972</td>
+            <td>R$8.986</td>
+            <td class="ok">Confortável, folga para produto</td>
+          </tr>
+          <tr>
+            <td><strong>500</strong></td>
+            <td>R$39.500</td>
+            <td>R$35.945</td>
+            <td>R$17.972</td>
+            <td class="ok">Pró-labore para fundadores</td>
+          </tr>
+          <tr>
+            <td><strong>5.000 (H1)</strong></td>
+            <td>R$395.000</td>
+            <td>R$359.450</td>
+            <td>R$179.725</td>
+            <td class="ok">Horizonte 1 atingido</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="font-size:1rem; font-weight:700; margin: 32px 0 16px; color:var(--off-white)">Custos fixos mínimos (sem salários)</h3>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Item</th><th>Custo mensal</th><th>Observação</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Contador</td><td>R$400–600</td><td>Obrigatório desde a abertura do CNPJ</td></tr>
+          <tr><td>Supabase</td><td>R$125–500</td><td>Grátis no início, escala com uso</td></tr>
+          <tr><td>Vimeo Pro</td><td>R$150–200</td><td>Já utilizado pelos influenciadores</td></tr>
+          <tr><td>Vercel</td><td>R$0–100</td><td>Grátis no início</td></tr>
+          <tr><td>Ferramentas (email, domínio, etc.)</td><td>R$100–200</td><td>Resend, domínio, GitHub Pro</td></tr>
+          <tr><td><strong>Total estimado</strong></td><td><strong>R$775–1.600/mês</strong></td><td>Sem salários</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="font-size:1rem; font-weight:700; margin: 32px 0 16px; color:var(--off-white)">Custos únicos de abertura</h3>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Item</th><th>Valor estimado</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Abertura de CNPJ</td><td>R$300–600</td></tr>
+          <tr><td>Registro de marca INPI (classes 38 + 41)</td><td>R$2.000–4.000</td></tr>
+          <tr><td>Contratos com influenciadores (advogado)</td><td>R$1.500–3.000</td></tr>
+          <tr><td><strong>Total para começar</strong></td><td><strong>R$4.000–8.000</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STACK ===== -->
+<div class="container" id="stack">
+  <div class="section">
+    <div class="section-label">04 — Tecnologia</div>
+    <h2 class="section-title">Stack tecnológica</h2>
+    <p class="section-intro">Escolhida para maximizar velocidade de desenvolvimento com vibe coding, minimizar custos iniciais e garantir escalabilidade futura.</p>
+
+    <div class="card">
+      <div class="stack-item">
+        <div class="stack-layer">Frontend</div>
+        <div>
+          <div class="stack-tool">Next.js 14 (App Router)</div>
+          <div class="stack-reason">O framework que a IA mais conhece. SSR nativo, roteamento simples, deploy automático no Vercel com push no GitHub.</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-layer">UI</div>
+        <div>
+          <div class="stack-tool">shadcn/ui + Tailwind CSS</div>
+          <div class="stack-reason">Componentes prontos, copy-paste, identidade visual customizável. A IA gera código correto para esse stack na maioria das vezes.</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-layer">Backend / DB</div>
+        <div>
+          <div class="stack-tool">Supabase</div>
+          <div class="stack-reason">Auth + banco PostgreSQL + storage + realtime em um lugar. Row Level Security garante isolamento de dados entre comunidades.</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-layer">Pagamentos</div>
+        <div>
+          <div class="stack-tool">Asaas</div>
+          <div class="stack-reason">Brasileiro. PIX (R$0,99/transação) + boleto + cartão parcelado. API simples, webhooks confiáveis, sem mensalidade fixa.</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-layer">Vídeo</div>
+        <div>
+          <div class="stack-tool">Vimeo (embed)</div>
+          <div class="stack-reason">Já utilizado. Controle de privacidade por domínio. Zero código adicional — influenciador cola o ID, plataforma renderiza.</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-layer">Email</div>
+        <div>
+          <div class="stack-tool">Resend</div>
+          <div class="stack-reason">Integração nativa com Next.js. Gratuito até 3.000 emails/mês. Transacional simples.</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-layer">Deploy</div>
+        <div>
+          <div class="stack-tool">Vercel + GitHub</div>
+          <div class="stack-reason">Push no repositório = deploy automático. Preview por branch. Zero configuração de servidor.</div>
+        </div>
+      </div>
+      <div class="stack-item" style="border-bottom:none">
+        <div class="stack-layer">Lives</div>
+        <div>
+          <div class="stack-tool">Zoom (link externo)</div>
+          <div class="stack-reason">Nenhum código necessário. Link da live divulgado na plataforma. Solução funcional para o Phase 1.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== BANCO ===== -->
+<div class="container" id="banco">
+  <div class="section">
+    <div class="section-label">05 — Banco de Dados</div>
+    <h2 class="section-title">Estrutura de dados — Phase 1</h2>
+    <p class="section-intro">10 tabelas. Cada uma com responsabilidade única. Projetado para ser compreensível por vibe coding e seguro com Row Level Security do Supabase.</p>
+
+<pre><code><span class="comment">-- 1. Perfis (estende o auth.users do Supabase)</span>
+<span class="db-table">profiles</span>
+  <span class="db-pk">id</span>          uuid PRIMARY KEY   <span class="comment">-- mesmo id do auth.users</span>
+  <span class="db-field">name</span>        text
+  <span class="db-field">avatar_url</span>  text
+  <span class="db-field">bio</span>         text               <span class="comment">-- máx 160 chars</span>
+  <span class="db-field">city</span>        text
+  <span class="db-field">type</span>        text               <span class="comment">-- 'member' | 'influencer' | 'admin'</span>
+  <span class="db-field">created_at</span>  timestamptz
+
+<span class="comment">-- 2. Influenciadores</span>
+<span class="db-table">influencers</span>
+  <span class="db-pk">user_id</span>          uuid PRIMARY KEY FK profiles
+  <span class="db-field">slug</span>             text UNIQUE        <span class="comment">-- ex: "leo-detailing"</span>
+  <span class="db-field">referral_code</span>    text UNIQUE        <span class="comment">-- código do link /join/[code]</span>
+  <span class="db-field">commission_rate</span>  decimal DEFAULT 0.35
+  <span class="db-field">health_score</span>     int DEFAULT 100
+  <span class="db-field">status</span>           text DEFAULT 'active'
+
+<span class="comment">-- 3. Comunidades (1 por influenciador no Phase 1)</span>
+<span class="db-table">communities</span>
+  <span class="db-pk">id</span>              uuid PRIMARY KEY
+  <span class="db-fk">influencer_id</span>   uuid FK influencers
+  <span class="db-field">name</span>            text
+  <span class="db-field">slug</span>            text UNIQUE
+  <span class="db-field">description</span>     text
+  <span class="db-field">cover_image_url</span> text
+  <span class="db-field">created_at</span>      timestamptz
+
+<span class="comment">-- 4. Assinaturas — coração do modelo financeiro</span>
+<span class="db-table">subscriptions</span>
+  <span class="db-pk">id</span>                       uuid PRIMARY KEY
+  <span class="db-fk">member_id</span>                uuid FK profiles
+  <span class="db-fk">referral_influencer_id</span>   uuid FK influencers   <span class="comment">-- DONO DO MEMBRO (imutável)</span>
+  <span class="db-field">gateway_subscription_id</span>  text UNIQUE           <span class="comment">-- id no Asaas</span>
+  <span class="db-field">status</span>                   text                  <span class="comment">-- 'active' | 'past_due' | 'cancelled'</span>
+  <span class="db-field">amount</span>                   decimal
+  <span class="db-field">started_at</span>               timestamptz
+  <span class="db-field">next_billing_at</span>          timestamptz
+  <span class="db-field">cancelled_at</span>             timestamptz
+
+<span class="comment">-- 5. Opt-in em comunidades</span>
+<span class="db-table">community_memberships</span>
+  <span class="db-pk">id</span>             uuid PRIMARY KEY
+  <span class="db-fk">member_id</span>      uuid FK profiles
+  <span class="db-fk">community_id</span>   uuid FK communities
+  <span class="db-field">joined_at</span>      timestamptz
+
+<span class="comment">-- 6. Conteúdo</span>
+<span class="db-table">content</span>
+  <span class="db-pk">id</span>             uuid PRIMARY KEY
+  <span class="db-fk">community_id</span>   uuid FK communities
+  <span class="db-field">title</span>          text
+  <span class="db-field">type</span>           text        <span class="comment">-- 'video' | 'post'</span>
+  <span class="db-field">vimeo_id</span>       text        <span class="comment">-- só para vídeos</span>
+  <span class="db-field">body</span>           text        <span class="comment">-- só para posts</span>
+  <span class="db-field">is_published</span>   bool DEFAULT false
+  <span class="db-field">published_at</span>   timestamptz
+  <span class="db-field">created_at</span>     timestamptz
+
+<span class="comment">-- 7. Comentários</span>
+<span class="db-table">comments</span>
+  <span class="db-pk">id</span>          uuid PRIMARY KEY
+  <span class="db-fk">content_id</span>  uuid FK content
+  <span class="db-fk">author_id</span>   uuid FK profiles
+  <span class="db-field">body</span>        text
+  <span class="db-fk">parent_id</span>   uuid FK comments   <span class="comment">-- para respostas (nullable)</span>
+  <span class="db-field">created_at</span>  timestamptz
+
+<span class="comment">-- 8. Reações (única por membro por conteúdo)</span>
+<span class="db-table">reactions</span>
+  <span class="db-fk">content_id</span>  uuid FK content
+  <span class="db-fk">member_id</span>   uuid FK profiles
+  PRIMARY KEY (content_id, member_id)
+
+<span class="comment">-- 9. Score de saúde do membro (calculado automaticamente)</span>
+<span class="db-table">member_health</span>
+  <span class="db-pk">member_id</span>   uuid PRIMARY KEY FK profiles
+  <span class="db-field">score</span>       int DEFAULT 0
+  <span class="db-field">can_post</span>    bool DEFAULT false    <span class="comment">-- true quando score >= 70</span>
+  <span class="db-field">updated_at</span>  timestamptz
+
+<span class="comment">-- 10. Relatório mensal de pagamentos aos influenciadores</span>
+<span class="db-table">influencer_monthly_reports</span>
+  <span class="db-pk">id</span>                    uuid PRIMARY KEY
+  <span class="db-fk">influencer_id</span>         uuid FK influencers
+  <span class="db-field">month</span>                 date              <span class="comment">-- primeiro dia: 2025-03-01</span>
+  <span class="db-field">active_members</span>        int
+  <span class="db-field">direct_commission</span>     decimal           <span class="comment">-- 35% das assinaturas dos seus membros</span>
+  <span class="db-field">performance_amount</span>    decimal           <span class="comment">-- fatia da caixa de performance</span>
+  <span class="db-field">total_payout</span>          decimal
+  <span class="db-field">is_paid</span>               bool DEFAULT false
+  <span class="db-field">paid_at</span>               timestamptz
+</code></pre>
+  </div>
+</div>
+
+<!-- ===== SPRINTS ===== -->
+<div class="container" id="sprints">
+  <div class="section">
+    <div class="section-label">06 — Implementação</div>
+    <h2 class="section-title">5 Sprints · ~10 semanas</h2>
+    <p class="section-intro">Cada sprint tem um checkpoint claro. Não avance para o próximo sem validar o anterior com um cenário real.</p>
+
+    <!-- Sprint 1 -->
+    <div class="sprint">
+      <div class="sprint-header">
+        <div>
+          <div class="sprint-number">Sprint 1</div>
+          <div class="sprint-title">Fundação</div>
+          <div style="font-size:0.85rem; color:#888; margin-top:4px">Setup completo do zero ao primeiro deploy</div>
+        </div>
+        <div class="sprint-duration">2 semanas</div>
+      </div>
+      <ul class="checklist">
+        <li>Setup: Next.js + Supabase + Vercel conectados e repositório no GitHub</li>
+        <li>Auth: cadastro, login e recuperação de senha via Supabase Auth</li>
+        <li>Perfil: criar e editar (nome, bio, cidade, foto)</li>
+        <li>Roteamento básico: home, <code>/comunidade/[slug]</code>, <code>/conteudo/[id]</code></li>
+        <li>Layout base com shadcn/ui aplicando identidade visual do DetailerHub</li>
+      </ul>
+      <div class="sprint-checkpoint">
+        <strong>Checkpoint</strong>
+        URL pública no ar. Consegue criar conta, logar e editar perfil.
+      </div>
+    </div>
+
+    <!-- Sprint 2 -->
+    <div class="sprint">
+      <div class="sprint-header">
+        <div>
+          <div class="sprint-number">Sprint 2</div>
+          <div class="sprint-title">Comunidades e Conteúdo</div>
+          <div style="font-size:0.85rem; color:#888; margin-top:4px">Influenciador publica · Membro consome</div>
+        </div>
+        <div class="sprint-duration">2 semanas</div>
+      </div>
+      <ul class="checklist">
+        <li>Painel do influenciador: criar e editar comunidade</li>
+        <li>Post de texto no feed da comunidade</li>
+        <li>Embed de vídeo Vimeo: influenciador cola o ID, plataforma renderiza o player</li>
+        <li>Feed da comunidade com ordenação por recência</li>
+        <li>Controle de acesso: conteúdo visível apenas para assinantes ativos (status manual no banco por ora)</li>
+      </ul>
+      <div class="sprint-checkpoint">
+        <strong>Checkpoint</strong>
+        Influenciador posta vídeo e texto. Membro (com acesso liberado manualmente no banco) consegue ver e navegar.
+      </div>
+    </div>
+
+    <!-- Sprint 3 -->
+    <div class="sprint">
+      <div class="sprint-header">
+        <div>
+          <div class="sprint-number">Sprint 3</div>
+          <div class="sprint-title">Engajamento</div>
+          <div style="font-size:0.85rem; color:#888; margin-top:4px">Membros interagem · Score começa a funcionar</div>
+        </div>
+        <div class="sprint-duration">2 semanas</div>
+      </div>
+      <ul class="checklist">
+        <li>Comentários em conteúdo + sistema de respostas</li>
+        <li>Reações (único por membro por conteúdo)</li>
+        <li>Opt-in em comunidades: botão "Entrar nesta comunidade"</li>
+        <li>Cálculo de score de saúde do membro (função SQL, roda via cron do Supabase)</li>
+        <li>Botão "Criar post" aparece/some baseado no score ≥70 (sem aviso visível ao membro)</li>
+        <li>Notificação positiva ao atingir threshold: "Você já faz parte desta comunidade!"</li>
+      </ul>
+      <div class="sprint-checkpoint">
+        <strong>Checkpoint</strong>
+        Membro comenta, reage, score sobe. Após engajamento suficiente, botão de post aparece automaticamente.
+      </div>
+    </div>
+
+    <!-- Sprint 4 -->
+    <div class="sprint critical">
+      <div class="sprint-header">
+        <div>
+          <div class="sprint-number">⚠ Sprint 4 — Crítico</div>
+          <div class="sprint-title">Pagamentos e Atribuição</div>
+          <div style="font-size:0.85rem; color:#888; margin-top:4px">O coração do modelo financeiro — cada função deve ser verificada manualmente antes de automatizar</div>
+        </div>
+        <div class="sprint-duration">2 semanas</div>
+      </div>
+      <ul class="checklist">
+        <li>Link de referral: <code>/join/[referral_code]</code> salva o código em cookie/sessão</li>
+        <li>No cadastro via link: <code>referral_influencer_id</code> associado à subscription — <strong>imutável após criação</strong></li>
+        <li>Integração Asaas: criar assinatura recorrente via API</li>
+        <li>Página de checkout: membro revisa plano, clica e vai para o hosted checkout do Asaas</li>
+        <li>Webhook do Asaas: pagamento confirmado → ativa membro; cancelamento → revoga acesso</li>
+        <li>Página admin de comissões: lista influenciadores + membros ativos + valor estimado do mês (verificação manual antes de pagar)</li>
+      </ul>
+      <div class="sprint-checkpoint">
+        <strong>Checkpoint obrigatório</strong>
+        Membro real paga R$1,00 de teste no Asaas. Acesso é liberado automaticamente. Influenciador aparece como dono no relatório admin. Só depois disso subir para produção.
+      </div>
+    </div>
+
+    <!-- Sprint 5 -->
+    <div class="sprint">
+      <div class="sprint-header">
+        <div>
+          <div class="sprint-number">Sprint 5</div>
+          <div class="sprint-title">Dashboards e Admin</div>
+          <div style="font-size:0.85rem; color:#888; margin-top:4px">Influenciador se auto-gerencia · Admin opera sem intervenção manual</div>
+        </div>
+        <div class="sprint-duration">2 semanas</div>
+      </div>
+      <ul class="checklist">
+        <li>Dashboard do influenciador: membros ativos, receita estimada do mês, origem dos membros</li>
+        <li>Cálculo de Performance (PP): função SQL com as 5 métricas gerando <code>influencer_monthly_reports</code></li>
+        <li>Painel admin: membros, assinaturas, cancelamentos, relatório mensal para pagamento</li>
+        <li>Email automático: novo membro entrou, pagamento falhou, renovação confirmada</li>
+        <li>Dashboard do membro: score atual, progresso, próxima conquista</li>
+      </ul>
+      <div class="sprint-checkpoint">
+        <strong>Checkpoint</strong>
+        Influenciador abre o dashboard e vê dados reais do mês sem precisar perguntar nada ao admin.
+      </div>
+    </div>
+
+    <div class="highlight" style="margin-top: 8px">
+      <p><strong>Nota sobre o Sprint 4:</strong> É o ponto de maior risco técnico para vibe coding. A lógica de webhooks e rastreamento financeiro é crítica — um bug significa pagar errado. Reserve o colega dev para revisar <em>especificamente</em> essa parte antes de ir ao ar, mesmo que ele não construa o resto.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== RISCOS ===== -->
+<div class="container" id="riscos">
+  <div class="section">
+    <div class="section-label">07 — Riscos</div>
+    <h2 class="section-title">Riscos e mitigações</h2>
+    <p class="section-intro">Ranqueados por impacto real no negócio, não por probabilidade.</p>
+
+    <div class="card">
+      <div class="risk-item">
+        <div class="risk-icon high">🔴</div>
+        <div>
+          <div class="risk-title">Bug financeiro no Sprint 4</div>
+          <div class="risk-desc">Pagamento errado para influenciador destrói confiança no momento em que ela é mais necessária.</div>
+          <div class="risk-mit">→ Comissão manual (página admin de aprovação) antes de qualquer automação. Revisão por dev experiente antes de ir ao ar.</div>
+        </div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-icon high">🔴</div>
+        <div>
+          <div class="risk-title">Influenciador sai e reivindica "seus" membros</div>
+          <div class="risk-desc">Se não houver contrato claro, a saída de um influenciador pode gerar disputa sobre os membros que ele trouxe.</div>
+          <div class="risk-mit">→ Contrato define: comissão é ativa enquanto o influenciador está na plataforma. Saída encerra o direito a comissões futuras. Esse ponto é inegociável no contrato.</div>
+        </div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-icon med">🟡</div>
+        <div>
+          <div class="risk-title">Membro se sente "dono" do influenciador que o trouxe, não da plataforma</div>
+          <div class="risk-desc">Se A sai, seus membros podem cancelar junto. Concentração de membros em 1-2 influenciadores cria fragilidade.</div>
+          <div class="risk-mit">→ Dashboard mostra ao influenciador A que ele ganha mesmo quando seus membros consomem conteúdo de B. Isso reposiciona o modelo como "você ganhou por trazer, a plataforma retém por você".</div>
+        </div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-icon med">🟡</div>
+        <div>
+          <div class="risk-title">Vibe coding travar em lógica complexa</div>
+          <div class="risk-desc">Webhooks, RLS no Supabase e cálculo de caixa de performance têm curva de aprendizado real.</div>
+          <div class="risk-mit">→ Sprint plan isola cada responsabilidade. Lógica financeira é simples e verificável antes de automatizar. Colega dev entra pontualmente no Sprint 4.</div>
+        </div>
+      </div>
+      <div class="risk-item" style="border-bottom:none">
+        <div class="risk-icon low">🟢</div>
+        <div>
+          <div class="risk-title">Break-even financeiro antes de ter produto</div>
+          <div class="risk-desc">Sem runway, o tempo entre zero e 150 membros é o período de maior pressão.</div>
+          <div class="risk-mit">→ O modelo foi validado em projeto anterior. Com 3 influenciadores de nicho e 6 anos de relacionamento do fundador, 150 membros em 60 dias pós-lançamento é o cenário conservador.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== HORIZONTES ===== -->
+<div class="container" id="horizontes">
+  <div class="section">
+    <div class="section-label">08 — Crescimento</div>
+    <h2 class="section-title">Horizontes estratégicos</h2>
+    <p class="section-intro">Cada horizonte só começa quando o anterior for completamente atingido — expansão construída sobre evidências reais, não suposições.</p>
+
+    <div class="horizon-grid">
+      <div class="horizon-card h1">
+        <div class="horizon-num">Horizonte 1 — Em curso</div>
+        <div class="horizon-title">Provar o Modelo</div>
+        <ul class="horizon-triggers">
+          <li>5.000 membros ativos</li>
+          <li>Churn mensal &lt; 7%</li>
+          <li>NPS dos influenciadores &gt; 50</li>
+          <li>≥80% influenciadores saudáveis por 6 meses</li>
+          <li>3+ contratos de anunciantes ativos</li>
+        </ul>
+        <span class="status-tag active">Em andamento</span>
+      </div>
+
+      <div class="horizon-card h2">
+        <div class="horizon-num">Horizonte 2 — Aguarda H1</div>
+        <div class="horizon-title">Estruturar a Expansão</div>
+        <ul class="horizon-triggers">
+          <li>DetailerHub financiando o Produto 2</li>
+          <li>2+ novos nichos automotivos prontos</li>
+          <li>Equipe operando com autonomia</li>
+          <li>Arquitetura escalável validada</li>
+        </ul>
+        <span class="status-tag waiting">Aguarda H1</span>
+      </div>
+
+      <div class="horizon-card h3">
+        <div class="horizon-num">Horizonte 3 — Aguarda H2</div>
+        <div class="horizon-title">Lançar CrewHouse</div>
+        <ul class="horizon-triggers">
+          <li>Plataforma mãe gratuita ao ar</li>
+          <li>3+ comunidades pagas além do DetailerHub</li>
+          <li>5+ contratos com marcas de médio/grande porte</li>
+          <li>DetailerHub como produto âncora premium</li>
+        </ul>
+        <span class="status-tag waiting">Aguarda H2</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo">DetailerHub</div>
+  <p>Documento interno · Confidencial · Uso restrito aos fundadores</p>
+  <p style="margin-top:6px; color:#444">Versão 1.0 · 2025</p>
+</footer>
+
+</body>
+</html>
