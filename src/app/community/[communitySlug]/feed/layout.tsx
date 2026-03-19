@@ -227,7 +227,7 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
 
         {/* ── Opt-in button ── */}
         {optedIn !== null && (
-          <div className="mt-4 px-1">
+          <div className="mt-4 px-1 space-y-1.5">
             <button
               onClick={handleOptIn}
               disabled={optInLoading}
@@ -246,8 +246,13 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
               ) : (
                 <UserPlus className="w-3.5 h-3.5" />
               )}
-              {optedIn ? "Membro desta comunidade" : "Entrar na comunidade"}
+              {optedIn ? "Seguindo esta comunidade" : "Seguir esta comunidade"}
             </button>
+            {!optedIn && (
+              <p className="text-[10px] text-gray-600 text-center px-1 leading-relaxed">
+                Apareça no ranking e mostre sua participação ativa
+              </p>
+            )}
           </div>
         )}
 

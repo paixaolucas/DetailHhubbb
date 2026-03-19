@@ -76,14 +76,14 @@ export default function LeaderboardPage() {
   const [loading, setLoading] = useState(false);
   const [commLoading, setCommLoading] = useState(true);
 
-  // Load user's communities
+  // Load communities — all published (works for members and influencers)
   useEffect(() => {
     const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     if (!token) return;
-    fetch("/api/communities/mine", { headers: { Authorization: `Bearer ${token}` } })
+    fetch("/api/communities?published=true", { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.json())
       .then((d) => {
-        const list: Community[] = d.data?.communities ?? d.data ?? [];
+        const list: Community[] = d.communities ?? d.data?.communities ?? d.data ?? [];
         setCommunities(list);
         if (list.length > 0) setSelectedId(list[0].id);
       })
@@ -103,7 +103,9 @@ export default function LeaderboardPage() {
     })
       .then((r) => r.json())
       .then((d) => {
-        const list: LeaderEntry[] = d.data ?? [];
+        // Add rank from array position (API doesn't include rank field)
+        const raw: Omit<LeaderEntry, "rank">[] = d.data ?? [];
+        const list: LeaderEntry[] = raw.map((e, i) => ({ ...e, rank: i + 1 }));
         setEntries(list);
         const me = list.find((e) => e.userId === userId) ?? null;
         setMyRank(me);

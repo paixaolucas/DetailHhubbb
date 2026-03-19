@@ -119,7 +119,7 @@ export function MembershipSection({
           href={`/community/${communitySlug}/feed`}
           className="inline-flex items-center gap-2 bg-[#006079] hover:bg-[#007A99] text-white px-6 py-3 rounded-xl font-semibold transition-all hover:shadow-lg hover:shadow-[#006079]/30"
         >
-          Entrar na comunidade <ArrowRight className="w-4 h-4" />
+          Acessar comunidade <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
     );
