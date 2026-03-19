@@ -16,6 +16,11 @@ const PUBLIC_PATHS = [
   "/communities",
   "/community",
   "/certificates",
+  "/sobre",
+  "/blog",
+  "/contato",
+  "/privacidade",
+  "/termos",
   "/api/auth/login",
   "/api/auth/register",
   "/api/auth/refresh",
@@ -104,25 +109,57 @@ export function middleware(request: NextRequest) {
     // Full cryptographic verification happens at the API layer
     const role = extractRole(request);
 
-    const SELLER_ONLY = ["/dashboard/meus-produtos", "/dashboard/vendas", "/dashboard/live"];
-    if (SELLER_ONLY.some((p) => pathname.startsWith(p)) && role === "COMMUNITY_MEMBER") {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
-    }
-
-    const INFLUENCER_ONLY = ["/dashboard/analytics"];
-    if (
-      INFLUENCER_ONLY.some((p) => pathname.startsWith(p)) &&
-      role !== "SUPER_ADMIN" && role !== "INFLUENCER_ADMIN"
-    ) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
-    }
-
+    // Routes for SUPER_ADMIN only
     const ADMIN_ONLY = [
       "/dashboard/admin",
       "/dashboard/usuarios",
       "/dashboard/communities/new",
     ];
     if (ADMIN_ONLY.some((p) => pathname.startsWith(p)) && role !== "SUPER_ADMIN") {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+
+    // Routes for INFLUENCER_ADMIN + SUPER_ADMIN only
+    const INFLUENCER_ONLY = [
+      "/dashboard/tools",
+      "/dashboard/financeiro",
+      "/dashboard/performance",
+      "/dashboard/entregas",
+      "/dashboard/milestones",
+      "/dashboard/content",
+      "/dashboard/communities",
+      "/dashboard/live",
+      "/dashboard/email-sequences",
+      "/dashboard/anuncios",
+      "/dashboard/projeto",
+    ];
+    if (
+      INFLUENCER_ONLY.some((p) => pathname.startsWith(p)) &&
+      role !== "SUPER_ADMIN" &&
+      role !== "INFLUENCER_ADMIN"
+    ) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+
+    // Routes for INFLUENCER_ADMIN + MARKETPLACE_PARTNER + SUPER_ADMIN
+    const ANALYTICS_ROUTES = ["/dashboard/analytics"];
+    if (
+      ANALYTICS_ROUTES.some((p) => pathname.startsWith(p)) &&
+      role !== "SUPER_ADMIN" &&
+      role !== "INFLUENCER_ADMIN" &&
+      role !== "MARKETPLACE_PARTNER"
+    ) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+
+    // Routes for sellers (MARKETPLACE_PARTNER + INFLUENCER_ADMIN + SUPER_ADMIN)
+    const SELLER_ROUTES = ["/dashboard/meus-produtos", "/dashboard/vendas"];
+    if (
+      SELLER_ROUTES.some((p) => pathname.startsWith(p)) &&
+      role !== "SUPER_ADMIN" &&
+      role !== "INFLUENCER_ADMIN" &&
+      role !== "MARKETPLACE_PARTNER"
+    ) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
   }
