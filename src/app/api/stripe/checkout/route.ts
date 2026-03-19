@@ -11,6 +11,7 @@ import { createCheckoutSession } from "@/services/payment/payment.service";
 import { AppError } from "@/types";
 import { z } from "zod";
 import { trackEvent } from "@/services/analytics/analytics.service";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
@@ -33,6 +34,8 @@ const checkoutSchema = z.object({
 });
 
 export const POST = withAuth(async (req, { session }) => {
+  const rl = checkRateLimit(`checkout:${session.userId}`, 60_000, 5);
+  if (rl) return rl;
   try {
     const body = await req.json();
     const { planId, successUrl, cancelUrl } = checkoutSchema.parse(body);

@@ -62,6 +62,14 @@ export const PUT = withRole(UserRole.SUPER_ADMIN)(async (req, { session, params 
       },
     });
 
+    // Revoke all active refresh tokens so ban/deactivation takes effect immediately
+    if (parsed.data.isBanned === true || parsed.data.isActive === false) {
+      await db.refreshToken.updateMany({
+        where: { userId, isRevoked: false },
+        data: { isRevoked: true },
+      });
+    }
+
     return NextResponse.json({ success: true, data: user });
   } catch (error) {
     console.error("[User Status PUT]", error);

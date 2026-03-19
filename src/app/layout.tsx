@@ -17,6 +17,11 @@ export const metadata: Metadata = {
     default: "Detailer'HUB",
     template: "%s | Detailer'HUB",
   },
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
   description:
     "A plataforma premium para comunidades automotivas. Conecte-se, aprenda e cresça com os melhores entusiastas de automóveis do Brasil.",
   keywords: [

@@ -8,11 +8,16 @@ export const GET = withAuth(async (req, { session }) => {
     include: { plan: true },
   });
 
+  const now = new Date();
+  const hasMembership =
+    membership?.status === "ACTIVE" &&
+    (membership.currentPeriodEnd == null || membership.currentPeriodEnd > now);
+
   return NextResponse.json(
     {
       success: true,
       data: {
-        hasMembership: membership?.status === "ACTIVE",
+        hasMembership,
         membership,
       },
     },

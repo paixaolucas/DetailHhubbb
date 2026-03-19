@@ -59,6 +59,12 @@ export const PATCH = withRole(UserRole.SUPER_ADMIN)(
         select: { id: true, role: true },
       });
 
+      // Revoke all active refresh tokens so the new role takes effect immediately
+      await db.refreshToken.updateMany({
+        where: { userId, isRevoked: false },
+        data: { isRevoked: true },
+      });
+
       return NextResponse.json({ success: true, data: user });
     } catch (error) {
       console.error("[User Role PATCH]", error);
