@@ -1,15 +1,17 @@
 "use client";
 
 // =============================================================================
-// Community Feed Layout — wraps all /community/[slug]/feed/* routes
-// Has its own header + space sidebar, separate from the dashboard layout
+// Community Feed Layout — redesigned with banner sidebar + color header
 // =============================================================================
 
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { Hash, Menu, X, Users, Trophy, UserPlus, UserCheck, Loader2 } from "lucide-react";
+import {
+  Hash, Menu, X, Users, Trophy, UserPlus, UserCheck,
+  Loader2, ChevronRight, LayoutDashboard,
+} from "lucide-react";
 import { LogoType } from "@/components/ui/logo";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { STORAGE_KEYS } from "@/lib/constants";
@@ -28,6 +30,7 @@ interface Community {
   name: string;
   slug: string;
   logoUrl?: string | null;
+  bannerUrl?: string | null;
   primaryColor: string;
   memberCount?: number;
   shortDescription?: string | null;
@@ -90,7 +93,7 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
       const method = optedIn ? "DELETE" : "POST";
       const res = await fetch(`/api/communities/${community.id}/join`, {
         method,
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token ?? ""}` },
       });
       const d = await res.json();
       if (d.success) setOptedIn(d.data.joined);
@@ -101,49 +104,76 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
     }
   }, [community, optedIn]);
 
-  // Active space slug from pathname: /community/[slug]/feed/[spaceSlug]
-  const activeSpaceSlug = pathname.split(`/community/${communitySlug}/feed/`)[1]?.split("/")[0] ?? "";
+  const activeSpaceSlug =
+    pathname.split(`/community/${communitySlug}/feed/`)[1]?.split("/")[0] ?? "";
 
   const Sidebar = () => (
-    <div className="flex flex-col h-full bg-[#222222] border-r border-white/10">
-      {/* Community header */}
-      <div className="h-14 flex items-center gap-3 px-4 border-b border-white/10 flex-shrink-0">
-        {community?.logoUrl ? (
-          <Image
-            src={community.logoUrl}
-            alt={community.name}
-            width={28}
-            height={28}
-            className="w-7 h-7 rounded-lg object-cover flex-shrink-0"
-          />
+    <div className="flex flex-col h-full bg-[#181818] border-r border-white/8">
+
+      {/* ── Community banner header ── */}
+      <div className="relative flex-shrink-0 overflow-hidden" style={{ minHeight: "80px" }}>
+        {community?.bannerUrl ? (
+          <>
+            <Image
+              src={community.bannerUrl}
+              alt={community.name ?? ""}
+              fill
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-[#181818]" />
+          </>
         ) : (
           <div
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-[#EEE6E4] flex-shrink-0"
-            style={{ backgroundColor: community?.primaryColor ?? "#007A99" }}
-          >
-            {community?.name.charAt(0) ?? "C"}
-          </div>
+            className="absolute inset-0"
+            style={{
+              background: community
+                ? `linear-gradient(135deg, ${community.primaryColor}50 0%, ${community.primaryColor}10 100%)`
+                : "linear-gradient(135deg, #006079 0%, #003344 100%)",
+            }}
+          />
         )}
-        <div className="flex flex-col min-w-0 flex-1">
-          <span className="font-semibold text-[#EEE6E4] text-sm truncate leading-tight">
-            {community?.name ?? "Comunidade"}
-          </span>
-          {community?.memberCount != null && (
-            <span className="text-[10px] text-gray-400">
-              {community.memberCount.toLocaleString("pt-BR")} membros
-            </span>
+
+        {/* Logo + name over banner */}
+        <div className="relative p-3 pt-4 flex items-end gap-2.5 h-20">
+          {community?.logoUrl ? (
+            <Image
+              src={community.logoUrl}
+              alt={community.name ?? ""}
+              width={32}
+              height={32}
+              className="w-8 h-8 rounded-xl object-cover border-2 border-[#181818] shadow-lg flex-shrink-0"
+            />
+          ) : (
+            <div
+              className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold text-[#EEE6E4] flex-shrink-0 border-2 border-[#181818] shadow-lg"
+              style={{ backgroundColor: community?.primaryColor ?? "#007A99" }}
+            >
+              {community?.name?.charAt(0) ?? "C"}
+            </div>
           )}
+          <div className="min-w-0 flex-1">
+            <p className="font-bold text-[#EEE6E4] text-sm truncate leading-tight drop-shadow">
+              {community?.name ?? "Comunidade"}
+            </p>
+            {community?.memberCount != null && (
+              <p className="text-[10px] text-gray-300/80 drop-shadow">
+                {community.memberCount.toLocaleString("pt-BR")} membros
+              </p>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Spaces nav */}
+      {/* ── Spaces nav ── */}
       <nav className="flex-1 overflow-y-auto py-3 px-2">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 px-2 mb-2">
+        <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-600 px-2 mb-2">
           Canais
         </p>
+
         {spaces.length === 0 && (
-          <p className="text-xs text-gray-400 px-2 py-2">Nenhum canal</p>
+          <p className="text-xs text-gray-600 px-2 py-2">Nenhum canal disponível</p>
         )}
+
         {spaces.map((space) => {
           const href = `/community/${communitySlug}/feed/${space.slug}`;
           const isActive = space.slug === activeSpaceSlug;
@@ -153,41 +183,61 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
               href={href}
               onClick={() => setSidebarOpen(false)}
               className={[
-                "flex items-center gap-2 px-2 py-2 rounded-lg text-sm transition-all group",
+                "flex items-center gap-2 px-2.5 py-2 rounded-xl text-sm transition-all group relative",
                 isActive
-                  ? "bg-[#006079]/20 text-[#009CD9] font-medium"
-                  : "text-gray-400 hover:bg-white/5 hover:text-gray-300",
+                  ? "text-[#EEE6E4] font-medium"
+                  : "text-gray-500 hover:text-gray-300 hover:bg-white/5",
               ].join(" ")}
             >
-              {space.icon ? (
-                <span className="text-base leading-none w-4 text-center flex-shrink-0">
-                  {space.icon}
-                </span>
-              ) : (
-                <Hash
-                  className={[
-                    "w-4 h-4 flex-shrink-0",
-                    isActive ? "text-[#009CD9]" : "text-gray-400 group-hover:text-gray-300",
-                  ].join(" ")}
+              {/* Active indicator bar */}
+              {isActive && (
+                <div
+                  className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-full"
+                  style={{ backgroundColor: community?.primaryColor ?? "#009CD9" }}
                 />
               )}
-              <span className="truncate">{space.name}</span>
+              {/* Active bg */}
+              {isActive && (
+                <div
+                  className="absolute inset-0 rounded-xl opacity-10"
+                  style={{ backgroundColor: community?.primaryColor ?? "#009CD9" }}
+                />
+              )}
+
+              <span className="relative flex items-center gap-2 w-full">
+                {space.icon ? (
+                  <span className="text-base leading-none w-4 text-center flex-shrink-0">
+                    {space.icon}
+                  </span>
+                ) : (
+                  <Hash
+                    className={[
+                      "w-4 h-4 flex-shrink-0 transition-colors",
+                      isActive
+                        ? "text-[#EEE6E4]"
+                        : "text-gray-600 group-hover:text-gray-400",
+                    ].join(" ")}
+                  />
+                )}
+                <span className="truncate">{space.name}</span>
+              </span>
             </Link>
           );
         })}
 
-        {/* Opt-in button */}
+        {/* ── Opt-in button ── */}
         {optedIn !== null && (
-          <div className="mt-3 px-2">
+          <div className="mt-4 px-1">
             <button
               onClick={handleOptIn}
               disabled={optInLoading}
               className={[
-                "w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-all",
+                "w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all",
                 optedIn
-                  ? "bg-[#006079]/20 text-[#009CD9] hover:bg-red-500/10 hover:text-red-400 border border-[#009CD9]/30 hover:border-red-500/30"
-                  : "bg-[#006079] text-white hover:bg-[#007A99] border border-transparent",
+                  ? "bg-white/5 text-gray-400 hover:bg-red-500/10 hover:text-red-400 border border-white/10 hover:border-red-500/30"
+                  : "text-white border border-transparent hover:opacity-90",
               ].join(" ")}
+              style={!optedIn ? { backgroundColor: community?.primaryColor ?? "#006079" } : {}}
             >
               {optInLoading ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -201,34 +251,34 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
           </div>
         )}
 
-        {/* Extra links */}
-        <div className="mt-4 pt-3 border-t border-white/10 flex flex-col gap-0.5">
+        {/* ── Extra nav links ── */}
+        <div className="mt-4 pt-3 border-t border-white/8 flex flex-col gap-0.5">
           <Link
             href={`/community/${communitySlug}/members`}
             onClick={() => setSidebarOpen(false)}
-            className="flex items-center gap-2 px-2 py-2 rounded-lg text-sm text-gray-400 hover:bg-white/5 hover:text-gray-300 transition-all"
+            className="flex items-center gap-2 px-2.5 py-2 rounded-xl text-sm text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-all"
           >
-            <Users className="w-4 h-4 text-gray-400" />
+            <Users className="w-4 h-4 text-gray-600" />
             <span>Membros</span>
           </Link>
           <Link
             href={`/community/${communitySlug}/leaderboard`}
             onClick={() => setSidebarOpen(false)}
-            className="flex items-center gap-2 px-2 py-2 rounded-lg text-sm text-gray-400 hover:bg-white/5 hover:text-gray-300 transition-all"
+            className="flex items-center gap-2 px-2.5 py-2 rounded-xl text-sm text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-all"
           >
-            <Trophy className="w-4 h-4 text-gray-400" />
+            <Trophy className="w-4 h-4 text-gray-600" />
             <span>Leaderboard</span>
           </Link>
         </div>
       </nav>
 
-      {/* Back to dashboard */}
-      <div className="p-3 border-t border-white/10 flex-shrink-0">
+      {/* ── Back to dashboard ── */}
+      <div className="p-3 border-t border-white/8 flex-shrink-0">
         <Link
           href="/dashboard"
-          className="flex items-center gap-2 px-2 py-2 rounded-lg text-xs text-gray-400 hover:text-gray-300 hover:bg-white/5 transition-all"
+          className="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs text-gray-600 hover:text-gray-400 hover:bg-white/5 transition-all"
         >
-          <span className="text-gray-400">&larr;</span>
+          <LayoutDashboard className="w-3.5 h-3.5" />
           Dashboard
         </Link>
       </div>
@@ -237,8 +287,9 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
 
   return (
     <div className="min-h-screen bg-[#1A1A1A] flex">
+
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex w-56 flex-col fixed h-full z-30">
+      <aside className="hidden md:flex w-60 flex-col fixed h-full z-30">
         <Sidebar />
       </aside>
 
@@ -252,7 +303,7 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
 
       {/* Mobile sidebar */}
       <aside
-        className={`md:hidden fixed top-0 left-0 h-full w-56 z-50 flex flex-col transition-transform duration-300 ${
+        className={`md:hidden fixed top-0 left-0 h-full w-60 z-50 flex flex-col transition-transform duration-300 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -267,37 +318,39 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
         <Sidebar />
       </aside>
 
-      {/* Main content */}
-      <div className="flex-1 md:ml-56 flex flex-col min-h-screen">
+      {/* ── Main content ── */}
+      <div className="flex-1 md:ml-60 flex flex-col min-h-screen">
+
         {/* Top header */}
-        <header className="h-14 bg-[#222222]/80 border-b border-white/10 flex items-center px-4 gap-3 flex-shrink-0 sticky top-0 z-20 backdrop-blur-sm">
+        <header className="h-14 bg-[#1A1A1A]/90 border-b border-white/8 flex items-center px-4 gap-3 flex-shrink-0 sticky top-0 z-20 backdrop-blur-sm">
           {/* Mobile hamburger */}
           <button
             onClick={() => setSidebarOpen(true)}
-            className="md:hidden text-gray-400 hover:text-[#EEE6E4] transition-colors"
+            className="md:hidden text-gray-400 hover:text-[#EEE6E4] transition-colors p-1"
           >
             <Menu className="w-5 h-5" />
           </button>
 
-          {/* Logo → dashboard */}
+          {/* Breadcrumb */}
           <Link href="/dashboard" className="flex items-center flex-shrink-0">
-            <LogoType height={20} variant="light" />
+            <LogoType height={18} variant="light" />
           </Link>
 
-          <span className="text-gray-400 text-sm hidden sm:block">/</span>
+          <ChevronRight className="w-3.5 h-3.5 text-gray-600 hidden sm:block" />
           <Link
             href={`/community/${communitySlug}/feed`}
-            className="text-gray-400 hover:text-[#EEE6E4] text-sm truncate hidden sm:block max-w-[160px] transition-colors"
+            className="text-gray-400 hover:text-[#EEE6E4] text-sm truncate hidden sm:block max-w-[160px] transition-colors font-medium"
           >
             {community?.name ?? communitySlug}
           </Link>
+
           {activeSpaceSlug && spaces.length > 0 && (() => {
             const activeSpace = spaces.find((s) => s.slug === activeSpaceSlug);
             return activeSpace ? (
               <>
-                <span className="text-gray-400 text-sm hidden sm:block">/</span>
+                <ChevronRight className="w-3.5 h-3.5 text-gray-600 hidden sm:block flex-shrink-0" />
                 <span className="text-[#EEE6E4] text-sm truncate hidden sm:block max-w-[140px] font-medium">
-                  {activeSpace.icon ? `${activeSpace.icon} ` : ""}{activeSpace.name}
+                  {activeSpace.icon ? `${activeSpace.icon} ` : "#"}{activeSpace.name}
                 </span>
               </>
             ) : null;
@@ -307,7 +360,8 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
             <NotificationBell />
             <Link
               href="/dashboard/settings"
-              className="w-8 h-8 bg-gradient-to-br from-[#006079] to-[#009CD9] rounded-xl flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity"
+              className="w-8 h-8 rounded-xl flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity shadow-lg"
+              style={{ background: `linear-gradient(135deg, #006079, #009CD9)` }}
               title={userName}
             >
               {userInitials}
@@ -315,13 +369,21 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
           </div>
         </header>
 
+        {/* ── Community accent strip (below header, above content) ── */}
+        {community && (
+          <div
+            className="h-0.5 flex-shrink-0"
+            style={{ background: `linear-gradient(90deg, ${community.primaryColor}, ${community.primaryColor}00)` }}
+          />
+        )}
+
         {/* Page content */}
         <main className="flex-1">
           {children}
         </main>
       </div>
 
-      {/* Chat widget — space-specific when in a space, else general */}
+      {/* Chat widget */}
       {community && (() => {
         const activeSpace = activeSpaceSlug ? spaces.find((s) => s.slug === activeSpaceSlug) : null;
         return activeSpace ? (
