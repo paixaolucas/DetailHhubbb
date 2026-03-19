@@ -615,13 +615,21 @@ function MemberDashboardInner({ userName }: { userName: string }) {
     const headers = { Authorization: `Bearer ${token}` };
     Promise.all([
       fetch("/api/communities?published=true", { headers }).then((r) => r.json()),
-      fetch("/api/platform-membership/me", { headers }).then((r) => r.json()),
+      fetch("/api/platform-membership/me", { headers }).then(async (r) => {
+        if (r.status === 401) {
+          // Stale JWT (e.g. after db re-seed) — clear storage and redirect to login
+          Object.values(STORAGE_KEYS).forEach((key) => localStorage.removeItem(key));
+          window.location.href = "/login";
+          throw new Error("SESSION_EXPIRED");
+        }
+        return r.json();
+      }),
     ])
       .then(([commData, platformData]) => {
         if (commData.success) setCommunities(commData.communities ?? []);
         setHasPlatform(platformData.data?.hasMembership === true);
       })
-      .catch(console.error)
+      .catch((err) => { if ((err as Error)?.message !== "SESSION_EXPIRED") console.error(err); })
       .finally(() => setLoading(false));
   }, []);
 

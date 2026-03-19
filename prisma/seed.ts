@@ -31,32 +31,35 @@ async function main() {
   // =============================================================================
   // CLEAN UP (development only)
   // =============================================================================
-  await db.$transaction([
-    db.aIUsageLog.deleteMany(),
-    db.analyticsEvent.deleteMany(),
-    db.contentProgress.deleteMany(),
-    db.liveSessionAttendee.deleteMany(),
-    db.liveSession.deleteMany(),
-    db.contentLesson.deleteMany(),
-    db.contentModule.deleteMany(),
-    db.commissionTransaction.deleteMany(),
-    db.commissionRule.deleteMany(),
-    db.payment.deleteMany(),
-    db.communityMembership.deleteMany(),
-    db.platformMembership.deleteMany(),
-    db.platformPlan.deleteMany(),
-    db.subscriptionPlan.deleteMany(),
-    db.eventRegistration.deleteMany(),
-    db.eventTicketType.deleteMany(),
-    db.event.deleteMany(),
-    db.community.deleteMany(),
-    db.influencer.deleteMany(),
-    db.refreshToken.deleteMany(),
-    db.marketplacePurchase.deleteMany(),
-    db.marketplaceListing.deleteMany(),
-    db.saasTool.deleteMany(),
-    db.user.deleteMany(),
-  ]);
+  // Sequential deletes (pgBouncer pooler doesn't support multi-query $transaction)
+  await db.aIUsageLog.deleteMany();
+  await db.analyticsEvent.deleteMany();
+  await db.contentProgress.deleteMany();
+  await db.liveSessionAttendee.deleteMany();
+  await db.liveSession.deleteMany();
+  await db.contentLesson.deleteMany();
+  await db.contentModule.deleteMany();
+  await db.commissionTransaction.deleteMany();
+  await db.commissionRule.deleteMany();
+  await db.payment.deleteMany();
+  await db.communityMembership.deleteMany();
+  await db.platformMembership.deleteMany();
+  await db.platformPlan.deleteMany();
+  await db.subscriptionPlan.deleteMany();
+  await db.eventRegistration.deleteMany();
+  await db.eventTicketType.deleteMany();
+  await db.event.deleteMany();
+  await db.post.deleteMany();
+  await db.space.deleteMany();
+  await db.community.deleteMany();
+  await db.influencer.deleteMany();
+  await db.refreshToken.deleteMany();
+  await db.marketplacePurchase.deleteMany();
+  await db.marketplaceListing.deleteMany();
+  await db.saasTool.deleteMany();
+  await db.userPoints.deleteMany();
+  await db.notification.deleteMany();
+  await db.user.deleteMany();
 
   const saltRounds = 12;
 
@@ -121,8 +124,8 @@ async function main() {
         youtube: "BarbaOficial",
       },
       isVerified: true,
-      totalEarnings: 53512,
-      pendingPayout: 3500,
+      totalEarnings: 18968,
+      pendingPayout: 2500,
     },
   });
 
@@ -135,8 +138,8 @@ async function main() {
         instagram: "@corujaozk",
       },
       isVerified: true,
-      totalEarnings: 43943,
-      pendingPayout: 3662,
+      totalEarnings: 18968,
+      pendingPayout: 2500,
     },
   });
 
@@ -149,8 +152,8 @@ async function main() {
         instagram: "@neto",
       },
       isVerified: true,
-      totalEarnings: 43943,
-      pendingPayout: 3662,
+      totalEarnings: 18968,
+      pendingPayout: 2500,
     },
   });
 
@@ -182,6 +185,8 @@ async function main() {
       displayName: "Gimenez",
       bio: "Apaixonado por carros e pelo universo automotivo. Na Garagem do Gimenez a gente transforma paixão em conteúdo de verdade.",
       isVerified: true,
+      totalEarnings: 18968,
+      pendingPayout: 2500,
     },
   });
 
@@ -191,6 +196,8 @@ async function main() {
       displayName: "Gigi",
       bio: "Estética automotiva com estilo e precisão. Na Sala do Gigi cada detalhe importa.",
       isVerified: true,
+      totalEarnings: 18968,
+      pendingPayout: 2500,
     },
   });
 
@@ -213,7 +220,7 @@ async function main() {
       bannerUrl: "/photos/barba-thumb.png",
       isPublished: true,
       isPrivate: false,
-      memberCount: 0,
+      memberCount: 350,
       welcomeMessage:
         "Bem-vindo à comunidade do Barba! Aqui a gente não aceita pink lemonade. É conteúdo de verdade, técnica de verdade, resultado de verdade. Bora queimar os mitos!",
       rules:
@@ -236,7 +243,7 @@ async function main() {
       bannerUrl: "/photos/corujao-thumb.png",
       isPublished: true,
       isPrivate: false,
-      memberCount: 0,
+      memberCount: 350,
       welcomeMessage:
         "Fala, rapaziada! Seja bem-vindo à comunidade do Corujão. Aqui a gente representa a rua, nunca esquece da origem e respeita quem veio de baixo. É zika!",
       rules:
@@ -259,7 +266,7 @@ async function main() {
       bannerUrl: "/photos/neto-thumb.png",
       isPublished: true,
       isPrivate: false,
-      memberCount: 0,
+      memberCount: 350,
       welcomeMessage:
         "Bem-vindo à Comunidade no Mel! Aqui você vai encontrar aulas, técnicas e uma galera apaixonada por estética automotiva. Bora aprender!",
       rules:
@@ -279,7 +286,7 @@ async function main() {
       logoUrl: null,
       isPublished: true,
       isPrivate: false,
-      memberCount: 0,
+      memberCount: 350,
     },
   });
 
@@ -294,7 +301,7 @@ async function main() {
       logoUrl: null,
       isPublished: true,
       isPrivate: false,
-      memberCount: 0,
+      memberCount: 350,
     },
   });
 
@@ -345,7 +352,7 @@ async function main() {
     },
   });
 
-  await db.subscriptionPlan.create({
+  const planGimenez = await db.subscriptionPlan.create({
     data: {
       communityId: communityGimenez.id,
       name: "Membro Garagem",
@@ -359,7 +366,7 @@ async function main() {
     },
   });
 
-  await db.subscriptionPlan.create({
+  const planGigi = await db.subscriptionPlan.create({
     data: {
       communityId: communityGigi.id,
       name: "Membro Sala",
@@ -515,7 +522,7 @@ async function main() {
     data: {
       name: "DetailHub Anual",
       description: "Acesso completo a todas as comunidades automotivas da plataforma.",
-      price: 837,
+      price: 948,
       currency: "brl",
       interval: "year",
       intervalCount: 1,
@@ -529,7 +536,7 @@ async function main() {
     data: {
       name: "DetailHub Mensal (PIX)",
       description: "Acesso completo a todas as comunidades. Cobrança mensal via PIX ou cartão recorrente.",
-      price: 69.75,
+      price: 79,
       currency: "brl",
       interval: "month",
       intervalCount: 1,
@@ -540,13 +547,16 @@ async function main() {
   });
 
   // =============================================================================
-  // 500 DEMO MEMBERS + PLATFORM MEMBERSHIPS
+  // 350 DEMO MEMBERS + PLATFORM MEMBERSHIPS
+  // 70 per influencer × 5 influencers = 350 total
+  // Mix: every 5th member is monthly PIX (R$79), rest annual (R$948)
+  // All memberships have currentPeriodEnd in the future
   // =============================================================================
-  console.log("🔄 Creating 500 demo members...");
+  console.log("🔄 Creating 350 demo members...");
   const memberPassword = await bcrypt.hash("Membro@123!", 8); // 8 rounds for seeding speed
 
   await db.user.createMany({
-    data: Array.from({ length: 500 }, (_, i) => ({
+    data: Array.from({ length: 350 }, (_, i) => ({
       email: `demo${i + 1}@detailhub.com`,
       passwordHash: memberPassword,
       firstName: FIRST_NAMES[i % FIRST_NAMES.length],
@@ -564,21 +574,24 @@ async function main() {
 
   const now = new Date();
 
-  // Distribute referrals: Barba 200 (20 mensais PIX + 180 anuais), Corujão 150, Neto 150
-  // All joinedAt spread over the last 6 months per influencer block so charts show data
+  // Distribute referrals: 70 per influencer (Barba, Corujão, Neto, Gimenez, Gigi)
+  // joinedAt spread over last 6 months per block; monthly members' end = 1 month from NOW (always valid)
   await db.platformMembership.createMany({
     data: demoMembers.map((member, i) => {
       const referredByInfluencerId =
-        i < 200 ? influencerBarba.id : i < 350 ? influencerCorujao.id : influencerNeto.id;
+        i < 70  ? influencerBarba.id    :
+        i < 140 ? influencerCorujao.id  :
+        i < 210 ? influencerNeto.id     :
+        i < 280 ? influencerGimenez.id  :
+                  influencerGigi.id;
 
-      // First 20 Barba members use the monthly PIX plan
-      const isMonthly = i < 20;
+      // Every 5th member is monthly PIX, rest annual
+      const isMonthly = i % 5 === 0;
       const planId = isMonthly ? platformPlanMonthly.id : platformPlan.id;
 
-      // Spread joinedAt over last 6 months per influencer block for a realistic chart
-      const localIndex = i < 200 ? i : i < 350 ? i - 200 : i - 350;
-      const blockSize = i < 200 ? 200 : 150;
-      const monthOffset = Math.floor((localIndex / blockSize) * 6); // 0..5
+      // Spread joinedAt over last 6 months within each 70-member block
+      const localIndex = i % 70;
+      const monthOffset = Math.floor((localIndex / 70) * 6); // 0..5
       const dayOffset = (localIndex % 28) + 1;
       const joinedAt = new Date(now.getFullYear(), now.getMonth() - 5 + monthOffset, dayOffset);
 
@@ -587,8 +600,9 @@ async function main() {
         planId,
         status: "ACTIVE" as const,
         currentPeriodStart: joinedAt,
+        // Monthly: always 1 month from NOW (never expired); Annual: 1 year from join date
         currentPeriodEnd: isMonthly
-          ? new Date(joinedAt.getFullYear(), joinedAt.getMonth() + 1, joinedAt.getDate())
+          ? new Date(now.getFullYear(), now.getMonth() + 1, now.getDate())
           : new Date(joinedAt.getFullYear() + 1, joinedAt.getMonth(), joinedAt.getDate()),
         referredByInfluencerId,
         joinedAt,
@@ -596,7 +610,7 @@ async function main() {
     }),
   });
 
-  console.log("✅ 500 demo members + platform memberships created");
+  console.log("✅ 350 demo members + platform memberships created");
 
   // =============================================================================
   // 2 NAMED TEST MEMBERS (for manual login testing)
@@ -662,49 +676,40 @@ async function main() {
 
   // =============================================================================
   // COMMUNITY MEMBERSHIPS (visible in community settings > Members tab)
-  // First 50 demo members for Barba, next 40 for Corujão, next 40 for Neto
+  // 70 demo members per community (one block per influencer) + named test members
   // =============================================================================
-  const barbaMembers = demoMembers.slice(0, 50);
-  const corujaoMembers = demoMembers.slice(200, 240);
-  const netoMembers = demoMembers.slice(350, 390);
+  const barbaMembers    = demoMembers.slice(0, 70);
+  const corujaoMembers  = demoMembers.slice(70, 140);
+  const netoMembers     = demoMembers.slice(140, 210);
+  const gimenezMembers  = demoMembers.slice(210, 280);
+  const gigiMembers     = demoMembers.slice(280, 350);
+
+  const makeMemberships = (
+    members: { id: string }[],
+    communityId: string,
+    planId: string,
+  ) => members.map((m, i) => ({
+    userId: m.id,
+    communityId,
+    planId,
+    status: "ACTIVE" as const,
+    subscriptionStatus: "ACTIVE" as const,
+    joinedAt: new Date(now.getFullYear(), now.getMonth() - Math.floor(i / 10), (i % 28) + 1),
+  }));
 
   await db.communityMembership.createMany({
     data: [
-      ...barbaMembers.map((m, i) => ({
-        userId: m.id,
-        communityId: communityBarba.id,
-        planId: planBarba.id,
-        status: "ACTIVE" as const,
-        subscriptionStatus: "ACTIVE" as const,
-        joinedAt: new Date(now.getFullYear(), now.getMonth() - Math.floor(i / 5), (i % 28) + 1),
-      })),
+      ...makeMemberships(barbaMembers, communityBarba.id, planBarba.id),
       { userId: member1.id, communityId: communityBarba.id, planId: planBarba.id, status: "ACTIVE", subscriptionStatus: "ACTIVE", joinedAt: new Date(Date.now() - 5 * 86400000) },
-      ...corujaoMembers.map((m, i) => ({
-        userId: m.id,
-        communityId: communityCorujao.id,
-        planId: planCorujao.id,
-        status: "ACTIVE" as const,
-        subscriptionStatus: "ACTIVE" as const,
-        joinedAt: new Date(now.getFullYear(), now.getMonth() - Math.floor(i / 4), (i % 28) + 1),
-      })),
+      ...makeMemberships(corujaoMembers, communityCorujao.id, planCorujao.id),
       { userId: member2.id, communityId: communityCorujao.id, planId: planCorujao.id, status: "ACTIVE", subscriptionStatus: "ACTIVE", joinedAt: new Date(Date.now() - 3 * 86400000) },
-      ...netoMembers.map((m, i) => ({
-        userId: m.id,
-        communityId: communityNoMel.id,
-        planId: planNoMel.id,
-        status: "ACTIVE" as const,
-        subscriptionStatus: "ACTIVE" as const,
-        joinedAt: new Date(now.getFullYear(), now.getMonth() - Math.floor(i / 4), (i % 28) + 1),
-      })),
+      ...makeMemberships(netoMembers, communityNoMel.id, planNoMel.id),
+      ...makeMemberships(gimenezMembers, communityGimenez.id, planGimenez.id),
+      ...makeMemberships(gigiMembers, communityGigi.id, planGigi.id),
     ],
   });
 
-  // Update community member counts
-  await db.community.update({ where: { id: communityBarba.id }, data: { memberCount: 202 } });
-  await db.community.update({ where: { id: communityCorujao.id }, data: { memberCount: 152 } });
-  await db.community.update({ where: { id: communityNoMel.id }, data: { memberCount: 152 } });
-
-  console.log("✅ Community memberships + member counts updated");
+  console.log("✅ Community memberships created (70 per community)");
 
   // =============================================================================
   // POSTS IN SPACES
@@ -736,7 +741,7 @@ async function main() {
       { spaceId: feedNoMel.id, authorId: netoUser.id, communityId: communityNoMel.id, type: PostType.TEXT, body: "Bem-vindos à Comunidade no Mel! Aqui a educação vem primeiro. Nossa missão: fazer de você um profissional completo em estética automotiva. Aproveite cada aula. 🍯", isPinned: true, likeCount: 287, commentCount: 44, viewCount: 1780 },
       { spaceId: feedNoMel.id, authorId: netoUser.id, communityId: communityNoMel.id, type: PostType.TEXT, body: "Módulo 3 liberado hoje! 'Especialização — Precificação e Captação de Clientes'. Esse módulo mudou a vida de muitos alunos que conseguiram triplicar o faturamento depois de aplicar as técnicas de precificação.", likeCount: 198, commentCount: 27, viewCount: 987, createdAt: new Date(Date.now() - 86400000) },
       { spaceId: aulasNoMel.id, authorId: netoUser.id, communityId: communityNoMel.id, type: PostType.TEXT, body: "DÚVIDA FREQUENTE: Qual é a diferença entre polish e compound? Polish é abrasivo mais fino — para riscos leves e hologramas. Compound é abrasivo pesado — para riscos mais profundos. Sempre comece pelo menos abrasivo.", likeCount: 156, commentCount: 23, viewCount: 876, createdAt: new Date(Date.now() - 2 * 86400000) },
-      { spaceId: aulasNoMel.id, authorId: demoMembers[350].id, communityId: communityNoMel.id, type: PostType.TEXT, body: "Terminei o módulo de fundamentos hoje. Cara, a aula de lavagem correta mudou minha perspectiva completamente. Nunca tinha entendido a importância do pré-lavagem. Obrigado Neto!", likeCount: 67, commentCount: 11, viewCount: 345, createdAt: new Date(Date.now() - 3 * 86400000) },
+      { spaceId: aulasNoMel.id, authorId: demoMembers[149].id, communityId: communityNoMel.id, type: PostType.TEXT, body: "Terminei o módulo de fundamentos hoje. Cara, a aula de lavagem correta mudou minha perspectiva completamente. Nunca tinha entendido a importância do pré-lavagem. Obrigado Neto!", likeCount: 67, commentCount: 11, viewCount: 345, createdAt: new Date(Date.now() - 3 * 86400000) },
     ],
   });
 
@@ -976,19 +981,21 @@ async function main() {
 ║ SuperAdmin    admin@comunidadehub.com / Admin@123456!      ║
 ╠═══════════════════════════════════════════════════════════╣
 ║ Barba         barba@comunidade.com / Influencer@123!       ║
-║               200 membros referidos · R$4.882,50/mês       ║
+║               70 membros referidos · R$948 anual / R$79mês ║
 ║ Corujão       corujao@comunidade.com / Influencer@123!     ║
-║               150 membros referidos · R$3.661,88/mês       ║
+║               70 membros referidos · R$948 anual / R$79mês ║
 ║ Neto          neto@comunidade.com / Influencer@123!        ║
-║               150 membros referidos · R$3.661,88/mês       ║
+║               70 membros referidos · R$948 anual / R$79mês ║
 ║ Gimenez       gimenez@comunidade.com / Influencer@123!     ║
+║               70 membros referidos · R$948 anual / R$79mês ║
 ║ Gigi          gigi@comunidade.com / Influencer@123!        ║
+║               70 membros referidos · R$948 anual / R$79mês ║
 ╠═══════════════════════════════════════════════════════════╣
 ║ Member 1      membro1@email.com / Membro@123!              ║
 ║ Member 2      membro2@email.com / Membro@123!              ║
-║ Demo members  demo1..500@detailhub.com / Membro@123!       ║
+║ Demo members  demo1..350@detailhub.com / Membro@123!       ║
 ╠═══════════════════════════════════════════════════════════╣
-║ Total: 500 plataforma memberships + 5 comunidades +        ║
+║ Total: 352 plataforma memberships + 5 comunidades (350/ea) ║
 ║        7 events + posts + lives + content                  ║
 ╚═══════════════════════════════════════════════════════════╝
   `);

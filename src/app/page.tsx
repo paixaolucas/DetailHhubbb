@@ -132,7 +132,7 @@ const featuredCommunities = [
     slug: "garagem-do-gimenez",
     primaryColor: "#C0392B",
     bannerUrl: null,
-    members: "nova",
+    members: "350",
     description: "A garagem do Gimenez — onde a paixão por carros vira conteúdo.",
   },
   {
@@ -140,7 +140,7 @@ const featuredCommunities = [
     slug: "sala-do-gigi",
     primaryColor: "#8E44AD",
     bannerUrl: null,
-    members: "nova",
+    members: "350",
     description: "A sala do Gigi — estética automotiva com estilo e precisão.",
   },
 ];
@@ -174,8 +174,8 @@ function FeaturedCommunitiesSection() {
           </p>
         </ScrollReveal>
 
-        {/* Horizontal scroll mobile / 3-col grid desktop */}
-        <div className="flex gap-5 overflow-x-auto pb-4 md:grid md:grid-cols-3 md:overflow-visible md:pb-0 snap-x snap-mandatory md:snap-none">
+        {/* Horizontal scroll mobile / 5-col grid desktop */}
+        <div className="flex gap-5 overflow-x-auto pb-4 md:grid md:grid-cols-3 lg:grid-cols-5 md:overflow-visible md:pb-0 snap-x snap-mandatory md:snap-none">
           {featuredCommunities.map((community, i) => (
             <div
               key={community.slug}
