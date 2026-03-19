@@ -320,7 +320,7 @@ export default function GaragePage() {
                   className="w-full h-28 object-cover rounded-xl border border-[#007A99]/30 opacity-70"
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-xs text-[#009CD9] bg-[#F8F7FF]/80 rounded-lg px-2 py-0.5">Pendente</span>
+                  <span className="text-xs text-[#009CD9] bg-[#1A1A1A]/80 rounded-lg px-2 py-0.5">Pendente</span>
                 </div>
                 <button
                   type="button"

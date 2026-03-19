@@ -319,8 +319,8 @@ export default function AdminDenunciasPage() {
             onClick={() => { setStatusFilter(key); setPage(1); }}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium border transition-all ${
               statusFilter === key
-                ? "bg-gray-900 text-white border-gray-900"
-                : "bg-white text-gray-400 border-white/10 hover:border-gray-400"
+                ? "bg-white/10 text-[#EEE6E4] border-white/20"
+                : "bg-white/5 text-gray-400 border-white/10 hover:border-white/30"
             }`}
           >
             <Icon className="w-3.5 h-3.5" />

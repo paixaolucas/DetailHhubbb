@@ -24,8 +24,8 @@ const TABS = [
 ];
 
 const COLORS = [
-  "#6366f1", "#8b5cf6", "#ec4899", "#ef4444",
-  "#f97316", "#eab308", "#22c55e", "#06b6d4", "#8b5cf6", "#64748b",
+  "#006079", "#007A99", "#009CD9", "#ec4899", "#ef4444",
+  "#f97316", "#eab308", "#22c55e", "#06b6d4", "#64748b",
 ];
 
 
@@ -82,7 +82,7 @@ export default function CommunitySettingsPage() {
   });
 
   const [appearanceForm, setAppearanceForm] = useState({
-    primaryColor: "#8b5cf6", logoUrl: "", bannerUrl: "",
+    primaryColor: "#006079", logoUrl: "", bannerUrl: "",
   });
 
   // Points allocation modal
@@ -132,7 +132,7 @@ export default function CommunitySettingsPage() {
           isPrivate: c.isPrivate ?? false,
         });
         setAppearanceForm({
-          primaryColor: c.primaryColor ?? "#8b5cf6",
+          primaryColor: c.primaryColor ?? "#006079",
           logoUrl: c.logoUrl ?? "", bannerUrl: (c as any).bannerUrl ?? "",
         });
       }
@@ -494,9 +494,9 @@ export default function CommunitySettingsPage() {
               ) : (
                 <div className="h-20 relative grid-pattern opacity-20" style={{ backgroundColor: appearanceForm.primaryColor }} />
               )}
-              <div className="p-4 bg-white">
+              <div className="p-4 bg-[#222222]">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-[#EEE6E4] font-bold -mt-6 border-2 border-gray-900" style={{ backgroundColor: appearanceForm.primaryColor }}>
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-[#EEE6E4] font-bold -mt-6 border-2 border-[#1A1A1A]" style={{ backgroundColor: appearanceForm.primaryColor }}>
                     {community.name.charAt(0)}
                   </div>
                   <p className="font-semibold text-sm text-[#EEE6E4]">{community.name}</p>
@@ -731,7 +731,7 @@ export default function CommunitySettingsPage() {
                   <select
                     value={testimonialForm.rating}
                     onChange={(e) => setTestimonialForm((p) => ({ ...p, rating: e.target.value }))}
-                    className={`${fieldClass()} bg-[#F8F7FF]`}
+                    className={`${fieldClass()}`}
                   >
                     {[5, 4, 3, 2, 1].map((r) => (
                       <option key={r} value={r}>{"★".repeat(r)} ({r})</option>

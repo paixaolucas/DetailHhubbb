@@ -288,7 +288,7 @@ export default function PostCard({
             </div>
           )}
           <div className="flex flex-col min-w-0">
-            <span className="text-sm font-semibold text-gray-300 leading-tight">{authorName}</span>
+            <span className="text-sm font-semibold text-[#EEE6E4] leading-tight">{authorName}</span>
             <span className="text-xs text-gray-500">{timeAgo(post.createdAt)}</span>
           </div>
 
@@ -360,7 +360,7 @@ export default function PostCard({
 
         {/* Body preview */}
         {post.body && post.body.trim() !== " " && (
-          <p className="text-sm text-gray-400 leading-relaxed line-clamp-3 whitespace-pre-wrap break-words">
+          <p className="text-sm text-gray-300 leading-relaxed line-clamp-3 whitespace-pre-wrap break-words">
             {post.body}
           </p>
         )}

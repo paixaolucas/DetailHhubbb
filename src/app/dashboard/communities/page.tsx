@@ -43,16 +43,16 @@ export default function CommunitiesPage() {
     return (
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <div className="h-8 bg-white rounded w-40 animate-pulse" />
-          <div className="h-9 bg-white rounded-xl w-36 animate-pulse" />
+          <div className="h-8 bg-white/10 rounded w-40 animate-pulse" />
+          <div className="h-9 bg-white/10 rounded-xl w-36 animate-pulse" />
         </div>
         {Array.from({ length: 3 }).map((_, i) => (
           <div key={i} className="glass-card p-6 animate-pulse">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-white rounded-xl" />
+              <div className="w-12 h-12 bg-white/10 rounded-xl" />
               <div className="flex-1 space-y-2">
-                <div className="h-5 bg-white rounded w-1/3" />
-                <div className="h-4 bg-white rounded w-1/2" />
+                <div className="h-5 bg-white/10 rounded w-1/3" />
+                <div className="h-4 bg-white/10 rounded w-1/2" />
               </div>
             </div>
           </div>

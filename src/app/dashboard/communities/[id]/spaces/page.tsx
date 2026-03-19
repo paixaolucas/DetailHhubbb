@@ -262,7 +262,7 @@ function SpaceModal({
                     "text-left p-3 rounded-xl border transition-all",
                     form.type === t.value
                       ? "border-[#007A99]/50 bg-[#007A99]/10"
-                      : "border-white/10 bg-white hover:border-[#99D3DF]",
+                      : "border-white/10 bg-white/5 hover:border-[#99D3DF]",
                   ].join(" ")}
                 >
                   <p className={[

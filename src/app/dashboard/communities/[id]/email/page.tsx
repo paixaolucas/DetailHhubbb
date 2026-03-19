@@ -221,7 +221,7 @@ export default function EmailSequencesPage() {
             ))}
           </div>
         ) : sequences.length === 0 && !showEditor ? (
-          <div className="text-center py-16 bg-white border border-dashed border-white/10 rounded-2xl">
+          <div className="text-center py-16 bg-white/5 border border-dashed border-white/10 rounded-2xl">
             <Mail className="w-12 h-12 text-gray-400 mx-auto mb-3" />
             <p className="text-gray-400 mb-1">Nenhuma sequência criada</p>
             <p className="text-gray-400 text-sm mb-5">
@@ -295,7 +295,7 @@ export default function EmailSequencesPage() {
                   <div className="flex items-center gap-2 mt-4">
                     <button
                       onClick={() => openEdit(seq)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-400 hover:text-[#EEE6E4] bg-white hover:bg-white/10 border border-white/10 rounded-lg transition-colors"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-400 hover:text-[#EEE6E4] bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors"
                     >
                       <Pencil className="w-3 h-3" />
                       Editar

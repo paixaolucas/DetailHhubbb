@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Linkedin, Copy, Check } from "lucide-react";
+import { Linkedin, Copy, Check, Printer } from "lucide-react";
 
 export function CertificateShareButtons() {
   const [copied, setCopied] = useState(false);
@@ -23,6 +23,13 @@ export function CertificateShareButtons() {
 
   return (
     <div className="flex items-center justify-center gap-3 flex-wrap">
+      <button
+        onClick={() => window.print()}
+        className="flex items-center gap-2 px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-gray-400 hover:text-[#EEE6E4] text-sm font-semibold rounded-xl transition-all print:hidden"
+      >
+        <Printer className="w-4 h-4" />
+        Imprimir / PDF
+      </button>
       <button
         onClick={shareLinkedIn}
         className="flex items-center gap-2 px-4 py-2.5 bg-[#0A66C2] hover:bg-[#004182] text-white text-sm font-semibold rounded-xl transition-all"

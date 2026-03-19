@@ -5,14 +5,15 @@
 // Has its own header + space sidebar, separate from the dashboard layout
 // =============================================================================
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { Hash, Menu, X, Users, Trophy } from "lucide-react";
-import { Logo } from "@/components/ui/logo";
+import { Hash, Menu, X, Users, Trophy, UserPlus, UserCheck, Loader2 } from "lucide-react";
+import { LogoType } from "@/components/ui/logo";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { STORAGE_KEYS } from "@/lib/constants";
+import { ChatWidget } from "@/components/community/ChatWidget";
 
 interface Space {
   id: string;
@@ -43,6 +44,8 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
   const [userName, setUserName] = useState("");
   const [userInitials, setUserInitials] = useState("U");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [optedIn, setOptedIn] = useState<boolean | null>(null);
+  const [optInLoading, setOptInLoading] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
@@ -66,14 +69,37 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
           const found = (d.communities as Community[]).find((c) => c.slug === communitySlug);
           if (found) {
             setCommunity(found);
-            return fetch(`/api/communities/${found.id}/spaces`, { headers })
-              .then((r) => r.json())
-              .then((sd) => { if (sd.success) setSpaces(sd.data ?? []); });
+            Promise.all([
+              fetch(`/api/communities/${found.id}/spaces`, { headers }).then((r) => r.json()),
+              fetch(`/api/communities/${found.id}/join`, { headers }).then((r) => r.json()),
+            ]).then(([sd, jd]) => {
+              if (sd.success) setSpaces(sd.data ?? []);
+              if (jd.success) setOptedIn(jd.data?.joined ?? false);
+            });
           }
         }
       })
       .catch(console.error);
   }, [communitySlug, router]);
+
+  const handleOptIn = useCallback(async () => {
+    if (!community) return;
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+    setOptInLoading(true);
+    try {
+      const method = optedIn ? "DELETE" : "POST";
+      const res = await fetch(`/api/communities/${community.id}/join`, {
+        method,
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const d = await res.json();
+      if (d.success) setOptedIn(d.data.joined);
+    } catch {
+      // ignore
+    } finally {
+      setOptInLoading(false);
+    }
+  }, [community, optedIn]);
 
   // Active space slug from pathname: /community/[slug]/feed/[spaceSlug]
   const activeSpaceSlug = pathname.split(`/community/${communitySlug}/feed/`)[1]?.split("/")[0] ?? "";
@@ -149,6 +175,31 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
             </Link>
           );
         })}
+
+        {/* Opt-in button */}
+        {optedIn !== null && (
+          <div className="mt-3 px-2">
+            <button
+              onClick={handleOptIn}
+              disabled={optInLoading}
+              className={[
+                "w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-all",
+                optedIn
+                  ? "bg-[#006079]/20 text-[#009CD9] hover:bg-red-500/10 hover:text-red-400 border border-[#009CD9]/30 hover:border-red-500/30"
+                  : "bg-[#006079] text-white hover:bg-[#007A99] border border-transparent",
+              ].join(" ")}
+            >
+              {optInLoading ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : optedIn ? (
+                <UserCheck className="w-3.5 h-3.5" />
+              ) : (
+                <UserPlus className="w-3.5 h-3.5" />
+              )}
+              {optedIn ? "Membro desta comunidade" : "Entrar na comunidade"}
+            </button>
+          </div>
+        )}
 
         {/* Extra links */}
         <div className="mt-4 pt-3 border-t border-white/10 flex flex-col gap-0.5">
@@ -229,15 +280,28 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
           </button>
 
           {/* Logo → dashboard */}
-          <Link href="/dashboard" className="flex items-center gap-2 flex-shrink-0">
-            <Logo size="sm" />
-            <span className="hidden sm:block text-[#EEE6E4] font-bold text-sm">Detailer&apos;HUB</span>
+          <Link href="/dashboard" className="flex items-center flex-shrink-0">
+            <LogoType height={20} variant="light" />
           </Link>
 
           <span className="text-gray-400 text-sm hidden sm:block">/</span>
-          <span className="text-gray-400 text-sm truncate hidden sm:block max-w-[200px]">
+          <Link
+            href={`/community/${communitySlug}/feed`}
+            className="text-gray-400 hover:text-[#EEE6E4] text-sm truncate hidden sm:block max-w-[160px] transition-colors"
+          >
             {community?.name ?? communitySlug}
-          </span>
+          </Link>
+          {activeSpaceSlug && spaces.length > 0 && (() => {
+            const activeSpace = spaces.find((s) => s.slug === activeSpaceSlug);
+            return activeSpace ? (
+              <>
+                <span className="text-gray-400 text-sm hidden sm:block">/</span>
+                <span className="text-[#EEE6E4] text-sm truncate hidden sm:block max-w-[140px] font-medium">
+                  {activeSpace.icon ? `${activeSpace.icon} ` : ""}{activeSpace.name}
+                </span>
+              </>
+            ) : null;
+          })()}
 
           <div className="ml-auto flex items-center gap-3">
             <NotificationBell />
@@ -256,6 +320,20 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
           {children}
         </main>
       </div>
+
+      {/* Chat widget — space-specific when in a space, else general */}
+      {community && (() => {
+        const activeSpace = activeSpaceSlug ? spaces.find((s) => s.slug === activeSpaceSlug) : null;
+        return activeSpace ? (
+          <ChatWidget
+            communityId={community.id}
+            spaceId={activeSpace.id}
+            label={`Chat: ${activeSpace.name}`}
+          />
+        ) : (
+          <ChatWidget communityId={community.id} />
+        );
+      })()}
     </div>
   );
 }

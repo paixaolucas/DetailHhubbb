@@ -2,11 +2,11 @@ export const metadata = { title: "Blog — Detailer'HUB" };
 
 export default function BlogPage() {
   return (
-    <div className="text-gray-900">
+    <div className="text-[#EEE6E4]">
       {/* Hero */}
-      <div className="bg-[#F0EEFF] border-b border-gray-200 py-20 px-4 text-center">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">Blog Detailer'HUB</h1>
-        <p className="text-gray-500 text-lg max-w-xl mx-auto">
+      <div className="bg-[#006079]/10 border-b border-white/10 py-20 px-4 text-center">
+        <h1 className="text-4xl md:text-5xl font-bold mb-4">Blog Detailer&apos;HUB</h1>
+        <p className="text-gray-400 text-lg max-w-xl mx-auto">
           Dicas, novidades e histórias do universo automotivo e das comunidades.
         </p>
       </div>
@@ -16,11 +16,11 @@ export default function BlogPage() {
           <span className="text-3xl">✍️</span>
         </div>
         <h2 className="text-2xl font-bold mb-3">Em breve</h2>
-        <p className="text-gray-500 leading-relaxed max-w-md mx-auto">
+        <p className="text-gray-400 leading-relaxed max-w-md mx-auto">
           Nosso blog está sendo preparado com muito cuidado. Em breve você encontrará aqui conteúdos exclusivos sobre
           comunidades automotivas, dicas de criadores e novidades da plataforma.
         </p>
-        <p className="text-sm text-gray-400 mt-6">
+        <p className="text-sm text-gray-500 mt-6">
           Quer ser notificado quando publicarmos? Entre na plataforma e ative as notificações.
         </p>
         <a

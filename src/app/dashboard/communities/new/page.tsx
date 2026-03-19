@@ -7,7 +7,7 @@ import { ArrowLeft, Info, Search, X, UserCheck, AlertTriangle } from "lucide-rea
 import { STORAGE_KEYS } from "@/lib/constants";
 
 const COLORS = [
-  "#6366f1", "#8b5cf6", "#ec4899", "#ef4444",
+  "#006079", "#007A99", "#009CD9", "#ec4899", "#ef4444",
   "#f97316", "#eab308", "#22c55e", "#06b6d4",
   "#64748b",
 ];
@@ -67,7 +67,7 @@ export default function NewCommunityPage() {
   // Form
   const [form, setForm] = useState({
     name: "", slug: "", shortDescription: "", description: "",
-    primaryColor: "#8b5cf6", isPrivate: false, tags: "",
+    primaryColor: "#006079", isPrivate: false, tags: "",
     welcomeMessage: "", rules: "",
   });
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
@@ -267,7 +267,7 @@ export default function NewCommunityPage() {
           <div>
             <label className="block text-sm font-medium text-gray-400 mb-1.5">URL da comunidade <span className="text-red-400">*</span></label>
             <div className="flex items-center bg-white/5 border border-white/10 hover:border-[#99D3DF] focus-within:border-[#007A99]/50 focus-within:ring-2 focus-within:ring-[#007A99]/30 rounded-xl overflow-hidden transition-all">
-              <span className="bg-white px-4 py-3 text-sm text-gray-500 border-r border-white/10 shrink-0">detailhub.com/</span>
+              <span className="bg-white/10 px-4 py-3 text-sm text-gray-400 border-r border-white/10 shrink-0">detailhub.com/</span>
               <input type="text" value={form.slug}
                 onChange={(e) => { setSlugManuallyEdited(true); setForm((p) => ({ ...p, slug: slugify(e.target.value) })); }}
                 placeholder="minha-comunidade"

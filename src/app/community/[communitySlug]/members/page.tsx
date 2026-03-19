@@ -222,7 +222,7 @@ export default function CommunityMembersPage() {
                 return (
                   <Link
                     key={member.id}
-                    href={`/members/${member.user.id}`}
+                    href={`/community/${communitySlug}/members/${member.user.id}`}
                     className="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center gap-4 hover:bg-white/10 hover:border-[#006079]/40 transition-all group"
                   >
                     {/* Avatar */}

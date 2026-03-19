@@ -69,7 +69,7 @@ const features = [
 
 const steps = [
   { step: "01", title: "Crie sua conta", desc: "Registre-se e configure seu perfil em menos de 5 minutos.", icon: Users },
-  { step: "02", title: "Assine o plano", desc: "R$837/ano — acesso imediato a todas as comunidades da plataforma.", icon: CheckCircle },
+  { step: "02", title: "Assine o plano", desc: "R$79/mês — acesso imediato a todas as comunidades da plataforma.", icon: CheckCircle },
   { step: "03", title: "Explore e evolua", desc: "Acesse cursos, lives, marketplace e a IA mecânica sem limites.", icon: Trophy },
 ];
 
@@ -160,22 +160,22 @@ function HeroSection() {
         {/* Badge */}
         <div className="inline-flex items-center gap-2 bg-[#006079]/10 border border-[#007A99]/30 rounded-full px-4 py-1.5 text-sm text-[#009CD9] mb-8">
           <Car className="w-4 h-4" />
-          A plataforma premium para comunidades automotivas
+          O maior ecossistema de estética automotiva do Brasil
         </div>
 
         {/* Headline */}
         <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-[1.1] tracking-tight">
-          <span className="text-[#EEE6E4]">Sua comunidade </span>
+          <span className="text-[#EEE6E4]">As melhores comunidades </span>
           <br />
           <span className="bg-gradient-to-r from-[#009CD9] via-[#007A99] to-[#006079] bg-clip-text text-transparent">
-            automotiva
+            automotivas do Brasil
           </span>
-          <span className="text-[#EEE6E4]">, premium.</span>
+          <span className="text-[#EEE6E4]"> — em um só lugar.</span>
         </h1>
 
         <p className="text-gray-400 text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
-          Acesse todas as comunidades automotivas premium em um único lugar.
-          Cursos, lives, marketplace e IA mecânica — tudo incluso.
+          O YouTube é sua vitrine. O Detailer&apos;HUB é a sua casa.
+          Cursos, lives, marketplace e IA mecânica — tudo incluso com uma única assinatura.
         </p>
 
         {/* CTAs */}
@@ -196,7 +196,7 @@ function HeroSection() {
 
         {/* Trust indicators */}
         <div className="flex items-center justify-center gap-3 sm:gap-6 mt-12 flex-wrap">
-          {["R$837/ano. Acesso a tudo.", "Setup em 5 minutos", "Cancele quando quiser"].map((item) => (
+          {["R$79/mês. Acesso a tudo.", "Setup em 5 minutos", "Cancele quando quiser"].map((item) => (
             <div key={item} className="flex items-center gap-2 text-gray-500 text-sm">
               <CheckCircle className="w-4 h-4 text-green-500" />
               {item}
@@ -272,7 +272,7 @@ function StatsBar() {
 
 function FeaturedCommunitiesSection() {
   return (
-    <section className="bg-[#1A1A1A] py-24 overflow-hidden">
+    <section id="comunidades" className="bg-[#1A1A1A] py-24 overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-[#006079]/10 border border-[#006079]/20 rounded-full px-3 py-1 text-xs text-[#009CD9] mb-4">
@@ -415,14 +415,14 @@ function PricingSection() {
               <div className="text-center mb-8">
                 <div className="inline-flex items-center gap-2 bg-[#006079]/10 border border-[#006079]/20 rounded-full px-3 py-1 text-xs text-[#009CD9] mb-4">
                   <Car className="w-3 h-3" />
-                  Detailer&apos;HUB Anual
+                  Detailer&apos;HUB — Acesso Completo
                 </div>
                 <div className="flex items-end justify-center gap-1">
                   <span className="text-gray-400 text-xl">R$</span>
-                  <span className="text-6xl font-bold text-[#EEE6E4]">837</span>
-                  <span className="text-gray-400 text-xl mb-2">/ano</span>
+                  <span className="text-6xl font-bold text-[#EEE6E4]">79</span>
+                  <span className="text-gray-400 text-xl mb-2">/mês</span>
                 </div>
-                <p className="text-gray-500 text-sm mt-2">R$69,75 por mês</p>
+                <p className="text-gray-500 text-sm mt-2">ou R$948/ano — cancele quando quiser</p>
               </div>
 
               <ul className="space-y-3 mb-8">
@@ -509,7 +509,7 @@ function CTASection() {
             </div>
 
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6 max-w-2xl mx-auto">
-              R$837/ano. Acesso a tudo. Cancele quando quiser.
+              Sua audiência merece uma casa. O Detailer&apos;HUB é essa casa.
             </h2>
 
             <p className="text-white/80 text-lg mb-10 max-w-xl mx-auto">

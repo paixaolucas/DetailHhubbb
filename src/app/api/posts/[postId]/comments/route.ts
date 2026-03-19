@@ -8,6 +8,7 @@ import { z } from "zod";
 import { withAuth, verifyMembership } from "@/middleware/auth.middleware";
 import { db } from "@/lib/db";
 import { notifyNewComment, notifyNewReply } from "@/services/notification/notification.service";
+import { awardPoints, awardInfluencerPoints } from "@/lib/points";
 
 const commentSchema = z.object({
   body: z
@@ -89,7 +90,12 @@ export const POST = withAuth(async (req, { session, params }) => {
         isLocked: true,
         authorId: true,
         title: true,
-        community: { select: { slug: true } },
+        community: {
+          select: {
+            slug: true,
+            influencer: { select: { userId: true } },
+          },
+        },
       },
     });
     if (!post) {
@@ -150,6 +156,30 @@ export const POST = withAuth(async (req, { session, params }) => {
         data: { commentCount: { increment: 1 } },
       }),
     ]);
+
+    // Award member points asynchronously (non-blocking)
+    const pointsEventType = parentId ? "REPLY_CREATE" : "COMMENT_CREATE";
+    awardPoints({
+      userId: session.userId,
+      communityId: post.communityId,
+      amount: parentId ? 6 : 8,
+      reason: parentId ? "respondeu um comentário" : "comentou em um post",
+      eventType: pointsEventType,
+      dailyLimit: parentId ? 8 : 5,
+    }).catch(() => {});
+
+    // Award influencer points for engagement in their community
+    const influencerUserId = post.community?.influencer?.userId;
+    if (influencerUserId && influencerUserId !== session.userId) {
+      awardInfluencerPoints({
+        userId: influencerUserId,
+        communityId: post.communityId,
+        amount: 8,
+        reason: "membro comentou na comunidade",
+        eventType: "INFLUENCER_MEMBER_COMMENT",
+        dailyLimit: 40,
+      }).catch(() => {});
+    }
 
     // Fire notifications asynchronously (non-blocking)
     const actorName = `${comment.author.firstName} ${comment.author.lastName}`;

@@ -8,7 +8,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { Users, BookOpen, Video, ArrowRight, Star, ChevronDown } from "lucide-react";
 import { MembershipSection } from "@/components/community/membership-section";
+import { LogoType } from "@/components/ui/logo";
 import { Metadata } from "next";
+import { getInfluencerHealth, getInfluencerHealthEmoji } from "@/lib/points";
 
 // ---------------------------------------------------------------------------
 // SEO — generateMetadata
@@ -50,7 +52,7 @@ async function getCommunity(slug: string) {
     include: {
       influencer: {
         include: {
-          user: { select: { firstName: true, lastName: true, avatarUrl: true } },
+          user: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } },
         },
       },
       subscriptionPlans: {
@@ -115,6 +117,15 @@ export default async function CommunityPage({
 
   const influencer = community.influencer;
   const hostName = `${influencer.user.firstName} ${influencer.user.lastName}`;
+
+  // Influencer health: based on their points in this community
+  const influencerPointsRecord = await db.userPoints.findUnique({
+    where: { userId_communityId: { userId: influencer.user.id, communityId: community.id } },
+    select: { points: true },
+  });
+  const influencerPts = influencerPointsRecord?.points ?? 0;
+  const influencerHealth = getInfluencerHealth(influencerPts);
+  const influencerHealthEmoji = getInfluencerHealthEmoji(influencerHealth);
   const hasModules = community.contentModules.length > 0;
   const hasTestimonials = community.testimonials.length > 0;
   const hasFaqs = community.faqs.length > 0;
@@ -124,11 +135,8 @@ export default async function CommunityPage({
       {/* Navbar */}
       <header className="border-b border-white/10 bg-[#1A1A1A]/80 backdrop-blur-xl sticky top-0 z-10">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-sm text-gray-400 hover:text-[#EEE6E4] transition-colors"
-          >
-            <span className="text-[#009CD9]">&larr;</span> Detailer&apos;HUB
+          <Link href="/" className="flex items-center">
+            <LogoType height={22} variant="light" />
           </Link>
           <div className="flex items-center gap-3">
             <Link
@@ -281,7 +289,20 @@ export default async function CommunityPage({
                 </div>
               )}
               <div>
-                <p className="font-semibold text-[#EEE6E4] text-lg">{hostName}</p>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="font-semibold text-[#EEE6E4] text-lg">{hostName}</p>
+                  <span
+                    className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border"
+                    title={`Saúde da comunidade: ${influencerHealth}`}
+                    style={{
+                      backgroundColor: influencerHealth === "Saudável" ? "rgba(34,197,94,0.1)" : influencerHealth === "Atenção" ? "rgba(234,179,8,0.1)" : "rgba(239,68,68,0.1)",
+                      borderColor: influencerHealth === "Saudável" ? "rgba(34,197,94,0.3)" : influencerHealth === "Atenção" ? "rgba(234,179,8,0.3)" : "rgba(239,68,68,0.3)",
+                      color: influencerHealth === "Saudável" ? "rgb(134,239,172)" : influencerHealth === "Atenção" ? "rgb(253,224,71)" : "rgb(252,165,165)",
+                    }}
+                  >
+                    {influencerHealthEmoji} {influencerHealth}
+                  </span>
+                </div>
                 <p className="text-sm text-gray-400 mb-3">{influencer.displayName}</p>
                 {influencer.bio && (
                   <p className="text-sm text-gray-400 leading-relaxed">{influencer.bio}</p>
@@ -436,16 +457,20 @@ export default async function CommunityPage({
             >
               {community.name.charAt(0)}
             </div>
-            <h3 className="text-2xl font-bold text-[#EEE6E4] mb-2">Quer fazer parte?</h3>
-            <p className="text-gray-400 mb-6 max-w-md mx-auto">
-              Crie sua conta gratuitamente e solicite acesso &agrave; comunidade{" "}
-              <strong className="text-[#EEE6E4]">{community.name}</strong>.
+            <h3 className="text-2xl font-bold text-[#EEE6E4] mb-2">
+              {community.name} é a sua casa.
+            </h3>
+            <p className="text-gray-400 mb-2 max-w-md mx-auto">
+              Uma assinatura Detailer&apos;HUB dá acesso a esta e a todas as outras comunidades da plataforma.
+            </p>
+            <p className="text-gray-500 text-sm mb-6 max-w-sm mx-auto">
+              O YouTube é sua vitrine. O Detailer&apos;HUB é a sua casa.
             </p>
             <Link
               href={`/register?community=${community.slug}`}
               className="inline-flex items-center gap-2 bg-[#006079] hover:bg-[#007A99] text-white px-8 py-3 rounded-xl font-semibold transition-all hover:shadow-lg hover:shadow-[#007A99]/30"
             >
-              Criar conta gr&aacute;tis <ArrowRight className="w-4 h-4" />
+              Entrar na comunidade <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>

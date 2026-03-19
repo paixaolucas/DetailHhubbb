@@ -4,7 +4,7 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Loader2, Car, Bot, Video } from "lucide-react";
-import { Logo } from "@/components/ui/logo";
+import { Logo, LogoType } from "@/components/ui/logo";
 import { STORAGE_KEYS } from "@/lib/constants";
 
 function LoginFormContent() {
@@ -70,9 +70,8 @@ function LoginFormContent() {
         <div className="absolute bottom-1/4 right-1/4 w-60 h-60 bg-cyan-600/15 rounded-full blur-3xl" />
 
         <div className="relative flex flex-col justify-center px-16 py-12">
-          <Link href="/" className="flex items-center gap-2.5 mb-16">
-            <Logo size="lg" />
-            <span className="text-[#EEE6E4] font-bold text-xl">Detailer&apos;HUB</span>
+          <Link href="/" className="flex items-center mb-16">
+            <LogoType height={30} variant="light" />
           </Link>
 
           <div className="space-y-8">
@@ -107,9 +106,8 @@ function LoginFormContent() {
       {/* Right panel - form */}
       <div className="flex-1 flex flex-col items-center justify-center p-6 lg:p-12">
         {/* Mobile logo */}
-        <Link href="/" className="flex items-center gap-2.5 mb-8 lg:hidden">
-          <Logo size="md" />
-          <span className="text-[#EEE6E4] font-bold text-lg">Detailer&apos;HUB</span>
+        <Link href="/" className="flex items-center mb-8 lg:hidden">
+          <LogoType height={26} variant="light" />
         </Link>
 
         <div className="w-full max-w-md">

@@ -271,7 +271,7 @@ export default function MessagesPage() {
 
   return (
     <>
-    <div className="h-[calc(100vh-8rem)] flex gap-0 rounded-2xl overflow-hidden border border-white/10 bg-[#F0EEFF]">
+    <div className="h-[calc(100vh-8rem)] flex gap-0 rounded-2xl overflow-hidden border border-white/10 bg-[#1A1A1A]">
       {/* ── Conversation list ── */}
       <div
         className={`${

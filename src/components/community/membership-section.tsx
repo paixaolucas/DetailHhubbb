@@ -2,13 +2,14 @@
 
 // =============================================================================
 // MEMBERSHIP SECTION — Community public page
-// Shows "already a member" card or subscription plans depending on membership status
-// Server component passes plans as serialized props; client reads localStorage token
+// Checks platform membership (current model) — a single subscription gives
+// access to all communities. Falls back to showing legacy per-community plans
+// if the platform model is not active.
 // =============================================================================
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { CheckCircle, ArrowRight, Zap } from "lucide-react";
+import { CheckCircle, ArrowRight, Zap, Lock } from "lucide-react";
 import { PlanCheckoutButton } from "@/components/community/plan-checkout-button";
 import { STORAGE_KEYS } from "@/lib/constants";
 
@@ -41,69 +42,125 @@ export function MembershipSection({
   primaryColor: string;
   plans: Plan[];
 }) {
-  const [isMember, setIsMember] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [status, setStatus] = useState<"loading" | "platform" | "community" | "none">("loading");
 
   useEffect(() => {
-    async function checkMembership() {
+    async function checkAccess() {
       try {
         const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
         if (!token) {
-          setIsLoading(false);
+          setStatus("none");
           return;
         }
-        const res = await fetch("/api/memberships/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          const ids: string[] = data.data ?? [];
-          setIsMember(ids.includes(communityId));
+
+        // Check platform membership first (current model)
+        const [platformRes, communityRes] = await Promise.all([
+          fetch("/api/platform-membership/me", {
+            headers: { Authorization: `Bearer ${token}` },
+          }).catch(() => null),
+          fetch("/api/memberships/me", {
+            headers: { Authorization: `Bearer ${token}` },
+          }).catch(() => null),
+        ]);
+
+        // Platform membership (single subscription = access to all)
+        if (platformRes?.ok) {
+          const data = await platformRes.json();
+          if (data.data?.status === "ACTIVE") {
+            setStatus("platform");
+            return;
+          }
         }
+
+        // Legacy community membership
+        if (communityRes?.ok) {
+          const data = await communityRes.json();
+          const ids: string[] = data.data ?? [];
+          if (ids.includes(communityId)) {
+            setStatus("community");
+            return;
+          }
+        }
+
+        setStatus("none");
       } catch {
-        // ignore — treat as not a member
-      } finally {
-        setIsLoading(false);
+        setStatus("none");
       }
     }
-    checkMembership();
+    checkAccess();
   }, [communityId]);
 
-  if (isLoading) {
+  if (status === "loading") {
     return (
       <div className="bg-white/5 border border-white/10 rounded-2xl p-8 animate-pulse">
-        <div className="h-5 bg-white/5 rounded w-1/3 mb-4" />
-        <div className="h-3 bg-white/5 rounded w-1/2 mb-6" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="h-44 bg-white/5 rounded-2xl" />
-          <div className="h-44 bg-white/5 rounded-2xl" />
-        </div>
+        <div className="h-5 bg-white/10 rounded w-1/3 mb-4" />
+        <div className="h-3 bg-white/10 rounded w-1/2 mb-6" />
+        <div className="h-44 bg-white/10 rounded-2xl" />
       </div>
     );
   }
 
-  if (isMember) {
+  // User has platform subscription — full access
+  if (status === "platform" || status === "community") {
     return (
       <div className="bg-green-500/10 border border-green-500/25 rounded-2xl p-8 text-center">
         <div className="w-16 h-16 bg-green-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
           <CheckCircle className="w-8 h-8 text-green-400" />
         </div>
-        <h3 className="text-xl font-bold text-[#EEE6E4] mb-2">Você já tem acesso!</h3>
+        <h3 className="text-xl font-bold text-[#EEE6E4] mb-2">
+          {status === "platform" ? "Você tem acesso completo!" : "Você já é membro!"}
+        </h3>
         <p className="text-gray-400 text-sm mb-6">
-          Sua assinatura está ativa. Explore o conteúdo exclusivo da comunidade.
+          {status === "platform"
+            ? "Sua assinatura Detailer'HUB dá acesso a esta e todas as outras comunidades."
+            : "Sua assinatura está ativa. Explore o conteúdo exclusivo."}
         </p>
         <Link
-          href="/dashboard/meu-aprendizado"
-          className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-xl font-semibold transition-all hover:shadow-lg hover:shadow-green-500/30"
+          href={`/community/${communitySlug}/feed`}
+          className="inline-flex items-center gap-2 bg-[#006079] hover:bg-[#007A99] text-white px-6 py-3 rounded-xl font-semibold transition-all hover:shadow-lg hover:shadow-[#006079]/30"
         >
-          Explorar conteúdo <ArrowRight className="w-4 h-4" />
+          Entrar na comunidade <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
     );
   }
 
-  if (plans.length === 0) return null;
+  // No membership — show subscription CTA
+  // If platform model (no legacy plans), show platform subscription CTA
+  if (plans.length === 0) {
+    return (
+      <div className="relative bg-gradient-to-br from-[#006079]/10 to-[#009CD9]/5 border border-[#006079]/30 rounded-2xl p-8 overflow-hidden">
+        <div className="absolute top-0 right-0 w-40 h-40 bg-[#009CD9]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative text-center">
+          <div className="w-16 h-16 bg-[#006079]/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Lock className="w-8 h-8 text-[#009CD9]" />
+          </div>
+          <h3 className="text-xl font-bold text-[#EEE6E4] mb-2">Acesso exclusivo para assinantes</h3>
+          <p className="text-gray-400 text-sm mb-2 max-w-sm mx-auto">
+            Uma assinatura Detailer&apos;HUB dá acesso a esta e todas as outras comunidades da plataforma.
+          </p>
+          <p className="text-2xl font-black text-[#EEE6E4] mb-1">
+            R$79<span className="text-gray-400 text-sm font-normal">/mês</span>
+          </p>
+          <p className="text-gray-500 text-xs mb-6">ou R$948/ano — cancele quando quiser</p>
+          <Link
+            href={`/register?community=${communitySlug}`}
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-[#006079] to-[#009CD9] hover:from-[#007A99] hover:to-[#009CD9] text-white px-8 py-3.5 rounded-xl font-semibold transition-all hover:shadow-lg hover:shadow-[#006079]/30"
+          >
+            Assinar agora <ArrowRight className="w-4 h-4" />
+          </Link>
+          <p className="text-gray-500 text-xs mt-3">
+            Já tem conta?{" "}
+            <Link href="/login" className="text-[#009CD9] hover:underline">
+              Entrar
+            </Link>
+          </p>
+        </div>
+      </div>
+    );
+  }
 
+  // Legacy per-community plans
   return (
     <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
       <h2 className="text-xl font-bold text-[#EEE6E4] mb-2">Planos de acesso</h2>
@@ -141,9 +198,7 @@ export function MembershipSection({
               <div className="mb-5">
                 <span className="text-3xl font-bold text-[#EEE6E4]">
                   R${" "}
-                  {plan.price.toLocaleString("pt-BR", {
-                    minimumFractionDigits: 2,
-                  })}
+                  {plan.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                 </span>
                 <span className="text-gray-500 text-sm">/{interval}</span>
                 {plan.trialDays > 0 && (
@@ -155,10 +210,7 @@ export function MembershipSection({
               {plan.features.length > 0 && (
                 <ul className="space-y-2 mb-5">
                   {plan.features.map((f, i) => (
-                    <li
-                      key={i}
-                      className="flex items-center gap-2 text-sm text-gray-400"
-                    >
+                    <li key={i} className="flex items-center gap-2 text-sm text-gray-400">
                       <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
                       {f}
                     </li>

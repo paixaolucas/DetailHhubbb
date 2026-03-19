@@ -23,6 +23,16 @@ export async function GET(
     const period = searchParams.get("period") ?? "all";
     const limitRaw = parseInt(searchParams.get("limit") ?? "10");
     const limit = Math.min(50, Math.max(1, isNaN(limitRaw) ? 10 : limitRaw));
+    const filterUserId = searchParams.get("userId") ?? null;
+
+    // Single-user score lookup (used by PostComposer gate)
+    if (filterUserId) {
+      const up = await db.userPoints.findUnique({
+        where: { userId_communityId: { userId: filterUserId, communityId } },
+        select: { points: true, level: true },
+      });
+      return NextResponse.json({ success: true, data: { points: up?.points ?? 0, level: up?.level ?? 1 } });
+    }
 
     // Build date filter for period
     let dateFilter: { gte?: Date } | undefined;
@@ -31,8 +41,10 @@ export async function GET(
       d.setDate(d.getDate() - 7);
       dateFilter = { gte: d };
     } else if (period === "month") {
+      // Use start of current calendar month (not last 30 days)
       const d = new Date();
-      d.setMonth(d.getMonth() - 1);
+      d.setDate(1);
+      d.setHours(0, 0, 0, 0);
       dateFilter = { gte: d };
     }
 

@@ -191,7 +191,7 @@ export default function MeusProdutosPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-400 mb-1.5">Tipo</label>
-              <select value={form.type} onChange={(e) => setForm((p) => ({ ...p, type: e.target.value }))} className={`${fieldClass()} bg-white`}>
+              <select value={form.type} onChange={(e) => setForm((p) => ({ ...p, type: e.target.value }))} className={`${fieldClass()} bg-[#1A1A1A]`}>
                 {LISTING_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
               </select>
             </div>

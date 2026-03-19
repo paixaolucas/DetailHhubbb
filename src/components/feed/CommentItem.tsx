@@ -190,7 +190,7 @@ export default function CommentItem({
         <div className="flex-1 min-w-0">
           {/* Header */}
           <div className="flex items-baseline gap-2 mb-1">
-            <span className="text-sm font-semibold text-gray-300">{authorName}</span>
+            <span className="text-sm font-semibold text-[#EEE6E4]">{authorName}</span>
             <span className="text-xs text-gray-400">{timeAgo(comment.createdAt)}</span>
           </div>
 
@@ -208,7 +208,7 @@ export default function CommentItem({
                 "inline-flex items-center gap-1 text-xs transition-colors",
                 liked
                   ? "text-[#009CD9] hover:text-[#009CD9]"
-                  : "text-gray-400 hover:text-gray-400",
+                  : "text-gray-500 hover:text-[#009CD9]",
               ].join(" ")}
             >
               <ThumbsUp className="w-3.5 h-3.5" />
@@ -218,7 +218,7 @@ export default function CommentItem({
             {!isReply && (
               <button
                 onClick={() => setShowReplyBox((v) => !v)}
-                className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-gray-400 transition-colors"
+                className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-[#009CD9] transition-colors"
               >
                 <CornerDownRight className="w-3.5 h-3.5" />
                 Responder
@@ -229,7 +229,7 @@ export default function CommentItem({
               <button
                 onClick={() => setConfirmDelete(true)}
                 disabled={deleting}
-                className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-red-400 transition-colors ml-auto"
+                className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-red-400 transition-colors ml-auto"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 {deleting ? "Excluindo..." : "Excluir"}

@@ -18,6 +18,7 @@ import {
   Heart,
 } from "lucide-react";
 import { STORAGE_KEYS } from "@/lib/constants";
+import { getMemberLevel, getMemberLevelColor, POST_THRESHOLD } from "@/lib/points";
 // date-fns is not in this project — using inline helper below
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -150,6 +151,7 @@ export default function MemberProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userScore, setUserScore] = useState<number | null>(null);
 
   useEffect(() => {
     setIsLoggedIn(!!localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN));
@@ -161,9 +163,10 @@ export default function MemberProfilePage() {
     async function load() {
       setIsLoading(true);
       try {
-        const [profileRes, postsRes] = await Promise.all([
+        const [profileRes, postsRes, scoreRes] = await Promise.all([
           fetch(`/api/users/${userId}/profile`),
           fetch(`/api/users/${userId}/posts`),
+          fetch(`/api/users/${userId}/score`),
         ]);
 
         if (!profileRes.ok && profileRes.status === 404) {
@@ -182,6 +185,12 @@ export default function MemberProfilePage() {
 
         setProfile(profileData.data);
         setPosts(postsData.data ?? []);
+        if (scoreRes.ok) {
+          const scoreData = await scoreRes.json();
+          if (scoreData.success && typeof scoreData.data?.totalPoints === "number") {
+            setUserScore(scoreData.data.totalPoints);
+          }
+        }
       } catch {
         setNotFound(true);
       } finally {
@@ -196,9 +205,9 @@ export default function MemberProfilePage() {
 
   if (notFound) {
     return (
-      <div className="min-h-screen bg-[#F8F7FF] flex items-center justify-center">
+      <div className="min-h-screen bg-[#1A1A1A] flex items-center justify-center">
         <div className="text-center space-y-3">
-          <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto">
             <Lock className="w-8 h-8 text-gray-400" />
           </div>
           <p className="text-[#EEE6E4] font-semibold text-lg">
@@ -221,9 +230,9 @@ export default function MemberProfilePage() {
   // Private profile
   if (profile && !profile.isPublic) {
     return (
-      <div className="min-h-screen bg-[#F8F7FF] flex items-center justify-center">
+      <div className="min-h-screen bg-[#1A1A1A] flex items-center justify-center">
         <div className="text-center space-y-3">
-          <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto">
             <Lock className="w-8 h-8 text-gray-400" />
           </div>
           <p className="text-[#EEE6E4] font-semibold text-lg">
@@ -258,10 +267,10 @@ export default function MemberProfilePage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#F8F7FF] py-10 px-4">
+    <div className="min-h-screen bg-[#1A1A1A] py-10 px-4">
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Profile card */}
-        <div className="bg-white backdrop-blur-md border border-white/10 rounded-2xl p-6 animate-fade-in">
+        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 animate-fade-in">
           <div className="flex items-start gap-5">
             {/* Avatar */}
             {user.avatarUrl ? (
@@ -289,6 +298,19 @@ export default function MemberProfilePage() {
                 >
                   {roleLabel}
                 </span>
+                {userScore !== null && user.role === "COMMUNITY_MEMBER" && (
+                  <span
+                    className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${getMemberLevelColor(getMemberLevel(userScore))}`}
+                    title={`${userScore} pts`}
+                  >
+                    {getMemberLevel(userScore)}
+                  </span>
+                )}
+                {userScore !== null && userScore >= POST_THRESHOLD && user.role === "COMMUNITY_MEMBER" && (
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20 font-medium">
+                    ✓ Pode criar posts
+                  </span>
+                )}
               </div>
 
               {/* Send message */}

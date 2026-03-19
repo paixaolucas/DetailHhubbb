@@ -70,6 +70,11 @@ model User {
   reports                Report[]                @relation("UserReports")
   // Platform membership
   platformMembership     PlatformMembership?
+  // Community opt-ins (lightweight "I belong here" within platform subscription)
+  communityOptIns        CommunityOptIn[]
+  // Study groups
+  createdStudyGroups     StudyGroup[]          @relation("StudyGroupCreator")
+  studyGroupMemberships  StudyGroupMember[]    @relation("StudyGroupMembership")
   // Advertiser profile
   advertiser             Advertiser?
   // Events
@@ -177,6 +182,10 @@ model Community {
   testimonials        CommunityTestimonial[]
   // Events
   events              Event[]
+  // Community opt-ins
+  optIns              CommunityOptIn[]
+  // Study groups
+  studyGroups         StudyGroup[]
 
   @@index([slug])
   @@index([influencerId])
@@ -1127,6 +1136,8 @@ enum AnalyticsEventType {
   MEMBER_JOIN
   POST_CREATE
   CHECKOUT_INITIATED
+  ONLINE_PING
+  CHAT_MESSAGE
 }
 
 enum CommunityMembershipStatus {
@@ -1220,6 +1231,26 @@ model PlatformMembership {
   @@index([status])
   @@index([referredByInfluencerId])
   @@map("platform_memberships")
+}
+
+// =============================================================================
+// COMMUNITY OPT-IN
+// Lightweight "I belong here" declaration within a platform subscription.
+// Access (subscription) ≠ Belonging (opt-in).
+// =============================================================================
+
+model CommunityOptIn {
+  id          String    @id @default(cuid())
+  userId      String
+  communityId String
+  joinedAt    DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, communityId])
+  @@index([communityId])
+  @@index([userId])
+  @@map("community_opt_ins")
 }
 
 enum PlatformMembershipStatus {
@@ -1490,4 +1521,36 @@ model InfluencerExternalMention {
 
   @@index([influencerId, year, month])
   @@map("influencer_external_mentions")
+}
+
+// ─── STUDY GROUPS ─────────────────────────────────────────────────────────────
+
+model StudyGroup {
+  id          String             @id @default(cuid())
+  communityId String
+  creatorId   String
+  name        String
+  description String?
+  maxMembers  Int                @default(10)
+  isOpen      Boolean            @default(true)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  community   Community          @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  creator     User               @relation("StudyGroupCreator", fields: [creatorId], references: [id])
+  members     StudyGroupMember[]
+
+  @@index([communityId])
+  @@map("study_groups")
+}
+
+model StudyGroupMember {
+  id           String     @id @default(cuid())
+  studyGroupId String
+  userId       String
+  joinedAt     DateTime   @default(now())
+  studyGroup   StudyGroup @relation(fields: [studyGroupId], references: [id], onDelete: Cascade)
+  user         User       @relation("StudyGroupMembership", fields: [userId], references: [id])
+
+  @@unique([studyGroupId, userId])
+  @@map("study_group_members")
 }

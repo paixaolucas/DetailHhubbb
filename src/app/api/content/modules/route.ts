@@ -9,6 +9,7 @@ import { contentService } from "@/services/content/content.service";
 import { db } from "@/lib/db";
 import { AppError } from "@/types";
 import { z } from "zod";
+import { UserRole } from "@prisma/client";
 
 const createModuleSchema = z.object({
   communityId: z.string().cuid(),
@@ -52,7 +53,31 @@ export const GET = withAuth(async (req, { session }) => {
       },
     });
 
-    return NextResponse.json({ success: true, data: modules });
+    // Admins/influencers see all modules unlocked
+    if (session.role === UserRole.SUPER_ADMIN || session.role === UserRole.INFLUENCER_ADMIN) {
+      return NextResponse.json({ success: true, data: modules.map((m) => ({ ...m, isLocked: false })) });
+    }
+
+    // For members: compute sequential unlock (previous module must be fully complete)
+    const lessonIds = modules.flatMap((m) => m.lessons.map((l) => l.id));
+    const completedSet = new Set<string>();
+    if (lessonIds.length > 0) {
+      const completed = await db.contentProgress.findMany({
+        where: { userId: session.userId, lessonId: { in: lessonIds }, isCompleted: true },
+        select: { lessonId: true },
+      });
+      for (const c of completed) completedSet.add(c.lessonId);
+    }
+
+    const result = modules.map((mod, idx) => {
+      if (idx === 0) return { ...mod, isLocked: false };
+      // Locked if previous module has at least one unfinished published lesson
+      const prevLessons = modules[idx - 1].lessons.filter((l) => l.isPublished);
+      const prevComplete = prevLessons.length > 0 && prevLessons.every((l) => completedSet.has(l.id));
+      return { ...mod, isLocked: !prevComplete };
+    });
+
+    return NextResponse.json({ success: true, data: result });
   } catch (error) {
     console.error("[Content:modules GET]", error);
     return NextResponse.json(

@@ -5,6 +5,7 @@
 import { NextResponse } from "next/server";
 import { withAuth } from "@/middleware/auth.middleware";
 import { db } from "@/lib/db";
+import { awardPoints } from "@/lib/points";
 
 const VALID_REACTION_TYPES = ["like", "fire", "clap", "heart", "rocket"] as const;
 type ReactionType = (typeof VALID_REACTION_TYPES)[number];
@@ -31,7 +32,7 @@ export const POST = withAuth(async (req, { session, params }) => {
 
     const comment = await db.comment.findUnique({
       where: { id: commentId },
-      select: { likeCount: true },
+      select: { likeCount: true, post: { select: { communityId: true } } },
     });
     if (!comment) {
       return NextResponse.json({ success: false, error: "Comment not found" }, { status: 404 });
@@ -64,6 +65,18 @@ export const POST = withAuth(async (req, { session, params }) => {
       });
       reacted = true;
       likeCount = updated.likeCount;
+
+      // Award points asynchronously (non-blocking)
+      if (comment.post?.communityId) {
+        awardPoints({
+          userId: session.userId,
+          communityId: comment.post.communityId,
+          amount: 3,
+          reason: "reagiu a um comentário",
+          eventType: "COMMENT_REACTION",
+          dailyLimit: 10,
+        }).catch(() => {});
+      }
     }
 
     return NextResponse.json({ success: true, data: { reacted, likeCount } });

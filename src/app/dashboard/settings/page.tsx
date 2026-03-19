@@ -699,8 +699,8 @@ export default function SettingsPage() {
                   <p className="text-2xl font-bold text-[#EEE6E4]">{inviteStats?.totalReferred ?? 0}</p>
                   <p className="text-xs text-gray-500 mt-1">Total captados</p>
                 </div>
-                <div className="bg-white/5 rounded-xl p-4 text-center border border-green-100">
-                  <p className="text-2xl font-bold text-green-600">{inviteStats?.activeReferred ?? 0}</p>
+                <div className="bg-white/5 rounded-xl p-4 text-center border border-green-500/30">
+                  <p className="text-2xl font-bold text-green-400">{inviteStats?.activeReferred ?? 0}</p>
                   <p className="text-xs text-gray-500 mt-1">Ativos hoje</p>
                 </div>
               </div>

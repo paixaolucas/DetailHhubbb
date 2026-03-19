@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Github, Twitter, Instagram, Youtube } from "lucide-react";
-import { Logo } from "@/components/ui/logo";
+import { LogoType } from "@/components/ui/logo";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -31,9 +31,8 @@ export function Footer() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
             {/* Brand */}
             <div className="lg:col-span-2">
-              <Link href="/" className="flex items-center gap-2 mb-4">
-                <Logo size="md" />
-                <span className="text-white font-bold text-lg">Detailer&apos;HUB</span>
+              <Link href="/" className="flex items-center mb-4">
+                <LogoType height={28} variant="light" />
               </Link>
               <p className="text-gray-400 text-sm leading-relaxed max-w-xs">
                 A plataforma premium para comunidades automotivas. Conecte-se com

@@ -8,6 +8,7 @@ import { withAuth, verifyMembership } from "@/middleware/auth.middleware";
 import { db } from "@/lib/db";
 import { createPostSchema } from "@/lib/validations/post";
 import { trackEvent } from "@/services/analytics/analytics.service";
+import { awardPoints, awardInfluencerPoints } from "@/lib/points";
 
 const AUTHOR_SELECT = {
   id: true,
@@ -97,7 +98,11 @@ export const POST = withAuth(async (req, { session, params }) => {
 
     const space = await db.space.findUnique({
       where: { id: spaceId },
-      select: { communityId: true, isLocked: true },
+      select: {
+        communityId: true,
+        isLocked: true,
+        community: { select: { influencer: { select: { userId: true } } } },
+      },
     });
     if (!space) {
       return NextResponse.json({ success: false, error: "Space not found" }, { status: 404 });
@@ -113,6 +118,18 @@ export const POST = withAuth(async (req, { session, params }) => {
     const isMember = await verifyMembership(session.userId, space.communityId);
     if (!isMember) {
       return NextResponse.json({ success: false, error: "Membership required" }, { status: 403 });
+    }
+
+    // Score gate: user needs ≥70 pts to create posts
+    const userPoints = await db.userPoints.findUnique({
+      where: { userId_communityId: { userId: session.userId, communityId: space.communityId } },
+      select: { points: true },
+    });
+    if ((userPoints?.points ?? 0) < 70) {
+      return NextResponse.json(
+        { success: false, error: "Score insuficiente para criar posts. Engaje com a comunidade para desbloquear." },
+        { status: 403 }
+      );
     }
 
     const rawBody = await req.json();
@@ -141,6 +158,29 @@ export const POST = withAuth(async (req, { session, params }) => {
     });
 
     trackEvent({ userId: session.userId, communityId: space.communityId, type: "POST_CREATE", properties: { postId: post.id } });
+
+    // Award member points asynchronously (non-blocking)
+    awardPoints({
+      userId: session.userId,
+      communityId: space.communityId,
+      amount: 15,
+      reason: "criou um post",
+      eventType: "POST_CREATE",
+      dailyLimit: 2,
+    }).catch(() => {});
+
+    // Award influencer points for activity in their community
+    const influencerUserId = space.community?.influencer?.userId;
+    if (influencerUserId && influencerUserId !== session.userId) {
+      awardInfluencerPoints({
+        userId: influencerUserId,
+        communityId: space.communityId,
+        amount: 10,
+        reason: "membro criou post na comunidade",
+        eventType: "INFLUENCER_MEMBER_POST",
+        dailyLimit: 20,
+      }).catch(() => {});
+    }
 
     return NextResponse.json({ success: true, data: post }, { status: 201 });
   } catch {

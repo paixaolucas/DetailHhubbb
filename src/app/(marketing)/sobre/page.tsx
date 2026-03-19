@@ -29,13 +29,17 @@ export default function SobrePage() {
         <section>
           <h2 className="text-2xl font-bold mb-4">Nossa missão</h2>
           <p className="text-gray-400 leading-relaxed">
-            O Detailer&apos;HUB nasceu com uma missão simples: ser a maior e melhor plataforma para comunidades automotivas do Brasil.
-            Queremos dar poder aos criadores de conteúdo automotivo para monetizar seu conhecimento, construir audiências engajadas e
-            impactar positivamente a cultura de carros no país.
+            O Detailer&apos;HUB é o maior ecossistema de estética automotiva do Brasil. Nascemos para dar aos criadores de conteúdo
+            um lugar de verdade — não apenas uma vitrine, mas uma casa. O YouTube é a vitrine. O Detailer&apos;HUB é a casa.
           </p>
           <p className="text-gray-400 leading-relaxed mt-4">
-            Com uma assinatura única de R$837/ano, membros têm acesso a todas as comunidades da plataforma — sem barreiras,
-            sem fragmentação. Acreditamos que o conhecimento automotivo deve ser acessível e que criadores merecem ser remunerados pelo que produzem.
+            Para os influenciadores, a missão é clara: <em>&quot;Sua audiência merece uma casa. O Detailer&apos;HUB é essa casa.&quot;</em>{" "}
+            Queremos dar poder a criadores automotivos para monetizar seu conhecimento, construir comunidades engajadas e
+            impactar positivamente a cultura de estética no país.
+          </p>
+          <p className="text-gray-400 leading-relaxed mt-4">
+            Para os membros, uma única assinatura de R$79/mês dá acesso a todas as comunidades da plataforma — sem barreiras,
+            sem fragmentação. As melhores comunidades de estética automotiva do Brasil, em um só lugar.
           </p>
         </section>
 

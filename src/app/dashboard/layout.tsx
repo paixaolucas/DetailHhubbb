@@ -43,7 +43,7 @@ import {
   Search,
 } from "lucide-react";
 import { RoleBadge } from "@/components/ui/badge";
-import { Logo } from "@/components/ui/logo";
+import { Logo, LogoType } from "@/components/ui/logo";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import SearchBar from "@/components/search/SearchBar";
 import { STORAGE_KEYS } from "@/lib/constants";
@@ -369,11 +369,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Logo */}
       <div className={`h-16 flex items-center border-b border-white/10 flex-shrink-0 ${collapsed ? "px-3 justify-center" : "px-4"}`}>
         {!collapsed && (
-          <Link href="/" className="flex items-center gap-2.5 flex-1 min-w-0">
-            <Logo size="md" />
-            <div className="min-w-0">
-              <span className="text-[#EEE6E4] font-bold text-sm leading-none block">Detailer&apos;HUB</span>
-            </div>
+          <Link href="/" className="flex items-center flex-1 min-w-0">
+            <LogoType height={24} variant="light" />
           </Link>
         )}
         {collapsed && <Logo size="md" />}
@@ -576,9 +573,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           >
             <Menu className="w-5 h-5" />
           </button>
-          <Link href="/" className="flex items-center gap-2 flex-1">
-            <Logo size="sm" />
-            <span className="text-[#EEE6E4] font-bold text-sm">Detailer&apos;HUB</span>
+          <Link href="/" className="flex items-center flex-1">
+            <LogoType height={22} variant="light" />
           </Link>
           <NotificationBell />
           <RoleBadge role={role} />

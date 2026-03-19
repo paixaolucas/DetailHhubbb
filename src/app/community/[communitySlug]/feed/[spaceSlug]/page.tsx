@@ -57,22 +57,22 @@ interface Post {
 
 function PostSkeleton() {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4 animate-pulse">
+    <div className="bg-white/5 border border-white/10 rounded-xl p-4 animate-pulse">
       <div className="flex items-center gap-3 mb-3">
-        <div className="w-8 h-8 bg-gray-50 rounded-full" />
+        <div className="w-8 h-8 bg-white/10 rounded-full" />
         <div className="space-y-1.5">
-          <div className="h-3.5 bg-gray-50 rounded w-28" />
-          <div className="h-3 bg-gray-50 rounded w-16" />
+          <div className="h-3.5 bg-white/10 rounded w-28" />
+          <div className="h-3 bg-white/10 rounded w-16" />
         </div>
       </div>
       <div className="space-y-2">
-        <div className="h-4 bg-gray-50 rounded" />
-        <div className="h-4 bg-gray-50 rounded w-5/6" />
-        <div className="h-4 bg-gray-50 rounded w-3/4" />
+        <div className="h-4 bg-white/10 rounded" />
+        <div className="h-4 bg-white/10 rounded w-5/6" />
+        <div className="h-4 bg-white/10 rounded w-3/4" />
       </div>
-      <div className="flex gap-4 mt-4 pt-3 border-t border-gray-100">
-        <div className="h-3 bg-gray-50 rounded w-12" />
-        <div className="h-3 bg-gray-50 rounded w-12" />
+      <div className="flex gap-4 mt-4 pt-3 border-t border-white/5">
+        <div className="h-3 bg-white/10 rounded w-12" />
+        <div className="h-3 bg-white/10 rounded w-12" />
       </div>
     </div>
   );
@@ -301,7 +301,7 @@ export default function SpaceFeedPage() {
           <p className="text-red-400 text-sm mb-4">{error}</p>
           <Link
             href={`/community/${communitySlug}/feed`}
-            className="text-xs text-gray-400 hover:text-gray-900 transition-colors"
+            className="text-xs text-gray-400 hover:text-[#EEE6E4] transition-colors"
           >
             ← Voltar aos canais
           </Link>
@@ -315,7 +315,7 @@ export default function SpaceFeedPage() {
   // ---------------------------------------------------------------------------
 
   return (
-    <div className="text-gray-900">
+    <div className="text-[#EEE6E4]">
       <div className="max-w-3xl mx-auto px-3 sm:px-4 py-4 sm:py-6 flex flex-col gap-4">
         {/* Feed column */}
         <main className="flex flex-col gap-4">
@@ -325,30 +325,30 @@ export default function SpaceFeedPage() {
               <Image src={community.bannerUrl} alt={community.name} fill className="object-cover" />
               <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex items-center px-5 gap-3">
                 {community.logoUrl ? (
-                  <Image src={community.logoUrl} alt={community.name} width={32} height={32} className="w-8 h-8 rounded-lg object-cover border border-gray-200 flex-shrink-0" />
+                  <Image src={community.logoUrl} alt={community.name} width={32} height={32} className="w-8 h-8 rounded-lg object-cover border border-white/10 flex-shrink-0" />
                 ) : (
                   <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-gray-900 flex-shrink-0"
-                    style={{ backgroundColor: community.primaryColor ?? "#8B5CF6" }}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+                    style={{ backgroundColor: community.primaryColor ?? "#006079" }}
                   >
                     {community.name.charAt(0)}
                   </div>
                 )}
-                <span className="font-semibold text-gray-900 text-sm drop-shadow">{community.name}</span>
+                <span className="font-semibold text-white text-sm drop-shadow">{community.name}</span>
               </div>
             </div>
           )}
 
           {/* Space header */}
           {!loading && activeSpace && (
-            <div className="bg-white border border-gray-200 rounded-xl px-5 py-3 flex items-center gap-3">
+            <div className="bg-white/5 border border-white/10 rounded-xl px-5 py-3 flex items-center gap-3">
               <span className="text-xl">
                 {activeSpace.icon ?? "#"}
               </span>
               <div>
-                <p className="font-semibold text-gray-900 text-sm">{activeSpace.name}</p>
+                <p className="font-semibold text-[#EEE6E4] text-sm">{activeSpace.name}</p>
                 {activeSpace.type && (
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-400">
                     {({ DISCUSSION: "Discussão", ANNOUNCEMENT: "Avisos", QA: "Perguntas", SHOWCASE: "Showcase" } as Record<string, string>)[activeSpace.type] ?? activeSpace.type}
                   </p>
                 )}
@@ -358,16 +358,16 @@ export default function SpaceFeedPage() {
 
           {/* Composer */}
           {!loading && activeSpace && (
-            <PostComposer spaceId={activeSpace.id} onPost={handleNewPost} />
+            <PostComposer spaceId={activeSpace.id} communityId={community?.id ?? ""} onPost={handleNewPost} />
           )}
 
           {/* Posts */}
           {(loading || postsLoading) ? (
             Array.from({ length: 5 }).map((_, i) => <PostSkeleton key={i} />)
           ) : posts.length === 0 ? (
-            <div className="bg-white border border-gray-200 rounded-xl p-12 text-center">
-              <p className="text-gray-500 text-sm">Nenhuma publicação ainda.</p>
-              <p className="text-gray-700 text-xs mt-1">
+            <div className="bg-white/5 border border-white/10 rounded-xl p-12 text-center">
+              <p className="text-gray-400 text-sm">Nenhuma publicação ainda.</p>
+              <p className="text-gray-500 text-xs mt-1">
                 Seja o primeiro a postar neste canal!
               </p>
             </div>
@@ -391,7 +391,7 @@ export default function SpaceFeedPage() {
                 <button
                   onClick={handleLoadMore}
                   disabled={loadingMore}
-                  className="w-full py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-gray-400 hover:bg-white/10 hover:text-[#EEE6E4] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {loadingMore ? (
                     <>

@@ -9,6 +9,7 @@ import { db } from "@/lib/db";
 import { AppError, ForbiddenError } from "@/types";
 import { UserRole } from "@prisma/client";
 import { z } from "zod";
+import { awardInfluencerPoints } from "@/lib/points";
 
 const createSessionSchema = z.object({
   communityId: z.string().cuid(),
@@ -107,6 +108,16 @@ export const POST = withAuth(async (req, { session }) => {
         isRecorded: parsed.data.isRecorded,
       },
     });
+
+    // Award influencer points for creating a live session (idempotent per session)
+    awardInfluencerPoints({
+      userId: session.userId,
+      communityId: parsed.data.communityId,
+      amount: 25,
+      reason: "criou uma live session",
+      eventType: "INFLUENCER_LIVE_CREATE",
+      metadata: { idempotencyKey: `live_${liveSession.id}` },
+    }).catch(() => {});
 
     return NextResponse.json({ success: true, data: liveSession }, { status: 201 });
   } catch (error) {

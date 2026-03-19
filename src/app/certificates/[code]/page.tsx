@@ -4,7 +4,7 @@
 // =============================================================================
 
 import Image from "next/image";
-import { Logo } from "@/components/ui/logo";
+import { LogoType } from "@/components/ui/logo";
 import { CheckCircle2, XCircle, Award, Calendar, Shield } from "lucide-react";
 import Link from "next/link";
 import { CertificateShareButtons } from "@/components/ui/certificate-share-buttons";
@@ -96,13 +96,8 @@ export default async function CertificatePage({
           {/* Platform header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Logo size="md" />
-              <div>
-                <p className="text-[#EEE6E4] font-bold text-lg leading-tight">
-                  Detailer'HUB
-                </p>
-                <p className="text-gray-500 text-xs">Plataforma de Comunidades</p>
-              </div>
+              <LogoType height={24} variant="light" />
+              <p className="text-gray-500 text-xs">Plataforma de Comunidades</p>
             </div>
 
             {/* Valid / invalid badge */}

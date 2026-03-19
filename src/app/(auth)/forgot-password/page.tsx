@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Loader2, ArrowLeft, Mail, CheckCircle } from "lucide-react";
-import { Logo } from "@/components/ui/logo";
+import { Logo, LogoType } from "@/components/ui/logo";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -41,9 +41,8 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen bg-[#1A1A1A] flex flex-col items-center justify-center p-6">
-      <Link href="/" className="flex items-center gap-2.5 mb-8">
-        <Logo size="md" />
-        <span className="text-[#EEE6E4] font-bold text-lg">Detailer&apos;HUB</span>
+      <Link href="/" className="flex items-center mb-8">
+        <LogoType height={26} variant="light" />
       </Link>
 
       <div className="w-full max-w-md glass-card p-8">

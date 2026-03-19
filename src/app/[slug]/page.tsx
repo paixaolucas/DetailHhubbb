@@ -89,9 +89,9 @@ export default function SlugPage() {
 
   if (status === "not_found") {
     return (
-      <div className="min-h-screen bg-[#F8F7FF] flex items-center justify-center">
+      <div className="min-h-screen bg-[#1A1A1A] flex items-center justify-center">
         <div className="text-center">
-          <p className="text-2xl font-bold text-gray-900 mb-2">Comunidade não encontrada</p>
+          <p className="text-2xl font-bold text-[#EEE6E4] mb-2">Comunidade não encontrada</p>
           <p className="text-gray-400 text-sm mb-6">O endereço <strong>/{slug}</strong> não existe na plataforma.</p>
           <a href="/dashboard" className="text-[#007A99] hover:text-[#009CD9] font-medium text-sm transition-colors">
             Voltar ao Dashboard →
@@ -102,7 +102,7 @@ export default function SlugPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F7FF] flex items-center justify-center">
+    <div className="min-h-screen bg-[#1A1A1A] flex items-center justify-center">
       <div className="flex flex-col items-center gap-3">
         <div className="w-8 h-8 border-[3px] border-[#007A99] border-t-transparent rounded-full animate-spin" />
         <p className="text-gray-400 text-sm">Redirecionando...</p>

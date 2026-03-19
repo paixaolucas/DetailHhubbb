@@ -260,7 +260,7 @@ export default function FinanceiroPage() {
                     name === "Comissão (R$)" ? [fmt(value), name] : [value, name]
                   }
                 />
-                <Bar yAxisId="members" dataKey="newMembers" fill="#8b5cf6" radius={[4, 4, 0, 0]} name="Novos membros" />
+                <Bar yAxisId="members" dataKey="newMembers" fill="#009CD9" radius={[4, 4, 0, 0]} name="Novos membros" />
                 <Bar yAxisId="commission" dataKey="commission" fill="#10b981" radius={[4, 4, 0, 0]} name="Comissão (R$)" />
               </BarChart>
             </ResponsiveContainer>
@@ -457,7 +457,7 @@ export default function FinanceiroPage() {
                       <th className="px-5 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wide">Sua Comissão</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-white/10">
                     {recentPayments.map((p) => (
                       <tr key={p.id} className="hover:bg-white/5 transition-colors">
                         <td className="px-5 py-3 text-gray-400 whitespace-nowrap">{fmtDate(p.createdAt)}</td>

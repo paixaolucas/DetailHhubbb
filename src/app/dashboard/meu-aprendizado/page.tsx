@@ -55,7 +55,7 @@ function LessonRow({ lesson, communitySlug }: { lesson: LessonData; communitySlu
       }`}
     >
       <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
-        lesson.completed ? "bg-green-500/20" : isCurrent ? "bg-[#007A99]/20" : "bg-white"
+        lesson.completed ? "bg-green-500/20" : isCurrent ? "bg-[#007A99]/20" : "bg-white/10"
       }`}>
         {lesson.completed ? (
           <CheckCircle2 className="w-3.5 h-3.5 text-green-400" />
@@ -82,7 +82,7 @@ function LessonRow({ lesson, communitySlug }: { lesson: LessonData; communitySlu
           </span>
         )}
         {!lesson.completed && !isCurrent && (
-          <span className="text-xs bg-white text-gray-500 px-2 py-0.5 rounded-full">
+          <span className="text-xs bg-white/10 text-gray-400 px-2 py-0.5 rounded-full">
             Iniciar
           </span>
         )}
@@ -99,10 +99,10 @@ function ModuleAccordion({ module, communitySlug }: { module: ModuleData; commun
     <div className="border border-white/10 rounded-xl overflow-hidden">
       <button
         onClick={() => setOpen((p) => !p)}
-        className="flex items-center gap-3 p-4 w-full hover:bg-[#E6F4F7] transition-colors text-left"
+        className="flex items-center gap-3 p-4 w-full hover:bg-white/5 transition-colors text-left"
       >
         <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${
-          module.progress === 100 ? "bg-green-500/20" : "bg-white"
+          module.progress === 100 ? "bg-green-500/20" : "bg-white/10"
         }`}>
           {module.progress === 100 ? (
             <CheckCircle2 className="w-4 h-4 text-green-400" />

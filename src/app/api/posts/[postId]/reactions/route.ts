@@ -5,6 +5,7 @@
 import { NextResponse } from "next/server";
 import { withAuth, verifyMembership } from "@/middleware/auth.middleware";
 import { db } from "@/lib/db";
+import { awardPoints } from "@/lib/points";
 
 const VALID_REACTION_TYPES = ["like", "fire", "clap", "heart", "rocket"] as const;
 type ReactionType = (typeof VALID_REACTION_TYPES)[number];
@@ -73,6 +74,16 @@ export const POST = withAuth(async (req, { session, params }) => {
       ]);
       reacted = true;
       likeCount = updatedPost.likeCount;
+
+      // Award points asynchronously (non-blocking)
+      awardPoints({
+        userId: session.userId,
+        communityId: post.communityId,
+        amount: 3,
+        reason: "reagiu a um post",
+        eventType: "POST_REACTION",
+        dailyLimit: 10,
+      }).catch(() => {});
     }
 
     return NextResponse.json({ success: true, data: { reacted, likeCount } });

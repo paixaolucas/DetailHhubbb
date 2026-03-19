@@ -12,6 +12,7 @@ import { ArrowLeft, Trash2, MessageCircle, Hash } from "lucide-react";
 import Link from "next/link";
 import ReactionBar from "@/components/feed/ReactionBar";
 import CommentItem, { CommentData } from "@/components/feed/CommentItem";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { STORAGE_KEYS } from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
@@ -76,19 +77,19 @@ function timeAgo(dateStr: string): string {
 function PostSkeleton() {
   return (
     <div className="animate-pulse space-y-4">
-      <div className="h-4 bg-white/5 rounded w-24" />
-      <div className="h-8 bg-white/5 rounded w-3/4" />
+      <div className="h-4 bg-white/10 rounded w-24" />
+      <div className="h-8 bg-white/10 rounded w-3/4" />
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-white/5 rounded-full" />
+        <div className="w-10 h-10 bg-white/10 rounded-full" />
         <div className="space-y-1.5">
-          <div className="h-4 bg-white/5 rounded w-32" />
-          <div className="h-3 bg-white/5 rounded w-20" />
+          <div className="h-4 bg-white/10 rounded w-32" />
+          <div className="h-3 bg-white/10 rounded w-20" />
         </div>
       </div>
       <div className="space-y-2">
-        <div className="h-4 bg-white/5 rounded" />
-        <div className="h-4 bg-white/5 rounded w-5/6" />
-        <div className="h-4 bg-white/5 rounded w-4/6" />
+        <div className="h-4 bg-white/10 rounded" />
+        <div className="h-4 bg-white/10 rounded w-5/6" />
+        <div className="h-4 bg-white/10 rounded w-4/6" />
       </div>
     </div>
   );
@@ -123,6 +124,7 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
 
   // Delete
   const [deleting, setDeleting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   // ---------------------------------------------------------------------------
 
@@ -267,8 +269,12 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
 
   // ---- Delete post ---------------------------------------------------------
 
-  async function handleDeletePost() {
-    if (!window.confirm("Excluir este post permanentemente?")) return;
+  function handleDeletePost() {
+    setConfirmDelete(true);
+  }
+
+  async function doDeletePost() {
+    setConfirmDelete(false);
     setDeleting(true);
     try {
       const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
@@ -362,7 +368,7 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
             </div>
           )}
           <div>
-            <p className="text-sm font-semibold text-gray-300">{authorName}</p>
+            <p className="text-sm font-semibold text-[#EEE6E4]">{authorName}</p>
             <p className="text-xs text-gray-500">{timeAgo(post.createdAt)}</p>
           </div>
           {isAuthor && (
@@ -379,7 +385,7 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
 
         {/* Body */}
         {post.body && post.body.trim() !== " " && (
-          <p className="text-gray-400 text-sm leading-relaxed whitespace-pre-wrap break-words">
+          <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap break-words">
             {post.body}
           </p>
         )}
@@ -414,9 +420,9 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
 
       {/* Comments section */}
       <div>
-        <h2 className="flex items-center gap-2 text-sm font-semibold text-gray-400 mb-4">
-          <MessageCircle className="w-4 h-4" />
-          {comments.length} comentário{comments.length !== 1 ? "s" : ""}
+        <h2 className="flex items-center gap-2 text-sm font-semibold text-[#EEE6E4] mb-4">
+          <MessageCircle className="w-4 h-4 text-[#009CD9]" />
+          {comments.length > 0 ? `${comments.length} comentário${comments.length !== 1 ? "s" : ""}` : "Comentários"}
         </h2>
 
         {/* Comment composer */}
@@ -461,9 +467,10 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
 
         {/* Comment list */}
         {comments.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-8">
-            Seja o primeiro a comentar.
-          </p>
+          <div className="bg-white/5 border border-white/10 rounded-xl p-8 text-center">
+            <MessageCircle className="w-8 h-8 text-gray-400 mx-auto mb-2 opacity-50" />
+            <p className="text-sm text-gray-400">Seja o primeiro a comentar.</p>
+          </div>
         ) : (
           <div className="flex flex-col gap-4">
             {comments.map((comment) => (
@@ -481,6 +488,16 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={confirmDelete}
+        title="Excluir post"
+        description="Tem certeza que deseja excluir este post? Esta ação não pode ser desfeita."
+        confirmLabel="Excluir"
+        variant="danger"
+        onConfirm={doDeletePost}
+        onCancel={() => setConfirmDelete(false)}
+      />
     </div>
   );
 }

@@ -20,7 +20,10 @@ import {
   Bot,
   Trophy,
   Settings,
+  Rocket,
 } from "lucide-react";
+import { getMemberLevel, getMemberLevelColor, POST_THRESHOLD, getInfluencerHealth, getInfluencerHealthEmoji } from "@/lib/points";
+import { BannerCarousel } from "@/components/ui/BannerCarousel";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/components/ui/toast-provider";
 import { CommunityThumbnail } from "@/components/community/CommunityThumbnail";
@@ -251,6 +254,7 @@ function InfluencerDashboard({ userName }: { userName: string }) {
   const [community, setCommunity] = useState<CommunityStats | null>(null);
   const [members, setMembers] = useState<RecentMember[]>([]);
   const [membersLoading, setMembersLoading] = useState(false);
+  const [influencerScore, setInfluencerScore] = useState<number>(0);
 
   useEffect(() => {
     const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
@@ -267,13 +271,17 @@ function InfluencerDashboard({ userName }: { userName: string }) {
         if (mineData.success && mineData.data?.length > 0) {
           const c = mineData.data[0];
           setCommunity(c);
-          // Load recent members
+          const userId = localStorage.getItem(STORAGE_KEYS.USER_ID);
+          // Load recent members + influencer score in parallel
           setMembersLoading(true);
-          fetch(`/api/communities/${c.id}/members?pageSize=5`, {
-            headers: { Authorization: `Bearer ${token}` },
-          })
-            .then((r) => r.json())
-            .then((d) => { if (d.success) setMembers(d.data ?? []); })
+          Promise.all([
+            fetch(`/api/communities/${c.id}/members?pageSize=5`, { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json()),
+            userId ? fetch(`/api/communities/${c.id}/leaderboard?userId=${userId}`, { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json()) : Promise.resolve(null),
+          ])
+            .then(([membersData, scoreData]) => {
+              if (membersData.success) setMembers(membersData.data ?? []);
+              if (scoreData?.success) setInfluencerScore(scoreData.data?.points ?? 0);
+            })
             .catch(console.error)
             .finally(() => setMembersLoading(false));
         }
@@ -306,6 +314,66 @@ function InfluencerDashboard({ userName }: { userName: string }) {
         <StatsCard title="Receita Total" value={summary?.totalRevenue ?? 0} growth={summary?.revenueGrowth} prefix="R$ " icon={TrendingUp} iconColor="text-[#009CD9]" iconBg="bg-[#009CD9]/10" />
         <StatsCard title="Churn Rate" value={summary?.churnRate ?? 0} suffix="%" icon={Activity} iconColor="text-orange-400" iconBg="bg-orange-500/10" />
       </div>
+
+      {/* Performance Box */}
+      {(() => {
+        const health = getInfluencerHealth(influencerScore);
+        const healthEmoji = getInfluencerHealthEmoji(health);
+        const healthColor =
+          health === "Saudável" ? "text-green-400 border-green-500/20 bg-green-500/10" :
+          health === "Atenção"  ? "text-yellow-400 border-yellow-500/20 bg-yellow-500/10" :
+                                   "text-red-400 border-red-500/20 bg-red-500/10";
+        const memberCount = summary?.activeMembers ?? community?.memberCount ?? 0;
+        const mrrProjection = memberCount * 79;
+        // PP Score: weighted from health (50) + engagement proxy (members)
+        const ppScore = Math.min(100, Math.round((influencerScore / 100) * 60 + (Math.min(memberCount, 50) / 50) * 40));
+        return (
+          <div className="glass-card p-5 border-[#007A99]/20">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-sm font-semibold text-[#EEE6E4] flex items-center gap-2">
+                <Trophy className="w-4 h-4 text-[#009CD9]" /> Caixa de Performance
+              </h2>
+              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${healthColor}`}>
+                {healthEmoji} {health}
+              </span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-[#EEE6E4]">{influencerScore}</p>
+                <p className="text-xs text-gray-400 mt-0.5">Score atual</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-[#EEE6E4]">{ppScore}</p>
+                <p className="text-xs text-gray-400 mt-0.5">PP Score</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-[#EEE6E4]">{memberCount}</p>
+                <p className="text-xs text-gray-400 mt-0.5">Membros opt-in</p>
+              </div>
+              <div className="text-center">
+                <p className="text-lg font-bold text-green-400">R${mrrProjection.toLocaleString("pt-BR")}</p>
+                <p className="text-xs text-gray-400 mt-0.5">MRR estimado</p>
+              </div>
+            </div>
+            <div className="mt-4">
+              <div className="flex justify-between text-xs text-gray-400 mb-1">
+                <span>Score de saúde</span>
+                <span>{influencerScore}/100+</span>
+              </div>
+              <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-700 ${
+                    health === "Saudável" ? "bg-gradient-to-r from-green-600 to-green-400" :
+                    health === "Atenção"  ? "bg-gradient-to-r from-yellow-600 to-yellow-400" :
+                                            "bg-gradient-to-r from-red-600 to-red-400"
+                  }`}
+                  style={{ width: `${Math.min(100, influencerScore)}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Revenue chart */}
@@ -487,6 +555,10 @@ function MemberDashboardInner({ userName }: { userName: string }) {
   const [hasPlatform, setHasPlatform] = useState<boolean | null>(null);
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [lbLoading, setLbLoading] = useState(true);
+  const [lbPeriod, setLbPeriod] = useState<"all" | "month">("all");
+  const [myScore, setMyScore] = useState<{ points: number; level: number } | null>(null);
+  const [recommended, setRecommended] = useState<any[]>([]);
+  const [recLoading, setRecLoading] = useState(true);
   const router = useRouter();
   const searchParams = useSearchParams();
   const toast = useToast();
@@ -520,11 +592,34 @@ function MemberDashboardInner({ userName }: { userName: string }) {
   }, []);
 
   useEffect(() => {
-    fetch("/api/leaderboard?limit=5")
+    setLbLoading(true);
+    fetch(`/api/leaderboard?limit=5&period=${lbPeriod}`)
       .then((r) => r.json())
       .then((d) => { if (d.success) setLeaderboard(d.data ?? []); })
       .catch(console.error)
       .finally(() => setLbLoading(false));
+  }, [lbPeriod]);
+
+  // Fetch user's own aggregated score
+  useEffect(() => {
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+    const userId = localStorage.getItem(STORAGE_KEYS.USER_ID);
+    if (!token || !userId) return;
+    fetch(`/api/users/${userId}/score`, { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => r.json())
+      .then((d) => { if (d.success) setMyScore(d.data); })
+      .catch(console.error);
+  }, []);
+
+  // Fetch recommended posts
+  useEffect(() => {
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+    if (!token) { setRecLoading(false); return; }
+    fetch("/api/feed/recommended?limit=5", { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => r.json())
+      .then((d) => { if (d.success) setRecommended(d.data ?? []); })
+      .catch(console.error)
+      .finally(() => setRecLoading(false));
   }, []);
 
   return (
@@ -532,7 +627,7 @@ function MemberDashboardInner({ userName }: { userName: string }) {
       {/* Welcome hero */}
       <div className="relative rounded-2xl overflow-hidden min-h-[160px] sm:min-h-[200px]">
         {/* Background layers */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#003344] via-[#004D61] to-[#006079]" />
         <div className="absolute inset-0 bg-[url('/photos/barba-thumb.png')] bg-cover bg-center opacity-10 mix-blend-luminosity" />
         {/* Geometric accents */}
         <div className="absolute -top-10 -right-10 w-64 h-64 bg-[#006079]/20 rounded-full blur-3xl" />
@@ -555,6 +650,134 @@ function MemberDashboardInner({ userName }: { userName: string }) {
         {/* Bottom accent line */}
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-[#007A99]/0 via-[#007A99]/60 to-[#007A99]/0" />
       </div>
+
+      {/* Advertiser banner carousel */}
+      <BannerCarousel />
+
+      {/* Score card */}
+      {myScore !== null && (() => {
+        const level = getMemberLevel(myScore.points);
+        const levelColor = getMemberLevelColor(level);
+        const canPost = myScore.points >= POST_THRESHOLD;
+        const nextThreshold = myScore.points < 40 ? 40 : myScore.points < 70 ? 70 : myScore.points < 85 ? 85 : null;
+        const pct = nextThreshold ? Math.min(100, Math.round((myScore.points / nextThreshold) * 100)) : 100;
+        return (
+          <div className="glass-card p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div className="w-12 h-12 bg-[#007A99]/10 rounded-xl flex items-center justify-center flex-shrink-0">
+              <Trophy className="w-6 h-6 text-[#009CD9]" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <p className="text-sm font-semibold text-[#EEE6E4]">Seu score na plataforma</p>
+                <span className={`text-xs px-2 py-0.5 rounded-full font-semibold border ${levelColor}`}>
+                  {level}
+                </span>
+                {canPost && (
+                  <span className="text-xs bg-green-500/20 text-green-400 border border-green-500/30 px-2 py-0.5 rounded-full font-semibold">
+                    ✓ Pode criar posts
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-2xl font-black text-[#EEE6E4]">{myScore.points.toLocaleString("pt-BR")}</span>
+                <span className="text-gray-400 text-sm">pts</span>
+              </div>
+              {nextThreshold ? (
+                <div>
+                  <div className="h-1.5 bg-white/10 rounded-full overflow-hidden mb-1">
+                    <div className="h-full bg-gradient-to-r from-[#006079] to-[#009CD9] rounded-full transition-all" style={{ width: `${pct}%` }} />
+                  </div>
+                  <p className="text-xs text-gray-500 flex items-center gap-1">
+                    <Rocket className="w-3 h-3 text-[#009CD9]" />
+                    Faltam <span className="text-[#009CD9] font-semibold mx-1">{nextThreshold - myScore.points} pts</span> para{" "}
+                    {nextThreshold === 40 ? "Ativo" : nextThreshold === 70 ? "Participante (criar posts)" : "Superfã"}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-xs text-yellow-400 font-medium">🏆 Nível máximo atingido!</p>
+              )}
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Recommended posts feed */}
+      {(recLoading || recommended.length > 0) && (
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <Activity className="w-5 h-5 text-[#009CD9]" />
+            <h2 className="text-lg font-bold text-[#EEE6E4]">Em alta nas comunidades</h2>
+          </div>
+          {recLoading ? (
+            <div className="space-y-3 animate-pulse">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="glass-card p-4 flex gap-3">
+                  <div className="w-8 h-8 rounded-full bg-white/10 flex-shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3 bg-white/10 rounded w-1/4" />
+                    <div className="h-4 bg-white/10 rounded w-3/4" />
+                    <div className="h-3 bg-white/10 rounded w-1/2" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {recommended.map((post) => {
+                const authorName = `${post.author.firstName} ${post.author.lastName}`;
+                const authorInitials = `${post.author.firstName?.[0] ?? ""}${post.author.lastName?.[0] ?? ""}`.toUpperCase();
+                const timeAgo = (() => {
+                  const diff = Date.now() - new Date(post.createdAt).getTime();
+                  const mins = Math.floor(diff / 60000);
+                  if (mins < 60) return `${mins}m`;
+                  const hours = Math.floor(mins / 60);
+                  if (hours < 24) return `${hours}h`;
+                  return `${Math.floor(hours / 24)}d`;
+                })();
+                const feedLink = `/community/${post.space?.community?.slug}/feed/${post.space?.slug}`;
+                return (
+                  <Link
+                    key={post.id}
+                    href={feedLink}
+                    className="glass-card p-4 flex gap-3 hover:border-[#009CD9]/20 transition-all block"
+                  >
+                    <div className="flex-shrink-0">
+                      {post.author.avatarUrl ? (
+                        <Image src={post.author.avatarUrl} alt={authorName} width={32} height={32} className="w-8 h-8 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#006079] to-[#009CD9] flex items-center justify-center text-white text-xs font-bold">
+                          {authorInitials}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className="text-xs text-gray-400 font-medium">{authorName}</span>
+                        <span className="text-xs text-gray-600">·</span>
+                        <span
+                          className="text-xs px-1.5 py-0.5 rounded text-white/80"
+                          style={{ backgroundColor: `${post.space?.community?.primaryColor ?? "#006079"}80` }}
+                        >
+                          {post.space?.community?.name}
+                        </span>
+                        <span className="text-xs text-gray-500 ml-auto">{timeAgo}</span>
+                      </div>
+                      {post.title && (
+                        <p className="text-sm font-semibold text-[#EEE6E4] leading-tight mb-1">{post.title}</p>
+                      )}
+                      <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">{post.body}</p>
+                      <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                        <span>{post._count.reactions} reações</span>
+                        <span>{post._count.comments} comentários</span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Main layout: communities + leaderboard side by side */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -599,8 +822,8 @@ function MemberDashboardInner({ userName }: { userName: string }) {
             </div>
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
-                <span className="text-3xl font-bold text-[#EEE6E4]">R$ 837</span>
-                <span className="text-gray-400 text-sm">/ano</span>
+                <span className="text-3xl font-bold text-[#EEE6E4]">R$ 79</span>
+                <span className="text-gray-400 text-sm">/mês</span>
               </div>
               <Link
                 href="/dashboard/assinar"
@@ -687,16 +910,28 @@ function MemberDashboardInner({ userName }: { userName: string }) {
 
         {/* Leaderboard — 1/3 */}
         <div className="lg:col-span-1">
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Trophy className="w-5 h-5 text-[#009CD9]" />
               <h2 className="text-xl font-bold text-[#EEE6E4]">Ranking</h2>
             </div>
-            <a href="/dashboard/leaderboard" className="text-sm text-[#009CD9] hover:text-[#009CD9] font-medium transition-colors">
+            <a href="/dashboard/leaderboard" className="text-sm text-[#009CD9] font-medium transition-colors">
               Ver completo →
             </a>
           </div>
-          <div className="glass-card divide-y divide-gray-100 sticky top-4">
+          {/* Period selector */}
+          <div className="flex items-center bg-white/5 rounded-xl p-0.5 mb-4">
+            {(["all", "month"] as const).map((p) => (
+              <button
+                key={p}
+                onClick={() => setLbPeriod(p)}
+                className={`flex-1 text-xs font-semibold py-1.5 rounded-lg transition-all ${lbPeriod === p ? "bg-[#006079] text-white" : "text-gray-400 hover:text-gray-300"}`}
+              >
+                {p === "all" ? "Geral" : "Este mês"}
+              </button>
+            ))}
+          </div>
+          <div className="glass-card divide-y divide-white/10 sticky top-4">
             {lbLoading ? (
               <div className="p-4 space-y-3 animate-pulse">
                 {[...Array(5)].map((_, i) => (
@@ -770,6 +1005,22 @@ function MemberDashboardInner({ userName }: { userName: string }) {
 function PartnerDashboard({ userName }: { userName: string }) {
   const firstName = userName.split(" ")[0] || "Parceiro";
   const greeting = getGreeting(firstName);
+  const [listings, setListings] = useState<{ id: string; title: string; price: number; currency: string; status: string; _count: { purchases: number } }[]>([]);
+  const [listingsLoading, setListingsLoading] = useState(true);
+
+  useEffect(() => {
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+    fetch("/api/marketplace/listings?mine=true&pageSize=5", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.json())
+      .then((d) => { if (d.success) setListings(d.data ?? []); })
+      .catch(console.error)
+      .finally(() => setListingsLoading(false));
+  }, []);
+
+  const activeCount = listings.filter((l) => l.status === "ACTIVE").length;
+  const totalSales = listings.reduce((acc, l) => acc + (l._count?.purchases ?? 0), 0);
 
   return (
     <div className="space-y-6">
@@ -784,30 +1035,50 @@ function PartnerDashboard({ userName }: { userName: string }) {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatsCard title="Produtos Ativos" value={3} icon={Package} iconColor="text-green-400" iconBg="bg-green-500/10" />
-        <StatsCard title="Vendas este mês" value={47} growth={12.5} icon={TrendingUp} iconColor="text-[#009CD9]" iconBg="bg-[#007A99]/10" />
-        <StatsCard title="Receita do mês" value={1840} prefix="R$ " growth={8.2} icon={DollarSign} iconColor="text-[#009CD9]" iconBg="bg-[#009CD9]/10" />
+        {listingsLoading ? (
+          [...Array(3)].map((_, i) => (
+            <div key={i} className="glass-card p-5 animate-pulse">
+              <div className="h-4 bg-white/10 rounded w-1/2 mb-3" />
+              <div className="h-8 bg-white/10 rounded w-1/3" />
+            </div>
+          ))
+        ) : (
+          <>
+            <StatsCard title="Produtos Ativos" value={activeCount} icon={Package} iconColor="text-green-400" iconBg="bg-green-500/10" />
+            <StatsCard title="Vendas totais" value={totalSales} icon={TrendingUp} iconColor="text-[#009CD9]" iconBg="bg-[#007A99]/10" />
+            <StatsCard title="Total de produtos" value={listings.length} icon={DollarSign} iconColor="text-[#009CD9]" iconBg="bg-[#009CD9]/10" />
+          </>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="glass-card p-6">
           <h2 className="text-base font-semibold text-[#EEE6E4] mb-4">Meus Produtos</h2>
-          <div className="space-y-3">
-            {[
-              { name: "Pack Templates de Diagnóstico", sales: 127, price: "R$ 47", rating: 4.8 },
-              { name: "Ebook: Motor Turbo do Zero", sales: 89, price: "R$ 27", rating: 4.6 },
-              { name: "Mentoria: Tuning Profissional", sales: 12, price: "R$ 297", rating: 5.0 },
-            ].map((product) => (
-              <div key={product.name} className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
-                <div>
-                  <p className="text-sm font-medium text-[#EEE6E4]">{product.name}</p>
-                  <p className="text-xs text-gray-500">{product.sales} vendas · ⭐ {product.rating}</p>
+          {listingsLoading ? (
+            <div className="space-y-3 animate-pulse">
+              {[1, 2, 3].map((i) => <div key={i} className="h-12 bg-white/10 rounded-xl" />)}
+            </div>
+          ) : listings.length === 0 ? (
+            <div className="text-center py-8 text-gray-400 text-sm">
+              <Package className="w-8 h-8 mx-auto mb-2 text-gray-500" />
+              Nenhum produto cadastrado ainda.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {listings.map((listing) => (
+                <div key={listing.id} className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                  <div>
+                    <p className="text-sm font-medium text-[#EEE6E4] truncate max-w-[180px]">{listing.title}</p>
+                    <p className="text-xs text-gray-500">{listing._count?.purchases ?? 0} vendas</p>
+                  </div>
+                  <span className="text-sm font-semibold text-[#009CD9]">
+                    R$ {listing.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                  </span>
                 </div>
-                <span className="text-sm font-semibold text-[#009CD9]">{product.price}</span>
-              </div>
-            ))}
-          </div>
-          <Link href="/dashboard/meus-produtos" className="mt-4 block text-center text-sm text-[#009CD9] hover:text-[#009CD9] font-medium transition-colors">
+              ))}
+            </div>
+          )}
+          <Link href="/dashboard/meus-produtos" className="mt-4 block text-center text-sm text-[#009CD9] font-medium transition-colors">
             Gerenciar produtos →
           </Link>
         </div>

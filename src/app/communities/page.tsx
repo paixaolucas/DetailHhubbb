@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Search, Users, Car, Gauge, Wrench, Star } from "lucide-react";
+import { Search, Users, Car } from "lucide-react";
 import { Footer } from "@/components/layout/footer";
-import { Logo } from "@/components/ui/logo";
+import { LogoType } from "@/components/ui/logo";
 
 interface Community {
   id: string;
@@ -68,9 +68,8 @@ export default function CommunitiesPage() {
       {/* Header */}
       <header className="bg-white/5 border-b border-white/10 backdrop-blur-md sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 font-bold text-lg">
-            <Logo size="md" />
-            <span className="text-[#EEE6E4]">Detailer&apos;HUB</span>
+          <Link href="/" className="flex items-center">
+            <LogoType height={28} variant="light" />
           </Link>
           <div className="flex items-center gap-3">
             <Link href="/login" className="text-gray-400 hover:text-[#EEE6E4] text-sm transition-colors">
@@ -194,7 +193,6 @@ export default function CommunitiesPage() {
 }
 
 function CommunityCard({ community }: { community: Community }) {
-  const defaultPlan = community.subscriptionPlans[0];
 
   return (
     <Link
@@ -284,14 +282,9 @@ function CommunityCard({ community }: { community: Community }) {
             <Users className="w-4 h-4" />
             <span>{community.memberCount.toLocaleString("pt-BR")} membros</span>
           </div>
-          {defaultPlan && (
-            <span className="text-sm font-semibold text-[#009CD9]">
-              R$ {Number(defaultPlan.price).toLocaleString("pt-BR")}/mês
-            </span>
-          )}
-          {!defaultPlan && (
-            <span className="text-xs text-green-400 font-medium">Grátis</span>
-          )}
+          <span className="text-xs font-semibold text-[#009CD9] group-hover:text-[#009CD9] flex items-center gap-1 transition-all">
+            Ver comunidade →
+          </span>
         </div>
       </div>
     </Link>

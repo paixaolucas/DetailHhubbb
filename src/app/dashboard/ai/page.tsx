@@ -112,7 +112,7 @@ export default function AutoAIPage() {
                 <button
                   key={q}
                   onClick={() => setInput(q)}
-                  className="text-left text-xs bg-white hover:bg-white/10 text-gray-400 hover:text-[#EEE6E4] border border-white/10 hover:border-[#009CD9]/20 px-3 py-2.5 rounded-xl transition-all"
+                  className="text-left text-xs bg-white/5 hover:bg-white/10 text-gray-400 hover:text-[#EEE6E4] border border-white/10 hover:border-[#009CD9]/20 px-3 py-2.5 rounded-xl transition-all"
                 >
                   {q}
                 </button>

@@ -13,10 +13,7 @@ export function LoadingSpinner({ size = "md", text }: LoadingSpinnerProps) {
           <Logo size="xl" />
           <div className="absolute inset-0 rounded-2xl border-2 border-[#009CD9]/50 animate-ping" />
         </div>
-        <div className="text-center">
-          <p className="text-[#EEE6E4] font-semibold text-lg">Detailer&apos;HUB</p>
-          {text && <p className="text-gray-400 text-sm mt-1">{text}</p>}
-        </div>
+        {text && <p className="text-gray-400 text-sm">{text}</p>}
       </div>
     );
   }

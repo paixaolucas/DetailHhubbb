@@ -78,13 +78,13 @@ export default function MinhasComunidadesPage() {
       <div
         className={`relative rounded-2xl p-6 border transition-all duration-300 group cursor-pointer ${
           hasAccess
-            ? "bg-white border-white/10 hover:border-white/25"
+            ? "bg-white/5 border-white/10 hover:border-white/25"
             : "bg-white/[0.02] border-white/5 hover:border-[#007A99]/30"
         }`}
       >
         {/* Lock overlay for no-access */}
         {!hasAccess && (
-          <div className="absolute inset-0 rounded-2xl bg-[#F8F7FF]/40 backdrop-blur-[1px] flex items-center justify-center z-10 group-hover:bg-[#F8F7FF]/20 transition-colors">
+          <div className="absolute inset-0 rounded-2xl bg-[#1A1A1A]/40 backdrop-blur-[1px] flex items-center justify-center z-10 group-hover:bg-[#1A1A1A]/20 transition-colors">
             <div className="flex flex-col items-center gap-2">
               <div className="w-10 h-10 bg-white/5 border border-white/10 rounded-full flex items-center justify-center group-hover:border-[#007A99]/40 transition-colors">
                 <Lock className="w-5 h-5 text-gray-400 group-hover:text-[#009CD9] transition-colors" />
@@ -259,12 +259,12 @@ export default function MinhasComunidadesPage() {
                 <div className="w-12 h-12 bg-white/5 rounded-xl" />
                 <div className="flex-1 space-y-2">
                   <div className="h-4 bg-white/5 rounded w-3/4" />
-                  <div className="h-3 bg-white rounded w-1/2" />
+                  <div className="h-3 bg-white/10 rounded w-1/2" />
                 </div>
               </div>
               <div className="space-y-2">
-                <div className="h-3 bg-white rounded" />
-                <div className="h-3 bg-white rounded w-4/5" />
+                <div className="h-3 bg-white/10 rounded" />
+                <div className="h-3 bg-white/10 rounded w-4/5" />
               </div>
             </div>
           ))}

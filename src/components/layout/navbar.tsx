@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X, LayoutDashboard, ChevronDown, LogOut } from "lucide-react";
-import { Logo } from "@/components/ui/logo";
+import { LogoType } from "@/components/ui/logo";
 import { STORAGE_KEYS } from "@/lib/constants";
 
 interface AuthUser {
@@ -50,9 +50,8 @@ export function NavBar() {
     <nav className="border-b border-white/10 backdrop-blur-md bg-[#1A1A1A]/90 sticky top-0 z-50">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 font-bold text-xl">
-          <Logo size="md" />
-          <span className="text-[#EEE6E4]">Detailer&apos;HUB</span>
+        <Link href="/" className="flex items-center flex-shrink-0">
+          <LogoType height={28} variant="light" />
         </Link>
 
         {/* Desktop links */}
