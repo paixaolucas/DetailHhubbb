@@ -40,7 +40,7 @@ export const GET = withAuth(async (req, { session, params }) => {
       return NextResponse.json({ success: false, error: "Post not found" }, { status: 404 });
     }
 
-    const isMember = await verifyMembership(session.userId, postMeta.communityId);
+    const isMember = await verifyMembership(session.userId, postMeta.communityId, session.hasPlatform);
     if (!isMember) {
       return NextResponse.json({ success: false, error: "Membership required" }, { status: 403 });
     }

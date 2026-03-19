@@ -21,7 +21,7 @@ export const GET = withAuth(async (_req, { session, params }) => {
     return NextResponse.json({ success: false, error: "Community ID required" }, { status: 400 });
   }
 
-  const isMember = await verifyMembership(session.userId, communityId);
+  const isMember = await verifyMembership(session.userId, communityId, session.hasPlatform);
   if (!isMember) {
     return NextResponse.json({ success: false, error: "Membership required" }, { status: 403 });
   }
@@ -44,7 +44,7 @@ export const POST = withAuth(async (req, { session, params }) => {
     return NextResponse.json({ success: false, error: "Community ID required" }, { status: 400 });
   }
 
-  const isMember = await verifyMembership(session.userId, communityId);
+  const isMember = await verifyMembership(session.userId, communityId, session.hasPlatform);
   if (!isMember) {
     return NextResponse.json({ success: false, error: "Membership required" }, { status: 403 });
   }

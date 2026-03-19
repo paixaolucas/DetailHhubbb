@@ -64,7 +64,7 @@ export const GET = withAuth(async (req, { session, params }) => {
     }
 
     // Verify membership
-    const isMember = await verifyMembership(session.userId, community.id);
+    const isMember = await verifyMembership(session.userId, community.id, session.hasPlatform);
     if (!isMember) {
       return NextResponse.json(
         { success: false, error: "Membership required" },

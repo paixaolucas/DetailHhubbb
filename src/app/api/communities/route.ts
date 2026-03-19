@@ -40,7 +40,13 @@ export async function GET(req: NextRequest) {
 
     const result = await listPublicCommunities({ page, pageSize, search, tags });
 
-    return NextResponse.json({ success: true, ...result }, { status: 200 });
+    return NextResponse.json(
+      { success: true, ...result },
+      {
+        status: 200,
+        headers: { "Cache-Control": "public, max-age=60, stale-while-revalidate=120" },
+      }
+    );
   } catch (error) {
     console.error("[Communities:GET]", error);
     return NextResponse.json(

@@ -33,7 +33,7 @@ export const POST = withAuth(async (req, { session }) => {
     }
     const { communityId } = parsed.data;
 
-    const isMember = await verifyMembership(session.userId, communityId);
+    const isMember = await verifyMembership(session.userId, communityId, session.hasPlatform);
     if (!isMember) {
       return NextResponse.json({ success: false, error: "Membership required" }, { status: 403 });
     }

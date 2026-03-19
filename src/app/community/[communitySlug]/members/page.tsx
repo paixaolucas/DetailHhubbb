@@ -87,32 +87,18 @@ export default function CommunityMembersPage() {
       try {
         const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
 
-        // Find community by slug
-        const mineRes = await fetch("/api/communities/mine", {
+        // Single call: resolve community by slug server-side
+        const overviewRes = await fetch(`/api/communities/${communitySlug}/overview`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const mineJson = await mineRes.json();
-        let found: Community | null = null;
-        if (mineJson.success && Array.isArray(mineJson.data)) {
-          found = mineJson.data.find((c: Community) => c.slug === communitySlug) ?? null;
-        }
+        const overviewJson = overviewRes.ok ? await overviewRes.json() : { success: false };
 
-        // Fallback: fetch all public communities
-        if (!found) {
-          const allRes = await fetch("/api/communities?pageSize=100");
-          const allJson = await allRes.json();
-          if (allJson.success) {
-            found = (allJson.communities ?? []).find(
-              (c: Community) => c.slug === communitySlug
-            ) ?? null;
-          }
-        }
-
-        if (!found) {
+        if (!overviewJson.success) {
           setError("Comunidade não encontrada.");
           return;
         }
 
+        const found: Community = overviewJson.data.community;
         setCommunity(found);
         await fetchMembers(found.id, 1);
       } catch {

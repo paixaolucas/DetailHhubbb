@@ -11,7 +11,10 @@ export const GET = withAuth(async (req, { session }) => {
     const communities = await getInfluencerCommunities(session.userId);
     return NextResponse.json(
       { success: true, data: communities },
-      { status: 200 }
+      {
+        status: 200,
+        headers: { "Cache-Control": "private, max-age=30, stale-while-revalidate=60" },
+      }
     );
   } catch (error) {
     console.error("[Communities:mine]", error);

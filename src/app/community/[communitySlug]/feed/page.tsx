@@ -90,58 +90,20 @@ export default function CommunityFeedPage() {
           return;
         }
 
-        const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
+        // Single round-trip: community + spaces resolved server-side by slug
+        const res = await fetch(`/api/communities/${communitySlug}/overview`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const json = res.ok ? await res.json() : { success: false };
 
-        // 1. Fetch public communities + owned communities in parallel
-        const [pubRes, mineRes] = await Promise.all([
-          fetch("/api/communities", { headers: { Authorization: `Bearer ${token}` } }),
-          fetch("/api/communities/mine", { headers: { Authorization: `Bearer ${token}` } }),
-        ]);
-        const pubJson = pubRes.ok ? await pubRes.json() : { success: false };
-        const mineJson = mineRes.ok ? await mineRes.json() : { success: false };
-
-        // Find community in public list
-        const allCommunities: Community[] = pubJson.success ? (pubJson.communities ?? []) : [];
-        const candidate = allCommunities.find((c: Community) => c.slug === communitySlug);
-
-        // Check owned communities (influencer / admin)
-        const ownedCommunities: Community[] = (mineJson.success && Array.isArray(mineJson.data)) ? mineJson.data : [];
-        const ownedMatch = ownedCommunities.find((c: Community) => c.slug === communitySlug);
-
-        let found: Community | null = ownedMatch ?? null;
-
-        if (!found && candidate) {
-          // SUPER_ADMIN always has access
-          // COMMUNITY_MEMBER with platform subscription has access to all published communities
-          // INFLUENCER_ADMIN has access to their own (already handled above) + can browse others
-          if (
-            role === "SUPER_ADMIN" ||
-            role === "COMMUNITY_MEMBER" ||
-            role === "INFLUENCER_ADMIN"
-          ) {
-            found = candidate;
-          }
-        }
-
-        if (!found) {
+        if (!json.success) {
           setError("Comunidade não encontrada ou você não tem acesso.");
           setLoading(false);
           return;
         }
 
-        setCommunity(found);
-
-        // 3. Fetch spaces for this community
-        const spacesRes = await fetch(
-          `/api/communities/${found.id}/spaces`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        const spacesJson = spacesRes.ok ? await spacesRes.json() : { success: false };
-
-        if (spacesJson.success) {
-          const spaceList: Space[] = spacesJson.data ?? [];
-          setSpaces(spaceList);
-        }
+        setCommunity(json.data.community);
+        setSpaces(json.data.spaces ?? []);
       } catch {
         setError("Erro de conexão. Tente novamente.");
       } finally {

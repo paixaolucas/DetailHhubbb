@@ -13,7 +13,7 @@ export const POST = withAuth(async (_req, { session, params }) => {
     return NextResponse.json({ success: false, error: "IDs required" }, { status: 400 });
   }
 
-  const isMember = await verifyMembership(session.userId, communityId);
+  const isMember = await verifyMembership(session.userId, communityId, session.hasPlatform);
   if (!isMember) {
     return NextResponse.json({ success: false, error: "Membership required" }, { status: 403 });
   }

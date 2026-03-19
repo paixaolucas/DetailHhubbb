@@ -22,7 +22,10 @@ export const GET = withAuth(async (req, { params }) => {
       orderBy: { sortOrder: "asc" },
     });
 
-    return NextResponse.json({ success: true, data: spaces });
+    return NextResponse.json(
+      { success: true, data: spaces },
+      { headers: { "Cache-Control": "private, max-age=60, stale-while-revalidate=120" } }
+    );
   } catch {
     return NextResponse.json(
       { success: false, error: "Internal server error" },

@@ -296,6 +296,8 @@ model PostReaction {
 
   @@unique([postId, userId, type])
   @@index([postId, userId])
+  @@index([postId])
+  @@index([userId])
   @@map("post_reactions")
 }
 
@@ -309,6 +311,8 @@ model CommentReaction {
   user      User     @relation(fields: [userId], references: [id])
 
   @@unique([commentId, userId, type])
+  @@index([commentId])
+  @@index([userId])
   @@map("comment_reactions")
 }
 

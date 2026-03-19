@@ -8,11 +8,14 @@ export const GET = withAuth(async (req, { session }) => {
     include: { plan: true },
   });
 
-  return NextResponse.json({
-    success: true,
-    data: {
-      hasMembership: membership?.status === "ACTIVE",
-      membership,
+  return NextResponse.json(
+    {
+      success: true,
+      data: {
+        hasMembership: membership?.status === "ACTIVE",
+        membership,
+      },
     },
-  });
+    { headers: { "Cache-Control": "private, max-age=30, stale-while-revalidate=60" } }
+  );
 });
