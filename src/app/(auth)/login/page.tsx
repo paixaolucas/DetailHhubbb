@@ -15,6 +15,7 @@ function LoginFormContent() {
   const [error, setError] = useState<string | null>(
     searchParams.get("error") || null
   );
+  const verified = searchParams.get("verificado") === "true";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -31,9 +32,12 @@ function LoginFormContent() {
       const data = await res.json();
 
       if (!res.ok) {
+        if (data.code === "EMAIL_NOT_VERIFIED") {
+          window.location.href = `/verificar-email?email=${encodeURIComponent(form.email)}`;
+          return;
+        }
         setError(data.error ?? "Credenciais inválidas");
         setIsLoading(false);
-        // Scroll to Google button if it's a Google-only account
         if (data.code === "GOOGLE_ONLY_ACCOUNT") {
           window.scrollTo({ top: 0, behavior: "smooth" });
         }
@@ -115,6 +119,13 @@ function LoginFormContent() {
             <h2 className="text-2xl font-bold text-[#EEE6E4] mb-1">Entrar na sua conta</h2>
             <p className="text-gray-400">Digite suas credenciais para continuar.</p>
           </div>
+
+          {/* Email verified success */}
+          {verified && (
+            <div className="mb-5 p-3.5 bg-green-500/10 border border-green-500/30 rounded-xl text-green-400 text-sm">
+              Email verificado com sucesso! Faça login para continuar.
+            </div>
+          )}
 
           {/* Error */}
           {error && (

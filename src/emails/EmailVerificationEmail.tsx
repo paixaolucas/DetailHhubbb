@@ -64,7 +64,7 @@ const header = {
   padding: "20px 30px",
   borderRadius: "12px 12px 0 0",
 };
-const logo = { color: "#3B82F6", fontSize: "24px", margin: 0 };
+const logo = { color: "#009CD9", fontSize: "24px", margin: 0 };
 const content = {
   backgroundColor: "#1F2937",
   padding: "30px",
@@ -73,7 +73,7 @@ const content = {
 const heading = { color: "#FFFFFF", fontSize: "20px", marginTop: 0 };
 const paragraph = { color: "#9CA3AF", fontSize: "15px", lineHeight: "24px" };
 const button = {
-  backgroundColor: "#3B82F6",
+  backgroundColor: "#006079",
   color: "#FFFFFF",
   padding: "12px 24px",
   borderRadius: "8px",

@@ -164,7 +164,7 @@ export default function MessagesPage() {
     loadMessages(selected.id);
 
     // Poll for new messages every 5s
-    pollRef.current = setInterval(() => loadMessages(selected.id), 5000);
+    pollRef.current = setInterval(() => loadMessages(selected.id), 10000);
     return () => {
       if (pollRef.current) clearInterval(pollRef.current);
     };

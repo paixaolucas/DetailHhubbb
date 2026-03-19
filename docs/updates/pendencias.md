@@ -12,7 +12,7 @@
 | 3 | Engajamento | ✅ Completo |
 | 4 | Pagamentos | ✅ Completo |
 | 5 | Dashboards & Admin | ✅ Completo |
-| **6** | **Infraestrutura para Produção** | 🔴 Pendente |
+| **6** | **Infraestrutura para Produção** | 🟡 Aguardando env vars |
 | **7** | **Segurança & UX Essencial** | 🔴 Pendente |
 | **8** | **Polimento Pré-lançamento** | 🟡 Pendente |
 | **9** | **Estabilidade de Longo Prazo (Time Bombs)** | 🔴 Pendente |

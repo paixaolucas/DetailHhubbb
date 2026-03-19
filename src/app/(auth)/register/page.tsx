@@ -95,7 +95,8 @@ function RegisterFormContent() {
       } else if (community) {
         router.push(`/community/${community}`);
       } else {
-        window.location.href = "/dashboard/boas-vindas";
+        const email = data.data?.user?.email ?? "";
+        window.location.href = `/verificar-email?email=${encodeURIComponent(email)}`;
       }
     } catch {
       setError("Erro de conexão. Tente novamente.");

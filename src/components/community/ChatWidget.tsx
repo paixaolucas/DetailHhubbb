@@ -12,7 +12,7 @@ import { MessageCircle, Send, X, Minimize2, ChevronDown } from "lucide-react";
 import { STORAGE_KEYS } from "@/lib/constants";
 
 const CHAT_MIN_ONLINE = 10;
-const POLL_INTERVAL_MS = 5000;
+const POLL_INTERVAL_MS = 10000;
 const PRESENCE_INTERVAL_MS = 60000;
 
 interface ChatMessage {

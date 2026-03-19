@@ -12,7 +12,7 @@
 - Membros assinam a **plataforma** (assinatura única R$948/ano = R$79/mês) e acessam TUDO
 - Inspirado no modelo Circle (uma assinatura, acesso a todas as comunidades)
 
-**Stack**: Next.js 14 App Router, TypeScript, Prisma, PostgreSQL (Neon), Stripe, OpenAI, Resend, UploadThing
+**Stack**: Next.js 14 App Router, TypeScript, Prisma, PostgreSQL (Supabase), Stripe, OpenAI, Resend, UploadThing
 **Deploy**: Vercel (previsto)
 
 ---

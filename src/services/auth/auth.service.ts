@@ -5,7 +5,7 @@
 
 import { db } from "@/lib/db";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
-import { sendWelcomeEmail } from "@/lib/email/send";
+import { sendWelcomeEmail, sendEmailVerificationEmail } from "@/lib/email/send";
 import {
   createAccessToken,
   createRefreshToken,
@@ -48,6 +48,7 @@ export async function registerUser(
 
   const passwordHash = await hashPassword(input.password);
   const newReferralCode = crypto.randomBytes(6).toString("hex").toUpperCase();
+  const emailVerifyToken = crypto.randomBytes(32).toString("hex");
 
   // Resolve who referred this new user (influencer's referralCode on their User)
   let referredById: string | undefined;
@@ -67,6 +68,7 @@ export async function registerUser(
       lastName: input.lastName,
       role: UserRole.COMMUNITY_MEMBER,
       referralCode: newReferralCode,
+      emailVerifyToken,
       ...(referredById ? { referredById } : {}),
     },
     select: {
@@ -107,9 +109,9 @@ export async function registerUser(
     avatarUrl: user.avatarUrl,
   };
 
-  // Send welcome email (non-blocking)
-  sendWelcomeEmail({ email: user.email, firstName: user.firstName }).catch(
-    (err) => console.error("[Auth] welcome email failed:", err)
+  // Send email verification (non-blocking) — welcome email sent after verification
+  sendEmailVerificationEmail({ email: user.email, firstName: user.firstName }, emailVerifyToken).catch(
+    (err) => console.error("[Auth] verification email failed:", err)
   );
 
   return {
@@ -322,6 +324,8 @@ export async function loginUser(
       id: true,
       email: true,
       passwordHash: true,
+      googleId: true,
+      emailVerified: true,
       role: true,
       firstName: true,
       lastName: true,
@@ -348,6 +352,15 @@ export async function loginUser(
 
   if (!user.isActive) {
     throw new AppError("Account deactivated", 403, "ACCOUNT_INACTIVE");
+  }
+
+  // Block login if email not verified (Google accounts are auto-verified)
+  if (!user.emailVerified && !user.googleId) {
+    throw new AppError(
+      "Confirme seu email antes de fazer login. Verifique sua caixa de entrada.",
+      403,
+      "EMAIL_NOT_VERIFIED"
+    );
   }
 
   // User registered via Google only (no password set)

@@ -57,7 +57,7 @@ export async function sendEmailVerificationEmail(
   user: { email: string; firstName: string },
   verificationToken: string
 ) {
-  const verificationLink = `${APP_URL}/verify-email?token=${verificationToken}`;
+  const verificationLink = `${APP_URL}/api/auth/verify-email?token=${verificationToken}`;
   await send(
     user.email,
     "Confirme seu e-mail — Detailer'HUB",

@@ -34,7 +34,7 @@ export const ourFileRouter = {
     }),
 
   postAttachmentUploader: f({
-    image: { maxFileSize: "8MB", maxFileCount: 10 },
+    image: { maxFileSize: "8MB", maxFileCount: 5 },
   })
     .middleware(async ({ req }) => {
       const authHeader = req.headers.get("authorization");
