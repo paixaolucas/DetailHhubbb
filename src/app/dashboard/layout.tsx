@@ -41,6 +41,7 @@ import {
   Megaphone,
   Car,
   Search,
+  Kanban,
 } from "lucide-react";
 import { RoleBadge } from "@/components/ui/badge";
 import { Logo, LogoType } from "@/components/ui/logo";
@@ -83,6 +84,7 @@ const ADMIN_NAV: NavEntry[] = [
       { href: "/dashboard/admin/plataforma", label: "Plataforma", icon: Server },
       { href: "/dashboard/admin/financeiro", label: "Financeiro", icon: DollarSign },
       { href: "/dashboard/admin/ferramentas", label: "Ferramentas", icon: Wrench },
+      { href: "/dashboard/projeto", label: "Projeto", icon: Kanban },
     ],
   },
   {

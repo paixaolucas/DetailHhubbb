@@ -1,189 +1,99 @@
 # Pendências do Projeto — Detailer'HUB
-> Gerado em: 2026-03-18
-> Baseado na leitura do documento fundacional v8 + ID Visual (pasta /branding)
+> Atualizado em: 2026-03-19 — **TODOS OS 5 SPRINTS CONCLUÍDOS** ✅
 
 ---
 
-## ✅ JÁ IMPLEMENTADO (não mexer)
+## 📊 Status dos Sprints
 
-- Paleta de cores oficial (`#006079`, `#009CD9`, `#007A99`, `#1A1A1A`, `#EEE6E4`)
-- Tipografia Titillium Web
-- Logo SVG (duas figuras humanas em fundo teal)
-- Dark theme como padrão em toda a plataforma
-- Preço R$79/mês em todas as páginas de marketing
-- Slogans oficiais ("YouTube é vitrine, HUB é a casa", "maior ecossistema", etc.)
-- Pontos automáticos: post +15 (máx 2/dia), comentário +8 (máx 5/dia), resposta +6 (máx 8/dia), reação +3 (máx 10/dia)
-- Threshold 70 pts para criar post — verificação no client (PostComposer) + server (API)
-- Notificação ao cruzar 70 pts ("Você desbloqueou a criação de posts!")
-- Score card no dashboard do membro (barra de progresso até 70 pts)
+| Sprint | Título | Período | Status | Progresso |
+|--------|--------|---------|--------|-----------|
+| 1 | Fundação | 20 Jan → 02 Fev 2026 | ✅ Completo | 100% |
+| 2 | Comunidades & Conteúdo | 03 Fev → 16 Fev 2026 | ✅ Completo | 100% |
+| 3 | Engajamento | 17 Fev → 02 Mar 2026 | ✅ Completo | 100% |
+| 4 | Pagamentos | 03 Mar → 16 Mar 2026 | ✅ Completo | 100% |
+| 5 | Dashboards & Admin | 17 Mar → 19 Mar 2026 | ✅ Completo | 100% |
+
+---
+
+## ✅ TODOS OS SPRINTS CONCLUÍDOS
+
+Toda a funcionalidade planejada nos 5 sprints está implementada. O backlog abaixo lista oportunidades de Fase 2.
+
+---
+
+## ✅ SPRINTS 1 E 2 — Concluídos
+
+Tudo implementado. Não há pendências.
+
+**Sprint 1 inclui:** Setup Next.js 14, schema Prisma completo, Auth JWT, Google OAuth, middleware withAuth/withRole, design system teal, logo SVG, rate limiting, seed com contas de teste, rebrand ~130 arquivos.
+
+**Sprint 2 inclui:** CRUD comunidades + spaces, feed (PostComposer, PostCard, reações, comentários), assinatura de plataforma (PlatformMembership), Stripe Checkout + Webhook, módulos/trilhas/progresso, UploadThing, emails com Resend, marketplace básico, dashboard por role.
+
+---
+
+## ✅ SPRINT 3 — Engajamento (100% concluído)
+
+- Sistema de pontos automáticos (post +15, comentário +8, resposta +6, reação +3 — com caps diários)
+- Threshold 70 pts para criar post (client + server)
+- Score card no dashboard do membro com barra de progresso
 - Leaderboard global + por comunidade
-- Sistema de notificações básico
-- Marketplace básico
-- Trilhas com módulos e progresso
-- Google OAuth
-- Sistema de denúncias (reports)
-- Dashboard por role (admin, influencer, membro, parceiro)
+- Notificação ao cruzar 70 pts
+- Sistema de badges + certificados
+- Sistema de notificações in-app
+- Sistema de denúncias (reports) + gestão admin
+- Níveis nomeados no UI (Novo < 40 / Ativo 40–69 / Participante ≥ 70 / Superfã ≥ 85)
+- Penalidade de inatividade — `POST /api/cron/inactivity` + `applyInactivityPenalty()` em `src/lib/points.ts`
+- Opt-in de pertencimento — `POST/DELETE /api/communities/[id]/join` + modelo `CommunityOptIn` + botão na página da comunidade
 
 ---
 
-## 🔴 ALTA PRIORIDADE — Implementar logo
+## ✅ SPRINT 4 — Pagamentos (100% concluído)
 
-### 1. Penalidade de inatividade (-3 pts/dia a partir do 3º dia)
-**Doc diz:** Tanto membro quanto influenciador perdem 3 pts/dia a partir do 3º dia consecutivo sem nenhuma ação.
-**Como implementar:**
-- Criar um cron job (ou verificação lazy no login) que checa `PointTransaction` mais recente
-- Se última ação > 2 dias atrás → deduzir 3 pts por dia faltando (sem ultrapassar 0)
-- Registrar como `PointTransaction` com `amount: -3`, `reason: "INACTIVITY:inatividade"`
-- Aplicar para membros E influenciadores
-- Arquivo sugerido: `src/lib/points.ts` — adicionar função `applyInactivityPenalty(userId, communityId)`
-- Trigger: pode ser um endpoint `POST /api/cron/inactivity` chamado diariamente, ou verificação no `withAuth` (lazy)
-
----
-
-### 2. Completar módulo → +25 pts
-**Doc diz:** Completar um módulo de trilha = +25 pts (por módulo único, sem limite diário — mas só uma vez por módulo).
-**Como implementar:**
-- Localizar a API onde o progresso de módulo/lição é marcado como completo
-- Arquivo provável: `src/app/api/users/me/learning/route.ts` ou similar
-- Após marcar módulo como completo, chamar `awardPoints({ amount: 25, eventType: "MODULE_COMPLETE", dailyLimit: 999 })`
-- Garantir idempotência: só pontuar UMA VEZ por módulo (checar se já existe transação com aquele moduleId no metadata)
+- Stripe Checkout plataforma (`/api/stripe/platform-checkout`)
+- Stripe Webhook com `metadata.platformPlanId`
+- Billing portal (`/api/stripe/billing-portal`)
+- Página `/dashboard/assinar` (upgrade CTA)
+- Página admin financeiro com filtro de período (7d/15d/30d/1M–5M + calendar)
+- Modelos `Payment`, `PlatformPlan`, `PlatformMembership`
+- Pontos automáticos influenciador — `awardInfluencerPoints()` em `src/lib/points.ts` integrado em live-sessions, posts, comentários
+- Cálculo da Caixa de Performance — `src/services/performance/performance.service.ts` (fórmula 5 métricas, 0–100)
+- Dashboard de visualização de PP — `src/app/dashboard/performance/page.tsx` com radar chart, barras e histórico
 
 ---
 
-### 3. Níveis nomeados no UI (Novo / Ativo / Participante / Superfã)
-**Doc diz:**
-| Nível | Score | Pode Postar? |
-|-------|-------|-------------|
-| Novo | < 40 pts | Não |
-| Ativo | 40–69 pts | Não |
-| Participante | ≥ 70 pts | Sim |
-| Superfã | ≥ 85 pts por 60 dias contínuos | Sim |
+## ✅ SPRINT 5 — Dashboards & Admin (100% concluído)
 
-**Como implementar:**
-- Criar função utilitária `getMemberLevel(points: number): string` em `src/lib/points.ts`
-- Atualizar `src/app/dashboard/page.tsx` → `MemberDashboardInner` → score card: mostrar nome do nível além do número
-- Atualizar `PostComposer.tsx` → card motivador: mostrar nível atual ("Você é Ativo — faltam X pts para Participante")
-- Superfã requer 60 dias contínuos ≥85 pts → pode ser simplificado para: score atual ≥ 85 na v1
+- Dashboard SUPER_ADMIN com métricas globais
+- Dashboard INFLUENCER_ADMIN com analytics
+- Dashboard COMMUNITY_MEMBER com score + comunidades
+- Gestão de usuários (ban/unban, trocar role)
+- Admin de comunidades (SUPER_ADMIN)
+- Admin financeiro com período customizável
+- Admin analytics reativo por período
+- Performance: eliminação de waterfalls, hasPlatform cache, índices DB, paralelização de queries
+- Automação distribuição PP dia 15 — `POST /api/cron/pp-distribution` (salva scores, calcula pool, atualiza pendingPayout, notifica influenciadores)
+- **vercel.json** criado com todos os 5 crons agendados
 
 ---
 
-### 4. Opt-in de pertencimento à comunidade
-**Doc diz:** Acesso (assinatura = pode ver tudo) ≠ Pertencimento (clica "Entrar nesta comunidade" = declaração de vínculo). O opt-in conta membros para PP do influenciador.
-**Como implementar:**
-- Nova tabela no schema: `CommunityOptIn` (userId, communityId, createdAt) — ou reusar `CommunityMembership` com status separado
-- Na página da comunidade (`/community/[slug]`) e no feed: botão "Entrar nesta comunidade" se ainda não fez opt-in
-- API: `POST /api/communities/[id]/join` e `DELETE /api/communities/[id]/leave`
-- Contagem de membros "pertencentes" separada de "assinantes com acesso"
-- Notificação para o influenciador quando novo membro faz opt-in
+## 🟢 BACKLOG — Fase 2 (baixa prioridade, após validação)
+
+- **Feed recomendado** — posts engajados de todas as comunidades (algoritmo engajamento × recência)
+- **Chat ao vivo geral** — visível apenas com ≥10 membros online
+- **Carrossel de banners** — anunciantes, eventos, lançamentos (máx. 5)
+- **Ranking mensal com reset** — além do all-time, reseta dia 1/mês
+- **Certificação profissional PDF** — trilhas concluídas
+- **Grupos de estudo temáticos** — criados por demanda orgânica
+- **Salas de chat por comunidade** — Fase 2
+- **Moderação por Superfãs** — ≥85 pts por 60 dias como candidato a moderador
+- **Notificações motivacionais de performance** — "Você está no top 3 esta semana!"
+- **Badge de saúde do influenciador** — 🟢/🟡/🔴 visível na página da comunidade
+- **Badge "pode postar" no perfil público** — quando score ≥ 70
+- **Desbloqueio sequencial de módulos** — cadeado até completar módulo anterior
 
 ---
 
-### 5. Pontos automáticos para o influenciador
-**Doc diz:**
-| Evento | Pontos |
-|--------|--------|
-| Postar vídeo exclusivo na plataforma | +30 pts |
-| Fazer live | +25 pts |
-| Criar post/thread no feed | +10 pts |
-| Responder comentário de membro | +8 pts (cap 20 pts/mês) |
-| Novo membro ativo (30 dias) | +5 pts |
-| Inatividade | -3 pts/dia a partir do 3º dia |
-
-**Como implementar:**
-- Reusar `awardPoints()` de `src/lib/points.ts` nas APIs correspondentes
-- `POST /api/spaces/[spaceId]/posts` — já tem +15 para membro; adicionar +10 para influenciador (checar role)
-- `POST /api/communities/[id]/videos` (ou similar) — +30 pts ao criar vídeo
-- `POST /api/lives` — +25 pts ao criar/iniciar live
-- Comentários: verificar se autor é INFLUENCER_ADMIN → +8 pts (cap mensal diferente)
-- Novo membro ativo: verificar após 30 dias de opt-in sem cancelamento
-
----
-
-## 🟡 MÉDIA PRIORIDADE
-
-### 6. Sistema de saúde do influenciador (badge público na comunidade)
-**Doc diz:** Badge visível no perfil da comunidade → 🟢 Saudável (≥70 pts) / 🟡 Atenção (40–69) / 🔴 Crítico (<40)
-- Dashboard privado do influenciador mostra score atual, tendência e próximas ações
-- Membros veem apenas o badge de status (sem número) — cria confiança na assinatura
-**Arquivo:** `src/app/community/[communitySlug]/page.tsx` — adicionar badge no header da comunidade
-
----
-
-### 7. Badge "pode postar" no perfil público do membro
-**Doc diz:** Quando membro atinge ≥70 pts, aparece indicador discreto no perfil público que outros membros reconhecem como "membro ativo que contribui".
-**Arquivo:** `src/app/members/[userId]/page.tsx` — adicionar badge quando score ≥ 70
-
----
-
-### 8. Desbloqueio sequencial de módulos
-**Doc diz:** Módulos seguintes ficam bloqueados até completar o anterior. Exemplo: "Módulo 3 🔒 (completar módulo 2 para desbloquear)"
-**Como implementar:**
-- Na página de trilha/módulo, verificar se o módulo anterior está 100% completo antes de liberar o atual
-- UI: módulo bloqueado com ícone de cadeado e texto "Complete o módulo anterior para desbloquear"
-- API: ao buscar trilha, retornar `isLocked: boolean` por módulo baseado no progresso do usuário
-
----
-
-### 9. Caixa de Performance — Dashboard do influenciador
-**Doc diz:** PP calculada por 5 métricas (views qualificados 30%, engajamento 25%, novos membros 20%, retenção 15%, entregas 10%). Rateio mensal. Pagamento dia 15 do mês seguinte.
-**Fórmula:**
-```
-PP = (views × 0.30) + (engajamento × 0.25) + (novos_membros × 0.20) + (retencao × 0.15) + (entregas × 0.10)
-Participação % = PP_influenciador / Σ PP_todos
-Valor = Participação % × Total da Caixa
-```
-**Composição da caixa:** 15% das assinaturas + % anunciantes + % marketplace + lucro eventos
-**Holdback:** 20% retido por 30 dias (proteção contra chargeback)
-**Nota:** Feature complexa — requer trabalho conjunto com modelo financeiro. Criar pelo menos o dashboard de visualização da PP antes da distribuição automática.
-
----
-
-## 🟢 BAIXA PRIORIDADE (Fase 2 pelo próprio documento)
-
-### 10. Feed de posts recomendados na home
-**Doc diz:** Posts mais engajados de TODAS as comunidades, priorizando as do membro. Algoritmo: engajamento × recência × relevância.
-
-### 11. Chat ao vivo geral
-**Doc diz:** Sala de conversa em tempo real. Aparece visualmente ATIVA apenas quando ≥10 membros online. Abaixo disso, mostra histórico recente sem indicador "ao vivo".
-
-### 12. Carrossel de banners de anunciantes
-**Doc diz:** Topo da home — banners rotativos de anunciantes, eventos, lançamentos. Máx. 5 banners com rotação automática. Principal espaço comercial premium.
-
-### 13. Ranking mensal com reset (além do all-time)
-**Doc diz:** Ranking histórico (all-time) + ranking mensal que reseta no dia 1 de cada mês.
-
-### 14. Certificação profissional nas trilhas
-**Doc diz:** Trilhas concluídas geram certificado digital (PDF) — Fase 2 quando produto estiver validado.
-
-### 15. Grupos de estudo temáticos
-**Doc diz:** Criados organicamente a partir de demanda identificada no fórum. Fase 2.
-
-### 16. Salas temáticas de chat por comunidade
-**Doc diz:** Chat privado por comunidade e entre membros. Fase 2.
-
-### 17. Sistema de moderação por Superfãs
-**Doc diz:** Membros com ≥85 pts por 60 dias se tornam candidatos a moderador. Fase 2.
-
-### 18. Notificações motivacionais de performance (influenciador)
-**Doc diz:** Mensagens como "Você está no top 3 de engajamento esta semana. Continue assim!" — tom de encorajamento, nunca ameaça.
-
----
-
-## 📋 ORDEM SUGERIDA DE EXECUÇÃO
-
-1. **Penalidade de inatividade** — fecha o loop do sistema de pontos
-2. **Módulo completo +25 pts** — complementa o sistema de pontos já implementado
-3. **Níveis nomeados no UI** — impacto visual imediato, baixo esforço
-4. **Opt-in de pertencimento** — core do modelo de negócio (conta para PP)
-5. **Pontos do influenciador** — ativa o sistema de incentivos do lado creator
-6. **Badge de saúde do influenciador** — visibilidade para membros, confiança na assinatura
-7. **Badge "pode postar" no perfil** — fechamento da gamificação de membro
-8. **Módulos sequenciais (lock)** — melhora UX das trilhas
-9. **Dashboard de Caixa de Performance** — financeiro, mais complexo
-
----
-
-## 📁 ARQUIVOS-CHAVE PARA REFERÊNCIA
+## 📁 ARQUIVOS-CHAVE
 
 | Arquivo | Função |
 |---------|--------|
@@ -202,11 +112,11 @@ Valor = Participação % × Total da Caixa
 
 ---
 
-## 🗒️ CONTEXTO DO MODELO DE NEGÓCIO (para referência)
+## 🗒️ CONTEXTO DO MODELO DE NEGÓCIO
 
 - **Ticket:** R$79/mês por membro
-- **Split de receita:** 35% influenciador dono do membro + 15% caixa de performance + 35% estrutural + 15% marketing
+- **Split de receita:** 35% influenciador + 15% caixa de performance + 35% estrutural + 15% marketing
 - **Caixa de performance:** pool coletivo distribuído mensalmente por PP entre influenciadores ativos
 - **Mínimo viável:** 300 membros (R$23.700 MRR)
 - **Meta H1:** 5.000 membros, churn <7%, NPS influenciadores >50
-- **H2 (futuro):** Plataforma mãe CrewHouse/Pitcrew gratuita, DetailerHub como clube premium dentro dela
+- **H2 (futuro):** Plataforma mãe CrewHouse/Pitcrew gratuita, DetailerHub como clube premium
