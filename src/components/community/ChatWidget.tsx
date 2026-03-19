@@ -3,7 +3,8 @@
 // =============================================================================
 // ChatWidget — General community chat
 // Only visible when ≥10 members online (polled via presence API)
-// Polls messages every 5s and presence every 60s
+// Uses SSE (EventSource) when available; falls back to 10s polling on Vercel.
+// SSE endpoint: /api/communities/[id]/chat/stream?token=<jwt>
 // =============================================================================
 
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -12,7 +13,7 @@ import { MessageCircle, Send, X, Minimize2, ChevronDown } from "lucide-react";
 import { STORAGE_KEYS } from "@/lib/constants";
 
 const CHAT_MIN_ONLINE = 10;
-const POLL_INTERVAL_MS = 10000;
+const POLL_INTERVAL_MS = 10000; // fallback polling interval
 const PRESENCE_INTERVAL_MS = 60000;
 
 interface ChatMessage {
@@ -42,12 +43,14 @@ export function ChatWidget({ communityId, spaceId, label = "Chat Geral" }: ChatW
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const esRef = useRef<EventSource | null>(null);
+
   const token = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN) : null;
   const myUserId = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEYS.USER_ID) : null;
 
   const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
 
-  // Presence ping
+  // ── Presence ping ────────────────────────────────────────────────────────────
   const ping = useCallback(async () => {
     if (!token) return;
     try {
@@ -63,7 +66,7 @@ export function ChatWidget({ communityId, spaceId, label = "Chat Geral" }: ChatW
     } catch { /* ignore */ }
   }, [communityId, token]);
 
-  // Fetch messages
+  // ── Polling fallback (used when SSE is unavailable or times out) ─────────────
   const fetchMessages = useCallback(async () => {
     if (!chatVisible || !open) return;
     try {
@@ -74,24 +77,74 @@ export function ChatWidget({ communityId, spaceId, label = "Chat Geral" }: ChatW
       const d = await res.json();
       if (d.success) setMessages(d.data);
     } catch { /* ignore */ }
-  }, [communityId, chatVisible, open, headers]);
+  }, [communityId, chatVisible, open, headers, spaceId]);
 
-  // Initial ping + interval
+  // ── Presence interval ────────────────────────────────────────────────────────
   useEffect(() => {
     ping();
     const id = setInterval(ping, PRESENCE_INTERVAL_MS);
     return () => clearInterval(id);
   }, [ping]);
 
-  // Poll messages when open
+  // ── SSE connection (with polling fallback) ───────────────────────────────────
   useEffect(() => {
-    if (!chatVisible || !open) return;
-    fetchMessages();
-    const id = setInterval(fetchMessages, POLL_INTERVAL_MS);
-    return () => clearInterval(id);
-  }, [fetchMessages, chatVisible, open]);
+    if (!chatVisible || !open || !token) return;
 
-  // Auto-scroll on new messages
+    let pollFallback: ReturnType<typeof setInterval> | null = null;
+    let usingSse = false;
+
+    // Try SSE first
+    if (typeof EventSource !== "undefined") {
+      const sseParams = new URLSearchParams({ token });
+      if (spaceId) sseParams.set("spaceId", spaceId);
+      const url = `/api/communities/${communityId}/chat/stream?${sseParams}`;
+
+      const es = new EventSource(url);
+      esRef.current = es;
+      usingSse = true;
+
+      es.onmessage = (evt) => {
+        try {
+          const data = JSON.parse(evt.data) as {
+            type: "init" | "messages";
+            messages: ChatMessage[];
+          };
+          if (data.type === "init") {
+            setMessages(data.messages);
+          } else if (data.type === "messages") {
+            setMessages((prev) => {
+              const ids = new Set(prev.map((m) => m.id));
+              const fresh = data.messages.filter((m) => !ids.has(m.id));
+              return [...prev, ...fresh];
+            });
+          }
+        } catch { /* ignore malformed event */ }
+      };
+
+      es.onerror = () => {
+        es.close();
+        esRef.current = null;
+        usingSse = false;
+        // Fall back to polling
+        fetchMessages();
+        pollFallback = setInterval(fetchMessages, POLL_INTERVAL_MS);
+      };
+    } else {
+      // Browser doesn't support EventSource — use polling
+      fetchMessages();
+      pollFallback = setInterval(fetchMessages, POLL_INTERVAL_MS);
+    }
+
+    return () => {
+      if (usingSse && esRef.current) {
+        esRef.current.close();
+        esRef.current = null;
+      }
+      if (pollFallback) clearInterval(pollFallback);
+    };
+  }, [chatVisible, open, token, communityId, spaceId, fetchMessages]);
+
+  // ── Auto-scroll on new messages ───────────────────────────────────────────────
   useEffect(() => {
     if (open && !minimized) {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
