@@ -69,7 +69,7 @@ export async function registerUser(
   });
 
   const [accessToken, refreshToken] = await Promise.all([
-    createAccessToken({ userId: user.id, email: user.email, role: user.role }),
+    createAccessToken({ userId: user.id, email: user.email, role: user.role, firstName: user.firstName, lastName: user.lastName }),
     createRefreshToken(user.id),
   ]);
 
@@ -182,6 +182,8 @@ export async function loginOrRegisterWithGoogle(
         userId: existingUser.id,
         email: existingUser.email,
         role: existingUser.role,
+        firstName: existingUser.firstName,
+        lastName: existingUser.lastName,
       }),
       createRefreshToken(existingUser.id),
     ]);
@@ -255,7 +257,7 @@ export async function loginOrRegisterWithGoogle(
   });
 
   const [accessToken, refreshToken] = await Promise.all([
-    createAccessToken({ userId: user.id, email: user.email, role: user.role }),
+    createAccessToken({ userId: user.id, email: user.email, role: user.role, firstName: user.firstName, lastName: user.lastName }),
     createRefreshToken(user.id),
   ]);
 
@@ -354,7 +356,7 @@ export async function loginUser(
   }
 
   const [accessToken, refreshToken] = await Promise.all([
-    createAccessToken({ userId: user.id, email: user.email, role: user.role }),
+    createAccessToken({ userId: user.id, email: user.email, role: user.role, firstName: user.firstName, lastName: user.lastName }),
     createRefreshToken(user.id),
   ]);
 
@@ -412,7 +414,7 @@ export async function refreshAccessToken(
     where: { token: refreshTokenString },
     include: {
       user: {
-        select: { id: true, email: true, role: true, isActive: true },
+        select: { id: true, email: true, role: true, firstName: true, lastName: true, isActive: true },
       },
     },
   });
@@ -443,6 +445,8 @@ export async function refreshAccessToken(
       userId: storedToken.user.id,
       email: storedToken.user.email,
       role: storedToken.user.role,
+      firstName: storedToken.user.firstName,
+      lastName: storedToken.user.lastName,
     }),
     createRefreshToken(storedToken.user.id),
   ]);

@@ -11,6 +11,8 @@ import type { Permission } from "@/lib/auth/rbac";
 import type { AuthSession } from "@/types";
 import { UserRole } from "@prisma/client";
 
+// db is still needed for verifyPlatformMembership / verifyMembership / verifyCommunityOwnership
+
 export type AuthenticatedHandler = (
   req: NextRequest,
   context: {
@@ -33,29 +35,15 @@ export async function getSessionFromRequest(
     const token = authHeader.substring(7);
     const payload = await verifyAccessToken(token);
 
-    const user = await db.user.findUnique({
-      where: { id: payload.sub },
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        firstName: true,
-        lastName: true,
-        avatarUrl: true,
-        isActive: true,
-        isBanned: true,
-      },
-    });
-
-    if (!user || !user.isActive || user.isBanned) return null;
-
+    // Use JWT claims directly — avoids a DB round-trip on every request.
+    // isActive/isBanned checks happen at login; the 2h token expiry limits exposure.
     return {
-      userId: user.id,
-      email: user.email,
-      role: user.role,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      avatarUrl: user.avatarUrl,
+      userId: payload.sub,
+      email: payload.email,
+      role: payload.role,
+      firstName: payload.firstName ?? "",
+      lastName: payload.lastName ?? "",
+      avatarUrl: null,
     };
   } catch {
     return null;

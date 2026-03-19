@@ -27,10 +27,14 @@ export async function createAccessToken(payload: {
   userId: string;
   email: string;
   role: string;
+  firstName?: string;
+  lastName?: string;
 }): Promise<string> {
   return await new SignJWT({
     email: payload.email,
     role: payload.role,
+    ...(payload.firstName ? { firstName: payload.firstName } : {}),
+    ...(payload.lastName ? { lastName: payload.lastName } : {}),
   })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(payload.userId)
@@ -62,6 +66,8 @@ export async function verifyAccessToken(token: string): Promise<JWTPayload> {
       sub: payload.sub as string,
       email: payload.email as string,
       role: payload.role as string,
+      firstName: payload.firstName as string | undefined,
+      lastName: payload.lastName as string | undefined,
       iat: payload.iat as number,
       exp: payload.exp as number,
     };

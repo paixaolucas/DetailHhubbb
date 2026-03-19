@@ -288,35 +288,23 @@ function InfluencerDashboard({ userName }: { userName: string }) {
   const fetchData = useCallback(() => {
     const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     if (!token) return;
-    Promise.all([
-      fetch("/api/analytics/influencer", { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json()),
-      fetch("/api/communities/mine", { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json()),
-    ])
-      .then(([analyticsData, mineData]) => {
-        if (analyticsData.success) {
-          setSummary(analyticsData.data.summary);
-          setTimeSeries(analyticsData.data.timeSeries ?? []);
+    // Single request returns all dashboard data — no sequential dependencies
+    fetch("/api/dashboard/influencer-summary", { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success) {
+          setSummary(d.data.summary);
+          setTimeSeries(d.data.timeSeries ?? []);
           setLastUpdated(new Date());
-        }
-        if (mineData.success && mineData.data?.length > 0) {
-          const c = mineData.data[0];
-          setCommunity(c);
-          const userId = localStorage.getItem(STORAGE_KEYS.USER_ID);
-          setMembersLoading(true);
-          Promise.all([
-            fetch(`/api/communities/${c.id}/members?pageSize=5`, { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json()),
-            userId ? fetch(`/api/communities/${c.id}/leaderboard?userId=${userId}`, { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json()) : Promise.resolve(null),
-          ])
-            .then(([membersData, scoreData]) => {
-              if (membersData.success) setMembers(membersData.data ?? []);
-              if (scoreData?.success) setInfluencerScore(scoreData.data?.points ?? 0);
-            })
-            .catch(console.error)
-            .finally(() => setMembersLoading(false));
+          if (d.data.communities?.length > 0) {
+            setCommunity(d.data.communities[0]);
+          }
+          setMembers(d.data.members ?? []);
+          setInfluencerScore(d.data.influencerScore ?? 0);
         }
       })
       .catch(console.error)
-      .finally(() => setLoading(false));
+      .finally(() => { setLoading(false); setMembersLoading(false); });
   }, []);
 
   useEffect(() => { fetchData(); }, [fetchData]);
@@ -609,68 +597,42 @@ function MemberDashboardInner({ userName }: { userName: string }) {
     }
   }, [searchParams, toast, router]);
 
-  const fetchCommunities = useCallback(() => {
+  const fetchAll = useCallback(() => {
     const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+    const userId = localStorage.getItem(STORAGE_KEYS.USER_ID);
     if (!token) { setLoading(false); return; }
     const headers = { Authorization: `Bearer ${token}` };
+
+    // Fire ALL requests in parallel — single round-trip instead of 4-5 sequential
     Promise.all([
       fetch("/api/communities?published=true", { headers }).then((r) => r.json()),
       fetch("/api/platform-membership/me", { headers }).then(async (r) => {
         if (r.status === 401) {
-          // Stale JWT (e.g. after db re-seed) — clear storage and redirect to login
           Object.values(STORAGE_KEYS).forEach((key) => localStorage.removeItem(key));
           window.location.href = "/login";
           throw new Error("SESSION_EXPIRED");
         }
         return r.json();
       }),
+      fetch(`/api/leaderboard?limit=5&period=${lbPeriod}`).then((r) => r.json()),
+      userId ? fetch(`/api/users/${userId}/score`, { headers }).then((r) => r.json()) : Promise.resolve(null),
+      fetch("/api/feed/recommended?limit=5", { headers }).then((r) => r.json()),
     ])
-      .then(([commData, platformData]) => {
+      .then(([commData, platformData, lbData, scoreData, recData]) => {
         if (commData.success) setCommunities(commData.communities ?? []);
         setHasPlatform(platformData.data?.hasMembership === true);
+        if (lbData.success) setLeaderboard(lbData.data ?? []);
+        if (scoreData?.success) setMyScore(scoreData.data);
+        if (recData?.success) setRecommended(recData.data ?? []);
       })
       .catch((err) => { if ((err as Error)?.message !== "SESSION_EXPIRED") console.error(err); })
-      .finally(() => setLoading(false));
-  }, []);
-
-  const fetchLeaderboard = useCallback(() => {
-    setLbLoading(true);
-    fetch(`/api/leaderboard?limit=5&period=${lbPeriod}`)
-      .then((r) => r.json())
-      .then((d) => { if (d.success) setLeaderboard(d.data ?? []); })
-      .catch(console.error)
-      .finally(() => setLbLoading(false));
+      .finally(() => { setLoading(false); setLbLoading(false); setRecLoading(false); });
   }, [lbPeriod]);
 
-  const fetchScore = useCallback(() => {
-    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
-    const userId = localStorage.getItem(STORAGE_KEYS.USER_ID);
-    if (!token || !userId) return;
-    fetch(`/api/users/${userId}/score`, { headers: { Authorization: `Bearer ${token}` } })
-      .then((r) => r.json())
-      .then((d) => { if (d.success) setMyScore(d.data); })
-      .catch(console.error);
-  }, []);
+  useEffect(() => { fetchAll(); }, [fetchAll]);
 
-  const fetchRecommended = useCallback(() => {
-    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
-    if (!token) { setRecLoading(false); return; }
-    fetch("/api/feed/recommended?limit=5", { headers: { Authorization: `Bearer ${token}` } })
-      .then((r) => r.json())
-      .then((d) => { if (d.success) setRecommended(d.data ?? []); })
-      .catch(console.error)
-      .finally(() => setRecLoading(false));
-  }, []);
-
-  useEffect(() => { fetchCommunities(); }, [fetchCommunities]);
-  useEffect(() => { fetchLeaderboard(); }, [fetchLeaderboard]);
-  useEffect(() => { fetchScore(); }, [fetchScore]);
-  useEffect(() => { fetchRecommended(); }, [fetchRecommended]);
-
-  useAutoRefresh(fetchCommunities, 30_000);
-  useAutoRefresh(fetchLeaderboard, 30_000);
-  useAutoRefresh(fetchScore, 60_000);
-  useAutoRefresh(fetchRecommended, 30_000);
+  // Staggered auto-refresh — avoid thundering herd
+  useAutoRefresh(fetchAll, 60_000);
 
   return (
     <div className="space-y-8">

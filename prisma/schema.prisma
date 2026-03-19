@@ -253,6 +253,7 @@ model Post {
   @@index([spaceId, createdAt])
   @@index([communityId, isPinned])
   @@index([authorId])
+  @@index([communityId, isHidden, createdAt])
   @@map("posts")
 }
 
@@ -294,6 +295,7 @@ model PostReaction {
   user      User     @relation(fields: [userId], references: [id])
 
   @@unique([postId, userId, type])
+  @@index([postId, userId])
   @@map("post_reactions")
 }
 
@@ -386,6 +388,7 @@ model UserPoints {
 
   @@unique([userId, communityId])
   @@index([communityId, points])
+  @@index([userId])
   @@map("user_points")
 }
 
@@ -398,6 +401,7 @@ model PointTransaction {
   createdAt    DateTime   @default(now())
   userPoints   UserPoints @relation(fields: [userPointsId], references: [id])
 
+  @@index([userPointsId, createdAt])
   @@map("point_transactions")
 }
 
@@ -1229,6 +1233,7 @@ model PlatformMembership {
 
   @@index([userId])
   @@index([status])
+  @@index([userId, status])
   @@index([referredByInfluencerId])
   @@map("platform_memberships")
 }
