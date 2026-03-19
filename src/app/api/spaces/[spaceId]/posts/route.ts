@@ -44,39 +44,62 @@ export const GET = withAuth(async (req, { session, params }) => {
     const cursor = searchParams.get("cursor") ?? undefined;
     const rawLimit = parseInt(searchParams.get("limit") ?? "20", 10);
     const limit = Math.min(isNaN(rawLimit) ? 20 : rawLimit, 50);
+    const newerThan = searchParams.get("newerThan") ?? undefined;
 
+    const postInclude = {
+      author: { select: AUTHOR_SELECT },
+      _count: { select: { reactions: true, comments: true } },
+      reactions: { select: { type: true, userId: true } },
+    } as const;
+
+    const REACTION_TYPES = ["like", "fire", "clap", "heart", "rocket"];
+    const userId = session.userId;
+
+    const formatPosts = (rawPosts: Array<{
+      reactions: Array<{ type: string; userId: string }>;
+      [key: string]: unknown;
+    }>) => rawPosts.map(({ reactions, ...post }) => {
+        const reactionCounts: Record<string, number> = {};
+        for (const type of REACTION_TYPES) {
+          reactionCounts[type] = reactions.filter((r) => r.type === type).length;
+        }
+        const userReactions = reactions
+          .filter((r) => r.userId === userId)
+          .map((r) => r.type);
+        return { ...post, reactionCounts, userReactions };
+    });
+
+    // ── newerThan: return only posts created after the given ISO timestamp ──
+    if (newerThan) {
+      const rawPosts = await db.post.findMany({
+        where: { spaceId, isHidden: false, createdAt: { gt: new Date(newerThan) } },
+        orderBy: { createdAt: "desc" },
+        take: 50,
+        include: postInclude,
+      });
+      return NextResponse.json({
+        success: true,
+        data: { posts: formatPosts(rawPosts), nextCursor: null },
+      });
+    }
+
+    // ── Default: cursor-based pagination ──
     const rawPosts = await db.post.findMany({
       where: { spaceId, isHidden: false },
       orderBy: [{ isPinned: "desc" }, { createdAt: "desc" }],
       take: limit + 1,
       cursor: cursor ? { id: cursor } : undefined,
       skip: cursor ? 1 : 0,
-      include: {
-        author: { select: AUTHOR_SELECT },
-        _count: { select: { reactions: true, comments: true } },
-        reactions: { select: { type: true, userId: true } },
-      },
+      include: postInclude,
     });
 
     const hasMore = rawPosts.length > limit;
     const raw = hasMore ? rawPosts.slice(0, limit) : rawPosts;
     const nextCursor = hasMore ? raw[raw.length - 1].id : null;
 
-    const REACTION_TYPES = ["like", "fire", "clap", "heart", "rocket"];
-    const page = raw.map(({ reactions, ...post }) => {
-      const reactionCounts: Record<string, number> = {};
-      for (const type of REACTION_TYPES) {
-        reactionCounts[type] = reactions.filter((r) => r.type === type).length;
-      }
-      const userReactions = reactions
-        .filter((r) => r.userId === session.userId)
-        .map((r) => r.type);
-      return { ...post, reactionCounts, userReactions };
-    });
-
     return NextResponse.json({
       success: true,
-      data: { posts: page, nextCursor },
+      data: { posts: formatPosts(raw), nextCursor },
     });
   } catch {
     return NextResponse.json(

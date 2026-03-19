@@ -6,11 +6,11 @@
 // Supports cursor-based "Load more" pagination
 // =============================================================================
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { AlertCircle, RefreshCw } from "lucide-react";
+import { AlertCircle, RefreshCw, ArrowUp } from "lucide-react";
 import { SpaceItem } from "@/components/feed/SpaceSidebar";
 import PostComposer from "@/components/feed/PostComposer";
 import PostCard from "@/components/feed/PostCard";
@@ -101,6 +101,10 @@ export default function SpaceFeedPage() {
 
   const [currentUserId, setCurrentUserId] = useState<string | undefined>();
   const [isOwner, setIsOwner] = useState(false);
+
+  // Live feed state
+  const [pendingPosts, setPendingPosts] = useState<Post[]>([]);
+  const postsRef = useRef<Post[]>([]);
 
   // ---------------------------------------------------------------------------
 
@@ -230,12 +234,56 @@ export default function SpaceFeedPage() {
     load();
   }, [communitySlug, spaceSlug, router, fetchPosts]);
 
+  // Keep postsRef in sync so the polling interval always sees latest posts
+  useEffect(() => {
+    postsRef.current = posts;
+  }, [posts]);
+
+  // ---------------------------------------------------------------------------
+  // Live polling — check for new posts every 10 s
+  // ---------------------------------------------------------------------------
+
+  useEffect(() => {
+    if (!activeSpace) return;
+
+    const poll = async () => {
+      const current = postsRef.current;
+      if (current.length === 0) return;
+      // Use the newest non-pinned post as the reference point
+      const ref = current.find((p) => !p.isPinned) ?? current[0];
+      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+      try {
+        const res = await fetch(
+          `/api/spaces/${activeSpace.id}/posts?newerThan=${encodeURIComponent(ref.createdAt)}&limit=20`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        const json = await res.json();
+        if (json.success) {
+          const fresh: Post[] = json.data.posts ?? [];
+          if (fresh.length > 0) {
+            const existingIds = new Set(postsRef.current.map((p) => p.id));
+            const brandNew = fresh.filter((p) => !existingIds.has(p.id));
+            if (brandNew.length > 0) {
+              setPendingPosts(brandNew);
+            }
+          }
+        }
+      } catch {
+        // polling failure is non-critical
+      }
+    };
+
+    const id = setInterval(poll, 10_000);
+    return () => clearInterval(id);
+  }, [activeSpace]);
+
   // ---------------------------------------------------------------------------
   // Handlers
   // ---------------------------------------------------------------------------
 
   function handleNewPost(post: unknown) {
     setPosts((prev) => [post as Post, ...prev]);
+    setPendingPosts([]);
   }
 
   async function handleReact(postId: string, type: string) {
@@ -271,6 +319,19 @@ export default function SpaceFeedPage() {
   async function handleLoadMore() {
     if (!activeSpace || !nextCursor) return;
     await fetchPosts(activeSpace.id, nextCursor);
+  }
+
+  function handleLoadPending() {
+    setPosts((prev) => {
+      const existingIds = new Set(prev.map((p) => p.id));
+      const toAdd = pendingPosts.filter((p) => !existingIds.has(p.id));
+      return [...toAdd, ...prev].sort((a, b) => {
+        if (a.isPinned && !b.isPinned) return -1;
+        if (!a.isPinned && b.isPinned) return 1;
+        return 0;
+      });
+    });
+    setPendingPosts([]);
   }
 
   function handlePostDelete(postId: string) {
@@ -354,6 +415,17 @@ export default function SpaceFeedPage() {
                 )}
               </div>
             </div>
+          )}
+
+          {/* New posts banner */}
+          {pendingPosts.length > 0 && (
+            <button
+              onClick={handleLoadPending}
+              className="w-full py-2.5 bg-[#006079]/20 border border-[#006079]/50 rounded-xl text-sm text-[#009CD9] hover:bg-[#006079]/30 transition-all flex items-center justify-center gap-2"
+            >
+              <ArrowUp className="w-4 h-4" />
+              {pendingPosts.length} nova{pendingPosts.length > 1 ? "s" : ""} publicaç{pendingPosts.length > 1 ? "ões" : "ão"} — clique para ver
+            </button>
           )}
 
           {/* Composer */}

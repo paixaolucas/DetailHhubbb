@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -23,6 +23,7 @@ import {
   Rocket,
 } from "lucide-react";
 import { getMemberLevel, getMemberLevelColor, POST_THRESHOLD, getInfluencerHealth, getInfluencerHealthEmoji } from "@/lib/points";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import { BannerCarousel } from "@/components/ui/BannerCarousel";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/components/ui/toast-provider";
@@ -145,37 +146,64 @@ function DashboardSkeleton() {
   );
 }
 
+// ─── Live indicator ───────────────────────────────────────────────────────────
+
+function LiveIndicator({ lastUpdated }: { lastUpdated: Date | null }) {
+  return (
+    <div className="flex items-center gap-2 text-xs text-gray-500 flex-shrink-0">
+      <span className="relative flex h-2 w-2">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+      </span>
+      {lastUpdated
+        ? `Atualizado às ${lastUpdated.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`
+        : "Ao vivo"}
+    </div>
+  );
+}
+
 // ─── ADMIN DASHBOARD ─────────────────────────────────────────────────────────
 
 function AdminDashboard() {
   const [summary, setSummary] = useState<any>(null);
   const [timeSeries, setTimeSeries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  useEffect(() => {
+  const fetchData = useCallback(() => {
     const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     if (!token) return;
     fetch("/api/analytics/platform", { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.json())
       .then((d) => {
-        if (d.success) { setSummary(d.data.summary); setTimeSeries(d.data.timeSeries ?? []); }
+        if (d.success) {
+          setSummary(d.data.summary);
+          setTimeSeries(d.data.timeSeries ?? []);
+          setLastUpdated(new Date());
+        }
       })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => { fetchData(); }, [fetchData]);
+  useAutoRefresh(fetchData, 60_000);
+
   if (loading) return <DashboardSkeleton />;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-red-500/10 rounded-xl flex items-center justify-center">
-          <Shield className="w-5 h-5 text-red-400" />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-red-500/10 rounded-xl flex items-center justify-center">
+            <Shield className="w-5 h-5 text-red-400" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-[#EEE6E4]">Painel Administrativo</h1>
+            <p className="text-gray-400 text-sm">Visão geral da plataforma Detailer&apos;HUB</p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-2xl font-bold text-[#EEE6E4]">Painel Administrativo</h1>
-          <p className="text-gray-400 text-sm">Visão geral da plataforma Detailer&apos;HUB</p>
-        </div>
+        <LiveIndicator lastUpdated={lastUpdated} />
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -255,8 +283,9 @@ function InfluencerDashboard({ userName }: { userName: string }) {
   const [members, setMembers] = useState<RecentMember[]>([]);
   const [membersLoading, setMembersLoading] = useState(false);
   const [influencerScore, setInfluencerScore] = useState<number>(0);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  useEffect(() => {
+  const fetchData = useCallback(() => {
     const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     if (!token) return;
     Promise.all([
@@ -267,12 +296,12 @@ function InfluencerDashboard({ userName }: { userName: string }) {
         if (analyticsData.success) {
           setSummary(analyticsData.data.summary);
           setTimeSeries(analyticsData.data.timeSeries ?? []);
+          setLastUpdated(new Date());
         }
         if (mineData.success && mineData.data?.length > 0) {
           const c = mineData.data[0];
           setCommunity(c);
           const userId = localStorage.getItem(STORAGE_KEYS.USER_ID);
-          // Load recent members + influencer score in parallel
           setMembersLoading(true);
           Promise.all([
             fetch(`/api/communities/${c.id}/members?pageSize=5`, { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json()),
@@ -290,6 +319,9 @@ function InfluencerDashboard({ userName }: { userName: string }) {
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => { fetchData(); }, [fetchData]);
+  useAutoRefresh(fetchData, 60_000);
+
   if (loading) return <DashboardSkeleton />;
   const firstName = userName.split(" ")[0] || "Criador";
   const greeting = getGreeting(firstName);
@@ -297,14 +329,17 @@ function InfluencerDashboard({ userName }: { userName: string }) {
   return (
     <div className="space-y-6">
       {/* Greeting */}
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-[#009CD9]/10 rounded-xl flex items-center justify-center">
-          <Star className="w-5 h-5 text-[#009CD9]" />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-[#009CD9]/10 rounded-xl flex items-center justify-center">
+            <Star className="w-5 h-5 text-[#009CD9]" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-[#EEE6E4]">{greeting}</h1>
+            <p className="text-gray-400 text-sm">Visão geral da sua comunidade automotiva</p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-2xl font-bold text-[#EEE6E4]">{greeting}</h1>
-          <p className="text-gray-400 text-sm">Visão geral da sua comunidade automotiva</p>
-        </div>
+        <LiveIndicator lastUpdated={lastUpdated} />
       </div>
 
       {/* Stats */}
@@ -574,10 +609,9 @@ function MemberDashboardInner({ userName }: { userName: string }) {
     }
   }, [searchParams, toast, router]);
 
-  useEffect(() => {
+  const fetchCommunities = useCallback(() => {
     const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     if (!token) { setLoading(false); return; }
-
     const headers = { Authorization: `Bearer ${token}` };
     Promise.all([
       fetch("/api/communities?published=true", { headers }).then((r) => r.json()),
@@ -591,7 +625,7 @@ function MemberDashboardInner({ userName }: { userName: string }) {
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
+  const fetchLeaderboard = useCallback(() => {
     setLbLoading(true);
     fetch(`/api/leaderboard?limit=5&period=${lbPeriod}`)
       .then((r) => r.json())
@@ -600,8 +634,7 @@ function MemberDashboardInner({ userName }: { userName: string }) {
       .finally(() => setLbLoading(false));
   }, [lbPeriod]);
 
-  // Fetch user's own aggregated score
-  useEffect(() => {
+  const fetchScore = useCallback(() => {
     const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     const userId = localStorage.getItem(STORAGE_KEYS.USER_ID);
     if (!token || !userId) return;
@@ -611,8 +644,7 @@ function MemberDashboardInner({ userName }: { userName: string }) {
       .catch(console.error);
   }, []);
 
-  // Fetch recommended posts
-  useEffect(() => {
+  const fetchRecommended = useCallback(() => {
     const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     if (!token) { setRecLoading(false); return; }
     fetch("/api/feed/recommended?limit=5", { headers: { Authorization: `Bearer ${token}` } })
@@ -621,6 +653,16 @@ function MemberDashboardInner({ userName }: { userName: string }) {
       .catch(console.error)
       .finally(() => setRecLoading(false));
   }, []);
+
+  useEffect(() => { fetchCommunities(); }, [fetchCommunities]);
+  useEffect(() => { fetchLeaderboard(); }, [fetchLeaderboard]);
+  useEffect(() => { fetchScore(); }, [fetchScore]);
+  useEffect(() => { fetchRecommended(); }, [fetchRecommended]);
+
+  useAutoRefresh(fetchCommunities, 30_000);
+  useAutoRefresh(fetchLeaderboard, 30_000);
+  useAutoRefresh(fetchScore, 60_000);
+  useAutoRefresh(fetchRecommended, 30_000);
 
   return (
     <div className="space-y-8">
@@ -1007,31 +1049,38 @@ function PartnerDashboard({ userName }: { userName: string }) {
   const greeting = getGreeting(firstName);
   const [listings, setListings] = useState<{ id: string; title: string; price: number; currency: string; status: string; _count: { purchases: number } }[]>([]);
   const [listingsLoading, setListingsLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  useEffect(() => {
+  const fetchListings = useCallback(() => {
     const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     fetch("/api/marketplace/listings?mine=true&pageSize=5", {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => r.json())
-      .then((d) => { if (d.success) setListings(d.data ?? []); })
+      .then((d) => { if (d.success) { setListings(d.data ?? []); setLastUpdated(new Date()); } })
       .catch(console.error)
       .finally(() => setListingsLoading(false));
   }, []);
+
+  useEffect(() => { fetchListings(); }, [fetchListings]);
+  useAutoRefresh(fetchListings, 60_000);
 
   const activeCount = listings.filter((l) => l.status === "ACTIVE").length;
   const totalSales = listings.reduce((acc, l) => acc + (l._count?.purchases ?? 0), 0);
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center">
-          <Package className="w-5 h-5 text-green-400" />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center">
+            <Package className="w-5 h-5 text-green-400" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-[#EEE6E4]">{greeting}</h1>
+            <p className="text-gray-400 text-sm">Gerencie seus produtos e acompanhe suas vendas</p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-2xl font-bold text-[#EEE6E4]">{greeting}</h1>
-          <p className="text-gray-400 text-sm">Gerencie seus produtos e acompanhe suas vendas</p>
-        </div>
+        <LiveIndicator lastUpdated={lastUpdated} />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

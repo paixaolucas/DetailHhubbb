@@ -25,7 +25,7 @@ export function useNotifications() {
 
   useEffect(() => {
     fetchUnreadCount();
-    const interval = setInterval(fetchUnreadCount, 30_000);
+    const interval = setInterval(fetchUnreadCount, 15_000);
     return () => clearInterval(interval);
   }, [fetchUnreadCount]);
 
