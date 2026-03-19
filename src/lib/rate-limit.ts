@@ -1,54 +1,31 @@
 // =============================================================================
-// IN-MEMORY RATE LIMITER (sliding window)
-// No Redis required for MVP — uses a module-level Map
+// RATE LIMITER — Upstash Redis em produção, in-memory fallback em dev
 // =============================================================================
 
 import { NextResponse } from "next/server";
 
-interface WindowEntry {
-  timestamps: number[];
-}
+const hasUpstash =
+  Boolean(process.env.UPSTASH_REDIS_REST_URL) &&
+  Boolean(process.env.UPSTASH_REDIS_REST_TOKEN);
 
-const store = new Map<string, WindowEntry>();
+// --- In-memory fallback (desenvolvimento local sem Redis) ---
 
-// Clean up old entries every 5 minutes to prevent memory leaks
-if (typeof setInterval !== "undefined") {
-  setInterval(() => {
-    const now = Date.now();
-    const keysToDelete: string[] = [];
-    store.forEach((entry, key) => {
-      if (entry.timestamps.length === 0 || now - entry.timestamps[0] > 600_000) {
-        keysToDelete.push(key);
-      }
-    });
-    keysToDelete.forEach((key) => store.delete(key));
-  }, 300_000);
-}
+const memStore = new Map<string, number[]>();
 
-/**
- * Check rate limit for a given key.
- * @param key      Unique identifier (IP address, userId, etc.)
- * @param windowMs Time window in milliseconds
- * @param max      Maximum requests allowed within the window
- * @returns `null` if within limit, or a 429 NextResponse if exceeded
- */
-export function checkRateLimit(
+function checkMemory(
   key: string,
   windowMs: number,
   max: number
 ): NextResponse | null {
   const now = Date.now();
   const windowStart = now - windowMs;
+  const timestamps = (memStore.get(key) ?? []).filter(
+    (ts) => ts > windowStart
+  );
 
-  const entry = store.get(key) ?? { timestamps: [] };
-
-  // Remove timestamps outside the current window
-  entry.timestamps = entry.timestamps.filter((ts) => ts > windowStart);
-
-  if (entry.timestamps.length >= max) {
-    store.set(key, entry);
+  if (timestamps.length >= max) {
     const retryAfter = Math.ceil(
-      (entry.timestamps[0] + windowMs - now) / 1000
+      (timestamps[0] + windowMs - now) / 1000
     );
     return NextResponse.json(
       {
@@ -58,7 +35,7 @@ export function checkRateLimit(
       {
         status: 429,
         headers: {
-          "Retry-After": String(retryAfter),
+          "Retry-After": String(Math.max(1, retryAfter)),
           "X-RateLimit-Limit": String(max),
           "X-RateLimit-Remaining": "0",
         },
@@ -66,7 +43,66 @@ export function checkRateLimit(
     );
   }
 
-  entry.timestamps.push(now);
-  store.set(key, entry);
+  timestamps.push(now);
+  memStore.set(key, timestamps);
   return null;
+}
+
+// --- Upstash Redis (produção) ---
+
+async function checkUpstash(
+  key: string,
+  windowMs: number,
+  max: number
+): Promise<NextResponse | null> {
+  const { Redis } = await import("@upstash/redis");
+  const { Ratelimit } = await import("@upstash/ratelimit");
+
+  const redis = new Redis({
+    url: process.env.UPSTASH_REDIS_REST_URL!,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+  });
+
+  const windowSec = Math.ceil(windowMs / 1000);
+  const limiter = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(max, `${windowSec} s`),
+    prefix: "@rl",
+    analytics: false,
+  });
+
+  const { success, limit, remaining, reset } = await limiter.limit(key);
+
+  if (!success) {
+    const retryAfter = Math.ceil((reset - Date.now()) / 1000);
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Muitas requisições. Tente novamente em alguns instantes.",
+      },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(Math.max(1, retryAfter)),
+          "X-RateLimit-Limit": String(limit),
+          "X-RateLimit-Remaining": String(remaining),
+        },
+      }
+    );
+  }
+
+  return null;
+}
+
+// --- API pública ---
+
+export async function checkRateLimit(
+  key: string,
+  windowMs: number,
+  max: number
+): Promise<NextResponse | null> {
+  if (hasUpstash) {
+    return checkUpstash(key, windowMs, max);
+  }
+  return checkMemory(key, windowMs, max);
 }

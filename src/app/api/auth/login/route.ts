@@ -13,7 +13,7 @@ import { RATE_LIMIT } from "@/lib/constants";
 
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
-  const limited = checkRateLimit(`login:${ip}`, RATE_LIMIT.AUTH.windowMs, RATE_LIMIT.AUTH.max);
+  const limited = await checkRateLimit(`login:${ip}`, RATE_LIMIT.AUTH.windowMs, RATE_LIMIT.AUTH.max);
   if (limited) return limited;
 
   try {
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     // Per-email brute force protection (5 attempts per 15 minutes)
     const emailRaw = body?.email?.toLowerCase?.() ?? "";
     if (emailRaw) {
-      const emailLimited = checkRateLimit(`login-email:${emailRaw}`, 15 * 60 * 1000, 5);
+      const emailLimited = await checkRateLimit(`login-email:${emailRaw}`, 15 * 60 * 1000, 5);
       if (emailLimited) {
         return NextResponse.json(
           { success: false, error: "Muitas tentativas de login. Aguarde 15 minutos." },

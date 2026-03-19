@@ -19,7 +19,7 @@ const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
-  const limited = checkRateLimit(`forgot-password:${ip}`, RATE_LIMIT.AUTH.windowMs, RATE_LIMIT.AUTH.max);
+  const limited = await checkRateLimit(`forgot-password:${ip}`, RATE_LIMIT.AUTH.windowMs, RATE_LIMIT.AUTH.max);
   if (limited) return limited;
 
   try {
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Per-email rate limit: 2 per hour to prevent targeted abuse / email DoS
-    const emailLimited = checkRateLimit(`forgot-pwd-email:${email.toLowerCase()}`, 60 * 60 * 1000, 2);
+    const emailLimited = await checkRateLimit(`forgot-pwd-email:${email.toLowerCase()}`, 60 * 60 * 1000, 2);
     if (emailLimited) {
       // Return same success message to avoid enumeration
       return NextResponse.json({
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Per-IP rate limit: 5 per hour to prevent mass enumeration
-    const ipLimited = checkRateLimit(`forgot-pwd-ip:${ip}`, 60 * 60 * 1000, 5);
+    const ipLimited = await checkRateLimit(`forgot-pwd-ip:${ip}`, 60 * 60 * 1000, 5);
     if (ipLimited) {
       return NextResponse.json({
         success: true,

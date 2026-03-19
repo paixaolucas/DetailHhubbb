@@ -15,7 +15,7 @@ import {
 } from "@/lib/constants";
 
 export const GET = withAuth(async (req: NextRequest, { session }) => {
-  const limited = checkRateLimit(
+  const limited = await checkRateLimit(
     `search:${session.userId}`,
     RATE_LIMIT.SEARCH.windowMs,
     RATE_LIMIT.SEARCH.max

@@ -34,7 +34,7 @@ const checkoutSchema = z.object({
 });
 
 export const POST = withAuth(async (req, { session }) => {
-  const rl = checkRateLimit(`checkout:${session.userId}`, 60_000, 5);
+  const rl = await checkRateLimit(`checkout:${session.userId}`, 60_000, 5);
   if (rl) return rl;
   try {
     const body = await req.json();

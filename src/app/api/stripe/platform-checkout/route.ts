@@ -7,7 +7,7 @@ import { AppError } from "@/types";
 import { checkRateLimit } from "@/lib/rate-limit";
 
 export const POST = withAuth(async (req, { session }) => {
-  const rl = checkRateLimit(`checkout:${session.userId}`, 60_000, 5);
+  const rl = await checkRateLimit(`checkout:${session.userId}`, 60_000, 5);
   if (rl) return rl;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
   if (!appUrl) {

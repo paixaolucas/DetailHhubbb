@@ -13,7 +13,7 @@ import { RATE_LIMIT } from "@/lib/constants";
 
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
-  const limited = checkRateLimit(`register:${ip}`, RATE_LIMIT.AUTH.windowMs, RATE_LIMIT.AUTH.max);
+  const limited = await checkRateLimit(`register:${ip}`, RATE_LIMIT.AUTH.windowMs, RATE_LIMIT.AUTH.max);
   if (limited) return limited;
 
   try {

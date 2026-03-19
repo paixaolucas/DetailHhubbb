@@ -26,7 +26,7 @@ const chatSchema = z.object({
 });
 
 export const POST = withAuth(async (req, { session }) => {
-  const limited = checkRateLimit(`ai-chat:${session.userId}`, RATE_LIMIT.AI_CHAT.windowMs, RATE_LIMIT.AI_CHAT.max);
+  const limited = await checkRateLimit(`ai-chat:${session.userId}`, RATE_LIMIT.AI_CHAT.windowMs, RATE_LIMIT.AI_CHAT.max);
   if (limited) return limited;
 
   try {

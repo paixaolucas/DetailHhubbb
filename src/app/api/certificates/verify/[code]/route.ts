@@ -14,7 +14,7 @@ export async function GET(
 ) {
   try {
     const ip = getClientIp(req);
-    const rateLimitResponse = checkRateLimit(`cert-verify:${ip}`, 60_000, 10);
+    const rateLimitResponse = await checkRateLimit(`cert-verify:${ip}`, 60_000, 10);
     if (rateLimitResponse) return rateLimitResponse;
 
     const code = params.code;

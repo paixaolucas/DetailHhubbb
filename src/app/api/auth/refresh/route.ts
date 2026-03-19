@@ -10,7 +10,7 @@ import { getClientIp } from "@/lib/api-helpers";
 
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
-  const limited = checkRateLimit(`refresh:${ip}`, 60_000, 20);
+  const limited = await checkRateLimit(`refresh:${ip}`, 60_000, 20);
   if (limited) return limited;
 
   try {
