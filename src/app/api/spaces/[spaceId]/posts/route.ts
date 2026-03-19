@@ -17,6 +17,53 @@ const AUTHOR_SELECT = {
   avatarUrl: true,
 } as const;
 
+const REACTION_TYPES = ["like", "fire", "clap", "heart", "rocket"];
+
+/** Attach reactionCounts and userReactions to posts using a single groupBy query */
+async function enrichWithReactions<T extends { id: string }>(
+  posts: T[],
+  postIds: string[],
+  userId: string
+): Promise<(T & { reactionCounts: Record<string, number>; userReactions: string[] })[]> {
+  if (postIds.length === 0) return posts.map((p) => ({ ...p, reactionCounts: {}, userReactions: [] }));
+
+  const [grouped, userRows] = await Promise.all([
+    db.postReaction.groupBy({
+      by: ["postId", "type"],
+      where: { postId: { in: postIds } },
+      _count: true,
+    }),
+    db.postReaction.findMany({
+      where: { postId: { in: postIds }, userId },
+      select: { postId: true, type: true },
+    }),
+  ]);
+
+  // Build lookup maps
+  const countMap = new Map<string, Record<string, number>>();
+  for (const row of grouped) {
+    if (!countMap.has(row.postId)) countMap.set(row.postId, {});
+    countMap.get(row.postId)![row.type] = row._count;
+  }
+
+  const userMap = new Map<string, string[]>();
+  for (const row of userRows) {
+    if (!userMap.has(row.postId)) userMap.set(row.postId, []);
+    userMap.get(row.postId)!.push(row.type);
+  }
+
+  return posts.map((post) => {
+    const counts = countMap.get(post.id) ?? {};
+    const reactionCounts: Record<string, number> = {};
+    for (const type of REACTION_TYPES) reactionCounts[type] = counts[type] ?? 0;
+    return {
+      ...post,
+      reactionCounts,
+      userReactions: userMap.get(post.id) ?? [],
+    };
+  });
+}
+
 export const GET = withAuth(async (req, { session, params }) => {
   try {
     const spaceId = params?.spaceId;
@@ -35,7 +82,7 @@ export const GET = withAuth(async (req, { session, params }) => {
       return NextResponse.json({ success: false, error: "Space not found" }, { status: 404 });
     }
 
-    const isMember = await verifyMembership(session.userId, space.communityId);
+    const isMember = await verifyMembership(session.userId, space.communityId, session.hasPlatform);
     if (!isMember) {
       return NextResponse.json({ success: false, error: "Membership required" }, { status: 403 });
     }
@@ -46,28 +93,12 @@ export const GET = withAuth(async (req, { session, params }) => {
     const limit = Math.min(isNaN(rawLimit) ? 20 : rawLimit, 50);
     const newerThan = searchParams.get("newerThan") ?? undefined;
 
-    const postInclude = {
+    const postSelect = {
       author: { select: AUTHOR_SELECT },
       _count: { select: { reactions: true, comments: true } },
-      reactions: { select: { type: true, userId: true } },
     } as const;
 
-    const REACTION_TYPES = ["like", "fire", "clap", "heart", "rocket"];
     const userId = session.userId;
-
-    const formatPosts = (rawPosts: Array<{
-      reactions: Array<{ type: string; userId: string }>;
-      [key: string]: unknown;
-    }>) => rawPosts.map(({ reactions, ...post }) => {
-        const reactionCounts: Record<string, number> = {};
-        for (const type of REACTION_TYPES) {
-          reactionCounts[type] = reactions.filter((r) => r.type === type).length;
-        }
-        const userReactions = reactions
-          .filter((r) => r.userId === userId)
-          .map((r) => r.type);
-        return { ...post, reactionCounts, userReactions };
-    });
 
     // ── newerThan: return only posts created after the given ISO timestamp ──
     if (newerThan) {
@@ -75,11 +106,13 @@ export const GET = withAuth(async (req, { session, params }) => {
         where: { spaceId, isHidden: false, createdAt: { gt: new Date(newerThan) } },
         orderBy: { createdAt: "desc" },
         take: 50,
-        include: postInclude,
+        include: postSelect,
       });
+      const postIds = rawPosts.map((p) => p.id);
+      const posts = await enrichWithReactions(rawPosts, postIds, userId);
       return NextResponse.json({
         success: true,
-        data: { posts: formatPosts(rawPosts), nextCursor: null },
+        data: { posts, nextCursor: null },
       });
     }
 
@@ -90,16 +123,18 @@ export const GET = withAuth(async (req, { session, params }) => {
       take: limit + 1,
       cursor: cursor ? { id: cursor } : undefined,
       skip: cursor ? 1 : 0,
-      include: postInclude,
+      include: postSelect,
     });
 
     const hasMore = rawPosts.length > limit;
     const raw = hasMore ? rawPosts.slice(0, limit) : rawPosts;
     const nextCursor = hasMore ? raw[raw.length - 1].id : null;
+    const postIds = raw.map((p) => p.id);
+    const posts = await enrichWithReactions(raw, postIds, userId);
 
     return NextResponse.json({
       success: true,
-      data: { posts: formatPosts(raw), nextCursor },
+      data: { posts, nextCursor },
     });
   } catch {
     return NextResponse.json(
@@ -138,7 +173,7 @@ export const POST = withAuth(async (req, { session, params }) => {
       );
     }
 
-    const isMember = await verifyMembership(session.userId, space.communityId);
+    const isMember = await verifyMembership(session.userId, space.communityId, session.hasPlatform);
     if (!isMember) {
       return NextResponse.json({ success: false, error: "Membership required" }, { status: 403 });
     }

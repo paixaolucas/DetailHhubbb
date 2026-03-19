@@ -95,7 +95,6 @@ export default function SpaceFeedPage() {
   const [nextCursor, setNextCursor] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(true);
-  const [postsLoading, setPostsLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
 
@@ -111,43 +110,32 @@ export default function SpaceFeedPage() {
 
   // ---------------------------------------------------------------------------
 
-  const fetchPosts = useCallback(
-    async (spaceId: string, cursor?: string) => {
-      const isLoadMore = !!cursor;
-      isLoadMore ? setLoadingMore(true) : setPostsLoading(true);
-
+  // Used only for "load more" (cursor-based pagination)
+  const fetchMorePosts = useCallback(
+    async (spaceId: string, cursor: string) => {
+      setLoadingMore(true);
       try {
         const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
-        const url = cursor
-          ? `/api/spaces/${spaceId}/posts?cursor=${cursor}&limit=20`
-          : `/api/spaces/${spaceId}/posts?limit=20`;
-
-        const res = await fetch(url, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(
+          `/api/spaces/${spaceId}/posts?cursor=${cursor}&limit=20`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
         const json = await res.json();
-
         if (json.success) {
           const newPosts: Post[] = json.data.posts ?? [];
-          // Pinned posts always appear first
-          const sorted = (isLoadMore ? newPosts : newPosts).sort((a, b) => {
-            if (a.isPinned && !b.isPinned) return -1;
-            if (!a.isPinned && b.isPinned) return 1;
-            return 0;
-          });
-          setPosts((prev) => (isLoadMore ? [...prev, ...sorted] : sorted));
+          setPosts((prev) => [...prev, ...newPosts]);
           setNextCursor(json.data.nextCursor ?? null);
         }
       } catch {
-        // silent — posts loading failure is non-critical
+        // non-critical
       } finally {
-        isLoadMore ? setLoadingMore(false) : setPostsLoading(false);
+        setLoadingMore(false);
       }
     },
     []
   );
 
-  // Main data load
+  // Main data load — single round-trip via combined endpoint
   useEffect(() => {
     async function load() {
       setLoading(true);
@@ -155,7 +143,6 @@ export default function SpaceFeedPage() {
       try {
         const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
         const uid = localStorage.getItem(STORAGE_KEYS.USER_ID);
-        const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
         setCurrentUserId(uid ?? undefined);
 
         if (!token) {
@@ -163,55 +150,27 @@ export default function SpaceFeedPage() {
           return;
         }
 
-        const headers = { Authorization: `Bearer ${token}` };
+        const res = await fetch(
+          `/api/communities/${communitySlug}/space/${spaceSlug}/posts?limit=20`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        const json = await res.json();
 
-        // Round 1: fetch mine + public communities in parallel
-        const [mineJson, pubJson] = await Promise.all([
-          fetch("/api/communities/mine", { headers }).then((r) => r.json()),
-          fetch("/api/communities?published=true", { headers }).then((r) => r.json()),
-        ]);
-
-        let found: Community | null = null;
-        if (mineJson.success && Array.isArray(mineJson.data)) {
-          found = mineJson.data.find((c: Community) => c.slug === communitySlug) ?? null;
-        }
-        if (!found) {
-          const all: Community[] = pubJson.success ? (pubJson.communities ?? []) : [];
-          const candidate = all.find((c: Community) => c.slug === communitySlug);
-          if (candidate && (role === "SUPER_ADMIN" || role === "COMMUNITY_MEMBER" || role === "INFLUENCER_ADMIN")) {
-            found = candidate;
-          }
-        }
-
-        if (!found) {
-          setError("Comunidade não encontrada ou você não tem acesso.");
+        if (!json.success) {
+          setError(json.error ?? "Comunidade não encontrada ou você não tem acesso.");
           setLoading(false);
           return;
         }
-        setCommunity(found);
 
-        // Round 2: fetch spaces + owner detail in parallel
-        const [spacesJson, detailJson] = await Promise.all([
-          fetch(`/api/communities/${found.id}/spaces`, { headers }).then((r) => r.json()),
-          role !== "SUPER_ADMIN"
-            ? fetch(`/api/communities/${found.id}`, { headers }).then((r) => r.json())
-            : Promise.resolve(null),
-        ]);
+        const { community, spaces, activeSpace, isOwner, posts: initialPosts, nextCursor: initialCursor } = json.data;
 
-        if (role === "SUPER_ADMIN") {
-          setIsOwner(true);
-        } else if (detailJson?.success && detailJson.data?.influencer?.userId === uid) {
-          setIsOwner(true);
-        }
-
-        const spaceList: SpaceItem[] = spacesJson.data ?? [];
-        setSpaces(spaceList);
-        const space = spaceList.find((s) => s.slug === spaceSlug) ?? null;
-        setActiveSpace(space);
-
-        // Show UI immediately, then load posts
+        setCommunity(community);
+        setSpaces(spaces);
+        setActiveSpace(activeSpace);
+        setIsOwner(isOwner);
+        setPosts(initialPosts ?? []);
+        setNextCursor(initialCursor ?? null);
         setLoading(false);
-        if (space) fetchPosts(space.id);
       } catch {
         setError("Erro de conexão. Tente novamente.");
         setLoading(false);
@@ -219,7 +178,7 @@ export default function SpaceFeedPage() {
     }
 
     load();
-  }, [communitySlug, spaceSlug, router, fetchPosts]);
+  }, [communitySlug, spaceSlug, router]);
 
   // Keep postsRef in sync so the polling interval always sees latest posts
   useEffect(() => {
@@ -260,7 +219,7 @@ export default function SpaceFeedPage() {
       }
     };
 
-    const id = setInterval(poll, 10_000);
+    const id = setInterval(poll, 30_000);
     return () => clearInterval(id);
   }, [activeSpace]);
 
@@ -307,8 +266,8 @@ export default function SpaceFeedPage() {
 
   const handleLoadMore = useCallback(async () => {
     if (!activeSpace || !nextCursor) return;
-    await fetchPosts(activeSpace.id, nextCursor);
-  }, [activeSpace, nextCursor, fetchPosts]);
+    await fetchMorePosts(activeSpace.id, nextCursor);
+  }, [activeSpace, nextCursor, fetchMorePosts]);
 
   const handleLoadPending = useCallback(() => {
     setPosts((prev) => {
@@ -423,7 +382,7 @@ export default function SpaceFeedPage() {
           )}
 
           {/* Posts */}
-          {(loading || postsLoading) ? (
+          {loading ? (
             Array.from({ length: 5 }).map((_, i) => <PostSkeleton key={i} />)
           ) : posts.length === 0 ? (
             <div className="bg-white/5 border border-white/10 rounded-xl p-12 text-center">

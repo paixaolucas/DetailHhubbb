@@ -18,6 +18,17 @@ import type { AuthTokens, AuthSession } from "@/types";
 import { UserRole } from "@prisma/client";
 import crypto from "crypto";
 
+/** Returns true if userId has an active PlatformMembership */
+async function hasActivePlatform(userId: string): Promise<boolean> {
+  const m = await db.platformMembership.findUnique({
+    where: { userId },
+    select: { status: true, currentPeriodEnd: true },
+  });
+  if (m?.status !== "ACTIVE") return false;
+  if (m.currentPeriodEnd != null && m.currentPeriodEnd <= new Date()) return false;
+  return true;
+}
+
 // =============================================================================
 // REGISTRATION
 // =============================================================================
@@ -177,16 +188,18 @@ export async function loginOrRegisterWithGoogle(
     }
 
     // Generate tokens
-    const [accessToken, refreshToken] = await Promise.all([
-      createAccessToken({
-        userId: existingUser.id,
-        email: existingUser.email,
-        role: existingUser.role,
-        firstName: existingUser.firstName,
-        lastName: existingUser.lastName,
-      }),
+    const [hasPlatform, refreshToken] = await Promise.all([
+      hasActivePlatform(existingUser.id),
       createRefreshToken(existingUser.id),
     ]);
+    const accessToken = await createAccessToken({
+      userId: existingUser.id,
+      email: existingUser.email,
+      role: existingUser.role,
+      firstName: existingUser.firstName,
+      lastName: existingUser.lastName,
+      hasPlatform,
+    });
 
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
@@ -355,10 +368,18 @@ export async function loginUser(
     throw new UnauthorizedError("Invalid credentials");
   }
 
-  const [accessToken, refreshToken] = await Promise.all([
-    createAccessToken({ userId: user.id, email: user.email, role: user.role, firstName: user.firstName, lastName: user.lastName }),
+  const [hasPlatform, refreshToken] = await Promise.all([
+    hasActivePlatform(user.id),
     createRefreshToken(user.id),
   ]);
+  const accessToken = await createAccessToken({
+    userId: user.id,
+    email: user.email,
+    role: user.role,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    hasPlatform,
+  });
 
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
@@ -439,17 +460,19 @@ export async function refreshAccessToken(
     throw new AppError("Account deactivated", 403, "ACCOUNT_INACTIVE");
   }
 
-  // Rotate refresh token
-  const [newAccessToken, newRefreshToken] = await Promise.all([
-    createAccessToken({
-      userId: storedToken.user.id,
-      email: storedToken.user.email,
-      role: storedToken.user.role,
-      firstName: storedToken.user.firstName,
-      lastName: storedToken.user.lastName,
-    }),
+  // Rotate refresh token (embed hasPlatform claim for fast-path membership checks)
+  const [hasPlatform, newRefreshToken] = await Promise.all([
+    hasActivePlatform(storedToken.user.id),
     createRefreshToken(storedToken.user.id),
   ]);
+  const newAccessToken = await createAccessToken({
+    userId: storedToken.user.id,
+    email: storedToken.user.email,
+    role: storedToken.user.role,
+    firstName: storedToken.user.firstName,
+    lastName: storedToken.user.lastName,
+    hasPlatform,
+  });
 
   await db.$transaction([
     db.refreshToken.update({

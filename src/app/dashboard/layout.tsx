@@ -241,9 +241,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [role, setRole] = useState("INFLUENCER_ADMIN");
-  const [userName, setUserName] = useState("");
-  const [authChecked, setAuthChecked] = useState(false);
+  const [role, setRole] = useState(() =>
+    typeof window !== "undefined" ? (localStorage.getItem(STORAGE_KEYS.USER_ROLE) ?? "INFLUENCER_ADMIN") : "INFLUENCER_ADMIN"
+  );
+  const [userName, setUserName] = useState(() =>
+    typeof window !== "undefined" ? (localStorage.getItem(STORAGE_KEYS.USER_NAME) ?? "") : ""
+  );
+  // Initialize from localStorage immediately — avoids spinner on every navigation
+  const [authChecked, setAuthChecked] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return !!localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+  });
   const [openGroups, setOpenGroups] = useState<Set<string>>(new Set());
 
   useEffect(() => {

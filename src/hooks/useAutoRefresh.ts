@@ -1,8 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 
 /**
  * Runs `callback` every `intervalMs` milliseconds.
- * Uses a ref so changing `callback` doesn't restart the interval.
+ * Pauses automatically when the tab is hidden; resumes (with an immediate call)
+ * when the tab becomes visible again.
  */
 export function useAutoRefresh(
   callback: () => void,
@@ -11,10 +12,38 @@ export function useAutoRefresh(
 ): void {
   const cbRef = useRef(callback);
   cbRef.current = callback;
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const start = useCallback(() => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => cbRef.current(), intervalMs);
+  }, [intervalMs]);
+
+  const stop = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, []);
 
   useEffect(() => {
     if (!enabled) return;
-    const id = setInterval(() => cbRef.current(), intervalMs);
-    return () => clearInterval(id);
-  }, [intervalMs, enabled]);
+
+    start();
+
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") {
+        cbRef.current(); // immediate fetch on return
+        start();
+      } else {
+        stop();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      stop();
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, [intervalMs, enabled, start, stop]);
 }

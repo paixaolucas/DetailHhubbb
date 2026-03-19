@@ -397,11 +397,14 @@ model PointTransaction {
   userPointsId String
   amount       Int
   reason       String
+  eventType    String?
   metadata     Json       @default("{}")
   createdAt    DateTime   @default(now())
   userPoints   UserPoints @relation(fields: [userPointsId], references: [id])
 
   @@index([userPointsId, createdAt])
+  @@index([eventType])
+  @@index([userPointsId, eventType])
   @@map("point_transactions")
 }
 

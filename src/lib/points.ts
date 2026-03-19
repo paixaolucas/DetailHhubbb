@@ -77,13 +77,13 @@ export async function awardPoints(params: {
   });
   if (!membership) return false;
 
-  // Check daily limit
+  // Check daily limit using indexed eventType field
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const countToday = await db.pointTransaction.count({
     where: {
       userPoints: { userId },
-      reason: { contains: eventType },
+      eventType: { equals: eventType },
       createdAt: { gte: today },
     },
   });
@@ -120,12 +120,12 @@ export async function awardPoints(params: {
       points: amount,
       totalEarned: amount,
       level: 1,
-      transactions: { create: { amount, reason: reasonStr } },
+      transactions: { create: { amount, reason: reasonStr, eventType } },
     },
     update: {
       points: { increment: amount },
       totalEarned: { increment: amount },
-      transactions: { create: { amount, reason: reasonStr } },
+      transactions: { create: { amount, reason: reasonStr, eventType } },
     },
     select: { points: true },
   });
@@ -175,21 +175,21 @@ export async function awardInfluencerPoints(params: {
     if (exists) return false;
   }
 
-  // Daily limit check
+  // Daily limit check using indexed eventType field
   if (dailyLimit !== undefined) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const count = await db.pointTransaction.count({
       where: {
         userPoints: { userId },
-        reason: { contains: eventType },
+        eventType: { equals: eventType },
         createdAt: { gte: today },
       },
     });
     if (count >= dailyLimit) return false;
   }
 
-  // Monthly cap check
+  // Monthly cap check using indexed eventType field
   if (monthlyLimit !== undefined) {
     const monthStart = new Date();
     monthStart.setDate(1);
@@ -197,7 +197,7 @@ export async function awardInfluencerPoints(params: {
     const monthTotal = await db.pointTransaction.aggregate({
       where: {
         userPoints: { userId },
-        reason: { contains: eventType },
+        eventType: { equals: eventType },
         createdAt: { gte: monthStart },
         amount: { gt: 0 },
       },
@@ -218,12 +218,12 @@ export async function awardInfluencerPoints(params: {
       points: amount,
       totalEarned: amount,
       level: 1,
-      transactions: { create: { amount, reason: reasonStr } },
+      transactions: { create: { amount, reason: reasonStr, eventType } },
     },
     update: {
       points: { increment: amount },
       totalEarned: { increment: amount },
-      transactions: { create: { amount, reason: reasonStr } },
+      transactions: { create: { amount, reason: reasonStr, eventType } },
     },
   });
 
@@ -277,7 +277,7 @@ export async function applyInactivityPenalty(params: {
   const alreadyPenalised = await db.pointTransaction.findFirst({
     where: {
       userPointsId: up.id,
-      reason: { contains: "INACTIVITY" },
+      eventType: { equals: "INACTIVITY" },
       createdAt: { gte: today },
     },
     select: { id: true },
@@ -294,7 +294,7 @@ export async function applyInactivityPenalty(params: {
     data: {
       points: { decrement: actualPenalty },
       transactions: {
-        create: { amount: -actualPenalty, reason: `INACTIVITY:${penaltyDays} dias sem ação` },
+        create: { amount: -actualPenalty, reason: `INACTIVITY:${penaltyDays} dias sem ação`, eventType: "INACTIVITY" },
       },
     },
   });

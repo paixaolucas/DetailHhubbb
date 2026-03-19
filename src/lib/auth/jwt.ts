@@ -29,12 +29,14 @@ export async function createAccessToken(payload: {
   role: string;
   firstName?: string;
   lastName?: string;
+  hasPlatform?: boolean;
 }): Promise<string> {
   return await new SignJWT({
     email: payload.email,
     role: payload.role,
     ...(payload.firstName ? { firstName: payload.firstName } : {}),
     ...(payload.lastName ? { lastName: payload.lastName } : {}),
+    ...(payload.hasPlatform !== undefined ? { hasPlatform: payload.hasPlatform } : {}),
   })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(payload.userId)
@@ -68,6 +70,7 @@ export async function verifyAccessToken(token: string): Promise<JWTPayload> {
       role: payload.role as string,
       firstName: payload.firstName as string | undefined,
       lastName: payload.lastName as string | undefined,
+      hasPlatform: payload.hasPlatform as boolean | undefined,
       iat: payload.iat as number,
       exp: payload.exp as number,
     };

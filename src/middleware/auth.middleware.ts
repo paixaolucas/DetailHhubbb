@@ -44,6 +44,7 @@ export async function getSessionFromRequest(
       firstName: payload.firstName ?? "",
       lastName: payload.lastName ?? "",
       avatarUrl: null,
+      hasPlatform: payload.hasPlatform,
     };
   } catch {
     return null;
@@ -137,8 +138,11 @@ export async function verifyCommunityOwnership(
 }
 
 export async function verifyPlatformMembership(
-  userId: string
+  userId: string,
+  /** Fast-path: if true (from JWT claim), skip DB query */
+  hasPlatformClaim?: boolean
 ): Promise<boolean> {
+  if (hasPlatformClaim === true) return true;
   const membership = await db.platformMembership.findUnique({
     where: { userId },
     select: { status: true, currentPeriodEnd: true },
@@ -151,8 +155,13 @@ export async function verifyPlatformMembership(
 
 export async function verifyMembership(
   userId: string,
-  communityId: string
+  communityId: string,
+  /** Fast-path: pass session.hasPlatform from JWT to skip DB query when possible */
+  hasPlatformClaim?: boolean
 ): Promise<boolean> {
+  // Fast path: JWT claims active platform membership
+  if (hasPlatformClaim === true) return true;
+
   // Check community-level membership first
   const membership = await db.communityMembership.findUnique({
     where: { userId_communityId: { userId, communityId } },

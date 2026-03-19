@@ -14,6 +14,7 @@ export interface JWTPayload {
   role: string;
   firstName?: string;
   lastName?: string;
+  hasPlatform?: boolean; // true if user has an active PlatformMembership
   iat: number;
   exp: number;
 }
@@ -31,6 +32,7 @@ export interface AuthSession {
   firstName: string;
   lastName: string;
   avatarUrl: string | null;
+  hasPlatform?: boolean;
 }
 
 // =============================================================================
