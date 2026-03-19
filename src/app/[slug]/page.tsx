@@ -62,7 +62,7 @@ export default function SlugPage() {
         return;
       }
 
-      const communities: Array<{ slug: string }> = communityRes.data ?? [];
+      const communities: Array<{ slug: string }> = communityRes.communities ?? [];
       const exists = communities.some((c) => c.slug === slug);
 
       if (!exists) {
@@ -75,7 +75,7 @@ export default function SlugPage() {
         .then((r) => r.json())
         .catch(() => null);
 
-      if (!membershipRes?.success || !membershipRes?.data?.isActive) {
+      if (!membershipRes?.success || !membershipRes?.data?.hasMembership) {
         router.replace("/dashboard/assinar");
         return;
       }

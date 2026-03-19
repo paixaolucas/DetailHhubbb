@@ -155,11 +155,10 @@ export async function verifyPlatformMembership(
     where: { userId },
     select: { status: true, currentPeriodEnd: true },
   });
-  return (
-    membership?.status === "ACTIVE" &&
-    membership.currentPeriodEnd != null &&
-    membership.currentPeriodEnd > new Date()
-  );
+  if (membership?.status !== "ACTIVE") return false;
+  // If currentPeriodEnd is set, enforce it; if null (manual/seed), trust ACTIVE status
+  if (membership.currentPeriodEnd != null && membership.currentPeriodEnd <= new Date()) return false;
+  return true;
 }
 
 export async function verifyMembership(

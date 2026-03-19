@@ -594,13 +594,15 @@ export default function CommunitySpacesPage() {
               Canais
             </h1>
             <p className="text-sm text-gray-500 mt-0.5">
-              Gerencie os canais de discussão da sua comunidade
+              Máximo de 3 canais por comunidade{!loading && ` — ${spaces.length}/3 usados`}
             </p>
           </div>
         </div>
         <button
           onClick={openCreate}
-          className="inline-flex items-center gap-2 bg-[#006079] hover:bg-[#007A99] text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all hover:shadow-lg hover:shadow-[#007A99]/25 flex-shrink-0"
+          disabled={spaces.length >= 3}
+          title={spaces.length >= 3 ? "Limite de 3 canais atingido" : "Criar novo canal"}
+          className="inline-flex items-center gap-2 bg-[#006079] hover:bg-[#007A99] disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all hover:shadow-lg hover:shadow-[#007A99]/25 flex-shrink-0"
         >
           <Plus className="w-4 h-4" />
           Novo canal
@@ -627,20 +629,39 @@ export default function CommunitySpacesPage() {
         </div>
       )}
 
-      {/* Summary stats */}
-      {!loading && spaces.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {SPACE_TYPES.map((t) => {
-            const count = spaces.filter((s) => s.type === t.value).length;
+      {/* 3-slot visual overview */}
+      {!loading && (
+        <div className="grid grid-cols-3 gap-3">
+          {([
+            { label: "Canal Geral",   desc: "Discussão livre entre membros",      icon: "💬", type: "DISCUSSION"   },
+            { label: "Avisos",        desc: "Comunicados e novidades",             icon: "📢", type: "ANNOUNCEMENT" },
+            { label: "Conteúdo",      desc: "Dicas, tutoriais e referências",      icon: "🎓", type: "DISCUSSION"   },
+          ] as const).map((slot, idx) => {
+            const filled = spaces[idx];
             return (
               <div
-                key={t.value}
-                className="bg-white/5 border border-white/10 rounded-xl p-4"
+                key={idx}
+                className={[
+                  "rounded-xl border p-4 transition-all text-center",
+                  filled
+                    ? "bg-[#006079]/10 border-[#006079]/30"
+                    : "bg-white/[0.02] border-dashed border-white/10",
+                ].join(" ")}
               >
-                <p className={`text-xs font-medium border rounded px-1.5 py-0.5 inline-block mb-2 ${TYPE_COLORS[t.value]}`}>
-                  {t.label}
+                <div className="text-2xl mb-2">{filled?.icon ?? slot.icon}</div>
+                <p className="text-xs font-semibold text-[#EEE6E4] truncate">
+                  {filled?.name ?? slot.label}
                 </p>
-                <p className="text-2xl font-bold text-[#EEE6E4]">{count}</p>
+                <p className="text-[10px] text-gray-600 mt-0.5 truncate">
+                  {filled ? `/${filled.slug}` : slot.desc}
+                </p>
+                {filled ? (
+                  <span className={`mt-2 inline-block text-[10px] px-1.5 py-0.5 rounded border ${TYPE_COLORS[filled.type]}`}>
+                    {SPACE_TYPES.find((t) => t.value === filled.type)?.label}
+                  </span>
+                ) : (
+                  <span className="mt-2 inline-block text-[10px] text-gray-600">vazio</span>
+                )}
               </div>
             );
           })}

@@ -46,6 +46,15 @@ export const POST = withAuth(async (req, { session, params }) => {
       return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
     }
 
+    // Enforce max 3 spaces per community
+    const spaceCount = await db.space.count({ where: { communityId } });
+    if (spaceCount >= 3) {
+      return NextResponse.json(
+        { success: false, error: "Limite atingido: cada comunidade pode ter no máximo 3 canais." },
+        { status: 400 }
+      );
+    }
+
     const body = await req.json();
     const { name, slug, description, icon, type, isPublic, isDefault } = body;
 
