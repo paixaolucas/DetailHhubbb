@@ -22,7 +22,7 @@
 ```bash
 npm install
 cp .env.example .env.local   # preencher todas as variáveis
-npx prisma migrate dev
+npx prisma db push            # Supabase: usar db push (não migrate dev — shadow DB incompatível)
 npx prisma db seed
 npm run dev
 ```
@@ -62,7 +62,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```bash
 npm run dev                            # servidor de desenvolvimento
 npx prisma studio                      # interface visual do banco
-npx prisma migrate dev --name <nome>   # nova migration
+npx prisma db push                     # aplicar schema ao banco (Supabase — não usar migrate dev)
 npx prisma db seed                     # popular banco com dados de teste
 npx tsc --noEmit                       # checar erros TypeScript (deve retornar 0)
 ```
