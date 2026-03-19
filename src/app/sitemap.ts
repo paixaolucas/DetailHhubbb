@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 import { db } from "@/lib/db";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_URL || "https://detailhub.com";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://detail-hhubbb-eight.vercel.app";
 
   const communities = await db.community.findMany({
     where: { isPublished: true },

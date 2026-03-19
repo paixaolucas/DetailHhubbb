@@ -38,11 +38,22 @@ export const metadata: Metadata = {
     description: "A plataforma premium para comunidades automotivas",
     type: "website",
     locale: "pt_BR",
+    url: process.env.NEXT_PUBLIC_APP_URL ?? "https://detail-hhubbb-eight.vercel.app",
+    siteName: "Detailer'HUB",
+    images: [
+      {
+        url: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://detail-hhubbb-eight.vercel.app"}/og-default.png`,
+        width: 1200,
+        height: 630,
+        alt: "Detailer'HUB — Comunidades automotivas premium",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Detailer'HUB",
     description: "A plataforma premium para comunidades automotivas",
+    images: [`${process.env.NEXT_PUBLIC_APP_URL ?? "https://detail-hhubbb-eight.vercel.app"}/og-default.png`],
   },
 };
 

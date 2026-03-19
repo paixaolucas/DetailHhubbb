@@ -7,7 +7,7 @@ export default function PrivacidadePage() {
       <div className="bg-[#006079]/10 border-b border-white/10 py-20 px-4 text-center">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">Política de Privacidade</h1>
         <p className="text-gray-400 max-w-xl mx-auto">
-          Última atualização: março de 2025
+          Última atualização: março de 2026
         </p>
       </div>
 
