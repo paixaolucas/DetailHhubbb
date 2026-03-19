@@ -49,15 +49,22 @@ async function main() {
   await db.eventRegistration.deleteMany();
   await db.eventTicketType.deleteMany();
   await db.event.deleteMany();
+  await db.postReaction.deleteMany();
+  await db.commentReaction.deleteMany();
+  await db.comment.deleteMany();
   await db.post.deleteMany();
   await db.space.deleteMany();
+  await db.pointTransaction.deleteMany();
+  await db.userPoints.deleteMany();
+  await db.userBadge.deleteMany();
+  await db.badge.deleteMany();
+  await db.certificate.deleteMany();
   await db.community.deleteMany();
   await db.influencer.deleteMany();
   await db.refreshToken.deleteMany();
   await db.marketplacePurchase.deleteMany();
   await db.marketplaceListing.deleteMany();
   await db.saasTool.deleteMany();
-  await db.userPoints.deleteMany();
   await db.notification.deleteMany();
   await db.user.deleteMany();
 
