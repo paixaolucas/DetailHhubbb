@@ -26,7 +26,7 @@ export function EmailVerificationEmail({
       <Body style={body}>
         <Container style={container}>
           <Section style={header}>
-            <Heading style={logo}>Detailer'HUB</Heading>
+            <Heading style={logo}>Detailer&apos;HUB</Heading>
           </Section>
 
           <Section style={content}>
@@ -48,7 +48,7 @@ export function EmailVerificationEmail({
 
           <Hr style={hr} />
           <Text style={footer}>
-            © {new Date().getFullYear()} Detailer'HUB. Todos os direitos
+            © {new Date().getFullYear()} Detailer&apos;HUB. Todos os direitos
             reservados.
           </Text>
         </Container>
