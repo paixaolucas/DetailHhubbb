@@ -127,6 +127,22 @@ const featuredCommunities = [
     members: "3.1k",
     description: "Educação em estética automotiva do zero ao avançado.",
   },
+  {
+    name: "Garagem do Gimenez",
+    slug: "garagem-do-gimenez",
+    primaryColor: "#C0392B",
+    bannerUrl: null,
+    members: "nova",
+    description: "A garagem do Gimenez — onde a paixão por carros vira conteúdo.",
+  },
+  {
+    name: "Sala do Gigi",
+    slug: "sala-do-gigi",
+    primaryColor: "#8E44AD",
+    bannerUrl: null,
+    members: "nova",
+    description: "A sala do Gigi — estética automotiva com estilo e precisão.",
+  },
 ];
 
 const pricingFeatures = [
