@@ -174,7 +174,7 @@ function AdminDashboard() {
         </div>
         <div>
           <h1 className="text-2xl font-bold text-[#EEE6E4]">Painel Administrativo</h1>
-          <p className="text-gray-400 text-sm">Visão geral da plataforma Detailer'HUB</p>
+          <p className="text-gray-400 text-sm">Visão geral da plataforma Detailer&apos;HUB</p>
         </div>
       </div>
 
@@ -636,7 +636,7 @@ function MemberDashboardInner({ userName }: { userName: string }) {
         {/* Content */}
         <div className="relative p-6 sm:p-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div>
-            <p className="text-[#009CD9] text-xs font-semibold uppercase tracking-widest mb-2">Detailer'HUB — Plataforma Automotiva</p>
+            <p className="text-[#009CD9] text-xs font-semibold uppercase tracking-widest mb-2">Detailer&apos;HUB — Plataforma Automotiva</p>
             <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-2">{greeting}</h1>
             <p className="text-white/50 text-sm">Explore as comunidades automotivas da plataforma</p>
           </div>

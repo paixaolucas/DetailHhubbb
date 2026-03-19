@@ -78,7 +78,7 @@ export default function AssinarPage() {
           <Car className="w-4 h-4" />
           Assinatura Única
         </div>
-        <h1 className="text-3xl font-bold text-[#EEE6E4] mb-3">Detailer'HUB</h1>
+        <h1 className="text-3xl font-bold text-[#EEE6E4] mb-3">Detailer&apos;HUB</h1>
         <p className="text-gray-400">Acesso completo à plataforma. Sem limites.</p>
       </div>
 
