@@ -38,15 +38,34 @@ export default function MinhasComunidadesPage() {
   useEffect(() => {
     async function load() {
       try {
-        const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+        // Get token, try refresh if missing
+        let token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+        if (!token) {
+          const refreshToken = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
+          if (refreshToken) {
+            try {
+              const r = await fetch("/api/auth/refresh", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ refreshToken }),
+              });
+              const d = await r.json();
+              if (r.ok && d.data?.accessToken) {
+                token = d.data.accessToken;
+                localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token!);
+              }
+            } catch { /* ignore */ }
+          }
+        }
+
         const headers: Record<string, string> = {};
         if (token) headers["Authorization"] = `Bearer ${token}`;
 
         // Fetch all communities + platform membership + per-community membership in parallel
         const [commRes, platformRes, myRes] = await Promise.all([
-          fetch("/api/communities?pageSize=100"),
-          fetch("/api/platform-membership/me", { headers }).catch(() => null),
-          fetch("/api/memberships/me", { headers }).catch(() => null),
+          fetch("/api/communities?published=true&pageSize=50"),
+          token ? fetch("/api/platform-membership/me", { headers }).catch(() => null) : Promise.resolve(null),
+          token ? fetch("/api/memberships/me", { headers }).catch(() => null) : Promise.resolve(null),
         ]);
 
         const commData = await commRes.json();

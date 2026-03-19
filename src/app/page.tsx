@@ -543,11 +543,11 @@ export default function HomePage() {
       <NavBar />
       <HeroSection />
       <StatsBar />
-      <FeaturedCommunitiesSection />
       <FeaturesSection />
       <HowItWorksSection />
       <PricingSection />
       <TestimonialsSection />
+      <FeaturedCommunitiesSection />
       <CTASection />
       <Footer />
     </div>

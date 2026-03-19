@@ -125,9 +125,12 @@ export function MembershipSection({
     );
   }
 
+  // Filter out free/zero-price plans — those are test/seed data, show platform CTA instead
+  const paidPlans = plans.filter((p) => p.price > 0);
+
   // No membership — show subscription CTA
-  // If platform model (no legacy plans), show platform subscription CTA
-  if (plans.length === 0) {
+  // If platform model (no legacy plans or only zero-price plans), show platform subscription CTA
+  if (paidPlans.length === 0) {
     return (
       <div className="relative bg-gradient-to-br from-[#006079]/10 to-[#009CD9]/5 border border-[#006079]/30 rounded-2xl p-8 overflow-hidden">
         <div className="absolute top-0 right-0 w-40 h-40 bg-[#009CD9]/10 rounded-full blur-3xl pointer-events-none" />
@@ -160,19 +163,19 @@ export function MembershipSection({
     );
   }
 
-  // Legacy per-community plans
+  // Legacy per-community plans (paid only)
   return (
     <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
       <h2 className="text-xl font-bold text-[#EEE6E4] mb-2">Planos de acesso</h2>
       <p className="text-gray-400 text-sm mb-6">Escolha o plano ideal para você.</p>
       <div
         className={`grid gap-4 ${
-          plans.length === 1
+          paidPlans.length === 1
             ? "grid-cols-1 max-w-sm mx-auto"
             : "grid-cols-1 sm:grid-cols-2"
         }`}
       >
-        {plans.map((plan) => {
+        {paidPlans.map((plan) => {
           const interval = INTERVAL_LABELS[plan.interval] ?? plan.interval;
           return (
             <div
