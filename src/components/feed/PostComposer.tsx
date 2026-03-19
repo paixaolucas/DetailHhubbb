@@ -93,8 +93,8 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
       .finally(() => setScoreLoading(false));
   }, [communityId]);
 
-  // Re-poll score every 10s so reactions/comments update the gate in real-time
-  useAutoRefresh(pollScore, 10_000);
+  // Re-poll score every 60s (instant refresh still happens on reactions/comments)
+  useAutoRefresh(pollScore, 60_000);
 
   // Instant re-fetch when parent signals a reaction/comment was made
   useEffect(() => {

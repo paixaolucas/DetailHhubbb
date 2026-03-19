@@ -5,7 +5,7 @@
 // Owner/Admin sees ⋯ menu with: pin, hide/show, delete (with confirmation)
 // =============================================================================
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, memo } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { MessageCircle, ThumbsUp, Pin, MoreHorizontal, EyeOff, Eye, Trash2 } from "lucide-react";
@@ -127,7 +127,7 @@ function ImageGrid({ urls }: { urls: string[] }) {
 // Component
 // ---------------------------------------------------------------------------
 
-export default function PostCard({
+function PostCard({
   post,
   communitySlug,
   spaceSlug,
@@ -412,3 +412,5 @@ export default function PostCard({
     </>
   );
 }
+
+export default memo(PostCard);

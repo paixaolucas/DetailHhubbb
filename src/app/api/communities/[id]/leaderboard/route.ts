@@ -31,7 +31,10 @@ export async function GET(
         where: { userId_communityId: { userId: filterUserId, communityId } },
         select: { points: true, level: true },
       });
-      return NextResponse.json({ success: true, data: { points: up?.points ?? 0, level: up?.level ?? 1 } });
+      return NextResponse.json(
+        { success: true, data: { points: up?.points ?? 0, level: up?.level ?? 1 } },
+        { headers: { "Cache-Control": "private, max-age=30, stale-while-revalidate=60" } }
+      );
     }
 
     // Build date filter for period

@@ -6,7 +6,7 @@
 // Supports cursor-based "Load more" pagination
 // =============================================================================
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -268,12 +268,12 @@ export default function SpaceFeedPage() {
   // Handlers
   // ---------------------------------------------------------------------------
 
-  function handleNewPost(post: unknown) {
+  const handleNewPost = useCallback((post: unknown) => {
     setPosts((prev) => [post as Post, ...prev]);
     setPendingPosts([]);
-  }
+  }, []);
 
-  async function handleReact(postId: string, type: string) {
+  const handleReact = useCallback(async (postId: string, type: string) => {
     const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     const res = await fetch(`/api/posts/${postId}/reactions`, {
       method: "POST",
@@ -303,14 +303,14 @@ export default function SpaceFeedPage() {
       // Trigger instant score refresh in PostComposer
       setScoreTrigger((n) => n + 1);
     }
-  }
+  }, []);
 
-  async function handleLoadMore() {
+  const handleLoadMore = useCallback(async () => {
     if (!activeSpace || !nextCursor) return;
     await fetchPosts(activeSpace.id, nextCursor);
-  }
+  }, [activeSpace, nextCursor, fetchPosts]);
 
-  function handleLoadPending() {
+  const handleLoadPending = useCallback(() => {
     setPosts((prev) => {
       const existingIds = new Set(prev.map((p) => p.id));
       const toAdd = pendingPosts.filter((p) => !existingIds.has(p.id));
@@ -321,13 +321,13 @@ export default function SpaceFeedPage() {
       });
     });
     setPendingPosts([]);
-  }
+  }, [pendingPosts]);
 
-  function handlePostDelete(postId: string) {
+  const handlePostDelete = useCallback((postId: string) => {
     setPosts((prev) => prev.filter((p) => p.id !== postId));
-  }
+  }, []);
 
-  function handlePostUpdate(updated: { id: string; isPinned?: boolean; isHidden?: boolean }) {
+  const handlePostUpdate = useCallback((updated: { id: string; isPinned?: boolean; isHidden?: boolean }) => {
     setPosts((prev) => {
       const next = prev.map((p) => (p.id === updated.id ? { ...p, ...updated } : p));
       // Re-sort so pinned posts stay on top
@@ -337,7 +337,7 @@ export default function SpaceFeedPage() {
         return 0;
       });
     });
-  }
+  }, []);
 
   // ---------------------------------------------------------------------------
   // Error state

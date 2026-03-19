@@ -384,41 +384,30 @@ async function main() {
   // SPACES
   // =============================================================================
 
-  // Barba spaces
-  const spacesBarbaResult = await db.space.findMany({ where: { communityId: communityBarba.id } });
-  // spaces were just deleted with community cascade, so create fresh:
+  // Barba spaces (max 3)
   await db.space.createMany({
     data: [
       { communityId: communityBarba.id, name: "Feed Geral", slug: "feed", description: "O coração da comunidade.", icon: "🔥", type: "DISCUSSION", sortOrder: 1, isDefault: true },
-      { communityId: communityBarba.id, name: "Queimando Mitos", slug: "queimando-mitos", description: "Desmistificando as maiores mentiras.", icon: "💥", type: "DISCUSSION", sortOrder: 2 },
-      { communityId: communityBarba.id, name: "Técnicas & Processos", slug: "tecnicas-processos", description: "Polimento, PPF, vitrificação.", icon: "🛠️", type: "DISCUSSION", sortOrder: 3 },
-      { communityId: communityBarba.id, name: "Produtos Testados", slug: "produtos-testados", description: "Reviews honestos.", icon: "🧴", type: "SHOWCASE", sortOrder: 4 },
-      { communityId: communityBarba.id, name: "Tira-Dúvidas", slug: "tira-duvidas", description: "Pergunta sem medo.", icon: "❓", type: "QA", sortOrder: 5 },
-      { communityId: communityBarba.id, name: "Avisos", slug: "avisos", description: "Comunicados oficiais.", icon: "📢", type: "ANNOUNCEMENT", sortOrder: 6 },
+      { communityId: communityBarba.id, name: "Tira-Dúvidas", slug: "tira-duvidas", description: "Pergunta sem medo.", icon: "❓", type: "QA", sortOrder: 2 },
+      { communityId: communityBarba.id, name: "Avisos", slug: "avisos", description: "Comunicados oficiais.", icon: "📢", type: "ANNOUNCEMENT", sortOrder: 3 },
     ],
   });
 
-  // Corujão spaces
+  // Corujão spaces (max 3)
   await db.space.createMany({
     data: [
       { communityId: communityCorujao.id, name: "Feed", slug: "feed", description: "Tudo rola aqui.", icon: "🦉", type: "DISCUSSION", sortOrder: 1, isDefault: true },
-      { communityId: communityCorujao.id, name: "É Zika!", slug: "e-zika", description: "Conteúdo que é zika mesmo.", icon: "⚡", type: "DISCUSSION", sortOrder: 2 },
-      { communityId: communityCorujao.id, name: "Técnicas da Rua", slug: "tecnicas-da-rua", description: "Técnicas que a rua ensina.", icon: "🔧", type: "DISCUSSION", sortOrder: 3 },
-      { communityId: communityCorujao.id, name: "Showcase", slug: "showcase", description: "Mostra o seu trampo.", icon: "🚗", type: "SHOWCASE", sortOrder: 4 },
-      { communityId: communityCorujao.id, name: "Tira-Dúvidas", slug: "tira-duvidas", description: "Pergunta à comunidade.", icon: "❓", type: "QA", sortOrder: 5 },
-      { communityId: communityCorujao.id, name: "Avisos", slug: "avisos", description: "Comunicados do Corujão.", icon: "📢", type: "ANNOUNCEMENT", sortOrder: 6 },
+      { communityId: communityCorujao.id, name: "Tira-Dúvidas", slug: "tira-duvidas", description: "Pergunta à comunidade.", icon: "❓", type: "QA", sortOrder: 2 },
+      { communityId: communityCorujao.id, name: "Avisos", slug: "avisos", description: "Comunicados do Corujão.", icon: "📢", type: "ANNOUNCEMENT", sortOrder: 3 },
     ],
   });
 
-  // No Mel spaces
+  // No Mel spaces (max 3)
   await db.space.createMany({
     data: [
       { communityId: communityNoMel.id, name: "Feed", slug: "feed", description: "Atualizações e novidades.", icon: "🍯", type: "DISCUSSION", sortOrder: 1, isDefault: true },
-      { communityId: communityNoMel.id, name: "Aulas & Conteúdo", slug: "aulas", description: "Discussões sobre aulas.", icon: "🎓", type: "DISCUSSION", sortOrder: 2 },
-      { communityId: communityNoMel.id, name: "Técnicas Avançadas", slug: "tecnicas-avancadas", description: "Polimento, PPF, ceramic coat.", icon: "✨", type: "DISCUSSION", sortOrder: 3 },
-      { communityId: communityNoMel.id, name: "Tira-Dúvidas", slug: "tira-duvidas", description: "Sua dúvida tem resposta.", icon: "❓", type: "QA", sortOrder: 4 },
-      { communityId: communityNoMel.id, name: "Showcase", slug: "showcase", description: "Mostre seus trabalhos.", icon: "🏆", type: "SHOWCASE", sortOrder: 5 },
-      { communityId: communityNoMel.id, name: "Avisos", slug: "avisos", description: "Comunicados oficiais.", icon: "📢", type: "ANNOUNCEMENT", sortOrder: 6 },
+      { communityId: communityNoMel.id, name: "Tira-Dúvidas", slug: "tira-duvidas", description: "Sua dúvida tem resposta.", icon: "❓", type: "QA", sortOrder: 2 },
+      { communityId: communityNoMel.id, name: "Avisos", slug: "avisos", description: "Comunicados oficiais.", icon: "📢", type: "ANNOUNCEMENT", sortOrder: 3 },
     ],
   });
 
