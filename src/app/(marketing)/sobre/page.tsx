@@ -1,10 +1,18 @@
 export const metadata = { title: "Sobre nós — Detailer'HUB" };
 
 const TEAM = [
-  { name: "Rafael Mendes", role: "CEO & Co-fundador", initials: "RM" },
-  { name: "Ana Costa", role: "CTO & Co-fundadora", initials: "AC" },
-  { name: "Bruno Oliveira", role: "Head de Produto", initials: "BO" },
-  { name: "Carla Souza", role: "Head de Comunidades", initials: "CS" },
+  {
+    name: "Matheus Gouvea",
+    role: "Co-Fundador & CEO",
+    initials: "MG",
+    bio: "Apaixonado por automóveis e tecnologia, Matheus lidera a visão e estratégia da plataforma para conectar os melhores entusiastas do Brasil.",
+  },
+  {
+    name: "Lucas Paixão",
+    role: "Co-Fundador & CTO",
+    initials: "LP",
+    bio: "Engenheiro de software especializado em plataformas de comunidade, Lucas é responsável pela arquitetura e desenvolvimento do Detailer'HUB.",
+  },
 ];
 
 const VALUES = [
@@ -38,7 +46,7 @@ export default function SobrePage() {
             impactar positivamente a cultura de estética no país.
           </p>
           <p className="text-gray-400 leading-relaxed mt-4">
-            Para os membros, uma única assinatura de R$79/mês dá acesso a todas as comunidades da plataforma — sem barreiras,
+            Para os membros, uma única assinatura dá acesso a todas as comunidades da plataforma — sem barreiras,
             sem fragmentação. As melhores comunidades de estética automotiva do Brasil, em um só lugar.
           </p>
         </section>
@@ -59,14 +67,15 @@ export default function SobrePage() {
         {/* Time */}
         <section>
           <h2 className="text-2xl font-bold mb-6">O time</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {TEAM.map(({ name, role, initials }) => (
-              <div key={name} className="bg-white/5 border border-white/10 rounded-2xl p-5 text-center">
-                <div className="w-14 h-14 bg-[#009CD9] rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {TEAM.map(({ name, role, initials, bio }) => (
+              <div key={name} className="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-[#006079] to-[#009CD9] rounded-full flex items-center justify-center text-white font-bold text-xl mx-auto mb-4">
                   {initials}
                 </div>
-                <p className="font-semibold text-[#EEE6E4] text-sm">{name}</p>
-                <p className="text-xs text-gray-400 mt-0.5">{role}</p>
+                <p className="font-semibold text-[#EEE6E4]">{name}</p>
+                <p className="text-sm text-[#009CD9] mt-0.5 mb-3">{role}</p>
+                <p className="text-xs text-gray-400 leading-relaxed">{bio}</p>
               </div>
             ))}
           </div>
