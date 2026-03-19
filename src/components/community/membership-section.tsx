@@ -66,7 +66,7 @@ export function MembershipSection({
         // Platform membership (single subscription = access to all)
         if (platformRes?.ok) {
           const data = await platformRes.json();
-          if (data.data?.status === "ACTIVE") {
+          if (data.data?.hasMembership === true) {
             setStatus("platform");
             return;
           }

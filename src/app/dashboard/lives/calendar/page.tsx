@@ -90,19 +90,45 @@ export default function CalendarPage() {
     typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN) : null;
 
   // Fetch memberships → communities
+  // If platform membership is active, fetch ALL communities instead
   useEffect(() => {
     if (!token) return;
-    fetch("/api/memberships/me", { headers: { Authorization: `Bearer ${token}` } })
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.success) {
-          const comms: Community[] = (d.data ?? []).map(
-            (m: { community: Community }) => m.community
-          );
-          setCommunities(comms);
+
+    Promise.all([
+      fetch("/api/memberships/me", { headers: { Authorization: `Bearer ${token}` } })
+        .then((r) => r.json())
+        .catch(() => ({ success: false, data: [] })),
+      fetch("/api/platform-membership/me", { headers: { Authorization: `Bearer ${token}` } })
+        .then((r) => r.json())
+        .catch(() => ({ success: false, data: null })),
+    ]).then(async ([membershipData, platformData]) => {
+      if (platformData?.data?.hasMembership === true) {
+        // Platform member — load all published communities
+        try {
+          const allRes = await fetch("/api/communities?published=true&pageSize=100");
+          const allData = await allRes.json();
+          if (allData.success) {
+            const comms: Community[] = (allData.communities ?? []).map(
+              (c: { id: string; name: string; slug: string; primaryColor: string }) => ({
+                id: c.id,
+                name: c.name,
+                slug: c.slug,
+                primaryColor: c.primaryColor,
+              })
+            );
+            setCommunities(comms);
+          }
+        } catch {
+          // ignore
         }
-      })
-      .catch(() => {});
+      } else if (membershipData.success) {
+        // Per-community memberships
+        const comms: Community[] = (membershipData.data ?? []).map(
+          (m: { community: Community }) => m.community
+        );
+        setCommunities(comms);
+      }
+    });
   }, [token]);
 
   // Fetch events for current month across all communities

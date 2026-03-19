@@ -29,13 +29,13 @@ export default function SearchResults({ results, query, onClose }: SearchResults
   }
 
   const handleCommunityClick = (slug: string) => {
-    router.push(`/c/${slug}`);
+    router.push(`/community/${slug}/feed`);
     onClose();
   };
 
   const handlePostClick = (postId: string, communitySlug?: string) => {
     if (communitySlug) {
-      router.push(`/c/${communitySlug}/posts/${postId}`);
+      router.push(`/community/${communitySlug}/feed`);
     } else {
       router.push(`/dashboard/search?q=${encodeURIComponent(query)}`);
     }
@@ -43,7 +43,7 @@ export default function SearchResults({ results, query, onClose }: SearchResults
   };
 
   const handleMemberClick = (memberId: string) => {
-    router.push(`/dashboard/search?q=${encodeURIComponent(query)}`);
+    router.push(`/members/${memberId}`);
     onClose();
   };
 

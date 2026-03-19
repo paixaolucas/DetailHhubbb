@@ -3,12 +3,13 @@
 // =============================================================================
 // MEMBER — MINHAS COMUNIDADES
 // Shows all communities: active ones in color, others greyed out with lock icon
+// Platform members (single subscription) have access to ALL communities.
 // =============================================================================
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Users, Lock, CheckCircle, Search, BookOpen, Video } from "lucide-react";
+import { Users, Lock, CheckCircle, Search, BookOpen, TrendingUp } from "lucide-react";
 import { STORAGE_KEYS } from "@/lib/constants";
 
 type Community = {
@@ -17,18 +18,20 @@ type Community = {
   slug: string;
   shortDescription?: string | null;
   logoUrl?: string | null;
+  bannerUrl?: string | null;
   primaryColor: string;
   memberCount: number;
   tags: string[];
   influencer: {
     displayName: string;
-    user: { firstName: string; lastName: string };
+    user: { firstName: string; lastName: string; avatarUrl?: string | null };
   };
 };
 
 export default function MinhasComunidadesPage() {
   const [communities, setCommunities] = useState<Community[]>([]);
   const [myCommunityIds, setMyCommunityIds] = useState<string[]>([]);
+  const [hasPlatformMembership, setHasPlatformMembership] = useState(false);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
@@ -39,16 +42,29 @@ export default function MinhasComunidadesPage() {
         const headers: Record<string, string> = {};
         if (token) headers["Authorization"] = `Bearer ${token}`;
 
-        const [commRes, myRes] = await Promise.all([
+        // Fetch all communities + platform membership + per-community membership in parallel
+        const [commRes, platformRes, myRes] = await Promise.all([
           fetch("/api/communities?pageSize=100"),
-          fetch("/api/memberships/me", { headers }),
+          fetch("/api/platform-membership/me", { headers }).catch(() => null),
+          fetch("/api/memberships/me", { headers }).catch(() => null),
         ]);
 
         const commData = await commRes.json();
-        const myData = myRes.ok ? await myRes.json() : { data: [] };
+        const platformData = platformRes?.ok ? await platformRes.json() : null;
+        const myData = myRes?.ok ? await myRes.json() : { data: [] };
 
-        if (commData.success) setCommunities(commData.communities ?? []);
-        if (myData.success) setMyCommunityIds(myData.data ?? []);
+        const allCommunities: Community[] = commData.success ? (commData.communities ?? []) : [];
+        setCommunities(allCommunities);
+
+        // If platform membership is active → access to ALL communities
+        if (platformData?.data?.hasMembership === true) {
+          setHasPlatformMembership(true);
+          setMyCommunityIds(allCommunities.map((c) => c.id));
+        } else {
+          // Fall back to per-community memberships
+          setHasPlatformMembership(false);
+          setMyCommunityIds(myData.data ?? []);
+        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -69,14 +85,22 @@ export default function MinhasComunidadesPage() {
   const mine = filtered.filter((c) => myCommunityIds.includes(c.id));
   const others = filtered.filter((c) => !myCommunityIds.includes(c.id));
 
+  // Top 3 by memberCount for "Explore mais" section
+  const topCommunities = [...communities]
+    .sort((a, b) => b.memberCount - a.memberCount)
+    .slice(0, 3);
+
   const hostName = (c: Community) =>
     c.influencer.displayName ||
     `${c.influencer.user.firstName} ${c.influencer.user.lastName}`;
 
+  const avatarInitial = (c: Community) =>
+    (c.influencer.displayName || c.influencer.user.firstName || "?")[0].toUpperCase();
+
   function CommunityCard({ community, hasAccess }: { community: Community; hasAccess: boolean }) {
     const card = (
       <div
-        className={`relative rounded-2xl p-6 border transition-all duration-300 group cursor-pointer ${
+        className={`relative rounded-2xl border transition-all duration-300 group cursor-pointer overflow-hidden ${
           hasAccess
             ? "bg-white/5 border-white/10 hover:border-white/25"
             : "bg-white/[0.02] border-white/5 hover:border-[#007A99]/30"
@@ -96,80 +120,100 @@ export default function MinhasComunidadesPage() {
 
         {/* Active badge */}
         {hasAccess && (
-          <div className="absolute top-4 right-4">
-            <span className="flex items-center gap-1 text-xs bg-green-500/15 border border-green-500/25 text-green-400 px-2.5 py-1 rounded-full font-medium">
+          <div className="absolute top-3 right-3 z-20">
+            <span className="flex items-center gap-1 text-xs bg-green-500/15 border border-green-500/25 text-green-400 px-2.5 py-1 rounded-full font-medium backdrop-blur-sm">
               <CheckCircle className="w-3 h-3" /> Acesso ativo
             </span>
           </div>
         )}
 
-        {/* Header */}
-        <div className="flex items-start gap-4 mb-4 pr-6">
-          {community.logoUrl ? (
+        {/* Banner */}
+        <div className={`relative h-28 overflow-hidden rounded-t-2xl ${!hasAccess ? "grayscale opacity-50" : ""}`}>
+          {community.bannerUrl ? (
             <Image
-              src={community.logoUrl}
-              alt={community.name}
-              width={48}
-              height={48}
-              className={`w-12 h-12 rounded-xl object-cover flex-shrink-0 ${!hasAccess ? "opacity-40 grayscale" : ""}`}
+              src={community.bannerUrl}
+              alt={`${community.name} banner`}
+              fill
+              className="object-cover"
             />
           ) : (
             <div
-              className={`w-12 h-12 rounded-xl flex items-center justify-center text-[#EEE6E4] font-bold text-lg flex-shrink-0 ${!hasAccess ? "opacity-40 grayscale" : ""}`}
-              style={{ backgroundColor: community.primaryColor }}
-            >
-              {community.name.charAt(0)}
-            </div>
+              className="w-full h-full"
+              style={{ backgroundColor: `${community.primaryColor}30` }}
+            />
           )}
-          <div className="flex-1 min-w-0">
-            <h3 className={`font-semibold text-lg leading-tight truncate ${hasAccess ? "text-[#EEE6E4] group-hover:text-[#009CD9] transition-colors" : "text-gray-500"}`}>
-              {community.name}
-            </h3>
-            <p className={`text-xs mt-0.5 truncate ${hasAccess ? "text-gray-500" : "text-gray-400"}`}>
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A1A]/80 via-transparent to-transparent" />
+        </div>
+
+        {/* Content */}
+        <div className="p-5">
+          {/* Influencer row */}
+          <div className="flex items-center gap-2 mb-3 -mt-1">
+            {community.influencer.user.avatarUrl ? (
+              <Image
+                src={community.influencer.user.avatarUrl}
+                alt={hostName(community)}
+                width={28}
+                height={28}
+                className={`w-7 h-7 rounded-full object-cover border-2 border-[#1A1A1A] flex-shrink-0 ${!hasAccess ? "opacity-40 grayscale" : ""}`}
+              />
+            ) : (
+              <div
+                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white border-2 border-[#1A1A1A] flex-shrink-0 ${!hasAccess ? "opacity-40 grayscale" : ""}`}
+                style={{ backgroundColor: community.primaryColor }}
+              >
+                {avatarInitial(community)}
+              </div>
+            )}
+            <p className={`text-xs truncate ${hasAccess ? "text-gray-400" : "text-gray-600"}`}>
               {hostName(community)}
             </p>
           </div>
-        </div>
 
-        {/* Description */}
-        {community.shortDescription && (
-          <p className={`text-sm leading-relaxed mb-4 line-clamp-2 ${hasAccess ? "text-gray-400" : "text-gray-400"}`}>
-            {community.shortDescription}
-          </p>
-        )}
+          {/* Community name */}
+          <h3 className={`font-semibold text-lg leading-tight mb-1 ${hasAccess ? "text-[#EEE6E4] group-hover:text-[#009CD9] transition-colors" : "text-gray-500"}`}>
+            {community.name}
+          </h3>
 
-        {/* Tags */}
-        {community.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-4">
-            {community.tags.slice(0, 3).map((tag) => (
-              <span
-                key={tag}
-                className={`px-2.5 py-0.5 rounded-full text-xs capitalize ${
-                  hasAccess ? "" : "opacity-40"
-                }`}
-                style={
-                  hasAccess
-                    ? { backgroundColor: `${community.primaryColor}20`, color: community.primaryColor }
-                    : { backgroundColor: "rgba(255,255,255,0.05)", color: "#6b7280" }
-                }
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
-
-        {/* Footer */}
-        <div className={`flex items-center justify-between text-xs pt-4 border-t ${hasAccess ? "border-white/5 text-gray-500" : "border-white/[0.03] text-gray-400"}`}>
-          <div className="flex items-center gap-1.5">
-            <Users className="w-3.5 h-3.5" />
-            {community.memberCount.toLocaleString("pt-BR")} membros
-          </div>
-          {hasAccess && (
-            <span className="text-[#009CD9] font-medium">
-              Entrar na comunidade →
-            </span>
+          {/* Description */}
+          {community.shortDescription && (
+            <p className={`text-sm leading-relaxed mb-3 line-clamp-2 ${hasAccess ? "text-gray-400" : "text-gray-600"}`}>
+              {community.shortDescription}
+            </p>
           )}
+
+          {/* Tags */}
+          {community.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-3">
+              {community.tags.slice(0, 3).map((tag) => (
+                <span
+                  key={tag}
+                  className={`px-2.5 py-0.5 rounded-full text-xs capitalize ${!hasAccess ? "opacity-40" : ""}`}
+                  style={
+                    hasAccess
+                      ? { backgroundColor: `${community.primaryColor}20`, color: community.primaryColor }
+                      : { backgroundColor: "rgba(255,255,255,0.05)", color: "#6b7280" }
+                  }
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Footer */}
+          <div className={`flex items-center justify-between text-xs pt-3 border-t ${hasAccess ? "border-white/5 text-gray-500" : "border-white/[0.03] text-gray-600"}`}>
+            <div className="flex items-center gap-1.5">
+              <Users className="w-3.5 h-3.5" />
+              {community.memberCount.toLocaleString("pt-BR")} membros
+            </div>
+            {hasAccess && (
+              <span className="text-[#009CD9] font-medium">
+                Entrar →
+              </span>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -198,7 +242,9 @@ export default function MinhasComunidadesPage() {
       <div>
         <h1 className="text-2xl font-bold text-[#EEE6E4] mb-1">Minhas Comunidades</h1>
         <p className="text-gray-400 text-sm">
-          Comunidades com acesso ativo aparecem em destaque. As demais estão disponíveis para solicitar acesso.
+          {hasPlatformMembership
+            ? "Sua assinatura Detailer'HUB dá acesso a todas as comunidades da plataforma."
+            : "Comunidades com acesso ativo aparecem em destaque. As demais estão disponíveis para solicitar acesso."}
         </p>
       </div>
 
@@ -254,17 +300,15 @@ export default function MinhasComunidadesPage() {
       {loading ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="glass-card p-6 h-52 animate-pulse">
-              <div className="flex gap-4 mb-4">
-                <div className="w-12 h-12 bg-white/5 rounded-xl" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-white/5 rounded w-3/4" />
-                  <div className="h-3 bg-white/10 rounded w-1/2" />
+            <div key={i} className="glass-card overflow-hidden h-64 animate-pulse rounded-2xl">
+              <div className="h-28 bg-white/5" />
+              <div className="p-5 space-y-3">
+                <div className="flex gap-3">
+                  <div className="w-7 h-7 bg-white/5 rounded-full" />
+                  <div className="h-3 bg-white/5 rounded w-1/3" />
                 </div>
-              </div>
-              <div className="space-y-2">
-                <div className="h-3 bg-white/10 rounded" />
-                <div className="h-3 bg-white/10 rounded w-4/5" />
+                <div className="h-4 bg-white/5 rounded w-3/4" />
+                <div className="h-3 bg-white/10 rounded w-full" />
               </div>
             </div>
           ))}
@@ -314,6 +358,44 @@ export default function MinhasComunidadesPage() {
               <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-400 font-medium">Nenhuma comunidade disponível ainda</p>
               <p className="text-gray-400 text-sm mt-1">Volte em breve para ver as primeiras comunidades da plataforma</p>
+            </div>
+          )}
+
+          {/* Explore mais — top communities by memberCount */}
+          {topCommunities.length > 0 && !search && (
+            <div>
+              <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-[#009CD9]" />
+                Em alta
+              </h2>
+              <div className="grid md:grid-cols-3 gap-4">
+                {topCommunities.map((c) => {
+                  const hasAccess = myCommunityIds.includes(c.id);
+                  return (
+                    <Link
+                      key={c.id}
+                      href={hasAccess ? `/community/${c.slug}/feed` : `/community/${c.slug}`}
+                      className="relative overflow-hidden rounded-2xl border border-[#006079]/30 bg-gradient-to-br from-[#006079]/10 to-[#009CD9]/5 hover:border-[#009CD9]/40 transition-all group"
+                    >
+                      {c.bannerUrl && (
+                        <div className="relative h-20 overflow-hidden">
+                          <Image src={c.bannerUrl} alt={c.name} fill className="object-cover opacity-40" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A1A]/80 to-transparent" />
+                        </div>
+                      )}
+                      <div className="p-4">
+                        <p className="font-semibold text-[#EEE6E4] group-hover:text-[#009CD9] transition-colors truncate">
+                          {c.name}
+                        </p>
+                        <div className="flex items-center gap-1.5 mt-1 text-xs text-gray-500">
+                          <Users className="w-3 h-3" />
+                          {c.memberCount.toLocaleString("pt-BR")} membros
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
           )}
         </>

@@ -1,10 +1,13 @@
 // =============================================================================
 // GET  /api/users/[id]/profile — Public user profile (no auth required)
 // PATCH /api/users/[id]/profile — Update own profile (auth required)
+//
+// NOTE: carColor, carPower, carFuel, carPhotos are stored inside the
+// socialLinks Json field under a "garage" key, since the UserProfile model
+// does not yet have a dedicated metadata column.
 // =============================================================================
 
 import { NextRequest, NextResponse } from "next/server";
-import { withAuth } from "@/middleware/auth.middleware";
 import { getSessionFromRequest } from "@/middleware/auth.middleware";
 import { db } from "@/lib/db";
 import { z } from "zod";
@@ -20,7 +23,23 @@ const updateProfileSchema = z.object({
   interests: z.array(z.string()).optional(),
   socialLinks: z.record(z.string(), z.string()).optional(),
   isPublic: z.boolean().optional(),
+  // Garage metadata fields (stored in socialLinks JSON under "garage" key)
+  carColor: z.string().max(50).optional(),
+  carPower: z.string().max(20).optional(),
+  carFuel: z.string().max(30).optional(),
+  carPhotos: z.array(z.string().url()).max(10).optional(),
 });
+
+// Helper to extract garage extras from the socialLinks Json field
+function extractGarageFromSocialLinks(socialLinks: unknown): Record<string, unknown> {
+  if (socialLinks && typeof socialLinks === "object" && !Array.isArray(socialLinks)) {
+    const sl = socialLinks as Record<string, unknown>;
+    if (sl.__garage && typeof sl.__garage === "object") {
+      return sl.__garage as Record<string, unknown>;
+    }
+  }
+  return {};
+}
 
 // ─── GET — Public profile ─────────────────────────────────────────────────────
 
@@ -57,7 +76,14 @@ export async function GET(
       return NextResponse.json({ success: true, data: null });
     }
 
-    return NextResponse.json({ success: true, data: profile });
+    // Expose garage extras as a top-level "metadata" key for the client
+    const garage = extractGarageFromSocialLinks(profile.socialLinks);
+    const responseData = {
+      ...profile,
+      metadata: garage,
+    };
+
+    return NextResponse.json({ success: true, data: responseData });
   } catch (error) {
     console.error("[UserProfile GET]", error);
     return NextResponse.json(
@@ -104,15 +130,55 @@ export async function PATCH(
       );
     }
 
-    const data = parsed.data;
+    const { carColor, carPower, carFuel, carPhotos, socialLinks, ...standardData } = parsed.data;
+
+    // Read existing profile to merge socialLinks / garage data
+    const existingProfile = await db.userProfile.findUnique({
+      where: { userId: id },
+      select: { socialLinks: true },
+    });
+
+    // Existing socialLinks (excluding __garage)
+    const existingSL = (existingProfile?.socialLinks &&
+      typeof existingProfile.socialLinks === "object" &&
+      !Array.isArray(existingProfile.socialLinks))
+      ? (existingProfile.socialLinks as Record<string, unknown>)
+      : {};
+
+    // Existing garage extras
+    const existingGarage = extractGarageFromSocialLinks(existingSL);
+
+    // New garage extras (merge)
+    const newGarage: Record<string, unknown> = {
+      ...existingGarage,
+      ...(carColor !== undefined && { carColor }),
+      ...(carPower !== undefined && { carPower }),
+      ...(carFuel !== undefined && { carFuel }),
+      ...(carPhotos !== undefined && { carPhotos }),
+    };
+
+    // Build final socialLinks: merge caller-supplied socialLinks with __garage
+    const incomingSL = socialLinks ?? {};
+    const { __garage: _drop, ...existingPublicSL } = existingSL as Record<string, unknown> & { __garage?: unknown };
+    const finalSocialLinks: Record<string, unknown> = {
+      ...existingPublicSL,
+      ...incomingSL,
+      __garage: newGarage,
+    };
 
     const profile = await db.userProfile.upsert({
       where: { userId: id },
-      update: { ...data },
-      create: { userId: id, ...data },
+      update: { ...standardData, socialLinks: finalSocialLinks as object },
+      create: { userId: id, ...standardData, socialLinks: finalSocialLinks as object },
     });
 
-    return NextResponse.json({ success: true, data: profile });
+    // Return metadata (garage extras) alongside profile for client convenience
+    const responseData = {
+      ...profile,
+      metadata: newGarage,
+    };
+
+    return NextResponse.json({ success: true, data: responseData });
   } catch (error) {
     console.error("[UserProfile PATCH]", error);
     return NextResponse.json(

@@ -132,12 +132,10 @@ export default function GaragePage() {
           carBrand: form.carBrand || undefined,
           carModel: form.carModel || undefined,
           carYear: form.carYear ? parseInt(form.carYear) : undefined,
-          metadata: {
-            carColor: form.carColor || undefined,
-            carPower: form.carPower || undefined,
-            carFuel: form.carFuel || undefined,
-            carPhotos: allPhotos,
-          },
+          carColor: form.carColor || undefined,
+          carPower: form.carPower || undefined,
+          carFuel: form.carFuel || undefined,
+          carPhotos: allPhotos,
         }),
       });
 
