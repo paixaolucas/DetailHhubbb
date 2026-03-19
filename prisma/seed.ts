@@ -935,8 +935,8 @@ async function main() {
   // =============================================================================
   await db.payment.createMany({
     data: [
-      { userId: member1.id, amount: 837, currency: "brl", status: "SUCCEEDED", type: "SUBSCRIPTION", createdAt: new Date(Date.now() - 30 * 86400000) },
-      { userId: member2.id, amount: 837, currency: "brl", status: "SUCCEEDED", type: "SUBSCRIPTION", createdAt: new Date(Date.now() - 25 * 86400000) },
+      { userId: member1.id, amount: 948, currency: "brl", status: "SUCCEEDED", type: "SUBSCRIPTION", createdAt: new Date(Date.now() - 30 * 86400000) },
+      { userId: member2.id, amount: 948, currency: "brl", status: "SUCCEEDED", type: "SUBSCRIPTION", createdAt: new Date(Date.now() - 25 * 86400000) },
     ],
   });
   console.log("✅ Payment history created");

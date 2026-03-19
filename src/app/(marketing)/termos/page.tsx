@@ -35,7 +35,7 @@ export default function TermosPage() {
 
           <h2 className="text-xl font-bold text-[#EEE6E4] mt-8 mb-3">4. Assinatura e pagamento</h2>
           <p className="text-gray-400 leading-relaxed">
-            A assinatura da plataforma custa R$837/ano e dá acesso a todas as comunidades. O pagamento é processado via Stripe
+            A assinatura da plataforma custa R$948/ano e dá acesso a todas as comunidades. O pagamento é processado via Stripe
             e cobrado antecipadamente pelo período contratado. Não há reembolso após 7 dias corridos do pagamento,
             conforme o Código de Defesa do Consumidor.
           </p>

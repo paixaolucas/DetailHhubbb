@@ -9,7 +9,7 @@
 
 **Detailer'HUB** é uma plataforma de comunidades automotivas premium.
 - Influencers criam comunidades
-- Membros assinam a **plataforma** (assinatura única R$837/ano = R$69,75/mês) e acessam TUDO
+- Membros assinam a **plataforma** (assinatura única R$948/ano = R$79/mês) e acessam TUDO
 - Inspirado no modelo Circle (uma assinatura, acesso a todas as comunidades)
 
 **Stack**: Next.js 14 App Router, TypeScript, Prisma, PostgreSQL (Neon), Stripe, OpenAI, Resend, UploadThing
@@ -72,7 +72,7 @@ npx tsc --noEmit                       # checar erros TypeScript (deve retornar 
 ## Modelo de Negócio
 
 ### Atual (implementado)
-- **Assinatura da plataforma**: R$600/ano via `PlatformPlan` → dá acesso a TODAS as comunidades
+- **Assinatura da plataforma**: R$948/ano via `PlatformPlan` → dá acesso a TODAS as comunidades
 - Stripe Checkout em `/api/stripe/platform-checkout`
 - Membros sem assinatura são redirecionados para `/dashboard/assinar`
 

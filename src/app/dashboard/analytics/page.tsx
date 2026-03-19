@@ -28,8 +28,8 @@ const chartStyle = {
   },
 };
 
-const PRECO_ANUAL = 837;
-const PRECO_PIX   = 837 / 12; // R$69,75/mês
+const PRECO_ANUAL = 948;
+const PRECO_PIX   = 79; // R$79/mês
 const COMISSAO    = 0.15;
 
 const QUICK_PERIODS = [
