@@ -701,84 +701,6 @@ function MemberDashboardInner({ userName }: { userName: string }) {
         );
       })()}
 
-      {/* Recommended posts feed */}
-      {(recLoading || recommended.length > 0) && (
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <Activity className="w-5 h-5 text-[#009CD9]" />
-            <h2 className="text-lg font-bold text-[#EEE6E4]">Em alta nas comunidades</h2>
-          </div>
-          {recLoading ? (
-            <div className="space-y-3 animate-pulse">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="glass-card p-4 flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-white/10 flex-shrink-0" />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-3 bg-white/10 rounded w-1/4" />
-                    <div className="h-4 bg-white/10 rounded w-3/4" />
-                    <div className="h-3 bg-white/10 rounded w-1/2" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {recommended.map((post) => {
-                const authorName = `${post.author.firstName} ${post.author.lastName}`;
-                const authorInitials = `${post.author.firstName?.[0] ?? ""}${post.author.lastName?.[0] ?? ""}`.toUpperCase();
-                const timeAgo = (() => {
-                  const diff = Date.now() - new Date(post.createdAt).getTime();
-                  const mins = Math.floor(diff / 60000);
-                  if (mins < 60) return `${mins}m`;
-                  const hours = Math.floor(mins / 60);
-                  if (hours < 24) return `${hours}h`;
-                  return `${Math.floor(hours / 24)}d`;
-                })();
-                const feedLink = `/community/${post.space?.community?.slug}/feed/${post.space?.slug}`;
-                return (
-                  <Link
-                    key={post.id}
-                    href={feedLink}
-                    className="glass-card p-4 flex gap-3 hover:border-[#009CD9]/20 transition-all block"
-                  >
-                    <div className="flex-shrink-0">
-                      {post.author.avatarUrl ? (
-                        <Image src={post.author.avatarUrl} alt={authorName} width={32} height={32} className="w-8 h-8 rounded-full object-cover" />
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#006079] to-[#009CD9] flex items-center justify-center text-white text-xs font-bold">
-                          {authorInitials}
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className="text-xs text-gray-400 font-medium">{authorName}</span>
-                        <span className="text-xs text-gray-600">·</span>
-                        <span
-                          className="text-xs px-1.5 py-0.5 rounded text-white/80"
-                          style={{ backgroundColor: `${post.space?.community?.primaryColor ?? "#006079"}80` }}
-                        >
-                          {post.space?.community?.name}
-                        </span>
-                        <span className="text-xs text-gray-500 ml-auto">{timeAgo}</span>
-                      </div>
-                      {post.title && (
-                        <p className="text-sm font-semibold text-[#EEE6E4] leading-tight mb-1">{post.title}</p>
-                      )}
-                      <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">{post.body}</p>
-                      <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
-                        <span>{post._count.reactions} reações</span>
-                        <span>{post._count.comments} comentários</span>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      )}
-
       {/* Main layout: communities + leaderboard side by side */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Communities — 2/3 */}
@@ -996,6 +918,84 @@ function MemberDashboardInner({ userName }: { userName: string }) {
           </div>
         </div>
       </div>
+
+      {/* Recommended posts feed */}
+      {(recLoading || recommended.length > 0) && (
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <Activity className="w-5 h-5 text-[#009CD9]" />
+            <h2 className="text-lg font-bold text-[#EEE6E4]">Em alta nas comunidades</h2>
+          </div>
+          {recLoading ? (
+            <div className="space-y-3 animate-pulse">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="glass-card p-4 flex gap-3">
+                  <div className="w-8 h-8 rounded-full bg-white/10 flex-shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3 bg-white/10 rounded w-1/4" />
+                    <div className="h-4 bg-white/10 rounded w-3/4" />
+                    <div className="h-3 bg-white/10 rounded w-1/2" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {recommended.map((post) => {
+                const authorName = `${post.author.firstName} ${post.author.lastName}`;
+                const authorInitials = `${post.author.firstName?.[0] ?? ""}${post.author.lastName?.[0] ?? ""}`.toUpperCase();
+                const timeAgo = (() => {
+                  const diff = Date.now() - new Date(post.createdAt).getTime();
+                  const mins = Math.floor(diff / 60000);
+                  if (mins < 60) return `${mins}m`;
+                  const hours = Math.floor(mins / 60);
+                  if (hours < 24) return `${hours}h`;
+                  return `${Math.floor(hours / 24)}d`;
+                })();
+                const feedLink = `/community/${post.space?.community?.slug}/feed/${post.space?.slug}`;
+                return (
+                  <Link
+                    key={post.id}
+                    href={feedLink}
+                    className="glass-card p-4 flex gap-3 hover:border-[#009CD9]/20 transition-all block"
+                  >
+                    <div className="flex-shrink-0">
+                      {post.author.avatarUrl ? (
+                        <Image src={post.author.avatarUrl} alt={authorName} width={32} height={32} className="w-8 h-8 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#006079] to-[#009CD9] flex items-center justify-center text-white text-xs font-bold">
+                          {authorInitials}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className="text-xs text-gray-400 font-medium">{authorName}</span>
+                        <span className="text-xs text-gray-600">·</span>
+                        <span
+                          className="text-xs px-1.5 py-0.5 rounded text-white/80"
+                          style={{ backgroundColor: `${post.space?.community?.primaryColor ?? "#006079"}80` }}
+                        >
+                          {post.space?.community?.name}
+                        </span>
+                        <span className="text-xs text-gray-500 ml-auto">{timeAgo}</span>
+                      </div>
+                      {post.title && (
+                        <p className="text-sm font-semibold text-[#EEE6E4] leading-tight mb-1">{post.title}</p>
+                      )}
+                      <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">{post.body}</p>
+                      <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                        <span>{post._count.reactions} reações</span>
+                        <span>{post._count.comments} comentários</span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,17 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowLeft, Settings, Palette, Users, AlertTriangle,
   Save, Trash2, Plus, Check, UserX, Crown, HelpCircle, Star, Pencil, X, Zap, Megaphone,
+  Upload,
 } from "lucide-react";
 import { useToast } from "@/components/ui/toast-provider";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import OnboardingChecklist from "@/components/community/OnboardingChecklist";
 import { STORAGE_KEYS } from "@/lib/constants";
+import { useUploadThing } from "@/utils/uploadthing";
 
 const TABS = [
   { id: "general", label: "Geral", icon: Settings },
@@ -83,6 +85,30 @@ export default function CommunitySettingsPage() {
 
   const [appearanceForm, setAppearanceForm] = useState({
     primaryColor: "#006079", logoUrl: "", bannerUrl: "",
+  });
+
+  // Image upload state
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [bannerUploading, setBannerUploading] = useState(false);
+
+  const { startUpload: startLogoUpload } = useUploadThing("communityImageUploader", {
+    onClientUploadComplete: (res) => {
+      const url = res?.[0]?.url;
+      if (url) setAppearanceForm((p) => ({ ...p, logoUrl: url }));
+      setLogoUploading(false);
+    },
+    onUploadError: () => setLogoUploading(false),
+  });
+
+  const { startUpload: startBannerUpload } = useUploadThing("communityImageUploader", {
+    onClientUploadComplete: (res) => {
+      const url = res?.[0]?.url;
+      if (url) setAppearanceForm((p) => ({ ...p, bannerUrl: url }));
+      setBannerUploading(false);
+    },
+    onUploadError: () => setBannerUploading(false),
   });
 
   // Points allocation modal
@@ -477,28 +503,80 @@ export default function CommunitySettingsPage() {
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Logo upload */}
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1.5">URL do Logo</label>
-              <input type="url" value={appearanceForm.logoUrl} onChange={(e) => setAppearanceForm((p) => ({ ...p, logoUrl: e.target.value }))} placeholder="https://..." className={fieldClass()} />
+              <label className="block text-sm font-medium text-gray-400 mb-1.5">Logo da comunidade</label>
+              <div className="flex items-center gap-3">
+                {appearanceForm.logoUrl ? (
+                  <Image src={appearanceForm.logoUrl} alt="logo" width={48} height={48} className="w-12 h-12 rounded-xl object-cover border border-white/10 flex-shrink-0" />
+                ) : (
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold text-white flex-shrink-0" style={{ backgroundColor: appearanceForm.primaryColor }}>
+                    {community.name.charAt(0)}
+                  </div>
+                )}
+                <div className="flex-1 space-y-1.5">
+                  <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => {
+                    const file = e.target.files?.[0]; if (!file) return;
+                    setLogoUploading(true); startLogoUpload([file]);
+                  }} />
+                  <button type="button" onClick={() => logoInputRef.current?.click()} disabled={logoUploading}
+                    className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 text-sm px-3 py-2 rounded-xl transition-all disabled:opacity-50">
+                    {logoUploading ? <div className="w-3.5 h-3.5 border-2 border-[#009CD9] border-t-transparent rounded-full animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
+                    {logoUploading ? "Enviando..." : "Escolher imagem"}
+                  </button>
+                  <input type="url" value={appearanceForm.logoUrl} onChange={(e) => setAppearanceForm((p) => ({ ...p, logoUrl: e.target.value }))} placeholder="ou cole uma URL" className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-gray-400 placeholder-gray-600 focus:outline-none focus:border-[#009CD9]" />
+                </div>
+              </div>
             </div>
+            {/* Banner upload */}
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1.5">URL da Capa</label>
-              <input type="url" value={appearanceForm.bannerUrl} onChange={(e) => setAppearanceForm((p) => ({ ...p, bannerUrl: e.target.value }))} placeholder="https://..." className={fieldClass()} />
+              <label className="block text-sm font-medium text-gray-400 mb-1.5">Banner (capa)</label>
+              <div className="space-y-2">
+                {appearanceForm.bannerUrl ? (
+                  <div className="relative h-16 rounded-xl overflow-hidden border border-white/10">
+                    <Image src={appearanceForm.bannerUrl} alt="banner" fill className="object-cover" />
+                    <button type="button" onClick={() => setAppearanceForm((p) => ({ ...p, bannerUrl: "" }))}
+                      className="absolute top-1 right-1 w-6 h-6 bg-black/60 rounded-full flex items-center justify-center hover:bg-red-500/60 transition-colors">
+                      <X className="w-3.5 h-3.5 text-white" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="h-16 rounded-xl border border-dashed border-white/20 flex items-center justify-center" style={{ backgroundColor: `${appearanceForm.primaryColor}15` }}>
+                    <p className="text-xs text-gray-600">Sem banner</p>
+                  </div>
+                )}
+                <input ref={bannerInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => {
+                  const file = e.target.files?.[0]; if (!file) return;
+                  setBannerUploading(true); startBannerUpload([file]);
+                }} />
+                <button type="button" onClick={() => bannerInputRef.current?.click()} disabled={bannerUploading}
+                  className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 text-sm px-3 py-2 rounded-xl transition-all disabled:opacity-50">
+                  {bannerUploading ? <div className="w-3.5 h-3.5 border-2 border-[#009CD9] border-t-transparent rounded-full animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
+                  {bannerUploading ? "Enviando..." : "Escolher banner"}
+                </button>
+                <input type="url" value={appearanceForm.bannerUrl} onChange={(e) => setAppearanceForm((p) => ({ ...p, bannerUrl: e.target.value }))} placeholder="ou cole uma URL" className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-gray-400 placeholder-gray-600 focus:outline-none focus:border-[#009CD9]" />
+              </div>
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-3">Preview</label>
+            <label className="block text-sm font-medium text-gray-400 mb-3">Preview do card</label>
             <div className="border border-white/10 rounded-xl overflow-hidden max-w-xs">
               {appearanceForm.bannerUrl ? (
-                <Image src={appearanceForm.bannerUrl} alt="cover" width={320} height={80} className="h-20 w-full object-cover" />
+                <div className="relative h-20 w-full">
+                  <Image src={appearanceForm.bannerUrl} alt="cover" fill className="object-cover" />
+                </div>
               ) : (
-                <div className="h-20 relative grid-pattern opacity-20" style={{ backgroundColor: appearanceForm.primaryColor }} />
+                <div className="h-20" style={{ background: `linear-gradient(135deg, ${appearanceForm.primaryColor}60 0%, ${appearanceForm.primaryColor}20 100%)` }} />
               )}
               <div className="p-4 bg-[#222222]">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-[#EEE6E4] font-bold -mt-6 border-2 border-[#1A1A1A]" style={{ backgroundColor: appearanceForm.primaryColor }}>
-                    {community.name.charAt(0)}
-                  </div>
+                  {appearanceForm.logoUrl ? (
+                    <Image src={appearanceForm.logoUrl} alt="logo" width={40} height={40} className="w-10 h-10 rounded-xl object-cover -mt-6 border-2 border-[#1A1A1A]" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center text-[#EEE6E4] font-bold -mt-6 border-2 border-[#1A1A1A]" style={{ backgroundColor: appearanceForm.primaryColor }}>
+                      {community.name.charAt(0)}
+                    </div>
+                  )}
                   <p className="font-semibold text-sm text-[#EEE6E4]">{community.name}</p>
                 </div>
               </div>

@@ -36,16 +36,18 @@ export const GET = withRole(UserRole.INFLUENCER_ADMIN)(async (_req, { session })
     select: { price: true, interval: true, intervalCount: true },
   });
 
-  // R$837/ano ÷ 12 = R$69.75/mês — fallback se não houver plano no banco
+  // R$948/ano ou R$79/mês — fallback se não houver plano no banco
   const annualPrice = activePlan?.interval === "year"
     ? Number(activePlan.price)
     : activePlan
       ? Number(activePlan.price) * (12 / (activePlan.intervalCount ?? 1))
-      : 837;
+      : 948;
 
   const monthlyEquivalent = activePlan?.interval === "month"
     ? Number(activePlan.price) / (activePlan.intervalCount ?? 1)
-    : annualPrice / 12;
+    : activePlan
+      ? annualPrice / 12
+      : 79;
 
   // ── Member counts ───────────────────────────────────────────────────────────
   const [totalReferred, newThisMonth, canceledThisMonth] = await Promise.all([

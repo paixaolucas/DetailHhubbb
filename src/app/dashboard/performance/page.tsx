@@ -182,17 +182,39 @@ export default function PerformancePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
-    fetch("/api/influencers/me/performance", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((r) => r.json())
-      .then((d) => {
+    async function load() {
+      let token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+      if (!token) {
+        const refreshToken = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
+        if (refreshToken) {
+          try {
+            const r = await fetch("/api/auth/refresh", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ refreshToken }),
+            });
+            const d = await r.json();
+            if (r.ok && d.data?.accessToken) {
+              token = d.data.accessToken;
+              localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token!);
+            }
+          } catch { /* ignore */ }
+        }
+      }
+      try {
+        const r = await fetch("/api/influencers/me/performance", {
+          headers: { Authorization: `Bearer ${token ?? ""}` },
+        });
+        const d = await r.json();
         if (d.success) setData(d.data);
         else setError(d.error ?? "Erro ao carregar dados");
-      })
-      .catch(() => setError("Erro de conexão"))
-      .finally(() => setLoading(false));
+      } catch {
+        setError("Erro de conexão");
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
   }, []);
 
   if (loading) {

@@ -174,7 +174,7 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
           <p className="text-xs text-gray-600 px-2 py-2">Nenhum canal disponível</p>
         )}
 
-        {spaces.map((space) => {
+        {spaces.slice(0, 3).map((space) => {
           const href = `/community/${communitySlug}/feed/${space.slug}`;
           const isActive = space.slug === activeSpaceSlug;
           return (

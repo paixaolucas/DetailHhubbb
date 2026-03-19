@@ -39,8 +39,9 @@ const COMM_TYPE_LABEL: Record<string, string> = {
 };
 
 // Preços da plataforma
-const PRECO_ANUAL = 837;      // R$837/ano
-const PRECO_PIX = 837 / 12;   // R$69,75/mês (equivalente mensal do plano anual)
+const PRECO_ANUAL = 948;      // R$948/ano
+const PRECO_MENSAL = 79;      // R$79/mês
+const PRECO_PIX = PRECO_MENSAL; // alias for backward compat
 const COMISSAO = 0.15;        // 15% plataforma
 
 const QUICK_PERIODS = [
@@ -471,7 +472,7 @@ export default function FinanceiroPage() {
               </div>
               <div className="mt-3 p-2.5 bg-emerald-500/5 rounded-xl border border-emerald-500/10">
                 <p className="text-xs text-emerald-400 text-center">
-                  Mesmo valor do plano anual fracionado: <strong>R$837 ÷ 12</strong>
+                  Mesmo valor do plano anual fracionado: <strong>R$79/mês</strong>
                 </p>
               </div>
             </div>

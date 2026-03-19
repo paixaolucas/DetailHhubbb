@@ -8,7 +8,7 @@ import { withAuth } from "@/middleware/auth.middleware";
 import { db } from "@/lib/db";
 
 const PRESENCE_WINDOW_MS = 2 * 60 * 1000; // 2 minutes
-export const CHAT_MIN_ONLINE = 10; // min online to show chat
+const CHAT_MIN_ONLINE = 10; // min online to show chat
 
 export const POST = withAuth(async (_req, { session, params }) => {
   const communityId = params?.id;

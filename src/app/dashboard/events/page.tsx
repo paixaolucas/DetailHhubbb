@@ -29,11 +29,30 @@ import { STORAGE_KEYS } from "@/lib/constants";
 // ---------------------------------------------------------------------------
 // Auth helper — adds Bearer token from localStorage to every request
 // ---------------------------------------------------------------------------
-function authedFetch(url: string, options?: RequestInit): Promise<Response> {
-  const token =
-    typeof window !== "undefined"
-      ? localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN)
-      : null;
+async function getValidToken(): Promise<string | null> {
+  let token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+  if (!token) {
+    const refreshToken = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
+    if (refreshToken) {
+      try {
+        const r = await fetch("/api/auth/refresh", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refreshToken }),
+        });
+        const d = await r.json();
+        if (r.ok && d.data?.accessToken) {
+          token = d.data.accessToken;
+          localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token!);
+        }
+      } catch { /* ignore */ }
+    }
+  }
+  return token;
+}
+
+async function authedFetch(url: string, options?: RequestInit): Promise<Response> {
+  const token = typeof window !== "undefined" ? await getValidToken() : null;
   return fetch(url, {
     ...options,
     credentials: "include",
