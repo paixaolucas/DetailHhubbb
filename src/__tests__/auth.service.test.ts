@@ -24,7 +24,6 @@ vi.mock("@/lib/db", () => ({
     platformMembership: {
       findUnique: vi.fn(),
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     $transaction: vi.fn((ops: any) => Promise.all(ops)),
   },
 }));
@@ -100,7 +99,6 @@ describe("registerUser", () => {
     vi.mocked(db.platformMembership.findUnique).mockResolvedValue(null);
     vi.mocked(db.refreshToken.create).mockResolvedValue(mockRefreshTokenRecord as never);
     vi.mocked(db.user.update).mockResolvedValue(mockUser as never);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(db.$transaction).mockImplementation((ops: any) => Promise.all(ops));
   });
 
@@ -170,7 +168,6 @@ describe("loginUser", () => {
     vi.mocked(db.platformMembership.findUnique).mockResolvedValue(null);
     vi.mocked(db.refreshToken.create).mockResolvedValue(mockRefreshTokenRecord as never);
     vi.mocked(db.user.update).mockResolvedValue(mockUser as never);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(db.$transaction).mockImplementation((ops: any) => Promise.all(ops));
     vi.mocked(verifyPassword).mockResolvedValue(true);
   });
@@ -264,7 +261,6 @@ describe("refreshAccessToken", () => {
     vi.mocked(db.platformMembership.findUnique).mockResolvedValue(null);
     vi.mocked(db.refreshToken.update).mockResolvedValue(mockRefreshTokenRecord as never);
     vi.mocked(db.refreshToken.create).mockResolvedValue(mockRefreshTokenRecord as never);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(db.$transaction).mockImplementation((ops: any) => Promise.all(ops));
   });
 

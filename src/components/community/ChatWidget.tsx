@@ -48,8 +48,6 @@ export function ChatWidget({ communityId, spaceId, label = "Chat Geral" }: ChatW
   const token = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN) : null;
   const myUserId = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEYS.USER_ID) : null;
 
-  const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
-
   // ── Presence ping ────────────────────────────────────────────────────────────
   const ping = useCallback(async () => {
     if (!token) return;
@@ -73,11 +71,12 @@ export function ChatWidget({ communityId, spaceId, label = "Chat Geral" }: ChatW
       const url = spaceId
         ? `/api/communities/${communityId}/chat?spaceId=${spaceId}`
         : `/api/communities/${communityId}/chat`;
-      const res = await fetch(url, { headers });
+      const authHeaders: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
+      const res = await fetch(url, { headers: authHeaders });
       const d = await res.json();
       if (d.success) setMessages(d.data);
     } catch { /* ignore */ }
-  }, [communityId, chatVisible, open, headers, spaceId]);
+  }, [communityId, chatVisible, open, token, spaceId]);
 
   // ── Presence interval ────────────────────────────────────────────────────────
   useEffect(() => {
