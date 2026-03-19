@@ -20,6 +20,7 @@ import { Footer } from "@/components/layout/footer";
 import { NavBar } from "@/components/layout/navbar";
 import { CommunityThumbnail } from "@/components/community/CommunityThumbnail";
 import { HeroSection } from "@/components/landing/HeroSection";
+import { ScrollReveal } from "@/components/ui/scroll-reveal";
 
 // ─── Static data ─────────────────────────────────────────────────────────────
 
@@ -152,14 +153,14 @@ function StatsBar() {
     <section className="bg-[#222222] border-y border-white/10 py-12">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-          {stats.map(({ value, label, growth }) => (
-            <div key={label} className="text-center">
+          {stats.map(({ value, label, growth }, i) => (
+            <ScrollReveal key={label} delay={i * 80} direction="up" className="text-center">
               <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#EEE6E4] mb-1">{value}</div>
               <div className="text-gray-500 text-sm">{label}</div>
               <div className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-medium">
                 {growth}
               </div>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
       </div>
@@ -171,7 +172,7 @@ function FeaturedCommunitiesSection() {
   return (
     <section id="comunidades" className="bg-[#1A1A1A] py-24 overflow-hidden">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
+        <ScrollReveal className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-[#006079]/10 border border-[#006079]/20 rounded-full px-3 py-1 text-xs text-[#009CD9] mb-4">
             <Trophy className="w-3 h-3" />
             Comunidades em destaque
@@ -182,7 +183,7 @@ function FeaturedCommunitiesSection() {
           <p className="text-gray-400 text-lg max-w-xl mx-auto">
             Dezenas de comunidades automotivas esperando por você. Uma assinatura, acesso a todas.
           </p>
-        </div>
+        </ScrollReveal>
 
         {/* Horizontal scroll mobile / 3-col grid desktop */}
         <div className="flex gap-5 overflow-x-auto pb-4 md:grid md:grid-cols-3 md:overflow-visible md:pb-0 snap-x snap-mandatory md:snap-none">
@@ -236,7 +237,7 @@ function FeaturesSection() {
   return (
     <section id="features" className="bg-[#1A1A1A] py-24">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
+        <ScrollReveal className="text-center mb-16">
           <div className="inline-flex items-center gap-2 bg-[#006079]/10 border border-[#006079]/20 rounded-full px-3 py-1 text-xs text-[#009CD9] mb-4">
             <Gauge className="w-3 h-3" />
             Funcionalidades
@@ -247,20 +248,19 @@ function FeaturesSection() {
           <p className="text-gray-400 text-lg max-w-xl mx-auto">
             Uma plataforma completa construída especificamente para o universo automotivo.
           </p>
-        </div>
+        </ScrollReveal>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map(({ icon: Icon, title, desc, color, bg }) => (
-            <div
-              key={title}
-              className="glass-card p-8 hover:border-[#006079]/20 transition-all duration-300 group"
-            >
-              <div className={`w-12 h-12 ${bg} rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
-                <Icon className={`w-6 h-6 ${color}`} />
+          {features.map(({ icon: Icon, title, desc, color, bg }, i) => (
+            <ScrollReveal key={title} delay={i * 70} direction="up">
+              <div className="glass-card p-8 hover:border-[#006079]/20 transition-all duration-300 group h-full">
+                <div className={`w-12 h-12 ${bg} rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
+                  <Icon className={`w-6 h-6 ${color}`} />
+                </div>
+                <h3 className="text-xl font-semibold text-[#EEE6E4] mb-3">{title}</h3>
+                <p className="text-gray-400 leading-relaxed">{desc}</p>
               </div>
-              <h3 className="text-xl font-semibold text-[#EEE6E4] mb-3">{title}</h3>
-              <p className="text-gray-400 leading-relaxed">{desc}</p>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
       </div>
@@ -272,21 +272,21 @@ function HowItWorksSection() {
   return (
     <section id="como-funciona" className="bg-[#222222] py-24">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
+        <ScrollReveal className="text-center mb-16">
           <h2 className="text-4xl font-bold text-[#EEE6E4] mb-4">Como funciona</h2>
           <p className="text-gray-400 text-lg">Simples, direto e sem fricção.</p>
-        </div>
+        </ScrollReveal>
 
         <div className="grid sm:grid-cols-3 gap-8 max-w-3xl mx-auto">
-          {steps.map(({ step, title, desc, icon: Icon }) => (
-            <div key={step} className="text-center">
+          {steps.map(({ step, title, desc, icon: Icon }, i) => (
+            <ScrollReveal key={step} delay={i * 120} direction="up" className="text-center">
               <div className="w-14 h-14 bg-[#006079]/10 border border-[#006079]/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Icon className="w-6 h-6 text-[#009CD9]" />
               </div>
               <div className="text-[#009CD9] text-xs font-bold mb-2 tracking-widest">{step}</div>
               <h4 className="text-[#EEE6E4] font-semibold mb-2">{title}</h4>
               <p className="text-gray-400 text-sm leading-relaxed">{desc}</p>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
       </div>
@@ -303,7 +303,7 @@ function PricingSection() {
           <p className="text-gray-400 text-lg">Sem tiers confusos. Sem surpresas.</p>
         </div>
 
-        <div className="max-w-md mx-auto">
+        <ScrollReveal className="max-w-md mx-auto">
           <div className="glass-card p-8 border-[#006079]/30 relative overflow-hidden">
             {/* Glow */}
             <div className="absolute inset-0 bg-gradient-to-b from-[#006079]/5 to-transparent pointer-events-none" />
@@ -342,7 +342,7 @@ function PricingSection() {
               </p>
             </div>
           </div>
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );
@@ -352,16 +352,17 @@ function TestimonialsSection() {
   return (
     <section className="bg-[#222222] py-24">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
+        <ScrollReveal className="text-center mb-16">
           <h2 className="text-4xl font-bold text-[#EEE6E4] mb-4">
             O que dizem nossos usuários
           </h2>
           <p className="text-gray-400 text-lg">Milhares de criadores e membros satisfeitos.</p>
-        </div>
+        </ScrollReveal>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {testimonials.map(({ name, role, text, stars, avatarColor, initials }) => (
-            <div key={name} className="glass-card p-7 flex flex-col gap-5">
+          {testimonials.map(({ name, role, text, stars, avatarColor, initials }, i) => (
+            <ScrollReveal key={name} delay={i * 100} direction="up">
+            <div className="glass-card p-7 flex flex-col gap-5 h-full">
               <div className="flex gap-1">
                 {Array.from({ length: stars }).map((_, i) => (
                   <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
@@ -383,6 +384,7 @@ function TestimonialsSection() {
                 </div>
               </div>
             </div>
+            </ScrollReveal>
           ))}
         </div>
       </div>
@@ -399,7 +401,7 @@ function CTASection() {
           <div className="absolute inset-0 grid-pattern opacity-20" />
           <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
 
-          <div className="relative p-6 sm:p-12 md:p-20 text-center">
+          <ScrollReveal className="relative p-6 sm:p-12 md:p-20 text-center">
             <div className="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-1.5 text-sm text-white mb-6">
               <Wrench className="w-4 h-4" />
               Pronto para começar?
@@ -425,7 +427,7 @@ function CTASection() {
             <p className="text-white/60 text-sm mt-6">
               Pagamento seguro via Stripe. Sem cartão para testar.
             </p>
-          </div>
+          </ScrollReveal>
         </div>
       </div>
     </section>
