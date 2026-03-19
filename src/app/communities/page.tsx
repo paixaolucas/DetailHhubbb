@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Search, Users, Car } from "lucide-react";
 import { Footer } from "@/components/layout/footer";
 import { LogoType } from "@/components/ui/logo";
@@ -210,10 +211,11 @@ function CommunityCard({ community }: { community: Community }) {
       >
         {community.bannerUrl ? (
           <div className="absolute inset-0 overflow-hidden">
-            <img
+            <Image
               src={community.bannerUrl}
               alt={community.name}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
             />
           </div>
         ) : (
@@ -221,10 +223,12 @@ function CommunityCard({ community }: { community: Community }) {
         )}
         <div className="absolute bottom-0 left-5 translate-y-1/2">
           {community.logoUrl ? (
-            <img
+            <Image
               src={community.logoUrl}
               alt={community.name}
-              className="w-14 h-14 rounded-xl border-2 border-white/10 shadow-lg object-cover"
+              width={56}
+              height={56}
+              className="rounded-xl border-2 border-white/10 shadow-lg object-cover"
             />
           ) : (
             <div
@@ -243,10 +247,12 @@ function CommunityCard({ community }: { community: Community }) {
         </h3>
         <div className="flex items-center gap-1.5 mt-0.5 mb-3">
           {community.influencer.user.avatarUrl ? (
-            <img
+            <Image
               src={community.influencer.user.avatarUrl}
               alt={community.influencer.displayName}
-              className="w-5 h-5 rounded-full object-cover"
+              width={20}
+              height={20}
+              className="rounded-full object-cover"
             />
           ) : (
             <div className="w-5 h-5 rounded-full bg-[#009CD9] flex items-center justify-center text-white text-[9px] font-bold">

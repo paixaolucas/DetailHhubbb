@@ -249,7 +249,7 @@ export default function AnalyticsPage() {
         })
         .finally(() => setEventsLoading(false));
     }
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     if (!role) return;
