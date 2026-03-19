@@ -70,9 +70,24 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // ── Cleanup: delete old analytics events and read notifications ──────────
+    const ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+    const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+
+    const [deletedEvents, deletedNotifications] = await Promise.all([
+      db.analyticsEvent.deleteMany({ where: { createdAt: { lt: ninetyDaysAgo } } }),
+      db.notification.deleteMany({ where: { isRead: true, createdAt: { lt: sixtyDaysAgo } } }),
+    ]);
+
+    console.log(`[Cron:MonthlyReset] Cleanup: ${deletedEvents.count} analytics events, ${deletedNotifications.count} notifications deleted`);
+
     return NextResponse.json({
       success: true,
-      data: { communitiesProcessed: communities.length, championsNotified },
+      data: {
+        communitiesProcessed: communities.length,
+        championsNotified,
+        cleanup: { deletedAnalyticsEvents: deletedEvents.count, deletedNotifications: deletedNotifications.count },
+      },
     });
   } catch {
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });

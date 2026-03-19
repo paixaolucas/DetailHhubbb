@@ -13,28 +13,32 @@ import { applyInactivityPenalty } from "@/lib/points";
 export async function POST(req: NextRequest) {
   // Simple secret check — set CRON_SECRET in env
   const secret = req.headers.get("x-cron-secret");
-  if (secret !== process.env.CRON_SECRET && process.env.CRON_SECRET) {
+  if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   }
 
   try {
     // Get all UserPoints records that have points > 0
+    // take: 200 prevents timeout on Vercel Hobby (10s limit) with large datasets
     const allUserPoints = await db.userPoints.findMany({
       where: { points: { gt: 0 } },
       select: { userId: true, communityId: true },
+      take: 200,
     });
 
     let penalised = 0;
     let totalPtsDeducted = 0;
 
-    for (const up of allUserPoints) {
-      const deducted = await applyInactivityPenalty({
-        userId: up.userId,
-        communityId: up.communityId,
-      });
-      if (deducted > 0) {
+    const results = await Promise.allSettled(
+      allUserPoints.map((up) =>
+        applyInactivityPenalty({ userId: up.userId, communityId: up.communityId })
+      )
+    );
+
+    for (const result of results) {
+      if (result.status === "fulfilled" && result.value > 0) {
         penalised++;
-        totalPtsDeducted += deducted;
+        totalPtsDeducted += result.value;
       }
     }
 
