@@ -22,6 +22,7 @@ import {
   ChevronLeft,
 } from "lucide-react";
 import { useToast } from "@/components/ui/toast-provider";
+import { useViewAs } from "@/contexts/view-as-context";
 import { STORAGE_KEYS } from "@/lib/constants";
 import { extractVideoFrames } from "@/utils/videoFrameExtractor";
 import { uploadFiles } from "@/utils/upload";
@@ -105,6 +106,7 @@ const STATUS_ICONS: Record<string, React.ElementType> = {
 export default function AnalysePage() {
   const router = useRouter();
   const toast = useToast();
+  const { viewAsUser, effectiveHasPlatform } = useViewAs();
   const [activeTab, setActiveTab] = useState<"new" | "history">("new");
 
   // --- New analysis state ---
@@ -248,7 +250,8 @@ export default function AnalysePage() {
             reader.readAsDataURL(file);
           });
           imageBase64Frames = [b64];
-          thumbnailUrl = fileUrl;
+          // Usa URL do Supabase se disponível; base64 como fallback para garantir preview no histórico
+          thumbnailUrl = fileUrl ?? b64;
         } else if (file.type.startsWith("video/")) {
           // Extract video frames
           try {
@@ -282,6 +285,10 @@ export default function AnalysePage() {
 
       const data = await res.json();
       if (data.success && data.data?.id) {
+        if (data.data.status === "FAILED") {
+          toast.error(data.data.error ?? "A análise falhou. Tente novamente.");
+          return;
+        }
         toast.success("Análise concluída com sucesso!");
         router.push(`/dashboard/analise/${data.data.id}`);
       } else {
@@ -335,10 +342,12 @@ export default function AnalysePage() {
   const [membershipOk, setMembershipOk] = useState(false);
 
   useEffect(() => {
-    const ok = hasPlatform();
+    // Em ViewAs, usa hasPlatform real do usuário simulado (do contexto).
+    // Sem ViewAs, lê do JWT do admin/usuário logado.
+    const ok = viewAsUser != null ? effectiveHasPlatform : hasPlatform();
     setMembershipOk(ok);
     setMembershipChecked(true);
-  }, [hasPlatform]);
+  }, [hasPlatform, viewAsUser, effectiveHasPlatform]);
 
   if (!membershipChecked) {
     return (

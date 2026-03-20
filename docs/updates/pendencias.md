@@ -1,5 +1,5 @@
 # Pendências do Projeto — Detailer'HUB
-> Atualizado em: 2026-03-19
+> Atualizado em: 2026-03-20
 
 ---
 
@@ -17,6 +17,7 @@
 | **8** | **Polimento Pré-lançamento** | ✅ Completo |
 | **9** | **Estabilidade de Longo Prazo (Time Bombs)** | ✅ Completo |
 | **10** | **Qualidade de Código** | ✅ Completo |
+| **11** | **Correção de Bugs Críticos (IA + ViewAs)** | ✅ Completo |
 
 ---
 
@@ -223,6 +224,166 @@
 - [ ] Priorizar rotas de pagamento e auth: substituir `any` por tipos específicos
 - [ ] Rodar `npx tsc --noEmit --strict` para identificar todos os `any` implícitos
 - **Esforço:** ~2–3h
+
+---
+
+## 🔴 SPRINT 11 — Correção de Bugs Críticos (IA de Análises + Visualizar Como)
+> Bugs reportados em 2026-03-20. Afetam integridade de dados, custos de API e segurança de permissões.
+
+---
+
+### 11.1 — [CRÍTICO] Trocar modelo gpt-4o → gpt-4o-mini em todas as análises
+**Problema:** `analysis.service.ts` usa `"gpt-4o"` em 3 locais (linhas ~139, ~312, ~363). O modelo correto é `gpt-4o-mini` para todas as análises — impacto direto em custo de API.
+**Arquivo:** `src/services/ai/analysis.service.ts`
+- [ ] Linha ~139 (`searchUrlContent`): `model: "gpt-4o"` → `"gpt-4o-mini"`
+- [ ] Linha ~312 (vision path): `model: "gpt-4o"` → `"gpt-4o-mini"`
+- [ ] Linha ~363 (URL/text path): `model: "gpt-4o"` → `"gpt-4o-mini"`
+- **Esforço:** ~5 min
+
+---
+
+### 11.2 — [CRÍTICO] Análises por URL alucinando — conteúdo não lido
+**Problema:** O threshold mínimo (`MINIMUM_USEFUL_CONTENT = 300`) é baixo demais — HTML boilerplate passa. Quando fetch E web_search retornam pouco conteúdo, a IA ainda executa com dados insuficientes e gera respostas fictícias. Não há validação explícita de que conteúdo real foi obtido antes de chamar a IA.
+**Arquivo:** `src/services/ai/analysis.service.ts`
+- [ ] Aumentar `MINIMUM_USEFUL_CONTENT` de `300` para `800` chars
+- [ ] Validar que web_search também retornou conteúdo substancial (≥ 800 chars) antes de usar
+- [ ] Adicionar verificação explícita antes de chamar a IA: se nenhum bloco `--- CONTEÚDO ---` ou `--- INFORMAÇÕES ADICIONAIS ---` foi adicionado ao `contentParts`, lançar erro:
+  ```ts
+  const hasRealContent = contentParts.some(
+    (p) => p.startsWith("--- CONTEÚDO") || p.startsWith("--- INFORMAÇÕES")
+  );
+  if (!hasRealContent) {
+    throw new Error(
+      "Não foi possível obter conteúdo da URL para análise. " +
+      "Cole as informações manualmente no campo de contexto."
+    );
+  }
+  ```
+- **Esforço:** ~30 min
+
+---
+
+### 11.3 — [CRÍTICO] JSON inválido da IA gera fake success silencioso
+**Problema:** Quando a IA retorna resposta que não pode ser parseada como JSON, o fallback atual (`analysis.service.ts:403-404`) cria um resultado fictício `{ score: 50, summary: "Análise concluída.", strengths: [], ... }` e marca o status como `COMPLETED`. O usuário vê uma análise "concluída" com dados vazios/inventados.
+**Arquivo:** `src/services/ai/analysis.service.ts`
+- [ ] Remover o fallback fake. Substituir por throw:
+  ```ts
+  // REMOVER:
+  // } else {
+  //   parsed = { score: 50, summary: "Análise concluída.", strengths: [], ... };
+  // }
+
+  // ADICIONAR:
+  } else {
+    throw new Error("Resposta da IA não pôde ser interpretada. Tente novamente.");
+  }
+  ```
+- **Esforço:** ~10 min
+
+---
+
+### 11.4 — [MÉDIO] Preview de imagem não persiste no histórico
+**Problema:** Em `analise/page.tsx:251`, ao enviar uma imagem, `thumbnailUrl = fileUrl`. Se o upload para o Supabase falhar (bucket `analyses` não configurado ou erro), `fileUrl` fica `undefined` e `thumbnailUrl` é salvo como `null` no banco. O histórico exibe apenas ícone, sem preview da imagem. Vídeos não têm esse problema pois usam base64 do primeiro frame.
+**Arquivo:** `src/app/dashboard/analise/page.tsx`
+- [ ] Linha ~251: usar base64 como fallback quando `fileUrl` for undefined:
+  ```ts
+  // ANTES:
+  thumbnailUrl = fileUrl;
+  // DEPOIS:
+  thumbnailUrl = fileUrl ?? b64;
+  ```
+  > Nota: base64 de imagem pode ter 300KB–2MB. Se o tamanho for um problema futuro, implementar compressão via canvas (gerar thumbnail 120×120px, ~5KB) antes de armazenar.
+- **Esforço:** ~15 min
+
+---
+
+### 11.5 — [MÉDIO] Toast "análise concluída" não verifica status real
+**Problema:** `analise/page.tsx:284-286` exibe toast de sucesso sempre que `data.success && data.data?.id`, sem checar `data.data.status`. Se o registro foi criado mas status for `"FAILED"`, o toast ainda diz "Análise concluída com sucesso!".
+**Arquivo:** `src/app/dashboard/analise/page.tsx`
+- [ ] Verificar `data.data.status` antes de exibir o toast:
+  ```ts
+  if (data.success && data.data?.id) {
+    if (data.data.status === "FAILED") {
+      toast.error(data.data.error ?? "A análise falhou. Tente novamente.");
+      return;
+    }
+    toast.success("Análise concluída com sucesso!");
+    router.push(`/dashboard/analise/${data.data.id}`);
+  } else {
+    toast.error(data.error ?? "Erro ao realizar análise");
+  }
+  ```
+- **Esforço:** ~10 min
+
+---
+
+### 11.6 — [CRÍTICO] Visualizar Como: middleware não troca role/hasPlatform do usuário simulado
+**Problema (API):** `auth.middleware.ts:72-80` — ao receber `X-View-As-User`, o middleware troca `session.userId` mas mantém `session.role = SUPER_ADMIN` e `session.hasPlatform` do admin. Consequência: `isPrivilegedRole` é sempre `true` em todas as rotas → platform membership check nunca ocorre → membro sem plano aparece com acesso a tudo via ViewAs.
+**Arquivo:** `src/middleware/auth.middleware.ts`
+- [ ] Ao interceptar `X-View-As-User`, buscar `role` real do usuário alvo no banco e aplicar à session:
+  ```ts
+  if (session.role === UserRole.SUPER_ADMIN) {
+    const viewAsUserId = req.headers.get("X-View-As-User");
+    if (viewAsUserId) {
+      const targetUser = await db.user.findUnique({
+        where: { id: viewAsUserId },
+        select: { role: true },
+      });
+      session.userId = viewAsUserId;
+      if (targetUser) {
+        session.role = targetUser.role;
+        session.hasPlatform = false; // força verificação real no banco para o usuário alvo
+      }
+    }
+  }
+  ```
+  > Impacto esperado: `withRole(SUPER_ADMIN)` bloqueará chamadas admin-only durante ViewAs — comportamento correto. O layout do dashboard usa `withAuth`, não `withRole`, então continua funcionando.
+- **Esforço:** ~30 min
+
+---
+
+### 11.7 — [CRÍTICO] Visualizar Como: frontend lê hasPlatform do JWT do admin, não do usuário simulado
+**Problema (Frontend):** Páginas como `analise/page.tsx:131-143` chamam `hasPlatform()` que lê diretamente do JWT do admin em localStorage. Se admin tem `hasPlatform=true` → membro sem plano aparece com acesso. Se admin não tem `hasPlatform=true` → influenciador (que tem acesso vitalício) aparece bloqueado.
+**Arquivos:** `src/contexts/view-as-context.tsx`, `src/app/dashboard/layout.tsx`, `src/app/dashboard/analise/page.tsx` (e outras páginas com membership check)
+- [ ] Estender `ViewAsContextValue` com campo `effectiveHasPlatform: boolean`:
+  ```ts
+  export interface ViewAsContextValue {
+    viewAs: string | null;
+    viewAsUser: { id: string; name: string; role: string; hasPlatform: boolean } | null;
+    effectiveRole: string;
+    effectiveName: string;
+    effectiveHasPlatform: boolean; // NOVO
+  }
+  ```
+- [ ] Em `layout.tsx`, ao selecionar usuário para ViewAs (linhas ~719-762), buscar `hasPlatform` real do usuário via `GET /api/platform-membership/me` com o `X-View-As-User` header já interceptado (ou via query ao carregar o usuário na lista), e armazenar em `viewAsUser.hasPlatform`
+- [ ] Calcular `effectiveHasPlatform` no `ViewAsContext.Provider`:
+  ```ts
+  effectiveHasPlatform: viewAsUser
+    ? viewAsUser.hasPlatform
+    : (currentUserHasPlatform), // do JWT do admin
+  ```
+- [ ] Em `analise/page.tsx` e demais páginas com membership check: usar `effectiveHasPlatform` do contexto quando em modo ViewAs:
+  ```ts
+  const { viewAsUser, effectiveHasPlatform } = useViewAs();
+  const membershipOk = viewAsUser !== null
+    ? effectiveHasPlatform
+    : hasPlatform(); // lê JWT apenas quando NÃO está em ViewAs
+  ```
+- **Esforço:** ~2–3h
+
+---
+
+### Resumo de prioridade — Sprint 11
+
+| # | Item | Arquivo(s) | Criticidade |
+|---|------|------------|-------------|
+| 11.1 | Modelo gpt-4o-mini | `analysis.service.ts` | 🔴 Custo |
+| 11.2 | Validação conteúdo URL | `analysis.service.ts` | 🔴 Dado incorreto |
+| 11.3 | JSON inválido = erro real | `analysis.service.ts` | 🔴 Fake success |
+| 11.4 | Thumbnail imagem | `analise/page.tsx` | 🟡 UX |
+| 11.5 | Toast status correto | `analise/page.tsx` | 🟡 UX |
+| 11.6 | ViewAs middleware role/hasPlatform | `auth.middleware.ts` | 🔴 Segurança |
+| 11.7 | ViewAs frontend hasPlatform | `view-as-context.tsx`, `layout.tsx`, páginas | 🔴 Segurança |
 
 ---
 

@@ -39,13 +39,24 @@ export const GET = withRole(UserRole.SUPER_ADMIN)(async (req, { session }) => {
         createdAt: true,
         lastLoginAt: true,
         avatarUrl: true,
+        platformMembership: {
+          select: { status: true, currentPeriodEnd: true },
+        },
       },
       orderBy: { createdAt: "desc" },
       skip: (page - 1) * pageSize,
       take: pageSize,
     });
 
-    return NextResponse.json({ success: true, data: users });
+    const now = new Date();
+    const data = users.map(({ platformMembership, ...u }) => ({
+      ...u,
+      hasPlatform:
+        platformMembership?.status === "ACTIVE" &&
+        (platformMembership.currentPeriodEnd == null || platformMembership.currentPeriodEnd > now),
+    }));
+
+    return NextResponse.json({ success: true, data });
   } catch (error) {
     console.error("[Users GET]", error);
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });

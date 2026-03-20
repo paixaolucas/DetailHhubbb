@@ -135,7 +135,7 @@ Inclua no resumo tudo que encontrar:
 Forneça o máximo de informações possível em português.`;
 
   const res = (await openai.responses.create({
-    model: "gpt-4o",
+    model: "gpt-4o-mini",
     tools: [{ type: "web_search_preview" as const }],
     input: [{ role: "user" as const, content: userMsg }],
     max_output_tokens: 2000,
@@ -310,7 +310,7 @@ export async function runAnalysis(params: {
       parts.push({ type: "input_text" as const, text: ctx.join("\n") });
 
       const res = (await openai.responses.create({
-        model: "gpt-4o",
+        model: "gpt-4o-mini",
         instructions: systemPrompt,
         input: [{ role: "user" as const, content: parts as unknown as string }],
         temperature: 0.3,
@@ -335,7 +335,7 @@ export async function runAnalysis(params: {
       }
 
       // If we have good fetched content, use it
-      const MINIMUM_USEFUL_CONTENT = 300; // chars
+      const MINIMUM_USEFUL_CONTENT = 800; // chars — threshold mínimo para conteúdo real
       if (fetchedContent.length >= MINIMUM_USEFUL_CONTENT) {
         contentParts.push("\n--- CONTEÚDO DA PÁGINA ---");
         contentParts.push(fetchedContent);
@@ -343,7 +343,7 @@ export async function runAnalysis(params: {
       } else if (inputUrl) {
         // Not enough from fetch (SPA, blocked) → use web_search to get real content
         const searched = await searchUrlContent(inputUrl, type, platform);
-        if (searched) {
+        if (searched && searched.length >= MINIMUM_USEFUL_CONTENT) {
           contentParts.push("\n--- CONTEÚDO OBTIDO VIA BUSCA WEB ---");
           contentParts.push(searched);
           contentParts.push("--- FIM ---");
@@ -355,13 +355,20 @@ export async function runAnalysis(params: {
         contentParts.push(pastedContent);
       }
 
-      if (contentParts.length <= 2) { // only URL + platform, no real content
-        throw new Error("Não foi possível obter conteúdo para análise. Cole as informações no campo de contexto.");
+      // Garante que conteúdo real foi obtido antes de chamar a IA
+      const hasRealContent = contentParts.some(
+        (p) => p.startsWith("\n--- CONTEÚDO") || p.startsWith("\n--- INFORMAÇÕES")
+      );
+      if (!hasRealContent) {
+        throw new Error(
+          "Não foi possível obter conteúdo suficiente da URL para análise. " +
+          "Cole as informações manualmente no campo de contexto."
+        );
       }
 
       // Chat Completions with response_format — always returns valid JSON
       const res = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-4o-mini",
         response_format: { type: "json_object" },
         temperature: 0.3,
         max_tokens: 3000,
@@ -401,7 +408,7 @@ export async function runAnalysis(params: {
         recommended_actions: Array.isArray(r.recommended_actions) ? r.recommended_actions as string[] : [],
       };
     } else {
-      parsed = { score: 50, summary: "Análise concluída.", strengths: [], weaknesses: [], improvements: [], recommended_actions: [] };
+      throw new Error("Resposta da IA não pôde ser interpretada como JSON válido. Tente novamente.");
     }
 
     const updated = await db.aIAnalysis.update({

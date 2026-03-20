@@ -70,12 +70,20 @@ export function withAuth(handler: AuthenticatedHandler) {
     }
 
     // ViewAs: SUPER_ADMIN can impersonate any user via X-View-As-User header.
-    // Override session.userId so all downstream queries use the target user's ID.
-    // session.role remains SUPER_ADMIN so all permission checks still pass.
+    // Swaps userId, role e hasPlatform para simular fielmente a experiência do usuário alvo.
+    // withRole(SUPER_ADMIN) bloqueará chamadas admin-only durante ViewAs — comportamento correto.
     if (session.role === UserRole.SUPER_ADMIN) {
       const viewAsUserId = req.headers.get("X-View-As-User");
       if (viewAsUserId) {
-        session.userId = viewAsUserId;
+        const targetUser = await db.user.findUnique({
+          where: { id: viewAsUserId },
+          select: { role: true },
+        });
+        if (targetUser) {
+          session.userId = viewAsUserId;
+          session.role = targetUser.role;
+          session.hasPlatform = false; // força verificação real no banco para o usuário alvo
+        }
       }
     }
 

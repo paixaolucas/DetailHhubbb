@@ -272,11 +272,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [viewAsOpen, setViewAsOpen] = useState(false);
   const [memberSearch, setMemberSearch] = useState("");
   const [influencerSearch, setInfluencerSearch] = useState("");
-  const [viewAsUser, setViewAsUser] = useState<{ id: string; name: string; role: string } | null>(null);
-  const [memberResults, setMemberResults] = useState<{ id: string; firstName: string; lastName: string; avatarUrl?: string | null }[]>([]);
-  const [influencerResults, setInfluencerResults] = useState<{ id: string; firstName: string; lastName: string; avatarUrl?: string | null }[]>([]);
-  const [preloadedMembers, setPreloadedMembers] = useState<{ id: string; firstName: string; lastName: string; avatarUrl?: string | null }[]>([]);
-  const [preloadedInfluencers, setPreloadedInfluencers] = useState<{ id: string; firstName: string; lastName: string; avatarUrl?: string | null }[]>([]);
+  const [viewAsUser, setViewAsUser] = useState<{ id: string; name: string; role: string; hasPlatform: boolean } | null>(null);
+  const [memberResults, setMemberResults] = useState<{ id: string; firstName: string; lastName: string; avatarUrl?: string | null; hasPlatform?: boolean }[]>([]);
+  const [influencerResults, setInfluencerResults] = useState<{ id: string; firstName: string; lastName: string; avatarUrl?: string | null; hasPlatform?: boolean }[]>([]);
+  const [preloadedMembers, setPreloadedMembers] = useState<{ id: string; firstName: string; lastName: string; avatarUrl?: string | null; hasPlatform?: boolean }[]>([]);
+  const [preloadedInfluencers, setPreloadedInfluencers] = useState<{ id: string; firstName: string; lastName: string; avatarUrl?: string | null; hasPlatform?: boolean }[]>([]);
   const [memberSearching, setMemberSearching] = useState(false);
   const [influencerSearching, setInfluencerSearching] = useState(false);
   const [viewAsPreloaded, setViewAsPreloaded] = useState(false);
@@ -717,7 +717,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             const active = viewAsUser?.id === u.id;
                             return (
                               <button key={u.id} title={name}
-                                onClick={() => { setViewAs("COMMUNITY_MEMBER"); setViewAsUser({ id: u.id, name, role: "COMMUNITY_MEMBER" }); setViewAsOpen(false); setMemberSearch(""); setMemberResults([]); router.push("/dashboard"); }}
+                                onClick={() => { setViewAs("COMMUNITY_MEMBER"); setViewAsUser({ id: u.id, name, role: "COMMUNITY_MEMBER", hasPlatform: u.hasPlatform ?? false }); setViewAsOpen(false); setMemberSearch(""); setMemberResults([]); router.push("/dashboard"); }}
                                 className={`w-9 h-9 rounded-full flex items-center justify-center text-[10px] font-bold text-white transition-all ring-2 ${active ? "ring-amber-400 scale-110" : "ring-transparent hover:ring-[#009CD9]/50 hover:scale-105"} bg-gradient-to-br from-[#006079] to-[#009CD9]`}>
                                 {u.avatarUrl ? (
                                   <Image src={u.avatarUrl} alt={name} width={36} height={36} className="w-full h-full rounded-full object-cover" />
@@ -759,7 +759,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             const active = viewAsUser?.id === u.id;
                             return (
                               <button key={u.id} title={name}
-                                onClick={() => { setViewAs("INFLUENCER_ADMIN"); setViewAsUser({ id: u.id, name, role: "INFLUENCER_ADMIN" }); setViewAsOpen(false); setInfluencerSearch(""); setInfluencerResults([]); router.push("/dashboard"); }}
+                                onClick={() => { setViewAs("INFLUENCER_ADMIN"); setViewAsUser({ id: u.id, name, role: "INFLUENCER_ADMIN", hasPlatform: true }); setViewAsOpen(false); setInfluencerSearch(""); setInfluencerResults([]); router.push("/dashboard"); }}
                                 className={`w-9 h-9 rounded-full flex items-center justify-center text-[10px] font-bold text-white transition-all ring-2 ${active ? "ring-amber-400 scale-110" : "ring-transparent hover:ring-[#009CD9]/50 hover:scale-105"} bg-gradient-to-br from-[#007A99] to-[#009CD9]`}>
                                 {u.avatarUrl ? (
                                   <Image src={u.avatarUrl} alt={name} width={36} height={36} className="w-full h-full rounded-full object-cover" />
@@ -918,6 +918,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 ? "INFLUENCER_ADMIN"
                 : viewAsUser?.role ?? "",
             effectiveName: viewAsUser?.name ?? userName,
+            effectiveHasPlatform:
+              viewAs === "MEMBER_PAID" ? true
+              : viewAs === "MEMBER_UNPAID" ? false
+              : viewAs === "INFLUENCER" || viewAs === "INFLUENCER_ADMIN" ? true
+              : viewAsUser != null ? viewAsUser.hasPlatform
+              : false,
           }}>
             {children}
           </ViewAsContext.Provider>
