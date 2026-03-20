@@ -31,7 +31,8 @@ export const MAX_POST_ATTACHMENTS = 10;
 
 // ─── Rate limiting ────────────────────────────────────────────────────────────
 export const RATE_LIMIT = {
-  AUTH: { windowMs: 60_000, max: 10 },      // 10 req/min per IP
-  AI_CHAT: { windowMs: 60_000, max: 20 },   // 20 req/min per userId
-  SEARCH: { windowMs: 60_000, max: 30 },    // 30 req/min per userId
+  AUTH: { windowMs: 60_000, max: 10 },        // 10 req/min per IP
+  AI_CHAT: { windowMs: 60_000, max: 20 },     // 20 req/min per userId
+  SEARCH: { windowMs: 60_000, max: 30 },      // 30 req/min per userId
+  AI_ANALYSIS: { windowMs: 60_000, max: 5 },  // 5 req/min per userId
 } as const;

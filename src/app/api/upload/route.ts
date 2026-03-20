@@ -9,13 +9,14 @@ import { withAuth } from "@/middleware/auth.middleware";
 const SUPABASE_URL = process.env.SUPABASE_URL!;
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
-const ALLOWED_BUCKETS = ["avatars", "community-images", "posts", "lessons"] as const;
+const ALLOWED_BUCKETS = ["avatars", "community-images", "posts", "lessons", "analyses"] as const;
 
 const MAX_SIZES: Record<string, number> = {
   "avatars": 4 * 1024 * 1024,           //   4MB
   "community-images": 8 * 1024 * 1024,  //   8MB
   "posts": 200 * 1024 * 1024,           // 200MB (images, videos, docs)
   "lessons": 200 * 1024 * 1024,         // 200MB
+  "analyses": 200 * 1024 * 1024,        // 200MB (images, videos for AI analysis)
 };
 
 export const POST = withAuth(async (req, { session }) => {

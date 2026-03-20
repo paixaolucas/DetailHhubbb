@@ -207,3 +207,42 @@ export class ConflictError extends AppError {
     super(message, 409, "CONFLICT");
   }
 }
+
+// =============================================================================
+// AI ANALYSIS TYPES
+// =============================================================================
+
+export type AIAnalysisType = "AD_CREATIVE" | "PROFILE_AUDIT" | "POST_ANALYSIS" | "SITE_ANALYSIS";
+export type AIAnalysisStatus = "PENDING" | "COMPLETED" | "FAILED";
+export type AIAnalysisInputType = "image" | "video" | "url";
+
+export interface AIAnalysisResult {
+  score: number;
+  summary?: string;
+  creative_readiness?: "SCALE" | "ITERATE" | "KILL";
+  creative_readiness_reasoning?: string;
+  breakdown?: Record<string, number>;
+  strengths: string[];
+  weaknesses: string[];
+  improvements: string[];
+  recommended_actions: string[];
+}
+
+export interface AIAnalysisSummary {
+  id: string;
+  type: AIAnalysisType;
+  inputType: AIAnalysisInputType;
+  inputUrl: string | null;
+  fileUrl: string | null;
+  thumbnailUrl: string | null;
+  platform: string | null;
+  score: number | null;
+  status: AIAnalysisStatus;
+  error: string | null;
+  createdAt: string;
+}
+
+export interface AIAnalysisDetail extends AIAnalysisSummary {
+  result: AIAnalysisResult | null;
+  tokensUsed: number;
+}

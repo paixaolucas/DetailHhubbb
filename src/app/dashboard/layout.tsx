@@ -50,6 +50,7 @@ import {
   Lock,
   Link2,
   Layers,
+  Sparkles,
 } from "lucide-react";
 import { RoleBadge } from "@/components/ui/badge";
 import { Logo, LogoType } from "@/components/ui/logo";
@@ -108,6 +109,7 @@ const ADMIN_NAV: NavEntry[] = [
       { href: "/dashboard/testimonials", label: "Depoimentos", icon: Star },
       { href: "/dashboard/marketplace", label: "Marketplace", icon: ShoppingBag },
       { href: "/dashboard/ai", label: "Auto AI", icon: Bot },
+      { href: "/dashboard/analise", label: "IA de Análises", icon: Sparkles },
     ],
   },
   {
@@ -152,6 +154,7 @@ const INFLUENCER_NAV: NavEntry[] = [
       { href: "/dashboard/anuncios", label: "Anúncios", icon: Megaphone },
       { href: "/dashboard/tools", label: "Ferramentas", icon: Wrench },
       { href: "/dashboard/ai", label: "Auto AI", icon: Bot },
+      { href: "/dashboard/analise", label: "IA de Análises", icon: Sparkles },
     ],
   },
   {
@@ -188,6 +191,7 @@ const MEMBER_NAV: NavEntry[] = [
       { href: "/dashboard/garage", label: "Minha Garagem", icon: Car },
       { href: "/dashboard/marketplace", label: "Marketplace", icon: ShoppingBag },
       { href: "/dashboard/ai", label: "Auto AI", icon: Bot },
+      { href: "/dashboard/analise", label: "IA de Análises", icon: Sparkles },
       { href: "/dashboard/search", label: "Buscar", icon: Search },
     ],
   },

@@ -80,9 +80,13 @@ const nextConfig = {
 
 export default withSentryConfig(nextConfig, {
   silent: true,
-  disableLogger: true,
   sourcemaps: {
     disable: !process.env.SENTRY_AUTH_TOKEN,
   },
-  automaticVercelMonitors: false,
+  webpack: {
+    automaticVercelMonitors: false,
+    treeshake: {
+      removeDebugLogging: true,
+    },
+  },
 });

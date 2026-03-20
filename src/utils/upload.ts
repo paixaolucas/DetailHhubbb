@@ -10,7 +10,7 @@ export interface UploadResult {
   size: number;
 }
 
-export type UploadBucket = "avatars" | "community-images" | "posts" | "lessons";
+export type UploadBucket = "avatars" | "community-images" | "posts" | "lessons" | "analyses";
 
 /**
  * Faz upload de múltiplos arquivos para o Supabase Storage via /api/upload.
