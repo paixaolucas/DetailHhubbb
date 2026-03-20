@@ -7,16 +7,11 @@
 import { NextResponse } from "next/server";
 import { withAuth } from "@/middleware/auth.middleware";
 import { db } from "@/lib/db";
-import { UserRole } from "@prisma/client";
 
-export const GET = withAuth(async (req, { session }) => {
+export const GET = withAuth(async (_req, { session }) => {
   try {
-    // SUPER_ADMIN can pass ?asUserId= to view another influencer's data
-    const url = new URL(req.url);
-    const asUserId = url.searchParams.get("asUserId");
-    const targetUserId = (asUserId && session.role === UserRole.SUPER_ADMIN)
-      ? asUserId
-      : session.userId;
+    // session.userId is already overridden by withAuth when X-View-As-User header is present
+    const targetUserId = session.userId;
 
     // Get influencer profile + communities in one query
     const influencer = await db.influencer.findUnique({
@@ -84,7 +79,7 @@ export const GET = withAuth(async (req, { session }) => {
       }),
       // Influencer score
       db.userPoints.findUnique({
-        where: { userId_communityId: { userId: targetUserId, communityId: primaryCommunityId } },
+        where: { userId_communityId: { userId: session.userId, communityId: primaryCommunityId } },
         select: { points: true, level: true },
       }),
       // Last 30 days payments for time series

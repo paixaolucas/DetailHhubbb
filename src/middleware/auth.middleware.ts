@@ -69,6 +69,16 @@ export function withAuth(handler: AuthenticatedHandler) {
       );
     }
 
+    // ViewAs: SUPER_ADMIN can impersonate any user via X-View-As-User header.
+    // Override session.userId so all downstream queries use the target user's ID.
+    // session.role remains SUPER_ADMIN so all permission checks still pass.
+    if (session.role === UserRole.SUPER_ADMIN) {
+      const viewAsUserId = req.headers.get("X-View-As-User");
+      if (viewAsUserId) {
+        session.userId = viewAsUserId;
+      }
+    }
+
     return handler(req, { session, params: context?.params });
   };
 }

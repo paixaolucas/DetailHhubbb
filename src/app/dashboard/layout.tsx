@@ -380,6 +380,33 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return () => clearInterval(refreshInterval);
   }, [router]);
 
+  // Global fetch intercept: when ViewAs is active with a specific user,
+  // inject X-View-As-User header into ALL /api/ calls automatically.
+  // This makes every page/tab work without any individual changes.
+  useEffect(() => {
+    if (!viewAsUser) return;
+
+    const originalFetch = window.fetch;
+    window.fetch = (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = typeof input === "string"
+        ? input
+        : input instanceof Request
+        ? input.url
+        : input.toString();
+
+      if (url.startsWith("/api/")) {
+        const headers = new Headers(init?.headers);
+        headers.set("X-View-As-User", viewAsUser.id);
+        return originalFetch(input, { ...init, headers });
+      }
+      return originalFetch(input, init);
+    };
+
+    return () => {
+      window.fetch = originalFetch;
+    };
+  }, [viewAsUser]);
+
   // Pre-load influencers + members when ViewAs panel opens
   useEffect(() => {
     if (!viewAsOpen || viewAsPreloaded) return;
