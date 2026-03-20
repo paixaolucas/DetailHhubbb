@@ -724,14 +724,32 @@ export default function AnalysePage() {
                     className="glass-card p-4 hover:border-white/20 transition-all group"
                   >
                     <div className="flex items-center gap-3">
-                      {/* Icon */}
-                      <div
-                        className={`w-10 h-10 bg-gradient-to-br ${typeConfig?.color ?? "from-[#006079] to-[#009CD9]"} rounded-xl flex items-center justify-center flex-shrink-0`}
-                      >
-                        {typeConfig ? (
-                          <typeConfig.icon className="w-5 h-5 text-white" />
+                      {/* Thumbnail or icon */}
+                      <div className="w-10 h-10 rounded-xl flex-shrink-0 overflow-hidden">
+                        {a.thumbnailUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={a.thumbnailUrl}
+                            alt=""
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).style.display = "none";
+                              (e.currentTarget.parentElement as HTMLElement).classList.add(
+                                "bg-gradient-to-br",
+                                typeConfig?.color?.split(" ")[0] ?? "from-[#006079]",
+                                typeConfig?.color?.split(" ")[1] ?? "to-[#009CD9]",
+                                "flex", "items-center", "justify-center"
+                              );
+                            }}
+                          />
                         ) : (
-                          <Sparkles className="w-5 h-5 text-white" />
+                          <div className={`w-full h-full bg-gradient-to-br ${typeConfig?.color ?? "from-[#006079] to-[#009CD9]"} flex items-center justify-center`}>
+                            {typeConfig ? (
+                              <typeConfig.icon className="w-5 h-5 text-white" />
+                            ) : (
+                              <Sparkles className="w-5 h-5 text-white" />
+                            )}
+                          </div>
                         )}
                       </div>
 

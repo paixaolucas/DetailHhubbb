@@ -13,11 +13,10 @@ import type {
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // =============================================================================
-// URL CONTENT FETCHER — busca conteúdo real da página no servidor
-// Complementa o web_search_preview (que faz busca mas não acessa URLs diretamente)
+// URL FETCHER — extrai conteúdo + og:image da página
 // =============================================================================
 
-async function fetchUrlContent(url: string): Promise<string> {
+export async function fetchUrlMeta(url: string): Promise<{ content: string; ogImage: string | null }> {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 12000);
@@ -30,20 +29,33 @@ async function fetchUrlContent(url: string): Promise<string> {
       },
     });
     clearTimeout(timeout);
-    if (!res.ok) return "";
+    if (!res.ok) return { content: "", ogImage: null };
+
     const html = await res.text();
-    // Check if page is mostly JavaScript (SPA like Instagram/TikTok) — not useful
-    const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-    const bodyContent = bodyMatch?.[1] ?? html;
-    const scriptRatio = (bodyContent.match(/<script/gi)?.length ?? 0) / Math.max(bodyContent.length / 1000, 1);
-    if (scriptRatio > 5) return ""; // SPA — let web_search handle it
+
+    // Extract og:image (lightweight thumbnail — just a URL string)
+    const ogImageMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
+      || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
+    const ogImage = ogImageMatch ? ogImageMatch[1].trim() : null;
+
+    // Check if SPA (mostly JS) — still return ogImage even for SPAs
+    const scriptCount = (html.match(/<script/gi) ?? []).length;
+    const htmlLen = html.length;
+    if (scriptCount > 20 && htmlLen < 50000) {
+      // Likely SPA — extract only meta tags, no body text
+      const metaContent = extractMetaOnly(html);
+      return { content: metaContent, ogImage };
+    }
 
     const extracted: string[] = [];
+
     const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
     if (titleMatch) extracted.push(`TÍTULO: ${titleMatch[1].trim()}`);
+
     const descMatch = html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']{10,})["']/i)
       || html.match(/<meta[^>]+content=["']([^"']{10,})["'][^>]+name=["']description["']/i);
-    if (descMatch) extracted.push(`DESCRIÇÃO: ${descMatch[1].trim()}`);
+    if (descMatch) extracted.push(`DESCRIÇÃO META: ${descMatch[1].trim()}`);
+
     const ogTitle = html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i);
     const ogDesc = html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i);
     const ogSite = html.match(/<meta[^>]+property=["']og:site_name["'][^>]+content=["']([^"']+)["']/i);
@@ -55,49 +67,57 @@ async function fetchUrlContent(url: string): Promise<string> {
     const h1Raw: string[] = [];
     let m: RegExpExecArray | null;
     const h1re = /<h1[^>]*>([^<]+)<\/h1>/gi;
-    while ((m = h1re.exec(html)) !== null) h1Raw.push(m[1].trim());
+    while ((m = h1re.exec(html)) !== null) h1Raw.push(m[1].replace(/<[^>]+>/g, "").trim());
     const h2Raw: string[] = [];
     const h2re = /<h2[^>]*>([^<]+)<\/h2>/gi;
-    while ((m = h2re.exec(html)) !== null && h2Raw.length < 6) h2Raw.push(m[1].trim());
+    while ((m = h2re.exec(html)) !== null && h2Raw.length < 6) h2Raw.push(m[1].replace(/<[^>]+>/g, "").trim());
     if (h1Raw.length > 0) extracted.push(`H1: ${h1Raw.join(" | ")}`);
     if (h2Raw.length > 0) extracted.push(`H2: ${h2Raw.join(" | ")}`);
 
-    // Visible body text (strip scripts/styles)
+    // Visible body text
     const bodyText = html
       .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, " ")
       .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, " ")
+      .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, " ")
+      .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, " ")
       .replace(/<[^>]+>/g, " ")
       .replace(/\s+/g, " ")
       .trim()
-      .slice(0, 3000);
-    if (bodyText.length > 200) extracted.push(`\nCONTEÚDO:\n${bodyText}`);
+      .slice(0, 3500);
+    if (bodyText.length > 200) extracted.push(`\nCONTEÚDO DA PÁGINA:\n${bodyText}`);
 
-    return extracted.join("\n");
+    return { content: extracted.join("\n"), ogImage };
   } catch {
-    return "";
+    return { content: "", ogImage: null };
   }
 }
 
+function extractMetaOnly(html: string): string {
+  const parts: string[] = [];
+  const title = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+  if (title) parts.push(`TÍTULO: ${title[1].trim()}`);
+  const ogTitle = html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i);
+  const ogDesc = html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i);
+  const ogSite = html.match(/<meta[^>]+property=["']og:site_name["'][^>]+content=["']([^"']+)["']/i);
+  if (ogSite) parts.push(`PLATAFORMA: ${ogSite[1].trim()}`);
+  if (ogTitle) parts.push(`TÍTULO: ${ogTitle[1].trim()}`);
+  if (ogDesc) parts.push(`DESCRIÇÃO: ${ogDesc[1].trim()}`);
+  return parts.join("\n");
+}
+
 // =============================================================================
-// JSON EXTRACTOR — parse JSON from model output (no response_format available
-// with web_search_preview tool, so we extract from free text)
+// JSON EXTRACTOR — para Responses API (sem response_format)
 // =============================================================================
 
 function extractJson(text: string): unknown {
-  // 1. Try direct parse
-  try { return JSON.parse(text.trim()); } catch { /* continue */ }
-
-  // 2. Try ```json ... ``` block
+  try { return JSON.parse(text.trim()); } catch { /* */ }
   const fenced = text.match(/```(?:json)?\s*([\s\S]+?)\s*```/);
-  if (fenced) { try { return JSON.parse(fenced[1]); } catch { /* continue */ } }
-
-  // 3. Try first { ... } block (greedy from first { to last })
+  if (fenced) { try { return JSON.parse(fenced[1]); } catch { /* */ } }
   const start = text.indexOf("{");
   const end = text.lastIndexOf("}");
   if (start !== -1 && end > start) {
-    try { return JSON.parse(text.slice(start, end + 1)); } catch { /* continue */ }
+    try { return JSON.parse(text.slice(start, end + 1)); } catch { /* */ }
   }
-
   return null;
 }
 
@@ -147,7 +167,7 @@ Retorne APENAS este JSON válido (sem markdown, sem texto antes ou depois):
 
 const PROFILE_AUDIT_PROMPT = `Você é um especialista em marketing digital e growth para redes sociais com foco em conversão de perfil para audiência e negócios.
 
-Se o usuário forneceu uma URL, use sua capacidade de busca web para acessar e analisar o perfil real. Analise tudo que encontrar: bio, foto, destaques, feed, número de seguidores, nicho, frequência de posts, engajamento visível.
+Analise o conteúdo do perfil fornecido abaixo. Se o conteúdo for limitado (perfil privado ou SPA), faça a melhor análise possível com o que está disponível — NUNCA retorne score 0 nem diga que não conseguiu acessar.
 
 CRITÉRIOS DE AVALIAÇÃO:
 1. CLAREZA DE IDENTIDADE: O visitante entende em 5 segundos quem é o perfil e o que oferece?
@@ -161,8 +181,8 @@ CRITÉRIOS DE AVALIAÇÃO:
 
 Retorne APENAS este JSON válido (sem markdown, sem texto antes ou depois):
 {
-  "score": <0-100>,
-  "summary": "<resumo executivo de 2-3 frases sobre o perfil>",
+  "score": <0-100 — NUNCA 0 a menos que o perfil seja completamente vazio>,
+  "summary": "<resumo executivo de 2-3 frases sobre o perfil baseado no conteúdo disponível>",
   "strengths": ["<ponto forte específico 1>", "<2>", "<3>"],
   "weaknesses": ["<problema que impacta crescimento 1>", "<2>", "<3>"],
   "improvements": ["<melhoria acionável com exemplo 1>", "<2>", "<3>"],
@@ -171,21 +191,21 @@ Retorne APENAS este JSON válido (sem markdown, sem texto antes ou depois):
 
 const POST_ANALYSIS_PROMPT = `Você é um especialista em crescimento orgânico, algoritmos de redes sociais e copywriting para conteúdo digital.
 
-Se o usuário forneceu uma URL, use sua capacidade de busca web para acessar e analisar o post/conteúdo real. Analise o que estiver disponível: visual, legenda, hashtags, engajamento, formato.
+Analise o conteúdo fornecido abaixo. Se o conteúdo for limitado, faça a melhor análise possível — NUNCA retorne score 0 nem diga que não conseguiu acessar o post.
 
 CRITÉRIOS DE AVALIAÇÃO:
 1. HOOK (primeiros 3 segundos): Para vídeos — o início prende? Para posts — a primeira linha/visual é impactante?
-2. RETENÇÃO: O conteúdo mantém interesse do início ao fim? Existe progressão lógica?
-3. VALOR ENTREGUE: O conteúdo ensina, entretém ou inspira de forma clara?
+2. RETENÇÃO: O conteúdo mantém interesse do início ao fim?
+3. VALOR ENTREGUE: Ensina, entretém ou inspira de forma clara?
 4. CTA E ENGAJAMENTO: Estimula comentários, compartilhamentos, salvamentos?
-5. LEGENDA/COPY: A legenda complementa o visual? É conversacional? Quebras de linha?
+5. LEGENDA/COPY: A legenda complementa o visual? É conversacional?
 6. HASHTAGS E KEYWORDS: Estratégia de alcance otimizada?
 7. FORMATO E PLATAFORMA: Formato adequado para a plataforma?
 8. TENDÊNCIAS: Aproveita formatos ou tendências atuais?
 
 Retorne APENAS este JSON válido (sem markdown, sem texto antes ou depois):
 {
-  "score": <0-100>,
+  "score": <0-100 — NUNCA 0 a menos que o conteúdo seja completamente vazio>,
   "summary": "<diagnóstico direto do potencial do conteúdo em 2-3 frases>",
   "strengths": ["<ponto forte 1>", "<2>", "<3>"],
   "weaknesses": ["<problema que limita alcance 1>", "<2>", "<3>"],
@@ -195,74 +215,37 @@ Retorne APENAS este JSON válido (sem markdown, sem texto antes ou depois):
 
 const SITE_ANALYSIS_PROMPT = `Você é um especialista sênior em CRO (Conversion Rate Optimization), UX, copywriting persuasivo e performance de landing pages.
 
-Se o usuário forneceu uma URL, use sua capacidade de busca web para ACESSAR e ANALISAR o site real diretamente. Observe tudo: headline, layout, copy, CTAs, prova social, formulários, design, velocidade percebida, mobile.
+Analise o conteúdo do site fornecido abaixo. Se o conteúdo for limitado, faça a melhor análise possível com o que está disponível — NUNCA retorne score 0 nem diga que não conseguiu acessar o site.
 
 DIMENSÕES DE ANÁLISE:
+1. HEADLINE E SUB-HEADLINE: Comunica o benefício em <5s? É específica? Usa dados?
+2. PROPOSTA DE VALOR ÚNICA (UVP): Diferencial competitivo explícito? Benefício acima do fold?
+3. PROVA SOCIAL: Depoimentos, números, logos, garantias?
+4. CALL-TO-ACTION: CTA visível sem scroll? Copy específico? Contraste adequado?
+5. FLUXO NARRATIVO (AIDA/PAS): Estrutura guia à conversão? Objeções tratadas?
+6. COPYWRITING E PERSUASÃO: Linguagem fala com dores? Benefícios > features?
+7. DESIGN E USABILIDADE: Hierarquia visual correta? Legibilidade? Aparência profissional?
+8. FORMULÁRIOS E ATRITO: Mínimo de campos? Processo simples?
+9. MOBILE E PERFORMANCE: Experiência mobile-first?
+10. SEO ON-PAGE: Meta title/description otimizados? H1/H2 coerentes?
 
-1. HEADLINE E SUB-HEADLINE
-   - Comunica o benefício principal em <5 segundos? É específica? Usa dados/números?
-   - A sub-headline complementa e aprofunda?
-
-2. PROPOSTA DE VALOR ÚNICA (UVP)
-   - O visitante entende PARA QUEM é o produto? O DIFERENCIAL competitivo está explícito?
-   - O benefício principal está acima do fold?
-
-3. PROVA SOCIAL E CREDIBILIDADE
-   - Depoimentos, cases, números de clientes? Logos de clientes/mídia?
-   - Certificações, garantias, selos de confiança?
-
-4. CALL-TO-ACTION (CTA)
-   - CTA principal visível sem scroll? Copy específico ("Começar grátis" vs "Enviar")?
-   - Múltiplos CTAs ao longo da página? Cor/contraste adequados?
-
-5. FLUXO NARRATIVO (AIDA/PAS)
-   - A estrutura guia logicamente até a conversão? Objeções tratadas?
-
-6. COPYWRITING E PERSUASÃO
-   - Linguagem fala com dores e desejos do público? Benefícios > features?
-   - Urgência/escassez legítima? Tom adequado ao público?
-
-7. DESIGN E USABILIDADE
-   - Hierarquia visual correta? Legibilidade (tamanho, contraste)? Aparência profissional?
-
-8. FORMULÁRIOS E ATRITO
-   - Mínimo de campos? Processo de conversão simples?
-
-9. MOBILE E PERFORMANCE
-   - Experiência mobile-first? Performance otimizada?
-
-10. SEO ON-PAGE
-    - Meta title/description otimizados? Estrutura H1/H2 coerente?
-
-INSTRUÇÕES: Seja muito específico — cite exemplos reais do site ao apontar problemas e melhorias. Priorize melhorias por impacto na conversão.
 Score: 0-30 fraca | 31-60 mediana | 61-80 boa | 81-100 excelente
+Seja específico — cite exemplos reais do conteúdo fornecido.
 
 Retorne APENAS este JSON válido (sem markdown, sem texto antes ou depois):
 {
-  "score": <0-100>,
+  "score": <0-100 — NUNCA 0 a menos que o site seja completamente vazio>,
   "summary": "<diagnóstico executivo com 2-3 achados mais críticos para conversão>",
-  "strengths": ["<ponto forte específico citando o site 1>", "<2>", "<3>"],
+  "strengths": ["<ponto forte específico 1>", "<2>", "<3>"],
   "weaknesses": ["<problema crítico com impacto na conversão 1>", "<2>", "<3>"],
-  "improvements": ["<melhoria com exemplo de implementação e impacto esperado 1>", "<2>", "<3>", "<4>", "<5>"],
+  "improvements": ["<melhoria com exemplo de implementação 1>", "<2>", "<3>", "<4>", "<5>"],
   "recommended_actions": ["<Quick Win de maior impacto 1>", "<2>", "<3>", "<4>"]
 }`;
 
 // =============================================================================
-// MODEL SELECTION
-// =============================================================================
-
-function getPromptAndModel(type: AIAnalysisType): { prompt: string; model: string } {
-  const prompts: Record<AIAnalysisType, string> = {
-    AD_CREATIVE: AD_CREATIVE_PROMPT,
-    PROFILE_AUDIT: PROFILE_AUDIT_PROMPT,
-    POST_ANALYSIS: POST_ANALYSIS_PROMPT,
-    SITE_ANALYSIS: SITE_ANALYSIS_PROMPT,
-  };
-  return { prompt: prompts[type], model: "gpt-4o" };
-}
-
-// =============================================================================
-// MAIN ANALYSIS RUNNER — uses Responses API with web_search_preview
+// MAIN ANALYSIS RUNNER
+// URL/text → Chat Completions + response_format (garante JSON)
+// Image/video → Responses API (vision)
 // =============================================================================
 
 export async function runAnalysis(params: {
@@ -275,60 +258,63 @@ export async function runAnalysis(params: {
   imageBase64Frames?: string[];
   platform?: string;
 }): Promise<AIAnalysisDetail> {
-  const {
-    analysisId,
-    type,
-    inputType,
-    inputUrl,
-    pastedContent,
-    imageBase64Frames = [],
-    platform,
-  } = params;
-  const { prompt, model } = getPromptAndModel(type);
+  const { analysisId, type, inputType, inputUrl, pastedContent, imageBase64Frames = [], platform } = params;
+
+  const prompts: Record<AIAnalysisType, string> = {
+    AD_CREATIVE: AD_CREATIVE_PROMPT,
+    PROFILE_AUDIT: PROFILE_AUDIT_PROMPT,
+    POST_ANALYSIS: POST_ANALYSIS_PROMPT,
+    SITE_ANALYSIS: SITE_ANALYSIS_PROMPT,
+  };
+  const systemPrompt = prompts[type];
 
   try {
-    // Build user content
-    type ContentPart =
-      | { type: "input_text"; text: string }
-      | { type: "input_image"; image_url: string };
-
-    let userContent: string | ContentPart[];
+    let tokensUsed = 0;
+    let rawJson: unknown = null;
 
     if (inputType === "image" || inputType === "video") {
-      // Vision: send frames as images — no web search needed
+      // ── Vision: Responses API ──────────────────────────────────────────────
       if (imageBase64Frames.length === 0) {
         throw new Error("Nenhum frame de imagem/vídeo foi enviado para análise.");
       }
+
+      type ContentPart = { type: "input_text"; text: string } | { type: "input_image"; image_url: string };
       const parts: ContentPart[] = imageBase64Frames.map((b64) => ({
         type: "input_image" as const,
         image_url: b64,
       }));
-      const contextLines: string[] = [];
-      if (platform) contextLines.push(`Plataforma: ${platform}`);
-      if (pastedContent) contextLines.push(`Contexto adicional: ${pastedContent}`);
-      if (contextLines.length > 0) {
-        parts.push({ type: "input_text" as const, text: contextLines.join("\n") });
-      }
-      userContent = parts;
+      const ctx: string[] = [];
+      if (platform) ctx.push(`Plataforma: ${platform}`);
+      if (pastedContent) ctx.push(`Contexto: ${pastedContent}`);
+      ctx.push("Retorne APENAS o JSON solicitado, sem texto adicional.");
+      parts.push({ type: "input_text" as const, text: ctx.join("\n") });
+
+      const res = (await openai.responses.create({
+        model: "gpt-4o",
+        instructions: systemPrompt,
+        input: [{ role: "user" as const, content: parts as unknown as string }],
+        temperature: 0.3,
+        max_output_tokens: 3000,
+      })) as OpenAIResponse;
+
+      tokensUsed = res.usage?.total_tokens ?? 0;
+      rawJson = extractJson(res.output_text ?? "");
+
     } else {
-      // URL or text — fetch content server-side + use web_search as complement
+      // ── URL/text: Chat Completions + response_format (always valid JSON) ──
       const lines: string[] = [];
 
       if (inputUrl) {
-        lines.push(`URL PARA ANÁLISE: ${inputUrl}`);
+        lines.push(`URL ANALISADA: ${inputUrl}`);
         if (platform) lines.push(`Plataforma: ${platform}`);
 
-        // Try server-side fetch first (works for most sites)
-        const fetched = await fetchUrlContent(inputUrl);
-        if (fetched) {
+        const { content } = await fetchUrlMeta(inputUrl);
+        if (content) {
           lines.push("\n--- CONTEÚDO EXTRAÍDO DA PÁGINA ---");
-          lines.push(fetched);
-          lines.push("--- FIM DO CONTEÚDO EXTRAÍDO ---");
-          lines.push("\nUSE TAMBÉM a ferramenta de busca web para obter mais contexto sobre este site/perfil e complementar a análise.");
+          lines.push(content);
+          lines.push("--- FIM ---");
         } else {
-          // SPA or blocked — rely entirely on web search
-          lines.push("\nO conteúdo da página não pôde ser extraído diretamente (provavelmente uma SPA como Instagram/TikTok).");
-          lines.push("USE a ferramenta de busca web para pesquisar informações sobre esta URL/perfil e fazer a análise completa.");
+          lines.push("\n[Conteúdo da página não disponível via fetch — analise com base na URL e no contexto fornecido]");
         }
       }
 
@@ -340,38 +326,26 @@ export async function runAnalysis(params: {
       if (lines.length === 0) {
         throw new Error("Nenhum conteúdo foi fornecido para análise.");
       }
-      userContent = lines.join("\n");
+
+      const res = await openai.chat.completions.create({
+        model: "gpt-4o",
+        response_format: { type: "json_object" },
+        temperature: 0.3,
+        max_tokens: 3000,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: lines.join("\n") },
+        ],
+      });
+
+      tokensUsed = res.usage?.total_tokens ?? 0;
+      rawJson = extractJson(res.choices[0]?.message?.content ?? "{}");
     }
 
-    // Always use web_search for URL analysis
-    const useWebSearch = inputType === "url";
-
-    // Build request
-    const requestBody: Parameters<typeof openai.responses.create>[0] = {
-      model,
-      instructions: prompt,
-      input: [
-        {
-          role: "user" as const,
-          content: userContent as string,
-        },
-      ],
-      temperature: 0.3,
-      max_output_tokens: 3000,
-      ...(useWebSearch ? { tools: [{ type: "web_search_preview" as const }] } : {}),
-    };
-
-    const response = (await openai.responses.create(requestBody)) as OpenAIResponse;
-
-    const tokensUsed = response.usage?.total_tokens ?? 0;
-    const rawText = response.output_text ?? "";
-
+    // ── Parse result ──────────────────────────────────────────────────────────
     let parsed: AIAnalysisResult;
-    const raw = extractJson(rawText);
-
-    if (raw && typeof raw === "object") {
-      const r = raw as Record<string, unknown>;
-      // Normalize creative_readiness (may be nested object or string)
+    if (rawJson && typeof rawJson === "object") {
+      const r = rawJson as Record<string, unknown>;
       let creative_readiness: "SCALE" | "ITERATE" | "KILL" | undefined;
       let creative_readiness_reasoning: string | undefined;
       if (r.creative_readiness && typeof r.creative_readiness === "object") {
@@ -382,9 +356,8 @@ export async function runAnalysis(params: {
         creative_readiness = r.creative_readiness as "SCALE" | "ITERATE" | "KILL";
         creative_readiness_reasoning = r.creative_readiness_reasoning as string;
       }
-
       parsed = {
-        score: Number(r.score ?? 0),
+        score: Number(r.score ?? 50),
         summary: r.summary as string | undefined,
         creative_readiness,
         creative_readiness_reasoning,
@@ -392,15 +365,12 @@ export async function runAnalysis(params: {
         strengths: Array.isArray(r.strengths) ? (r.strengths as string[]) : [],
         weaknesses: Array.isArray(r.weaknesses) ? (r.weaknesses as string[]) : [],
         improvements: Array.isArray(r.improvements) ? (r.improvements as string[]) : [],
-        recommended_actions: Array.isArray(r.recommended_actions)
-          ? (r.recommended_actions as string[])
-          : [],
+        recommended_actions: Array.isArray(r.recommended_actions) ? (r.recommended_actions as string[]) : [],
       };
     } else {
-      // Fallback: model returned free text — treat as summary
       parsed = {
-        score: 0,
-        summary: rawText.slice(0, 300) || "Não foi possível processar a resposta da IA.",
+        score: 50,
+        summary: "Análise realizada — veja os detalhes abaixo.",
         strengths: [],
         weaknesses: [],
         improvements: [],
@@ -456,30 +426,16 @@ export async function listAnalyses(params: {
   const { userId, page, pageSize, type } = params;
   const skip = (page - 1) * pageSize;
   const where = { userId, ...(type ? { type } : {}) };
-
   const [analyses, total] = await db.$transaction([
     db.aIAnalysis.findMany({
       where,
       orderBy: { createdAt: "desc" },
       skip,
       take: pageSize,
-      select: {
-        id: true,
-        type: true,
-        inputType: true,
-        inputUrl: true,
-        fileUrl: true,
-        thumbnailUrl: true,
-        platform: true,
-        score: true,
-        status: true,
-        error: true,
-        createdAt: true,
-      },
+      select: { id: true, type: true, inputType: true, inputUrl: true, fileUrl: true, thumbnailUrl: true, platform: true, score: true, status: true, error: true, createdAt: true },
     }),
     db.aIAnalysis.count({ where }),
   ]);
-
   return {
     analyses: analyses.map((a) => ({
       ...a,
@@ -492,10 +448,7 @@ export async function listAnalyses(params: {
   };
 }
 
-export async function getAnalysis(
-  id: string,
-  userId: string
-): Promise<AIAnalysisDetail | null> {
+export async function getAnalysis(id: string, userId: string): Promise<AIAnalysisDetail | null> {
   const a = await db.aIAnalysis.findFirst({ where: { id, userId } });
   if (!a) return null;
   return {

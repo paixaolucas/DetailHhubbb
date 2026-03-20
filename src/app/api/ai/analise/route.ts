@@ -6,7 +6,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth, verifyPlatformMembership } from "@/middleware/auth.middleware";
 import { db } from "@/lib/db";
-import { runAnalysis, listAnalyses } from "@/services/ai/analysis.service";
+import { runAnalysis, listAnalyses, fetchUrlMeta } from "@/services/ai/analysis.service";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { RATE_LIMIT } from "@/lib/constants";
 import { UserRole } from "@prisma/client";
@@ -85,6 +85,14 @@ export const POST = withAuth(
         { success: false, error: "Tipo de entrada inválido" },
         { status: 400 }
       );
+    }
+
+    // For URL analyses, fetch og:image as thumbnail (lightweight — just a URL string)
+    if (inputType === "url" && inputUrl && !thumbnailUrl) {
+      try {
+        const { ogImage } = await fetchUrlMeta(inputUrl);
+        if (ogImage) thumbnailUrl = ogImage;
+      } catch { /* thumbnail is optional */ }
     }
 
     // Create pending record
