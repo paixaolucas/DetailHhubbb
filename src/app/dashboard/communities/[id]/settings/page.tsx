@@ -13,7 +13,7 @@ import { useToast } from "@/components/ui/toast-provider";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import OnboardingChecklist from "@/components/community/OnboardingChecklist";
 import { STORAGE_KEYS } from "@/lib/constants";
-import { useUploadThing } from "@/utils/uploadthing";
+import { uploadFiles } from "@/utils/upload";
 
 const TABS = [
   { id: "general", label: "Geral", icon: Settings },
@@ -93,23 +93,23 @@ export default function CommunitySettingsPage() {
   const [logoUploading, setLogoUploading] = useState(false);
   const [bannerUploading, setBannerUploading] = useState(false);
 
-  const { startUpload: startLogoUpload } = useUploadThing("communityImageUploader", {
-    onClientUploadComplete: (res) => {
-      const url = res?.[0]?.url;
-      if (url) setAppearanceForm((p) => ({ ...p, logoUrl: url }));
+  async function startLogoUpload(files: File[]) {
+    try {
+      const [result] = await uploadFiles(files, "community-images");
+      setAppearanceForm((p) => ({ ...p, logoUrl: result.url }));
+    } catch { /* silent */ } finally {
       setLogoUploading(false);
-    },
-    onUploadError: () => setLogoUploading(false),
-  });
+    }
+  }
 
-  const { startUpload: startBannerUpload } = useUploadThing("communityImageUploader", {
-    onClientUploadComplete: (res) => {
-      const url = res?.[0]?.url;
-      if (url) setAppearanceForm((p) => ({ ...p, bannerUrl: url }));
+  async function startBannerUpload(files: File[]) {
+    try {
+      const [result] = await uploadFiles(files, "community-images");
+      setAppearanceForm((p) => ({ ...p, bannerUrl: result.url }));
+    } catch { /* silent */ } finally {
       setBannerUploading(false);
-    },
-    onUploadError: () => setBannerUploading(false),
-  });
+    }
+  }
 
   // Points allocation modal
   const [pointsModal, setPointsModal] = useState<{ open: boolean; userId: string; userName: string }>({

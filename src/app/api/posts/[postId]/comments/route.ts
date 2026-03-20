@@ -17,6 +17,12 @@ const commentSchema = z.object({
     .max(5000, "Máximo 5000 caracteres")
     .trim(),
   parentId: z.string().optional(),
+  attachments: z.array(
+    z.union([
+      z.string().url(),
+      z.object({ url: z.string().url(), name: z.string(), size: z.number().optional() }),
+    ])
+  ).max(10).optional().default([]),
 });
 
 const AUTHOR_SELECT = {
@@ -123,7 +129,7 @@ export const POST = withAuth(async (req, { session, params }) => {
         { status: 400 }
       );
     }
-    const { body: commentBody, parentId } = parsed.data;
+    const { body: commentBody, parentId, attachments } = parsed.data;
 
     let parentAuthorId: string | null = null;
     if (parentId) {
@@ -147,6 +153,7 @@ export const POST = withAuth(async (req, { session, params }) => {
           authorId: session.userId,
           parentId: parentId ?? null,
           body: commentBody,
+          attachments: attachments as object[],
         },
         include: {
           author: { select: AUTHOR_SELECT },

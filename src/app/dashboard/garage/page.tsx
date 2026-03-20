@@ -9,7 +9,7 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Car, Save, ImageIcon, X, Share2 } from "lucide-react";
-import { useUploadThing } from "@/utils/uploadthing";
+import { uploadFiles } from "@/utils/upload";
 import { STORAGE_KEYS } from "@/lib/constants";
 
 interface GarageData {
@@ -44,7 +44,6 @@ export default function GaragePage() {
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { startUpload } = useUploadThing("postAttachmentUploader");
 
   useEffect(() => {
     const uid = localStorage.getItem(STORAGE_KEYS.USER_ID);
@@ -113,8 +112,8 @@ export default function GaragePage() {
       if (selectedFiles.length > 0) {
         setUploading(true);
         try {
-          const uploaded = await startUpload(selectedFiles);
-          newPhotoUrls = (uploaded ?? []).map((f) => f.url);
+          const uploaded = await uploadFiles(selectedFiles, "posts");
+          newPhotoUrls = uploaded.map((f) => f.url);
         } catch {
           setError("Erro ao fazer upload das fotos.");
           return;

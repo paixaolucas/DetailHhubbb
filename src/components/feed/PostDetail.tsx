@@ -8,12 +8,13 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
-import { ArrowLeft, Trash2, MessageCircle, Hash } from "lucide-react";
+import { ArrowLeft, Trash2, MessageCircle, Hash, Paperclip, FileText, Download, X } from "lucide-react";
 import Link from "next/link";
 import ReactionBar from "@/components/feed/ReactionBar";
-import CommentItem, { CommentData } from "@/components/feed/CommentItem";
+import CommentItem, { CommentData, CommentAttachment } from "@/components/feed/CommentItem";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { STORAGE_KEYS } from "@/lib/constants";
+import { uploadFiles } from "@/utils/upload";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -121,6 +122,9 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
   const [commentBody, setCommentBody] = useState("");
   const [commentLoading, setCommentLoading] = useState(false);
   const [commentError, setCommentError] = useState("");
+  const [commentFiles, setCommentFiles] = useState<File[]>([]);
+  const [uploadingComment, setUploadingComment] = useState(false);
+  const commentFileRef = useRef<HTMLInputElement>(null);
 
   // Delete
   const [deleting, setDeleting] = useState(false);
@@ -240,18 +244,34 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
 
   async function handleComment(e: React.FormEvent) {
     e.preventDefault();
-    if (!commentBody.trim()) return;
+    if (!commentBody.trim() && commentFiles.length === 0) return;
     setCommentLoading(true);
     setCommentError("");
     try {
       const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+
+      // Upload files first
+      let attachments: (string | CommentAttachment)[] = [];
+      if (commentFiles.length > 0) {
+        setUploadingComment(true);
+        try {
+          const uploaded = await uploadFiles(commentFiles, "posts");
+          attachments = uploaded;
+        } catch {
+          setCommentError("Erro ao enviar arquivo. Tente novamente.");
+          return;
+        } finally {
+          setUploadingComment(false);
+        }
+      }
+
       const res = await fetch(`/api/posts/${postId}/comments`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ body: commentBody.trim() }),
+        body: JSON.stringify({ body: commentBody.trim() || " ", attachments }),
       });
       const json = await res.json();
       if (!res.ok || !json.success) {
@@ -260,10 +280,12 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
       }
       setComments((prev) => [...prev, json.data]);
       setCommentBody("");
+      setCommentFiles([]);
     } catch {
       setCommentError("Erro de conexão.");
     } finally {
       setCommentLoading(false);
+      setUploadingComment(false);
     }
   }
 
@@ -434,22 +456,65 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
               onChange={(e) => setCommentBody(e.target.value)}
               placeholder="Escreva um comentário..."
               rows={3}
-              required
               className="w-full bg-white/5 border border-white/10 hover:border-[#006079]/40 focus:border-[#009CD9]/40 rounded-xl px-4 py-3 text-sm text-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/20 resize-none transition-all"
             />
+
+            {/* File previews */}
+            {commentFiles.length > 0 && (
+              <div className="flex flex-col gap-1.5">
+                {commentFiles.map((f, i) => (
+                  <div key={i} className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-gray-300">
+                    <FileText className="w-4 h-4 text-[#009CD9] flex-shrink-0" />
+                    <span className="flex-1 truncate">{f.name}</span>
+                    <span className="text-gray-500">{Math.round(f.size / 1024)}KB</span>
+                    <button type="button" onClick={() => setCommentFiles((prev) => prev.filter((_, j) => j !== i))} className="text-gray-500 hover:text-red-400">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
             {commentError && (
               <p className="text-xs text-red-400">{commentError}</p>
             )}
-            <div className="flex justify-end">
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => commentFileRef.current?.click()}
+                className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#009CD9] transition-colors"
+                title="Anexar arquivo"
+              >
+                <Paperclip className="w-4 h-4" />
+                <span>Arquivo</span>
+              </button>
+              <input
+                ref={commentFileRef}
+                type="file"
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,.png,.jpg,.jpeg,.gif,.webp"
+                multiple
+                className="hidden"
+                onChange={(e) => {
+                  const files = Array.from(e.target.files ?? []);
+                  setCommentFiles((prev) => [...prev, ...files].slice(0, 5));
+                  e.target.value = "";
+                }}
+              />
+              <div className="flex-1" />
               <button
                 type="submit"
-                disabled={commentLoading || !commentBody.trim()}
+                disabled={commentLoading || uploadingComment || (!commentBody.trim() && commentFiles.length === 0)}
                 className="inline-flex items-center gap-2 bg-[#006079] hover:bg-[#007A99] disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-4 py-2 rounded-lg transition-all"
               >
-                {commentLoading ? (
+                {uploadingComment ? (
                   <>
                     <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     Enviando...
+                  </>
+                ) : commentLoading ? (
+                  <>
+                    <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Publicando...
                   </>
                 ) : (
                   "Comentar"

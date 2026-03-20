@@ -271,15 +271,16 @@ enum PostType {
 }
 
 model Comment {
-  id        String            @id @default(cuid())
-  postId    String
-  authorId  String
-  parentId  String?
-  body      String            @db.Text
-  isHidden  Boolean           @default(false)
-  likeCount Int               @default(0)
-  createdAt DateTime          @default(now())
-  updatedAt DateTime          @updatedAt
+  id          String            @id @default(cuid())
+  postId      String
+  authorId    String
+  parentId    String?
+  body        String            @db.Text
+  attachments Json              @default("[]")
+  isHidden    Boolean           @default(false)
+  likeCount   Int               @default(0)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
   post      Post              @relation(fields: [postId], references: [id], onDelete: Cascade)
   author    User              @relation(fields: [authorId], references: [id])
   parent    Comment?          @relation("Replies", fields: [parentId], references: [id])

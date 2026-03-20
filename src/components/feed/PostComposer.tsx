@@ -11,7 +11,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import Image from "next/image";
 import { Send, Plus, Minus, ImageIcon, X, Lock, Rocket, Video, Paperclip, FileText } from "lucide-react";
-import { useUploadThing } from "@/utils/uploadthing";
+import { uploadFiles } from "@/utils/upload";
 import { STORAGE_KEYS } from "@/lib/constants";
 import { getMemberLevel, getMemberLevelColor, POST_THRESHOLD } from "@/lib/points";
 import VideoEmbed from "@/components/ui/VideoEmbed";
@@ -111,8 +111,6 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
     if (scoreTrigger) pollScore();
   }, [scoreTrigger, pollScore]);
 
-  const { startUpload } = useUploadThing("postAttachmentUploader");
-  const { startUpload: startFileUpload } = useUploadThing("postFileUploader");
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
@@ -155,8 +153,8 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
       if (selectedFiles.length > 0) {
         setUploading(true);
         try {
-          const uploaded = await startUpload(selectedFiles);
-          attachments = (uploaded ?? []).map((f) => f.url);
+          const uploaded = await uploadFiles(selectedFiles, "posts");
+          attachments = uploaded.map((f) => f.url);
         } catch {
           setError("Erro ao fazer upload das imagens. Tente novamente.");
           return;
@@ -168,13 +166,8 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
       if (docFiles.length > 0) {
         setUploadingDocs(true);
         try {
-          const uploaded = await startFileUpload(docFiles.map((d) => d.file));
-          const fileObjs = (uploaded ?? []).map((f, i) => ({
-            url: f.url,
-            name: docFiles[i]?.name ?? f.url.split("/").pop() ?? "arquivo",
-            size: docFiles[i]?.size ?? 0,
-          }));
-          attachments = [...attachments, ...fileObjs];
+          const uploaded = await uploadFiles(docFiles.map((d) => d.file), "posts");
+          attachments = [...attachments, ...uploaded];
         } catch {
           setError("Erro ao fazer upload dos arquivos. Tente novamente.");
           return;

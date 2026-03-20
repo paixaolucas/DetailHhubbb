@@ -5,11 +5,12 @@
 // delete option, and inline reply form. Renders replies indented below.
 // =============================================================================
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
-import { ThumbsUp, Trash2, CornerDownRight } from "lucide-react";
+import { ThumbsUp, Trash2, CornerDownRight, Paperclip, FileText, Download, X } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { STORAGE_KEYS } from "@/lib/constants";
+import { uploadFiles } from "@/utils/upload";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -22,6 +23,12 @@ export interface CommentAuthor {
   avatarUrl?: string | null;
 }
 
+export interface CommentAttachment {
+  url: string;
+  name: string;
+  size?: number;
+}
+
 export interface CommentData {
   id: string;
   body: string;
@@ -29,6 +36,7 @@ export interface CommentData {
   likeCount: number;
   createdAt: string;
   replies?: CommentData[];
+  attachments?: (string | CommentAttachment)[];
   _count?: { reactions?: number };
 }
 
@@ -84,6 +92,9 @@ export default function CommentItem({
   const [localReplies, setLocalReplies] = useState<CommentData[]>(
     comment.replies ?? []
   );
+  const [replyFiles, setReplyFiles] = useState<File[]>([]);
+  const [uploadingReply, setUploadingReply] = useState(false);
+  const replyFileRef = useRef<HTMLInputElement>(null);
 
   const authorName = `${comment.author.firstName} ${comment.author.lastName}`;
   const initials = `${comment.author.firstName[0] ?? ""}${comment.author.lastName[0] ?? ""}`.toUpperCase();
@@ -139,18 +150,34 @@ export default function CommentItem({
 
   async function handleReply(e: React.FormEvent) {
     e.preventDefault();
-    if (!replyBody.trim()) return;
+    if (!replyBody.trim() && replyFiles.length === 0) return;
     setReplyLoading(true);
     setReplyError("");
     try {
       const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+
+      // Upload files first
+      let attachments: (string | CommentAttachment)[] = [];
+      if (replyFiles.length > 0) {
+        setUploadingReply(true);
+        try {
+          const uploaded = await uploadFiles(replyFiles, "posts");
+          attachments = uploaded;
+        } catch {
+          setReplyError("Erro ao enviar arquivo. Tente novamente.");
+          return;
+        } finally {
+          setUploadingReply(false);
+        }
+      }
+
       const res = await fetch(`/api/posts/${postId}/comments`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ body: replyBody.trim(), parentId: comment.id }),
+        body: JSON.stringify({ body: replyBody.trim() || " ", parentId: comment.id, attachments }),
       });
       const json = await res.json();
       if (!res.ok || !json.success) {
@@ -159,11 +186,13 @@ export default function CommentItem({
       }
       setLocalReplies((prev) => [...prev, json.data]);
       setReplyBody("");
+      setReplyFiles([]);
       setShowReplyBox(false);
     } catch {
       setReplyError("Erro de conexão.");
     } finally {
       setReplyLoading(false);
+      setUploadingReply(false);
     }
   }
 
@@ -198,6 +227,35 @@ export default function CommentItem({
           <p className="text-sm text-gray-400 leading-relaxed whitespace-pre-wrap break-words">
             {comment.body}
           </p>
+
+          {/* Attachments */}
+          {comment.attachments && comment.attachments.length > 0 && (
+            <div className="mt-2 flex flex-col gap-1.5">
+              {comment.attachments.map((att, i) => {
+                if (typeof att === "string") {
+                  return (
+                    <a key={i} href={att} target="_blank" rel="noopener noreferrer" className="text-xs text-[#009CD9] hover:underline break-all">
+                      {att}
+                    </a>
+                  );
+                }
+                return (
+                  <a
+                    key={i}
+                    href={att.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-white/5 border border-white/10 hover:border-[#009CD9]/40 rounded-lg px-3 py-2 text-xs text-gray-300 hover:text-[#EEE6E4] transition-all group"
+                  >
+                    <FileText className="w-4 h-4 text-[#009CD9] flex-shrink-0" />
+                    <span className="flex-1 min-w-0 truncate">{att.name}</span>
+                    {att.size && <span className="text-gray-500 flex-shrink-0">{Math.round(att.size / 1024)}KB</span>}
+                    <Download className="w-3.5 h-3.5 text-gray-500 group-hover:text-[#009CD9] flex-shrink-0" />
+                  </a>
+                );
+              })}
+            </div>
+          )}
 
           {/* Actions */}
           <div className="flex items-center gap-3 mt-2">
@@ -245,23 +303,59 @@ export default function CommentItem({
                 onChange={(e) => setReplyBody(e.target.value)}
                 placeholder="Escreva uma resposta..."
                 rows={2}
-                required
                 className="w-full bg-white/5 border border-white/10 focus:border-[#009CD9]/40 rounded-lg px-3 py-2 text-sm text-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/20 resize-none transition-all"
               />
+
+              {/* File previews */}
+              {replyFiles.length > 0 && (
+                <div className="flex flex-col gap-1">
+                  {replyFiles.map((f, i) => (
+                    <div key={i} className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-gray-300">
+                      <FileText className="w-3.5 h-3.5 text-[#009CD9] flex-shrink-0" />
+                      <span className="flex-1 truncate">{f.name}</span>
+                      <span className="text-gray-500">{Math.round(f.size / 1024)}KB</span>
+                      <button type="button" onClick={() => setReplyFiles((prev) => prev.filter((_, j) => j !== i))} className="text-gray-500 hover:text-red-400">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               {replyError && (
                 <p className="text-xs text-red-400">{replyError}</p>
               )}
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => replyFileRef.current?.click()}
+                  className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-[#009CD9] transition-colors"
+                  title="Anexar arquivo"
+                >
+                  <Paperclip className="w-3.5 h-3.5" />
+                </button>
+                <input
+                  ref={replyFileRef}
+                  type="file"
+                  accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,.png,.jpg,.jpeg,.gif,.webp"
+                  multiple
+                  className="hidden"
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files ?? []);
+                    setReplyFiles((prev) => [...prev, ...files].slice(0, 5));
+                    e.target.value = "";
+                  }}
+                />
                 <button
                   type="submit"
-                  disabled={replyLoading || !replyBody.trim()}
+                  disabled={replyLoading || uploadingReply || (!replyBody.trim() && replyFiles.length === 0)}
                   className="text-xs bg-[#006079] hover:bg-[#007A99] disabled:opacity-50 text-white px-3 py-1.5 rounded-lg font-medium transition-all"
                 >
-                  {replyLoading ? "Enviando..." : "Responder"}
+                  {uploadingReply ? "Enviando..." : replyLoading ? "Publicando..." : "Responder"}
                 </button>
                 <button
                   type="button"
-                  onClick={() => { setShowReplyBox(false); setReplyBody(""); }}
+                  onClick={() => { setShowReplyBox(false); setReplyBody(""); setReplyFiles([]); }}
                   className="text-xs text-gray-500 hover:text-gray-400 px-2 py-1.5 transition-colors"
                 >
                   Cancelar

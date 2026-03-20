@@ -20,7 +20,7 @@ import {
   Clock,
 } from "lucide-react";
 import { RoleBadge } from "@/components/ui/badge";
-import { useUploadThing } from "@/utils/uploadthing";
+import { uploadFiles } from "@/utils/upload";
 import { useToast } from "@/components/ui/toast-provider";
 import { STORAGE_KEYS } from "@/lib/constants";
 
@@ -118,27 +118,21 @@ export default function SettingsPage() {
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
-  const { startUpload } = useUploadThing("avatarUploader", {
-    onClientUploadComplete: (res) => {
-      const url = res?.[0]?.url;
-      if (url) {
-        setProfileForm((p) => ({ ...p, avatarUrl: url }));
-        setAvatarPreview(url);
-      }
-      setAvatarUploading(false);
-    },
-    onUploadError: () => {
-      setAvatarUploading(false);
-    },
-  });
-
-  function handleAvatarFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleAvatarFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     const preview = URL.createObjectURL(file);
     setAvatarPreview(preview);
     setAvatarUploading(true);
-    startUpload([file]);
+    try {
+      const [result] = await uploadFiles([file], "avatars");
+      setProfileForm((p) => ({ ...p, avatarUrl: result.url }));
+      setAvatarPreview(result.url);
+    } catch {
+      // mantém preview local, não bloqueia
+    } finally {
+      setAvatarUploading(false);
+    }
   }
 
   // Influencer profile (F6)

@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { STORAGE_KEYS } from "@/lib/constants";
-import { useUploadThing } from "@/utils/uploadthing";
+import { uploadFiles } from "@/utils/upload";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -131,7 +131,6 @@ export default function TrilhasManagerPage() {
   // File upload
   const [uploadingFiles, setUploadingFiles] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { startUpload } = useUploadThing("lessonFileUploader");
 
   // ---------------------------------------------------------------------------
 
@@ -294,11 +293,11 @@ export default function TrilhasManagerPage() {
     if (!files.length) return;
     setUploadingFiles(true);
     try {
-      const uploaded = await startUpload(files);
-      const newFiles: LessonFile[] = (uploaded ?? []).map((f) => ({
+      const uploaded = await uploadFiles(files, "lessons");
+      const newFiles: LessonFile[] = uploaded.map((f) => ({
         url: f.url,
-        name: (f as { name?: string }).name ?? f.url.split("/").pop() ?? "arquivo",
-        size: (f as { size?: number }).size,
+        name: f.name,
+        size: f.size,
       }));
       setLessonForm((prev) => ({ ...prev, attachments: [...prev.attachments, ...newFiles] }));
     } catch {
