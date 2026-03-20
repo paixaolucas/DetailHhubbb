@@ -56,6 +56,7 @@ import { Logo, LogoType } from "@/components/ui/logo";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import SearchBar from "@/components/search/SearchBar";
 import { STORAGE_KEYS } from "@/lib/constants";
+import { ViewAsContext } from "@/contexts/view-as-context";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -876,7 +877,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* Page content */}
         <div className="flex-1 p-4 sm:p-6">
-          {children}
+          <ViewAsContext.Provider value={{
+            viewAs,
+            viewAsUser,
+            effectiveRole:
+              viewAs === "MEMBER_PAID" || viewAs === "MEMBER_UNPAID"
+                ? "COMMUNITY_MEMBER"
+                : viewAs === "INFLUENCER" || viewAs === "INFLUENCER_ADMIN"
+                ? "INFLUENCER_ADMIN"
+                : viewAsUser?.role ?? "",
+            effectiveName: viewAsUser?.name ?? userName,
+          }}>
+            {children}
+          </ViewAsContext.Provider>
         </div>
       </main>
     </div>

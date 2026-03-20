@@ -29,6 +29,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/components/ui/toast-provider";
 import { CommunityThumbnail } from "@/components/community/CommunityThumbnail";
 import { STORAGE_KEYS } from "@/lib/constants";
+import { useViewAs } from "@/contexts/view-as-context";
 import {
   AreaChart,
   Area,
@@ -570,12 +571,12 @@ function CommunityCardSkeleton() {
   );
 }
 
-function MemberDashboardInner({ userName }: { userName: string }) {
+function MemberDashboardInner({ userName, forcePaid }: { userName: string; forcePaid?: boolean | null }) {
   const firstName = userName.split(" ")[0] || "Aluno";
   const greeting = getGreeting(firstName);
   const [communities, setCommunities] = useState<CommunityCard[]>([]);
   const [loading, setLoading] = useState(true);
-  const [hasPlatform, setHasPlatform] = useState<boolean | null>(null);
+  const [hasPlatform, setHasPlatform] = useState<boolean | null>(forcePaid !== undefined ? forcePaid : null);
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [lbLoading, setLbLoading] = useState(true);
   const [lbPeriod, setLbPeriod] = useState<"all" | "month">("all");
@@ -604,23 +605,28 @@ function MemberDashboardInner({ userName }: { userName: string }) {
     const headers = { Authorization: `Bearer ${token}` };
 
     // Fire ALL requests in parallel — single round-trip instead of 4-5 sequential
+    // When forcePaid is set (ViewAs mode), skip membership check and use the forced value
+    const membershipPromise = forcePaid !== undefined
+      ? Promise.resolve({ data: { hasMembership: forcePaid } })
+      : fetch("/api/platform-membership/me", { headers }).then(async (r) => {
+          if (r.status === 401) {
+            Object.values(STORAGE_KEYS).forEach((key) => localStorage.removeItem(key));
+            window.location.href = "/login";
+            throw new Error("SESSION_EXPIRED");
+          }
+          return r.json();
+        });
+
     Promise.all([
       fetch("/api/communities?published=true", { headers }).then((r) => r.json()),
-      fetch("/api/platform-membership/me", { headers }).then(async (r) => {
-        if (r.status === 401) {
-          Object.values(STORAGE_KEYS).forEach((key) => localStorage.removeItem(key));
-          window.location.href = "/login";
-          throw new Error("SESSION_EXPIRED");
-        }
-        return r.json();
-      }),
+      membershipPromise,
       fetch(`/api/leaderboard?limit=5&period=${lbPeriod}`).then((r) => r.json()),
       userId ? fetch(`/api/users/${userId}/score`, { headers }).then((r) => r.json()) : Promise.resolve(null),
       fetch("/api/feed/recommended?limit=5", { headers }).then((r) => r.json()),
     ])
       .then(([commData, platformData, lbData, scoreData, recData]) => {
         if (commData.success) setCommunities(commData.communities ?? []);
-        setHasPlatform(platformData.data?.hasMembership === true);
+        if (forcePaid === undefined) setHasPlatform(platformData.data?.hasMembership === true);
         if (lbData.success) setLeaderboard(lbData.data ?? []);
         if (scoreData?.success) setMyScore(scoreData.data);
         if (recData?.success) setRecommended(recData.data ?? []);
@@ -1127,9 +1133,10 @@ function PartnerDashboard({ userName }: { userName: string }) {
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
-  const [role, setRole] = useState<string | null>(null);
-  const [userName, setUserName] = useState("");
+  const [actualRole, setActualRole] = useState<string | null>(null);
+  const [actualName, setActualName] = useState("");
   const router = useRouter();
+  const { viewAs, effectiveRole, effectiveName } = useViewAs();
 
   useEffect(() => {
     const storedRole = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
@@ -1137,22 +1144,38 @@ export default function DashboardPage() {
       router.replace("/login");
       return;
     }
-    setRole(storedRole);
-    setUserName(localStorage.getItem(STORAGE_KEYS.USER_NAME) ?? "");
+    setActualRole(storedRole);
+    setActualName(localStorage.getItem(STORAGE_KEYS.USER_NAME) ?? "");
   }, [router]);
 
-  if (!role) return (
+  if (!actualRole) return (
     <div className="flex items-center justify-center h-64">
       <div className="w-8 h-8 border-[3px] border-[#007A99] border-t-transparent rounded-full animate-spin" />
     </div>
   );
 
+  // ViewAs: usa role/nome efetivo do contexto quando admin está simulando
+  const role = effectiveRole || actualRole;
+  const userName = effectiveName || actualName;
+
+  // Determina se a assinatura é forçada (ViewAs presets)
+  const forcePaid =
+    effectiveRole === "COMMUNITY_MEMBER" && effectiveRole !== actualRole
+      ? (viewAs === "MEMBER_UNPAID" ? false : true)
+      : undefined;
+
   switch (role) {
     case "SUPER_ADMIN": return <AdminDashboard />;
     case "INFLUENCER_ADMIN": return <InfluencerDashboard userName={userName} />;
-    case "COMMUNITY_MEMBER": return <Suspense fallback={<DashboardSkeleton />}><MemberDashboardInner userName={userName} /></Suspense>;
+    case "COMMUNITY_MEMBER": return (
+      <Suspense fallback={<DashboardSkeleton />}>
+        <MemberDashboardInner userName={userName} forcePaid={forcePaid} />
+      </Suspense>
+    );
     case "MARKETPLACE_PARTNER": return <PartnerDashboard userName={userName} />;
     default: {
+      // Se effectiveRole não mapeia para nada (ex: preset genérico), mantém SUPER_ADMIN
+      if (actualRole === "SUPER_ADMIN") return <AdminDashboard />;
       router.replace("/login");
       return null;
     }
