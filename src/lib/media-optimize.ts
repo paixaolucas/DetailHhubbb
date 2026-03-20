@@ -77,7 +77,7 @@ export async function compressImage(file: File, maxSizeMB = 1): Promise<File> {
  * Returns an error string, or null if valid.
  */
 export function validateVideoFile(file: File): string | null {
-  const MAX_MB = 10;
+  const MAX_MB = 100;
   const ALLOWED = ["video/mp4", "video/webm", "video/quicktime"];
   if (!ALLOWED.includes(file.type)) {
     return "Formato não suportado. Use MP4, WebM ou MOV.";
@@ -100,8 +100,8 @@ export function checkVideoDuration(file: File): Promise<string | null> {
 
     video.onloadedmetadata = () => {
       cleanup();
-      if (video.duration > 60) {
-        resolve(`Vídeo muito longo. Máximo 1 minuto (atual: ${Math.ceil(video.duration)}s).`);
+      if (video.duration > 600) {
+        resolve(`Vídeo muito longo. Máximo 10 minutos (atual: ${Math.ceil(video.duration / 60)}min).`);
       } else {
         resolve(null);
       }

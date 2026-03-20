@@ -20,7 +20,7 @@ const commentSchema = z.object({
   attachments: z.array(
     z.union([
       z.string().url(),
-      z.object({ url: z.string().url(), name: z.string(), size: z.number().optional() }),
+      z.object({ url: z.string().url(), name: z.string(), size: z.number().optional(), mediaType: z.string().optional() }),
     ])
   ).max(10).optional().default([]),
 });

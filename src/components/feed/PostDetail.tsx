@@ -17,6 +17,7 @@ import { STORAGE_KEYS } from "@/lib/constants";
 import { uploadFiles } from "@/utils/upload";
 import { EMOJI_CATS } from "@/lib/emoji-data";
 import { compressImage, validateVideoFile, checkVideoDuration } from "@/lib/media-optimize";
+import { LinkifyText } from "@/components/ui/linkify-text";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -359,8 +360,8 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
           const compressed = await Promise.all(commentImageFiles.map((f) => compressImage(f, 1)));
           const uploaded = await uploadFiles(compressed, "posts");
           attachments = uploaded.map((f) => f.url);
-        } catch {
-          setCommentError("Erro ao enviar imagens. Tente novamente.");
+        } catch (err) {
+          setCommentError(err instanceof Error ? err.message : "Erro ao enviar imagens. Tente novamente.");
           return;
         } finally {
           setUploadingCommentImages(false);
@@ -374,8 +375,8 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
           const uploaded = await uploadFiles([commentVideoFile], "posts");
           const v = uploaded[0];
           attachments = [...attachments, { url: v.url, name: v.name, size: v.size, mediaType: "video" }];
-        } catch {
-          setCommentError("Erro ao enviar vídeo. Tente novamente.");
+        } catch (err) {
+          setCommentError(err instanceof Error ? err.message : "Erro ao enviar vídeo. Tente novamente.");
           return;
         } finally {
           setUploadingCommentVideo(false);
@@ -397,8 +398,8 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
             return { url: f.url, name: f.name, size: f.size, mediaType: ext === "pdf" ? "pdf" : "doc" };
           });
           attachments = [...attachments, ...withTypes];
-        } catch {
-          setCommentError("Erro ao enviar arquivos. Tente novamente.");
+        } catch (err) {
+          setCommentError(err instanceof Error ? err.message : "Erro ao enviar arquivos. Tente novamente.");
           return;
         } finally {
           setUploadingComment(false);
@@ -554,7 +555,7 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
         {/* Body */}
         {post.body && post.body.trim() !== " " && (
           <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap break-words">
-            {post.body}
+            <LinkifyText text={post.body} />
           </p>
         )}
 
@@ -611,7 +612,7 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
                 {commentImagePreviews.map((url, idx) => (
                   <div key={idx} className="relative group">
                     <Image src={url} alt="" width={72} height={72}
-                      unoptimized={commentImageFiles[idx]?.type === "image/gif"}
+                      unoptimized
                       className="w-18 h-18 object-cover rounded-lg border border-white/10"
                       style={{ width: 72, height: 72 }}
                     />
@@ -744,7 +745,7 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
               {/* Vídeo */}
               <div className="relative flex-shrink-0" ref={commentVideoMenuRef}>
                 <button type="button"
-                  onClick={() => { if (!commentVideoFile && !commentVideoEmbedUrl && commentImageFiles.length === 0) setCommentVideoMenuOpen((v) => !v); }}
+                  onClick={() => { if (!commentVideoFile && !commentVideoEmbedUrl) setCommentVideoMenuOpen((v) => !v); }}
                   disabled={(!!commentVideoFile || !!commentVideoEmbedUrl) && !commentVideoMenuOpen}
                   className={`inline-flex items-center gap-1.5 text-xs px-2 py-1.5 rounded-lg transition-colors disabled:opacity-40 ${(commentVideoFile || commentVideoEmbedUrl) ? "text-[#009CD9] bg-[#006079]/20" : commentVideoMenuOpen ? "bg-[#006079]/20 text-[#009CD9]" : "text-gray-500 hover:text-[#009CD9] hover:bg-white/5"}`}
                   title="Vídeo">

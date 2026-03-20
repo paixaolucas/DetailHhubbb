@@ -13,6 +13,7 @@ import { STORAGE_KEYS } from "@/lib/constants";
 import { uploadFiles } from "@/utils/upload";
 import { EMOJI_CATS } from "@/lib/emoji-data";
 import { compressImage, validateVideoFile, checkVideoDuration } from "@/lib/media-optimize";
+import { LinkifyText } from "@/components/ui/linkify-text";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -254,8 +255,8 @@ export default function CommentItem({
           const compressed = await Promise.all(replyImageFiles.map((f) => compressImage(f, 1)));
           const uploaded = await uploadFiles(compressed, "posts");
           attachments = uploaded.map((f) => f.url);
-        } catch {
-          setReplyError("Erro ao enviar imagens. Tente novamente.");
+        } catch (err) {
+          setReplyError(err instanceof Error ? err.message : "Erro ao enviar imagens. Tente novamente.");
           return;
         } finally {
           setUploadingReplyImages(false);
@@ -268,8 +269,8 @@ export default function CommentItem({
           const uploaded = await uploadFiles([replyVideoFile], "posts");
           const v = uploaded[0];
           attachments = [...attachments, { url: v.url, name: v.name, size: v.size, mediaType: "video" }];
-        } catch {
-          setReplyError("Erro ao enviar vídeo. Tente novamente.");
+        } catch (err) {
+          setReplyError(err instanceof Error ? err.message : "Erro ao enviar vídeo. Tente novamente.");
           return;
         } finally {
           setUploadingReplyVideo(false);
@@ -289,8 +290,8 @@ export default function CommentItem({
             return { url: f.url, name: f.name, size: f.size, mediaType: ext === "pdf" ? "pdf" : "doc" };
           });
           attachments = [...attachments, ...withTypes];
-        } catch {
-          setReplyError("Erro ao enviar arquivos. Tente novamente.");
+        } catch (err) {
+          setReplyError(err instanceof Error ? err.message : "Erro ao enviar arquivos. Tente novamente.");
           return;
         } finally {
           setUploadingReplyDocs(false);
@@ -357,7 +358,7 @@ export default function CommentItem({
 
           {/* Body */}
           <p className="text-sm text-gray-400 leading-relaxed whitespace-pre-wrap break-words">
-            {comment.body}
+            <LinkifyText text={comment.body} />
           </p>
 
           {/* Attachments */}
@@ -504,7 +505,7 @@ export default function CommentItem({
                   {replyImagePreviews.map((url, idx) => (
                     <div key={idx} className="relative group">
                       <Image src={url} alt="" width={60} height={60}
-                        unoptimized={replyImageFiles[idx]?.type === "image/gif"}
+                        unoptimized
                         className="object-cover rounded-lg border border-white/10"
                         style={{ width: 60, height: 60 }}
                       />
@@ -631,7 +632,7 @@ export default function CommentItem({
                 {/* Vídeo */}
                 <div className="relative flex-shrink-0" ref={replyVideoMenuRef}>
                   <button type="button"
-                    onClick={() => { if (!replyVideoFile && !replyVideoEmbedUrl && replyImageFiles.length === 0) setReplyVideoMenuOpen((v) => !v); }}
+                    onClick={() => { if (!replyVideoFile && !replyVideoEmbedUrl) setReplyVideoMenuOpen((v) => !v); }}
                     disabled={(!!replyVideoFile || !!replyVideoEmbedUrl) && !replyVideoMenuOpen}
                     className={`inline-flex items-center gap-1 text-xs px-1.5 py-1 rounded-lg transition-colors disabled:opacity-40 ${(replyVideoFile || replyVideoEmbedUrl) ? "text-[#009CD9] bg-[#006079]/20" : replyVideoMenuOpen ? "bg-[#006079]/20 text-[#009CD9]" : "text-gray-500 hover:text-[#009CD9] hover:bg-white/5"}`}
                     title="Vídeo">

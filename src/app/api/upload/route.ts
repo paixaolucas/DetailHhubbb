@@ -12,10 +12,10 @@ const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const ALLOWED_BUCKETS = ["avatars", "community-images", "posts", "lessons"] as const;
 
 const MAX_SIZES: Record<string, number> = {
-  "avatars": 4 * 1024 * 1024,          // 4MB
-  "community-images": 8 * 1024 * 1024, // 8MB
-  "posts": 64 * 1024 * 1024,           // 64MB
-  "lessons": 64 * 1024 * 1024,         // 64MB
+  "avatars": 4 * 1024 * 1024,           //   4MB
+  "community-images": 8 * 1024 * 1024,  //   8MB
+  "posts": 200 * 1024 * 1024,           // 200MB (images, videos, docs)
+  "lessons": 200 * 1024 * 1024,         // 200MB
 };
 
 export const POST = withAuth(async (req, { session }) => {
@@ -50,19 +50,26 @@ export const POST = withAuth(async (req, { session }) => {
     // Gera path único: userId/timestamp-filename
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
     const path = `${session.userId}/${Date.now()}-${safeName}`;
+    const fileBytes = Buffer.from(await file.arrayBuffer());
+    const contentType = file.type || "application/octet-stream";
 
-    const uploadRes = await fetch(
-      `${SUPABASE_URL}/storage/v1/object/${bucket}/${path}`,
-      {
+    const doUpload = (ct: string) =>
+      fetch(`${SUPABASE_URL}/storage/v1/object/${bucket}/${path}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
-          "Content-Type": file.type || "application/octet-stream",
+          "Content-Type": ct,
           "x-upsert": "true",
         },
-        body: Buffer.from(await file.arrayBuffer()),
-      }
-    );
+        body: fileBytes,
+      });
+
+    let uploadRes = await doUpload(contentType);
+
+    // Se o bucket rejeitar o MIME type, tentar novamente como octet-stream
+    if (!uploadRes.ok && uploadRes.status === 422 && contentType !== "application/octet-stream") {
+      uploadRes = await doUpload("application/octet-stream");
+    }
 
     if (!uploadRes.ok) {
       const errText = await uploadRes.text();
@@ -72,6 +79,7 @@ export const POST = withAuth(async (req, { session }) => {
         const errJson = JSON.parse(errText);
         if (errJson?.error === "Bucket not found") userMsg = "Bucket de storage não encontrado. Configure os buckets no Supabase.";
         else if (errJson?.message) userMsg = errJson.message;
+        else if (errJson?.error) userMsg = errJson.error;
       } catch { /* not json */ }
       return NextResponse.json({ success: false, error: userMsg }, { status: 500 });
     }

@@ -9,6 +9,7 @@ import { useState, useRef, useEffect, memo } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { MessageCircle, ThumbsUp, Pin, MoreHorizontal, EyeOff, Eye, Trash2, FileText, Download } from "lucide-react";
+import { LinkifyText } from "@/components/ui/linkify-text";
 import ReactionBar from "@/components/feed/ReactionBar";
 import { useToast } from "@/components/ui/toast-provider";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
@@ -363,7 +364,7 @@ function PostCard({
         {/* Body preview */}
         {post.body && post.body.trim() !== " " && (
           <p className="text-sm text-gray-300 leading-relaxed line-clamp-3 whitespace-pre-wrap break-words">
-            {post.body}
+            <LinkifyText text={post.body} />
           </p>
         )}
 
