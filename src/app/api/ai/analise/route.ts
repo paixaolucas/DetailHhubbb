@@ -87,12 +87,14 @@ export const POST = withAuth(
       );
     }
 
-    // For URL analyses, fetch og:image as thumbnail (lightweight — just a URL string)
+    // For URL analyses: fetch once here — get og:image for thumbnail + content for analysis
+    let prefetchedContent: string | undefined;
     if (inputType === "url" && inputUrl && !thumbnailUrl) {
       try {
-        const { ogImage } = await fetchUrlMeta(inputUrl);
+        const { ogImage, content } = await fetchUrlMeta(inputUrl);
         if (ogImage) thumbnailUrl = ogImage;
-      } catch { /* thumbnail is optional */ }
+        if (content) prefetchedContent = content;
+      } catch { /* optional */ }
     }
 
     // Create pending record
@@ -120,6 +122,7 @@ export const POST = withAuth(
         pastedContent,
         imageBase64Frames: imageBase64Frames ?? [],
         platform,
+        prefetchedContent,
       });
 
       return NextResponse.json({ success: true, data: result });

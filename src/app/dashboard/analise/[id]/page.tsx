@@ -334,12 +334,22 @@ export default function AnalyseResultPage() {
           {/* Hero card: score + type + readiness */}
           <div className="glass-card p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-              {/* Type icon */}
-              <div
-                className={`w-14 h-14 bg-gradient-to-br ${typeConfig?.color ?? "from-[#006079] to-[#009CD9]"} rounded-2xl flex items-center justify-center flex-shrink-0`}
-              >
-                <Icon className="w-7 h-7 text-white" />
-              </div>
+              {/* Thumbnail or type icon */}
+              {analysis.thumbnailUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={analysis.thumbnailUrl}
+                  alt=""
+                  className="w-14 h-14 rounded-2xl object-cover flex-shrink-0"
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                />
+              ) : (
+                <div
+                  className={`w-14 h-14 bg-gradient-to-br ${typeConfig?.color ?? "from-[#006079] to-[#009CD9]"} rounded-2xl flex items-center justify-center flex-shrink-0`}
+                >
+                  <Icon className="w-7 h-7 text-white" />
+                </div>
+              )}
 
               {/* Title + meta */}
               <div className="flex-1 min-w-0">

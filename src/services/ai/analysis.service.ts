@@ -13,13 +13,13 @@ import type {
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // =============================================================================
-// URL FETCHER — extrai conteúdo + og:image da página
+// URL FETCHER — extrai conteúdo + og:image
 // =============================================================================
 
 export async function fetchUrlMeta(url: string): Promise<{ content: string; ogImage: string | null }> {
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 12000);
+    const timeout = setTimeout(() => controller.abort(), 10000);
     const res = await fetch(url, {
       signal: controller.signal,
       headers: {
@@ -33,28 +33,21 @@ export async function fetchUrlMeta(url: string): Promise<{ content: string; ogIm
 
     const html = await res.text();
 
-    // Extract og:image (lightweight thumbnail — just a URL string)
-    const ogImageMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
+    // og:image — make absolute if relative
+    const ogImgMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
       || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
-    const ogImage = ogImageMatch ? ogImageMatch[1].trim() : null;
-
-    // Check if SPA (mostly JS) — still return ogImage even for SPAs
-    const scriptCount = (html.match(/<script/gi) ?? []).length;
-    const htmlLen = html.length;
-    if (scriptCount > 20 && htmlLen < 50000) {
-      // Likely SPA — extract only meta tags, no body text
-      const metaContent = extractMetaOnly(html);
-      return { content: metaContent, ogImage };
+    let ogImage: string | null = ogImgMatch ? ogImgMatch[1].trim() : null;
+    if (ogImage && ogImage.startsWith("/")) {
+      try { ogImage = new URL(ogImage, url).href; } catch { ogImage = null; }
     }
 
     const extracted: string[] = [];
+    const titleM = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+    if (titleM) extracted.push(`TÍTULO: ${titleM[1].trim()}`);
 
-    const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-    if (titleMatch) extracted.push(`TÍTULO: ${titleMatch[1].trim()}`);
-
-    const descMatch = html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']{10,})["']/i)
+    const descM = html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']{10,})["']/i)
       || html.match(/<meta[^>]+content=["']([^"']{10,})["'][^>]+name=["']description["']/i);
-    if (descMatch) extracted.push(`DESCRIÇÃO META: ${descMatch[1].trim()}`);
+    if (descM) extracted.push(`DESCRIÇÃO: ${descM[1].trim()}`);
 
     const ogTitle = html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i);
     const ogDesc = html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i);
@@ -63,18 +56,16 @@ export async function fetchUrlMeta(url: string): Promise<{ content: string; ogIm
     if (ogTitle) extracted.push(`OG TÍTULO: ${ogTitle[1].trim()}`);
     if (ogDesc) extracted.push(`OG DESCRIÇÃO: ${ogDesc[1].trim()}`);
 
-    // Headings
     const h1Raw: string[] = [];
     let m: RegExpExecArray | null;
-    const h1re = /<h1[^>]*>([^<]+)<\/h1>/gi;
+    const h1re = /<h1[^>]*>([\s\S]*?)<\/h1>/gi;
     while ((m = h1re.exec(html)) !== null) h1Raw.push(m[1].replace(/<[^>]+>/g, "").trim());
     const h2Raw: string[] = [];
-    const h2re = /<h2[^>]*>([^<]+)<\/h2>/gi;
-    while ((m = h2re.exec(html)) !== null && h2Raw.length < 6) h2Raw.push(m[1].replace(/<[^>]+>/g, "").trim());
+    const h2re = /<h2[^>]*>([\s\S]*?)<\/h2>/gi;
+    while ((m = h2re.exec(html)) !== null && h2Raw.length < 5) h2Raw.push(m[1].replace(/<[^>]+>/g, "").trim());
     if (h1Raw.length > 0) extracted.push(`H1: ${h1Raw.join(" | ")}`);
     if (h2Raw.length > 0) extracted.push(`H2: ${h2Raw.join(" | ")}`);
 
-    // Visible body text
     const bodyText = html
       .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, " ")
       .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, " ")
@@ -84,7 +75,7 @@ export async function fetchUrlMeta(url: string): Promise<{ content: string; ogIm
       .replace(/\s+/g, " ")
       .trim()
       .slice(0, 3500);
-    if (bodyText.length > 200) extracted.push(`\nCONTEÚDO DA PÁGINA:\n${bodyText}`);
+    if (bodyText.length > 200) extracted.push(`\nCONTEÚDO:\n${bodyText}`);
 
     return { content: extracted.join("\n"), ogImage };
   } catch {
@@ -92,21 +83,69 @@ export async function fetchUrlMeta(url: string): Promise<{ content: string; ogIm
   }
 }
 
-function extractMetaOnly(html: string): string {
-  const parts: string[] = [];
-  const title = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-  if (title) parts.push(`TÍTULO: ${title[1].trim()}`);
-  const ogTitle = html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i);
-  const ogDesc = html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i);
-  const ogSite = html.match(/<meta[^>]+property=["']og:site_name["'][^>]+content=["']([^"']+)["']/i);
-  if (ogSite) parts.push(`PLATAFORMA: ${ogSite[1].trim()}`);
-  if (ogTitle) parts.push(`TÍTULO: ${ogTitle[1].trim()}`);
-  if (ogDesc) parts.push(`DESCRIÇÃO: ${ogDesc[1].trim()}`);
-  return parts.join("\n");
+// =============================================================================
+// STEP 1 — web_search: busca conteúdo real da URL/perfil/post/site
+// Usado quando o fetch server-side retornar pouco conteúdo (SPAs, redes sociais)
+// =============================================================================
+
+async function searchUrlContent(url: string, type: AIAnalysisType, platform?: string): Promise<string> {
+  // Build a smart search query based on URL and type
+  let searchQuery = url;
+  try {
+    const parsed = new URL(url);
+    const hostname = parsed.hostname.replace(/^www\./, "");
+    const path = parsed.pathname;
+
+    if (hostname.includes("instagram.com")) {
+      const user = path.replace(/\//g, "").split("?")[0];
+      searchQuery = `instagram perfil @${user} bio nicho seguidores conteúdo`;
+    } else if (hostname.includes("tiktok.com")) {
+      const user = path.replace(/\//g, "").replace("@", "").split("?")[0];
+      searchQuery = `tiktok @${user} perfil bio nicho conteúdo seguidores`;
+    } else if (hostname.includes("youtube.com")) {
+      searchQuery = `youtube canal ${path} sobre nicho conteúdo`;
+    } else if (type === "POST_ANALYSIS") {
+      searchQuery = `conteúdo post ${url}`;
+    } else if (type === "PROFILE_AUDIT") {
+      searchQuery = `perfil ${hostname} ${path} sobre bio`;
+    } else {
+      // Site analysis
+      searchQuery = `${hostname} site produto serviço proposta de valor landing page`;
+    }
+  } catch { /* keep original url */ }
+
+  const typeLabels: Record<AIAnalysisType, string> = {
+    AD_CREATIVE: "criativo de anúncio",
+    PROFILE_AUDIT: "perfil nas redes sociais",
+    POST_ANALYSIS: "post/conteúdo",
+    SITE_ANALYSIS: "site/landing page",
+  };
+
+  const userMsg = `Pesquise e forneça um resumo DETALHADO sobre este ${typeLabels[type]}:
+
+URL: ${url}
+${platform ? `Plataforma: ${platform}` : ""}
+Busca sugerida: ${searchQuery}
+
+Inclua no resumo tudo que encontrar:
+- Para perfis: bio completa, número de seguidores, nicho, tipo de conteúdo, frequência de posts, destaques, engajamento
+- Para sites: headline, proposta de valor, copy principal, CTAs, preços, prova social, estrutura
+- Para posts: conteúdo do post, legenda, hashtags, engajamento
+
+Forneça o máximo de informações possível em português.`;
+
+  const res = (await openai.responses.create({
+    model: "gpt-4o",
+    tools: [{ type: "web_search_preview" as const }],
+    input: [{ role: "user" as const, content: userMsg }],
+    max_output_tokens: 2000,
+  })) as OpenAIResponse;
+
+  return res.output_text ?? "";
 }
 
 // =============================================================================
-// JSON EXTRACTOR — para Responses API (sem response_format)
+// JSON EXTRACTOR
 // =============================================================================
 
 function extractJson(text: string): unknown {
@@ -125,127 +164,108 @@ function extractJson(text: string): unknown {
 // PROMPTS
 // =============================================================================
 
-const AD_CREATIVE_PROMPT = `Você é o diretor criativo mais exigente da publicidade digital brasileira. Analise o criativo de anúncio fornecido com precisão cirúrgica.
+const AD_CREATIVE_PROMPT = `Você é o diretor criativo mais exigente da publicidade digital brasileira. Analise o criativo de anúncio com precisão cirúrgica.
 
-CRITÉRIOS DE AVALIAÇÃO:
-- Hook (0-100): Os primeiros 3 segundos/o elemento visual principal prendem imediatamente? Existe curiosidade, choque ou identificação?
-- Clareza (0-100): A mensagem é entendida em <5 segundos? A oferta está clara? O público sabe o que é vendido?
-- CTA (0-100): Existe call-to-action visível, urgente e específico?
-- Ritmo (0-100): O ritmo/pacing mantém o interesse? Montagem, fala e transições prendem o espectador?
-- Valor (0-100): A proposta de valor é clara e convincente? Benefícios > features?
-- Impacto Emocional (0-100): Evoca emoção? Identificação, desejo, medo ou ganância?
-- Design (0-100): Qualidade visual profissional? Hierarquia visual clara? Texto legível?
-- Fit de Audiência (0-100): Linguagem, referências e tom adequados ao público-alvo?
+Avalie os critérios (0-100 cada):
+- Hook: primeiros 3 segundos prendem? curiosidade/choque/identificação?
+- Clareza: mensagem entendida em <5s? oferta clara?
+- CTA: call-to-action visível, urgente e específico?
+- Ritmo: pacing mantém interesse? montagem/transições funcionam?
+- Valor: proposta clara e convincente? benefícios > features?
+- Impacto Emocional: evoca emoção? identificação/desejo/medo/ganância?
+- Design: qualidade visual profissional? hierarquia clara? texto legível?
+- Fit Audiência: linguagem e tom adequados ao público-alvo?
 
-CRITÉRIOS PARA DECISÃO:
-- SCALE: score ≥ 75 e sem falhas críticas em Hook, Clareza ou CTA
-- ITERATE: score 50-74 ou falhas corrigíveis
-- KILL: score < 50 ou falhas estruturais simultâneas em Hook + Clareza + CTA
+Decisão: SCALE (score ≥75, sem falhas críticas) | ITERATE (score 50-74) | KILL (score <50 ou falhas em Hook+Clareza+CTA)
 
-Retorne APENAS este JSON válido (sem markdown, sem texto antes ou depois):
+Retorne APENAS este JSON (sem markdown):
 {
   "score": <0-100>,
-  "creative_readiness": {
-    "action": "<SCALE|ITERATE|KILL>",
-    "reasoning": "<2-3 frases diretas e práticas>"
-  },
-  "breakdown": {
-    "hook": <0-100>,
-    "clareza": <0-100>,
-    "cta": <0-100>,
-    "ritmo": <0-100>,
-    "valor": <0-100>,
-    "impacto_emocional": <0-100>,
-    "design": <0-100>,
-    "fit_audiencia": <0-100>
-  },
-  "strengths": ["<específico 1>", "<específico 2>", "<específico 3>"],
-  "weaknesses": ["<problema com impacto 1>", "<problema 2>", "<problema 3>"],
-  "improvements": ["<acionável 1>", "<acionável 2>", "<acionável 3>"],
-  "recommended_actions": ["<ação imediata 1>", "<ação 2>", "<ação 3>"]
+  "creative_readiness": { "action": "<SCALE|ITERATE|KILL>", "reasoning": "<2-3 frases>" },
+  "breakdown": { "hook": <0-100>, "clareza": <0-100>, "cta": <0-100>, "ritmo": <0-100>, "valor": <0-100>, "impacto_emocional": <0-100>, "design": <0-100>, "fit_audiencia": <0-100> },
+  "strengths": ["<específico 1>", "<2>", "<3>"],
+  "weaknesses": ["<problema 1>", "<2>", "<3>"],
+  "improvements": ["<ação específica 1>", "<2>", "<3>"],
+  "recommended_actions": ["<prioridade 1>", "<2>", "<3>"]
 }`;
 
-const PROFILE_AUDIT_PROMPT = `Você é um especialista em marketing digital e growth para redes sociais com foco em conversão de perfil para audiência e negócios.
+const PROFILE_AUDIT_PROMPT = `Você é especialista em marketing digital e growth para redes sociais.
 
-Analise o conteúdo do perfil fornecido abaixo. Se o conteúdo for limitado (perfil privado ou SPA), faça a melhor análise possível com o que está disponível — NUNCA retorne score 0 nem diga que não conseguiu acessar.
+Com base no conteúdo do perfil fornecido, faça uma auditoria completa avaliando:
+1. Clareza de identidade: visitante entende em 5s quem é e o que oferece?
+2. Proposta de valor: diferencial claro? por que seguir?
+3. Bio/descrição: específica, keywords relevantes, CTA?
+4. Credibilidade: sinais de autoridade (verificação, números, prêmios)?
+5. Call-to-action: link ou próxima ação clara?
+6. Consistência de nicho: focado ou disperso?
+7. Nome/handle: memorável e fácil de encontrar?
+8. Apelo comercial: atrai marcas e parceiros?
 
-CRITÉRIOS DE AVALIAÇÃO:
-1. CLAREZA DE IDENTIDADE: O visitante entende em 5 segundos quem é o perfil e o que oferece?
-2. PROPOSTA DE VALOR: Existe diferencial claro? Por que seguir este e não outro?
-3. BIO/DESCRIÇÃO: Específica, palavras-chave relevantes, CTA presente?
-4. CREDIBILIDADE: Sinais de autoridade? (verificação, números, prêmios, mídia)
-5. CALL-TO-ACTION: Link ou ação clara para o próximo passo?
-6. CONSISTÊNCIA DE NICHO: Perfil focado ou disperso?
-7. NOME/HANDLE: Memorável, fácil de pronunciar e encontrar?
-8. APELO COMERCIAL: Atrai marcas, clientes ou parcerias?
-
-Retorne APENAS este JSON válido (sem markdown, sem texto antes ou depois):
+Retorne APENAS este JSON (sem markdown):
 {
-  "score": <0-100 — NUNCA 0 a menos que o perfil seja completamente vazio>,
-  "summary": "<resumo executivo de 2-3 frases sobre o perfil baseado no conteúdo disponível>",
-  "strengths": ["<ponto forte específico 1>", "<2>", "<3>"],
-  "weaknesses": ["<problema que impacta crescimento 1>", "<2>", "<3>"],
-  "improvements": ["<melhoria acionável com exemplo 1>", "<2>", "<3>"],
-  "recommended_actions": ["<ação prioritária com instrução clara 1>", "<2>", "<3>"]
+  "score": <0-100>,
+  "summary": "<diagnóstico de 2-3 frases baseado no conteúdo>",
+  "strengths": ["<1>", "<2>", "<3>"],
+  "weaknesses": ["<1>", "<2>", "<3>"],
+  "improvements": ["<1>", "<2>", "<3>"],
+  "recommended_actions": ["<1>", "<2>", "<3>"]
 }`;
 
-const POST_ANALYSIS_PROMPT = `Você é um especialista em crescimento orgânico, algoritmos de redes sociais e copywriting para conteúdo digital.
+const POST_ANALYSIS_PROMPT = `Você é especialista em crescimento orgânico e algoritmos de redes sociais.
 
-Analise o conteúdo fornecido abaixo. Se o conteúdo for limitado, faça a melhor análise possível — NUNCA retorne score 0 nem diga que não conseguiu acessar o post.
+Com base no conteúdo do post fornecido, analise:
+1. Hook: primeiros 3 segundos/primeira linha prendem?
+2. Retenção: mantém interesse do início ao fim?
+3. Valor: ensina, entretém ou inspira claramente?
+4. CTA/Engajamento: estimula comentários, compartilhamentos, salvamentos?
+5. Legenda/copy: complementa o visual? é conversacional?
+6. Hashtags/keywords: alcance otimizado?
+7. Formato: adequado para a plataforma?
+8. Tendências: aproveita formatos atuais?
 
-CRITÉRIOS DE AVALIAÇÃO:
-1. HOOK (primeiros 3 segundos): Para vídeos — o início prende? Para posts — a primeira linha/visual é impactante?
-2. RETENÇÃO: O conteúdo mantém interesse do início ao fim?
-3. VALOR ENTREGUE: Ensina, entretém ou inspira de forma clara?
-4. CTA E ENGAJAMENTO: Estimula comentários, compartilhamentos, salvamentos?
-5. LEGENDA/COPY: A legenda complementa o visual? É conversacional?
-6. HASHTAGS E KEYWORDS: Estratégia de alcance otimizada?
-7. FORMATO E PLATAFORMA: Formato adequado para a plataforma?
-8. TENDÊNCIAS: Aproveita formatos ou tendências atuais?
-
-Retorne APENAS este JSON válido (sem markdown, sem texto antes ou depois):
+Retorne APENAS este JSON (sem markdown):
 {
-  "score": <0-100 — NUNCA 0 a menos que o conteúdo seja completamente vazio>,
-  "summary": "<diagnóstico direto do potencial do conteúdo em 2-3 frases>",
-  "strengths": ["<ponto forte 1>", "<2>", "<3>"],
-  "weaknesses": ["<problema que limita alcance 1>", "<2>", "<3>"],
-  "improvements": ["<melhoria com exemplo de como aplicar 1>", "<2>", "<3>"],
-  "recommended_actions": ["<ação de maior impacto 1>", "<2>", "<3>"]
+  "score": <0-100>,
+  "summary": "<diagnóstico de 2-3 frases>",
+  "strengths": ["<1>", "<2>", "<3>"],
+  "weaknesses": ["<1>", "<2>", "<3>"],
+  "improvements": ["<1>", "<2>", "<3>"],
+  "recommended_actions": ["<1>", "<2>", "<3>"]
 }`;
 
-const SITE_ANALYSIS_PROMPT = `Você é um especialista sênior em CRO (Conversion Rate Optimization), UX, copywriting persuasivo e performance de landing pages.
+const SITE_ANALYSIS_PROMPT = `Você é especialista sênior em CRO, UX e copywriting persuasivo.
 
-Analise o conteúdo do site fornecido abaixo. Se o conteúdo for limitado, faça a melhor análise possível com o que está disponível — NUNCA retorne score 0 nem diga que não conseguiu acessar o site.
-
-DIMENSÕES DE ANÁLISE:
-1. HEADLINE E SUB-HEADLINE: Comunica o benefício em <5s? É específica? Usa dados?
-2. PROPOSTA DE VALOR ÚNICA (UVP): Diferencial competitivo explícito? Benefício acima do fold?
-3. PROVA SOCIAL: Depoimentos, números, logos, garantias?
-4. CALL-TO-ACTION: CTA visível sem scroll? Copy específico? Contraste adequado?
-5. FLUXO NARRATIVO (AIDA/PAS): Estrutura guia à conversão? Objeções tratadas?
-6. COPYWRITING E PERSUASÃO: Linguagem fala com dores? Benefícios > features?
-7. DESIGN E USABILIDADE: Hierarquia visual correta? Legibilidade? Aparência profissional?
-8. FORMULÁRIOS E ATRITO: Mínimo de campos? Processo simples?
-9. MOBILE E PERFORMANCE: Experiência mobile-first?
-10. SEO ON-PAGE: Meta title/description otimizados? H1/H2 coerentes?
+Com base no conteúdo do site fornecido, faça uma auditoria profissional:
+1. Headline/sub-headline: benefício em <5s? específica? usa dados?
+2. UVP: diferencial competitivo explícito? benefício acima do fold?
+3. Prova social: depoimentos, números, logos, garantias?
+4. CTA: visível sem scroll? copy específico? contraste adequado?
+5. Fluxo narrativo (AIDA/PAS): guia à conversão? trata objeções?
+6. Copywriting: fala com dores do público? benefícios > features?
+7. Design/usabilidade: hierarquia visual? legibilidade? profissional?
+8. Atrito: formulários mínimos? processo simples?
+9. Mobile/performance: experiência mobile-first?
+10. SEO on-page: meta tags? H1/H2 coerentes?
 
 Score: 0-30 fraca | 31-60 mediana | 61-80 boa | 81-100 excelente
-Seja específico — cite exemplos reais do conteúdo fornecido.
+Cite exemplos específicos do conteúdo. Priorize por impacto na conversão.
 
-Retorne APENAS este JSON válido (sem markdown, sem texto antes ou depois):
+Retorne APENAS este JSON (sem markdown):
 {
-  "score": <0-100 — NUNCA 0 a menos que o site seja completamente vazio>,
-  "summary": "<diagnóstico executivo com 2-3 achados mais críticos para conversão>",
-  "strengths": ["<ponto forte específico 1>", "<2>", "<3>"],
-  "weaknesses": ["<problema crítico com impacto na conversão 1>", "<2>", "<3>"],
-  "improvements": ["<melhoria com exemplo de implementação 1>", "<2>", "<3>", "<4>", "<5>"],
-  "recommended_actions": ["<Quick Win de maior impacto 1>", "<2>", "<3>", "<4>"]
+  "score": <0-100>,
+  "summary": "<2-3 achados mais críticos para conversão>",
+  "strengths": ["<1>", "<2>", "<3>"],
+  "weaknesses": ["<1>", "<2>", "<3>"],
+  "improvements": ["<1>", "<2>", "<3>", "<4>", "<5>"],
+  "recommended_actions": ["<Quick Win 1>", "<2>", "<3>", "<4>"]
 }`;
 
 // =============================================================================
 // MAIN ANALYSIS RUNNER
-// URL/text → Chat Completions + response_format (garante JSON)
-// Image/video → Responses API (vision)
+// Estratégia:
+//   Image/video → Responses API vision
+//   URL → fetchUrlMeta (rápido); se conteúdo insuficiente → web_search (SPAs)
+//   Ambos terminam com Chat Completions + response_format para JSON garantido
 // =============================================================================
 
 export async function runAnalysis(params: {
@@ -257,8 +277,9 @@ export async function runAnalysis(params: {
   pastedContent?: string;
   imageBase64Frames?: string[];
   platform?: string;
+  prefetchedContent?: string; // passed from route to avoid double fetch
 }): Promise<AIAnalysisDetail> {
-  const { analysisId, type, inputType, inputUrl, pastedContent, imageBase64Frames = [], platform } = params;
+  const { analysisId, type, inputType, inputUrl, pastedContent, imageBase64Frames = [], platform, prefetchedContent } = params;
 
   const prompts: Record<AIAnalysisType, string> = {
     AD_CREATIVE: AD_CREATIVE_PROMPT,
@@ -273,11 +294,10 @@ export async function runAnalysis(params: {
     let rawJson: unknown = null;
 
     if (inputType === "image" || inputType === "video") {
-      // ── Vision: Responses API ──────────────────────────────────────────────
+      // ── VISION path ────────────────────────────────────────────────────────
       if (imageBase64Frames.length === 0) {
         throw new Error("Nenhum frame de imagem/vídeo foi enviado para análise.");
       }
-
       type ContentPart = { type: "input_text"; text: string } | { type: "input_image"; image_url: string };
       const parts: ContentPart[] = imageBase64Frames.map((b64) => ({
         type: "input_image" as const,
@@ -301,32 +321,45 @@ export async function runAnalysis(params: {
       rawJson = extractJson(res.output_text ?? "");
 
     } else {
-      // ── URL/text: Chat Completions + response_format (always valid JSON) ──
-      const lines: string[] = [];
+      // ── URL/text path ──────────────────────────────────────────────────────
+      const contentParts: string[] = [];
 
-      if (inputUrl) {
-        lines.push(`URL ANALISADA: ${inputUrl}`);
-        if (platform) lines.push(`Plataforma: ${platform}`);
+      if (inputUrl) contentParts.push(`URL: ${inputUrl}`);
+      if (platform) contentParts.push(`Plataforma: ${platform}`);
 
+      // Use prefetched content (from route) or fetch now
+      let fetchedContent = prefetchedContent ?? "";
+      if (!fetchedContent && inputUrl) {
         const { content } = await fetchUrlMeta(inputUrl);
-        if (content) {
-          lines.push("\n--- CONTEÚDO EXTRAÍDO DA PÁGINA ---");
-          lines.push(content);
-          lines.push("--- FIM ---");
-        } else {
-          lines.push("\n[Conteúdo da página não disponível via fetch — analise com base na URL e no contexto fornecido]");
+        fetchedContent = content;
+      }
+
+      // If we have good fetched content, use it
+      const MINIMUM_USEFUL_CONTENT = 300; // chars
+      if (fetchedContent.length >= MINIMUM_USEFUL_CONTENT) {
+        contentParts.push("\n--- CONTEÚDO DA PÁGINA ---");
+        contentParts.push(fetchedContent);
+        contentParts.push("--- FIM ---");
+      } else if (inputUrl) {
+        // Not enough from fetch (SPA, blocked) → use web_search to get real content
+        const searched = await searchUrlContent(inputUrl, type, platform);
+        if (searched) {
+          contentParts.push("\n--- CONTEÚDO OBTIDO VIA BUSCA WEB ---");
+          contentParts.push(searched);
+          contentParts.push("--- FIM ---");
         }
       }
 
       if (pastedContent) {
-        lines.push("\n--- INFORMAÇÕES ADICIONAIS DO USUÁRIO ---");
-        lines.push(pastedContent);
+        contentParts.push("\n--- INFORMAÇÕES ADICIONAIS ---");
+        contentParts.push(pastedContent);
       }
 
-      if (lines.length === 0) {
-        throw new Error("Nenhum conteúdo foi fornecido para análise.");
+      if (contentParts.length <= 2) { // only URL + platform, no real content
+        throw new Error("Não foi possível obter conteúdo para análise. Cole as informações no campo de contexto.");
       }
 
+      // Chat Completions with response_format — always returns valid JSON
       const res = await openai.chat.completions.create({
         model: "gpt-4o",
         response_format: { type: "json_object" },
@@ -334,7 +367,7 @@ export async function runAnalysis(params: {
         max_tokens: 3000,
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: lines.join("\n") },
+          { role: "user", content: contentParts.join("\n") },
         ],
       });
 
@@ -342,7 +375,7 @@ export async function runAnalysis(params: {
       rawJson = extractJson(res.choices[0]?.message?.content ?? "{}");
     }
 
-    // ── Parse result ──────────────────────────────────────────────────────────
+    // ── Parse ──────────────────────────────────────────────────────────────
     let parsed: AIAnalysisResult;
     if (rawJson && typeof rawJson === "object") {
       const r = rawJson as Record<string, unknown>;
@@ -362,110 +395,52 @@ export async function runAnalysis(params: {
         creative_readiness,
         creative_readiness_reasoning,
         breakdown: r.breakdown as Record<string, number> | undefined,
-        strengths: Array.isArray(r.strengths) ? (r.strengths as string[]) : [],
-        weaknesses: Array.isArray(r.weaknesses) ? (r.weaknesses as string[]) : [],
-        improvements: Array.isArray(r.improvements) ? (r.improvements as string[]) : [],
-        recommended_actions: Array.isArray(r.recommended_actions) ? (r.recommended_actions as string[]) : [],
+        strengths: Array.isArray(r.strengths) ? r.strengths as string[] : [],
+        weaknesses: Array.isArray(r.weaknesses) ? r.weaknesses as string[] : [],
+        improvements: Array.isArray(r.improvements) ? r.improvements as string[] : [],
+        recommended_actions: Array.isArray(r.recommended_actions) ? r.recommended_actions as string[] : [],
       };
     } else {
-      parsed = {
-        score: 50,
-        summary: "Análise realizada — veja os detalhes abaixo.",
-        strengths: [],
-        weaknesses: [],
-        improvements: [],
-        recommended_actions: [],
-      };
+      parsed = { score: 50, summary: "Análise concluída.", strengths: [], weaknesses: [], improvements: [], recommended_actions: [] };
     }
 
     const updated = await db.aIAnalysis.update({
       where: { id: analysisId },
-      data: {
-        status: "COMPLETED",
-        score: parsed.score,
-        result: JSON.parse(JSON.stringify(parsed)),
-        tokensUsed,
-      },
+      data: { status: "COMPLETED", score: parsed.score, result: JSON.parse(JSON.stringify(parsed)), tokensUsed },
     });
 
     return {
-      id: updated.id,
-      type: updated.type as AIAnalysisType,
-      inputType: updated.inputType as AIAnalysisInputType,
-      inputUrl: updated.inputUrl,
-      fileUrl: updated.fileUrl,
-      thumbnailUrl: updated.thumbnailUrl,
-      platform: updated.platform,
-      score: updated.score,
-      status: updated.status as "COMPLETED",
-      error: updated.error,
-      createdAt: updated.createdAt.toISOString(),
-      result: parsed,
-      tokensUsed: updated.tokensUsed,
+      id: updated.id, type: updated.type as AIAnalysisType, inputType: updated.inputType as AIAnalysisInputType,
+      inputUrl: updated.inputUrl, fileUrl: updated.fileUrl, thumbnailUrl: updated.thumbnailUrl,
+      platform: updated.platform, score: updated.score, status: updated.status as "COMPLETED",
+      error: updated.error, createdAt: updated.createdAt.toISOString(), result: parsed, tokensUsed: updated.tokensUsed,
     };
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : "Erro desconhecido";
-    await db.aIAnalysis.update({
-      where: { id: analysisId },
-      data: { status: "FAILED", error: errorMsg },
-    });
+    await db.aIAnalysis.update({ where: { id: analysisId }, data: { status: "FAILED", error: errorMsg } });
     throw err;
   }
 }
 
 // =============================================================================
-// CRUD HELPERS
+// CRUD
 // =============================================================================
 
-export async function listAnalyses(params: {
-  userId: string;
-  page: number;
-  pageSize: number;
-  type?: AIAnalysisType;
-}): Promise<{ analyses: AIAnalysisSummary[]; total: number }> {
+export async function listAnalyses(params: { userId: string; page: number; pageSize: number; type?: AIAnalysisType }): Promise<{ analyses: AIAnalysisSummary[]; total: number }> {
   const { userId, page, pageSize, type } = params;
   const skip = (page - 1) * pageSize;
   const where = { userId, ...(type ? { type } : {}) };
   const [analyses, total] = await db.$transaction([
-    db.aIAnalysis.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      skip,
-      take: pageSize,
-      select: { id: true, type: true, inputType: true, inputUrl: true, fileUrl: true, thumbnailUrl: true, platform: true, score: true, status: true, error: true, createdAt: true },
-    }),
+    db.aIAnalysis.findMany({ where, orderBy: { createdAt: "desc" }, skip, take: pageSize, select: { id: true, type: true, inputType: true, inputUrl: true, fileUrl: true, thumbnailUrl: true, platform: true, score: true, status: true, error: true, createdAt: true } }),
     db.aIAnalysis.count({ where }),
   ]);
-  return {
-    analyses: analyses.map((a) => ({
-      ...a,
-      type: a.type as AIAnalysisType,
-      inputType: a.inputType as AIAnalysisInputType,
-      status: a.status as AIAnalysisStatus,
-      createdAt: a.createdAt.toISOString(),
-    })),
-    total,
-  };
+  return { analyses: analyses.map((a) => ({ ...a, type: a.type as AIAnalysisType, inputType: a.inputType as AIAnalysisInputType, status: a.status as AIAnalysisStatus, createdAt: a.createdAt.toISOString() })), total };
 }
 
 export async function getAnalysis(id: string, userId: string): Promise<AIAnalysisDetail | null> {
   const a = await db.aIAnalysis.findFirst({ where: { id, userId } });
   if (!a) return null;
-  return {
-    id: a.id,
-    type: a.type as AIAnalysisType,
-    inputType: a.inputType as AIAnalysisInputType,
-    inputUrl: a.inputUrl,
-    fileUrl: a.fileUrl,
-    thumbnailUrl: a.thumbnailUrl,
-    platform: a.platform,
-    score: a.score,
-    status: a.status as AIAnalysisStatus,
-    error: a.error,
-    createdAt: a.createdAt.toISOString(),
-    result: (a.result as AIAnalysisResult | null) ?? null,
-    tokensUsed: a.tokensUsed,
-  };
+  return { id: a.id, type: a.type as AIAnalysisType, inputType: a.inputType as AIAnalysisInputType, inputUrl: a.inputUrl, fileUrl: a.fileUrl, thumbnailUrl: a.thumbnailUrl, platform: a.platform, score: a.score, status: a.status as AIAnalysisStatus, error: a.error, createdAt: a.createdAt.toISOString(), result: (a.result as AIAnalysisResult | null) ?? null, tokensUsed: a.tokensUsed };
 }
 
 export async function deleteAnalysis(id: string, userId: string): Promise<void> {
