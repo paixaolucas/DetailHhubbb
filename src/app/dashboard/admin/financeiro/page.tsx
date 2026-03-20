@@ -507,16 +507,16 @@ export default function FinanceiroPage() {
                 <XAxis
                   dataKey="date"
                   {...chartStyle.axis}
-                  tickFormatter={(v) => new Date(v).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}
+                  tickFormatter={(v: string) => new Date(v).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}
                 />
-                <YAxis {...chartStyle.axis} tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
+                <YAxis {...chartStyle.axis} tickFormatter={(v: number) => `R$${(v / 1000).toFixed(0)}k`} />
                 <Tooltip
                   {...chartStyle.tooltip}
                   formatter={(v: number, name: string) => [
                     `R$ ${v.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
                     name === "revenueAnual" ? "Anual" : "PIX Mensal",
                   ]}
-                  labelFormatter={(v) => new Date(v).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}
+                  labelFormatter={(v: string) => new Date(v).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}
                 />
                 <Area type="monotone" dataKey="revenueAnual" stackId="1" stroke="#3b82f6" fill="url(#gradAnual)" strokeWidth={2} />
                 <Area type="monotone" dataKey="revenuePix"   stackId="1" stroke="#10b981" fill="url(#gradPix)"   strokeWidth={2} />

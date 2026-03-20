@@ -225,8 +225,8 @@ function AdminDashboard() {
                 </linearGradient>
               </defs>
               <CartesianGrid {...chartStyle.cartesianGrid} />
-              <XAxis dataKey="date" {...chartStyle.xAxis} tickFormatter={(v) => new Date(v).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })} />
-              <YAxis {...chartStyle.yAxis} tickFormatter={(v) => `R$${v}`} />
+              <XAxis dataKey="date" {...chartStyle.xAxis} tickFormatter={(v: string) => new Date(v).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })} />
+              <YAxis {...chartStyle.yAxis} tickFormatter={(v: number) => `R$${v}`} />
               <Tooltip {...chartStyle.tooltip} formatter={(v: number) => [`R$ ${v.toLocaleString("pt-BR")}`, "Receita"]} />
               <Area type="monotone" dataKey="revenue" stroke="#009CD9" strokeWidth={2} fill="url(#adminRevenue)" />
             </AreaChart>
@@ -411,8 +411,8 @@ function InfluencerDashboard({ userName }: { userName: string }) {
                 </linearGradient>
               </defs>
               <CartesianGrid {...chartStyle.cartesianGrid} />
-              <XAxis dataKey="date" {...chartStyle.xAxis} tickFormatter={(v) => new Date(v).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })} />
-              <YAxis {...chartStyle.yAxis} tickFormatter={(v) => `R$${v}`} />
+              <XAxis dataKey="date" {...chartStyle.xAxis} tickFormatter={(v: string) => new Date(v).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })} />
+              <YAxis {...chartStyle.yAxis} tickFormatter={(v: number) => `R$${v}`} />
               <Tooltip {...chartStyle.tooltip} formatter={(v: number) => [`R$ ${v.toLocaleString("pt-BR")}`, "Receita"]} />
               <Area type="monotone" dataKey="revenue" stroke="#009CD9" strokeWidth={2} fill="url(#inflRevenue)" />
             </AreaChart>

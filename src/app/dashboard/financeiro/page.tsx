@@ -253,7 +253,7 @@ export default function FinanceiroPage() {
                 <CartesianGrid {...chartStyle.grid} />
                 <XAxis dataKey="month" {...chartStyle.axis} />
                 <YAxis yAxisId="members" {...chartStyle.axis} allowDecimals={false} />
-                <YAxis yAxisId="commission" orientation="right" {...chartStyle.axis} tickFormatter={(v) => `R$${v}`} />
+                <YAxis yAxisId="commission" orientation="right" {...chartStyle.axis} tickFormatter={(v: number) => `R$${v}`} />
                 <Tooltip
                   {...chartStyle.tooltip}
                   formatter={(value: number, name: string) =>

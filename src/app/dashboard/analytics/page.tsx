@@ -561,15 +561,15 @@ export default function AnalyticsPage() {
             </defs>
             <CartesianGrid {...chartStyle.grid} />
             <XAxis dataKey="date" {...chartStyle.axis}
-              tickFormatter={(v) => new Date(v).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })} />
-            <YAxis {...chartStyle.axis} tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
+              tickFormatter={(v: string) => new Date(v).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })} />
+            <YAxis {...chartStyle.axis} tickFormatter={(v: number) => `R$${(v / 1000).toFixed(0)}k`} />
             <Tooltip
               {...chartStyle.tooltip}
               formatter={(v: number, name: string) => [
                 `R$ ${v.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
                 name === "revenueAnual" ? "Anual" : "PIX Mensal",
               ]}
-              labelFormatter={(v) => new Date(v).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}
+              labelFormatter={(v: string) => new Date(v).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}
             />
             <Area type="monotone" dataKey="revenueAnual" stackId="1" stroke="#009CD9" fill="url(#gradAnual)" strokeWidth={2} name="revenueAnual" />
             <Area type="monotone" dataKey="revenuePix"   stackId="1" stroke="#10b981" fill="url(#gradPix)"   strokeWidth={2} name="revenuePix" />
@@ -590,7 +590,7 @@ export default function AnalyticsPage() {
             </defs>
             <CartesianGrid {...chartStyle.grid} />
             <XAxis dataKey="date" {...chartStyle.axis}
-              tickFormatter={(v) => new Date(v).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })} />
+              tickFormatter={(v: string) => new Date(v).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })} />
             <YAxis {...chartStyle.axis} />
             <Tooltip {...chartStyle.tooltip} />
             <Area type="monotone" dataKey="activeMembers" stroke="#10b981" fill="url(#membersGrad)" strokeWidth={2} name="Membros Ativos" />
@@ -605,7 +605,7 @@ export default function AnalyticsPage() {
           <BarChart data={timeSeries}>
             <CartesianGrid {...chartStyle.grid} />
             <XAxis dataKey="date" {...chartStyle.axis}
-              tickFormatter={(v) => new Date(v).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })} />
+              tickFormatter={(v: string) => new Date(v).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })} />
             <YAxis {...chartStyle.axis} />
             <Tooltip {...chartStyle.tooltip} formatter={(v: number) => [v, "Novas assinaturas"]} />
             <Bar dataKey="newSubscriptions" fill="#009CD9" radius={[3, 3, 0, 0]} name="Novas assinaturas" />
