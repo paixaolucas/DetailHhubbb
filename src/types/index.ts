@@ -219,6 +219,7 @@ export type AIAnalysisInputType = "image" | "video" | "url";
 export interface AIAnalysisResult {
   score: number;
   summary?: string;
+  diagnose?: string;
   creative_readiness?: "SCALE" | "ITERATE" | "KILL";
   creative_readiness_reasoning?: string;
   breakdown?: Record<string, number>;
@@ -226,6 +227,11 @@ export interface AIAnalysisResult {
   weaknesses: string[];
   improvements: string[];
   recommended_actions: string[];
+  quick_wins?: string[];
+  kpis?: string[];
+  copy_suggestions?: string[];
+  content_strategy?: string[];
+  ab_test_ideas?: string[];
 }
 
 export interface AIAnalysisSummary {

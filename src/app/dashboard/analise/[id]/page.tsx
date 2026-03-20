@@ -19,6 +19,11 @@ import {
   ArrowRight,
   Trash2,
   Loader2,
+  Target,
+  FlaskConical,
+  BarChart3,
+  BookOpen,
+  PenLine,
 } from "lucide-react";
 import { useToast } from "@/components/ui/toast-provider";
 import { STORAGE_KEYS } from "@/lib/constants";
@@ -441,7 +446,30 @@ export default function AnalyseResultPage() {
             </div>
           )}
 
-          {/* Strengths / Weaknesses / Improvements / Actions */}
+          {/* Diagnóstico detalhado */}
+          {result.diagnose && (
+            <div className="glass-card p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <BookOpen className="w-4 h-4 text-[#009CD9]" />
+                <h3 className="text-sm font-semibold text-[#EEE6E4]">Diagnóstico Completo</h3>
+              </div>
+              <p className="text-sm text-gray-300 leading-relaxed">{result.diagnose}</p>
+            </div>
+          )}
+
+          {/* Quick Wins — destaque */}
+          {result.quick_wins && result.quick_wins.length > 0 && (
+            <div className="glass-card p-5 border-[#009CD9]/20 bg-[#009CD9]/5">
+              <ResultList
+                title="Quick Wins — Faça Agora (alto impacto, baixo esforço)"
+                items={result.quick_wins}
+                icon={Zap}
+                color="text-[#009CD9]"
+              />
+            </div>
+          )}
+
+          {/* Strengths / Weaknesses */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="glass-card p-5">
               <ResultList
@@ -459,6 +487,10 @@ export default function AnalyseResultPage() {
                 color="text-red-400"
               />
             </div>
+          </div>
+
+          {/* Improvements / Actions */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="glass-card p-5">
               <ResultList
                 title="Melhorias Sugeridas"
@@ -469,13 +501,61 @@ export default function AnalyseResultPage() {
             </div>
             <div className="glass-card p-5">
               <ResultList
-                title="Ações Imediatas"
+                title="Plano de Ação Prioritário"
                 items={result.recommended_actions}
-                icon={Zap}
+                icon={Target}
                 color="text-[#009CD9]"
               />
             </div>
           </div>
+
+          {/* Copy Suggestions */}
+          {result.copy_suggestions && result.copy_suggestions.length > 0 && (
+            <div className="glass-card p-5">
+              <ResultList
+                title="Sugestões de Copy — Versões Reescritas"
+                items={result.copy_suggestions}
+                icon={PenLine}
+                color="text-purple-400"
+              />
+            </div>
+          )}
+
+          {/* Content Strategy (PROFILE_AUDIT) */}
+          {result.content_strategy && result.content_strategy.length > 0 && (
+            <div className="glass-card p-5">
+              <ResultList
+                title="Estratégia de Conteúdo Recomendada"
+                items={result.content_strategy}
+                icon={BookOpen}
+                color="text-[#33A7BF]"
+              />
+            </div>
+          )}
+
+          {/* A/B Test Ideas (AD_CREATIVE) */}
+          {result.ab_test_ideas && result.ab_test_ideas.length > 0 && (
+            <div className="glass-card p-5">
+              <ResultList
+                title="Ideias de Teste A/B"
+                items={result.ab_test_ideas}
+                icon={FlaskConical}
+                color="text-orange-400"
+              />
+            </div>
+          )}
+
+          {/* KPIs */}
+          {result.kpis && result.kpis.length > 0 && (
+            <div className="glass-card p-5">
+              <ResultList
+                title="KPIs para Acompanhar"
+                items={result.kpis}
+                icon={BarChart3}
+                color="text-green-400"
+              />
+            </div>
+          )}
 
           {/* New analysis CTA */}
           <div className="flex justify-center pt-2">
