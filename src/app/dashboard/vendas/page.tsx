@@ -177,7 +177,7 @@ export default function VendasPage() {
             <CartesianGrid {...chartStyle.grid} />
             <XAxis dataKey="date" {...chartStyle.axis} tickFormatter={(v: string) => new Date(v).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })} />
             <YAxis {...chartStyle.axis} tickFormatter={(v: number) => `R$${v.toFixed(0)}`} />
-            <Tooltip {...chartStyle.tooltip} formatter={(v: number) => [`R$ ${v.toFixed(2)}`, "Receita"]} labelFormatter={(l) => new Date(l).toLocaleDateString("pt-BR")} />
+            <Tooltip {...chartStyle.tooltip} formatter={(v: number) => [`R$ ${v.toFixed(2)}`, "Receita"]} labelFormatter={(l: string) => new Date(l).toLocaleDateString("pt-BR")} />
             <Area type="monotone" dataKey="revenue" stroke="#22c55e" strokeWidth={2} fill="url(#salesGrad)" name="Receita" />
           </AreaChart>
         </ResponsiveContainer>
