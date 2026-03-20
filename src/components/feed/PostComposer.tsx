@@ -10,33 +10,13 @@ import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import Image from "next/image";
 import {
   Send, Plus, Minus, ImageIcon, X, Lock, Rocket,
-  Video, Paperclip, Smile, FileText,
+  Video, Paperclip, Smile, FileText, Link2,
 } from "lucide-react";
 import { uploadFiles } from "@/utils/upload";
 import { STORAGE_KEYS } from "@/lib/constants";
 import { getMemberLevel, getMemberLevelColor, POST_THRESHOLD } from "@/lib/points";
 import { compressImage, validateVideoFile, checkVideoDuration } from "@/lib/media-optimize";
-
-// ─── Emoji picker data ────────────────────────────────────────────────────────
-
-const EMOJI_CATS = [
-  {
-    label: "😊", title: "Expressões",
-    emojis: ["😀","😂","🥹","😊","😍","🤩","🥳","😎","🤔","😅","😭","🥺","😤","🤯","🥰","😘","😏","😇","🫡","🫠","😮","😆","😁","😋","😛","🤑","😜","🙄","😑","😐"],
-  },
-  {
-    label: "👍", title: "Gestos",
-    emojis: ["👍","👎","👏","🙌","💪","✌️","🤘","👋","🫵","🤙","🙏","🫂","🤝","🫶","🤞","🤟","👊","🖐️","💀","👻"],
-  },
-  {
-    label: "❤️", title: "Reações",
-    emojis: ["❤️","🧡","💛","💚","💙","💜","🖤","🤍","💔","❤️‍🔥","💕","💞","💗","💖","✨","🔥","⭐","🌟","💯","⚡","🎉","🎊","🏆","🎯","🚀","💡","💎","🥇","🎸","🏁"],
-  },
-  {
-    label: "🚗", title: "Automotivo",
-    emojis: ["🚗","🚕","🏎️","🚙","🏍️","🛻","⛽","🔧","🛞","🪛","🔩","⚙️","🛠️","🏁","💨","🛣️","🚦","🚧","🔑","🧰","🔦","💡","🔋","🪙"],
-  },
-];
+import { EMOJI_CATS } from "@/lib/emoji-data";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -80,6 +60,16 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
   const [emojiTab, setEmojiTab] = useState(0);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Video menu (arquivo vs embedar)
+  const [showVideoMenu, setShowVideoMenu] = useState(false);
+  const [showEmbedInput, setShowEmbedInput] = useState(false);
+  const [videoEmbedUrl, setVideoEmbedUrl] = useState("");
+  const videoMenuRef = useRef<HTMLDivElement>(null);
+
+  // Link
+  const [showLinkInput, setShowLinkInput] = useState(false);
+  const [linkInputVal, setLinkInputVal] = useState("");
 
   // User info
   const [userName, setUserName] = useState("");
@@ -142,6 +132,18 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
     document.addEventListener("mousedown", handleOutside);
     return () => document.removeEventListener("mousedown", handleOutside);
   }, [showEmojiPicker]);
+
+  // Close video menu on outside click
+  useEffect(() => {
+    if (!showVideoMenu) return;
+    function handleOutside(e: MouseEvent) {
+      if (videoMenuRef.current && !videoMenuRef.current.contains(e.target as Node)) {
+        setShowVideoMenu(false);
+      }
+    }
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, [showVideoMenu]);
 
   // ── Emoji insertion ───────────────────────────────────────────────────────
 
@@ -270,7 +272,12 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
         }
       }
 
-      const type = videoFile ? "VIDEO" : imageFiles.length > 0 || docFiles.length > 0 ? "IMAGE" : "TEXT";
+      // Handle embed URL (YouTube/Vimeo)
+      if (videoEmbedUrl.trim()) {
+        attachments = [...attachments, { url: videoEmbedUrl.trim(), name: "video-embed", size: 0, mediaType: "video-embed" }];
+      }
+
+      const type = (videoFile || videoEmbedUrl) ? "VIDEO" : imageFiles.length > 0 || docFiles.length > 0 ? "IMAGE" : "TEXT";
       const payload: Record<string, unknown> = { body: body.trim() || " ", type };
       if (showTitle && title.trim()) payload.title = title.trim();
       if (attachments.length > 0) payload.attachments = attachments;
@@ -291,6 +298,8 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
       setFocused(false);
       if (videoPreviewUrl) URL.revokeObjectURL(videoPreviewUrl);
       setVideoFile(null); setVideoPreviewUrl(""); setVideoError("");
+      setVideoEmbedUrl(""); setShowEmbedInput(false);
+      setShowLinkInput(false); setLinkInputVal("");
     } catch {
       setError("Erro de conexão. Tente novamente.");
     } finally {
@@ -357,8 +366,8 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
   }
 
   const busy = isLoading || uploadingImages || uploadingVideo || uploadingDocs;
-  const hasContent = !!(body.trim() || imageFiles.length || videoFile || docFiles.length);
-  const expanded = focused || body.length > 0 || !!imageFiles.length || !!docFiles.length || !!videoFile;
+  const hasContent = !!(body.trim() || imageFiles.length || videoFile || docFiles.length || videoEmbedUrl.trim());
+  const expanded = focused || body.length > 0 || !!imageFiles.length || !!docFiles.length || !!videoFile || !!videoEmbedUrl;
 
   return (
     <form onSubmit={handleSubmit} className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-3">
@@ -453,6 +462,68 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
         </p>
       )}
 
+      {/* Embed URL input */}
+      {showEmbedInput && !videoFile && (
+        <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-2">
+          <Link2 className="w-3.5 h-3.5 text-[#009CD9] flex-shrink-0" />
+          <input
+            type="url"
+            value={videoEmbedUrl}
+            onChange={(e) => setVideoEmbedUrl(e.target.value)}
+            placeholder="https://youtube.com/watch?v=... ou Vimeo"
+            className="flex-1 bg-transparent text-sm text-gray-300 placeholder-gray-500 focus:outline-none"
+          />
+          {videoEmbedUrl.trim() && <span className="text-xs text-[#009CD9]">✓</span>}
+          <button
+            type="button"
+            onClick={() => { setShowEmbedInput(false); setVideoEmbedUrl(""); }}
+            className="text-gray-500 hover:text-red-400 transition-colors"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
+      {/* Link input */}
+      {showLinkInput && (
+        <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-2">
+          <Link2 className="w-3.5 h-3.5 text-[#009CD9] flex-shrink-0" />
+          <input
+            type="url"
+            value={linkInputVal}
+            onChange={(e) => setLinkInputVal(e.target.value)}
+            placeholder="https://..."
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                if (linkInputVal.trim()) {
+                  setBody((prev) => prev + (prev ? "\n" : "") + linkInputVal.trim());
+                  setLinkInputVal(""); setShowLinkInput(false);
+                }
+              }
+            }}
+            className="flex-1 bg-transparent text-sm text-gray-300 placeholder-gray-500 focus:outline-none"
+          />
+          <button
+            type="button"
+            onClick={() => {
+              if (linkInputVal.trim()) setBody((prev) => prev + (prev ? "\n" : "") + linkInputVal.trim());
+              setLinkInputVal(""); setShowLinkInput(false);
+            }}
+            className="text-xs text-[#009CD9] hover:text-[#007A99] font-medium transition-colors"
+          >
+            Inserir
+          </button>
+          <button
+            type="button"
+            onClick={() => { setShowLinkInput(false); setLinkInputVal(""); }}
+            className="text-gray-500 hover:text-red-400 transition-colors"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
       {/* Doc previews */}
       {docFiles.length > 0 && (
         <div className="flex flex-col gap-1.5 pl-12">
@@ -545,19 +616,43 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
             {imageFiles.length > 0 && <span className="text-[#009CD9]">({imageFiles.length})</span>}
           </button>
 
-          {/* Vídeo */}
-          <button
-            type="button"
-            onClick={() => videoInputRef.current?.click()}
-            disabled={!!videoFile || imageFiles.length > 0}
-            className={`inline-flex items-center gap-1.5 text-xs px-2 py-1.5 rounded-lg transition-colors disabled:opacity-40 flex-shrink-0 ${
-              videoFile ? "text-[#009CD9] bg-[#006079]/20" : "text-gray-500 hover:text-[#009CD9] hover:bg-white/5"
-            }`}
-            title="Vídeo direto (máx 10MB / 1 min, MP4/WebM/MOV)"
-          >
-            <Video className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Vídeo</span>
-          </button>
+          {/* Vídeo — dropdown: arquivo ou embedar */}
+          <div className="relative flex-shrink-0" ref={videoMenuRef}>
+            <button
+              type="button"
+              onClick={() => { if (!videoFile && !videoEmbedUrl && imageFiles.length === 0) setShowVideoMenu((v) => !v); }}
+              disabled={(!!videoFile || !!videoEmbedUrl) && !showVideoMenu}
+              className={`inline-flex items-center gap-1.5 text-xs px-2 py-1.5 rounded-lg transition-colors disabled:opacity-40 ${
+                (videoFile || videoEmbedUrl) ? "text-[#009CD9] bg-[#006079]/20" : showVideoMenu ? "bg-[#006079]/20 text-[#009CD9]" : "text-gray-500 hover:text-[#009CD9] hover:bg-white/5"
+              }`}
+              title="Vídeo"
+            >
+              <Video className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Vídeo</span>
+            </button>
+            {showVideoMenu && (
+              <div className="absolute bottom-full mb-2 left-0 w-48 bg-[#252525] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => { videoInputRef.current?.click(); setShowVideoMenu(false); }}
+                  className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-gray-300 hover:bg-white/5 hover:text-[#EEE6E4] transition-colors"
+                >
+                  <Paperclip className="w-3.5 h-3.5 text-[#009CD9]" />
+                  Upload arquivo
+                  <span className="ml-auto text-[10px] text-gray-500">MP4/WebM/MOV</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setShowEmbedInput(true); setShowVideoMenu(false); }}
+                  className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-gray-300 hover:bg-white/5 hover:text-[#EEE6E4] transition-colors border-t border-white/5"
+                >
+                  <Link2 className="w-3.5 h-3.5 text-[#009CD9]" />
+                  Embedar URL
+                  <span className="ml-auto text-[10px] text-gray-500">YouTube/Vimeo</span>
+                </button>
+              </div>
+            )}
+          </div>
 
           {/* PDF / Arquivo */}
           <button
@@ -570,6 +665,19 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
             <Paperclip className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">PDF</span>
             {docFiles.length > 0 && <span className="text-[#009CD9]">({docFiles.length})</span>}
+          </button>
+
+          {/* Link */}
+          <button
+            type="button"
+            onClick={() => setShowLinkInput((v) => !v)}
+            className={`inline-flex items-center gap-1.5 text-xs px-2 py-1.5 rounded-lg transition-colors flex-shrink-0 ${
+              showLinkInput ? "bg-[#006079]/20 text-[#009CD9]" : "text-gray-500 hover:text-[#009CD9] hover:bg-white/5"
+            }`}
+            title="Inserir link"
+          >
+            <Link2 className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Link</span>
           </button>
 
           {/* Título toggle */}

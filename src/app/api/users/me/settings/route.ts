@@ -35,6 +35,7 @@ export const GET = withAuth(async (req, { session }) => {
         twoFactorEnabled: true,
         referralCode: true,
         notificationPrefs: true,
+        lastLoginAt: true,
       },
     });
 

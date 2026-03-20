@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -245,36 +245,10 @@ function getNavItems(role: string): NavEntry[] {
 
 // ─── View As ─────────────────────────────────────────────────────────────────
 
-interface ViewAsOption {
-  id: string;
-  label: string;
-  icon: React.ElementType;
-  desc: string;
-  navigateTo?: string;
-}
-
-const VIEW_AS_OPTIONS: ViewAsOption[] = [
-  { id: "MEMBER",       label: "Membros",          icon: UserCheck, desc: "Como um assinante vê a plataforma" },
-  { id: "INFLUENCER",   label: "Influenciadores",  icon: Crown,     desc: "Como um criador de comunidade vê" },
-  { id: "PAYWALL",      label: "Paywalls",          icon: Lock,      desc: "O que não-assinantes enxergam",        navigateTo: "/dashboard/assinar" },
-  { id: "INVITE_LINK",  label: "Links de Convite", icon: Link2,     desc: "Espaços e grupos via link de convite", navigateTo: "/dashboard/admin/comunidades" },
-  { id: "ACCESS_GROUP", label: "Grupos de Acesso", icon: Layers,    desc: "Espaços e grupos disponíveis",         navigateTo: "/dashboard/communities" },
-];
-
 const VIEW_AS_LABELS: Record<string, string> = {
-  MEMBER:       "Membro",
-  INFLUENCER:   "Influenciador",
-  PAYWALL:      "Paywall (sem assinatura)",
-  INVITE_LINK:  "Link de Convite",
-  ACCESS_GROUP: "Grupo de Acesso",
-};
-
-const VIEW_AS_DESCS: Record<string, string> = {
-  MEMBER:       "Você está vendo a plataforma como um membro comum.",
-  INFLUENCER:   "Você está vendo como um influenciador.",
-  PAYWALL:      "Você está vendo o que usuários sem assinatura enxergam.",
-  INVITE_LINK:  "Você está vendo o que novos membros veem via link de convite.",
-  ACCESS_GROUP: "Você está vendo os grupos e espaços disponíveis.",
+  MEMBER_PAID:   "Membro (assinante)",
+  MEMBER_UNPAID: "Membro (sem assinatura)",
+  INFLUENCER:    "Influenciador",
 };
 
 // ─── Layout ──────────────────────────────────────────────────────────────────
@@ -290,7 +264,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [openGroups, setOpenGroups] = useState<Set<string>>(new Set());
   const [viewAs, setViewAs] = useState<string | null>(null);
   const [viewAsOpen, setViewAsOpen] = useState(false);
-  const [viewAsSearch, setViewAsSearch] = useState("");
+  const [memberSearch, setMemberSearch] = useState("");
+  const [influencerSearch, setInfluencerSearch] = useState("");
+  const [viewAsUser, setViewAsUser] = useState<{ id: string; name: string; role: string } | null>(null);
+  const [memberResults, setMemberResults] = useState<{ id: string; firstName: string; lastName: string; role: string }[]>([]);
+  const [influencerResults, setInfluencerResults] = useState<{ id: string; firstName: string; lastName: string; role: string }[]>([]);
+  const [memberSearching, setMemberSearching] = useState(false);
+  const [influencerSearching, setInfluencerSearching] = useState(false);
+  const memberDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const influencerDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     async function checkAuth() {
@@ -357,6 +339,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
 
     checkAuth();
+
+    // Ping "last seen" in background (non-blocking)
+    fetch("/api/users/me/seen", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    }).catch(() => {});
 
     // Proactively refresh token every 5 minutes to prevent idle logout
     const refreshInterval = setInterval(async () => {
@@ -437,16 +426,62 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     .join("")
     .toUpperCase();
 
+  function searchMembers(q: string) {
+    setMemberSearch(q);
+    if (memberDebounce.current) clearTimeout(memberDebounce.current);
+    if (!q.trim()) { setMemberResults([]); return; }
+    memberDebounce.current = setTimeout(async () => {
+      setMemberSearching(true);
+      try {
+        const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+        const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&types=members`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        const data = await res.json();
+        if (data.success && data.data?.members) {
+          setMemberResults(data.data.members.filter((u: { role: string }) => u.role === "COMMUNITY_MEMBER").slice(0, 5));
+        }
+      } catch { /* ignore */ } finally {
+        setMemberSearching(false);
+      }
+    }, 300);
+  }
+
+  function searchInfluencers(q: string) {
+    setInfluencerSearch(q);
+    if (influencerDebounce.current) clearTimeout(influencerDebounce.current);
+    if (!q.trim()) { setInfluencerResults([]); return; }
+    influencerDebounce.current = setTimeout(async () => {
+      setInfluencerSearching(true);
+      try {
+        const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+        const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&types=members`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        const data = await res.json();
+        if (data.success && data.data?.members) {
+          setInfluencerResults(data.data.members.filter((u: { role: string }) => u.role === "INFLUENCER_ADMIN").slice(0, 5));
+        }
+      } catch { /* ignore */ } finally {
+        setInfluencerSearching(false);
+      }
+    }, 300);
+  }
+
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className={`h-16 flex items-center border-b border-white/10 flex-shrink-0 ${collapsed ? "px-3 justify-center" : "px-4"}`}>
         {!collapsed && (
-          <Link href="/" className="flex items-center flex-1 min-w-0">
+          <Link href="/dashboard" className="flex items-center flex-1 min-w-0">
             <LogoType height={24} variant="light" />
           </Link>
         )}
-        {collapsed && <Logo size="md" />}
+        {collapsed && (
+          <Link href="/dashboard">
+            <Logo size="md" />
+          </Link>
+        )}
         <button
           onClick={() => setCollapsed(!collapsed)}
           className={`text-gray-500 hover:text-[#EEE6E4] transition-colors p-1 rounded-lg hover:bg-white/5 ${collapsed ? "hidden md:flex" : "ml-auto"}`}
@@ -480,7 +515,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Nav */}
       <nav className="flex-1 py-3 overflow-y-auto space-y-0.5 px-2">
-        {((viewAs === "MEMBER" ? MEMBER_NAV : viewAs === "INFLUENCER" ? INFLUENCER_NAV : getNavItems(role)) as NavEntry[]).map((entry) => {
+        {((viewAs === "MEMBER_PAID" || viewAs === "MEMBER_UNPAID" || viewAs === "COMMUNITY_MEMBER" ? MEMBER_NAV : viewAs === "INFLUENCER" || viewAs === "INFLUENCER_ADMIN" ? INFLUENCER_NAV : getNavItems(role)) as NavEntry[]).map((entry) => {
           if (!entry.type || entry.type === "link") {
             const item = entry as NavLink;
             const isActive = item.exact
@@ -587,52 +622,94 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {viewAsOpen && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setViewAsOpen(false)} />
-                <div className="absolute bottom-full mb-2 left-0 right-0 bg-[#252525] border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50">
-                  {/* Header */}
+                <div className="absolute bottom-full mb-2 left-0 right-0 bg-[#252525] border border-white/10 rounded-xl overflow-y-auto shadow-2xl z-50 max-h-[80vh]">
+
+                  {/* ── Membros ── */}
                   <div className="p-2 border-b border-white/10">
-                    <p className="text-[10px] text-gray-500 uppercase tracking-wide px-1 mb-1.5 font-medium">Visualizar como</p>
+                    <p className="text-[10px] text-gray-500 uppercase tracking-wide px-1 mb-2 font-semibold flex items-center gap-1.5">
+                      <UserCheck className="w-3 h-3" />Membros
+                    </p>
+                    {/* Presets */}
+                    <div className="space-y-0.5 mb-2">
+                      {[
+                        { id: "MEMBER_PAID",   label: "Membro assinante",     desc: "Já pagou a plataforma",     icon: UserCheck },
+                        { id: "MEMBER_UNPAID", label: "Membro sem assinatura", desc: "Ainda não assinou",          icon: Lock },
+                      ].map(({ id, label, desc, icon: Icon }) => (
+                        <button key={id}
+                          onClick={() => { setViewAs(id); setViewAsUser(null); setViewAsOpen(false); if (id === "MEMBER_UNPAID") router.push("/dashboard/assinar"); }}
+                          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left hover:bg-white/5 ${viewAs === id && !viewAsUser ? "text-amber-400 bg-amber-500/10" : "text-gray-400 hover:text-[#EEE6E4]"}`}>
+                          <Icon className="w-4 h-4 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-medium leading-tight">{label}</p>
+                            <p className="text-[10px] text-gray-500">{desc}</p>
+                          </div>
+                          {viewAs === id && !viewAsUser && <div className="w-1.5 h-1.5 bg-amber-400 rounded-full flex-shrink-0" />}
+                        </button>
+                      ))}
+                    </div>
+                    {/* Member search */}
                     <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5">
                       <Search className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-                      <input
-                        type="text"
-                        placeholder="Pesquisar membro..."
-                        value={viewAsSearch}
-                        onChange={(e) => setViewAsSearch(e.target.value)}
+                      <input type="text" placeholder="Pesquisar membro..." value={memberSearch}
+                        onChange={(e) => searchMembers(e.target.value)}
                         className="bg-transparent text-xs text-[#EEE6E4] placeholder-gray-500 flex-1 outline-none"
                       />
+                      {memberSearching && <div className="w-3 h-3 border border-[#009CD9] border-t-transparent rounded-full animate-spin flex-shrink-0" />}
                     </div>
+                    {memberResults.length > 0 && (
+                      <div className="mt-1 space-y-0.5">
+                        {memberResults.map((u) => (
+                          <button key={u.id}
+                            onClick={() => { setViewAs("COMMUNITY_MEMBER"); setViewAsUser({ id: u.id, name: `${u.firstName} ${u.lastName}`.trim(), role: u.role }); setViewAsOpen(false); setMemberSearch(""); setMemberResults([]); }}
+                            className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs transition-all text-left hover:bg-white/5 ${viewAsUser?.id === u.id ? "text-amber-400 bg-amber-500/10" : "text-gray-400 hover:text-[#EEE6E4]"}`}>
+                            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-[#006079] to-[#009CD9] flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0">
+                              {(u.firstName[0] ?? "").toUpperCase()}{(u.lastName[0] ?? "").toUpperCase()}
+                            </div>
+                            <span className="flex-1 truncate">{u.firstName} {u.lastName}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                  {/* Options */}
-                  <div className="p-1">
-                    {VIEW_AS_OPTIONS.filter((o) =>
-                      !viewAsSearch || o.label.toLowerCase().includes(viewAsSearch.toLowerCase())
-                    ).map(({ id, label, icon: Icon, desc, navigateTo }) => (
-                      <button
-                        key={id}
-                        onClick={() => {
-                          setViewAs(id);
-                          setViewAsOpen(false);
-                          setViewAsSearch("");
-                          if (navigateTo) router.push(navigateTo);
-                        }}
-                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left hover:bg-white/5 ${
-                          viewAs === id ? "text-amber-400" : "text-gray-400 hover:text-[#EEE6E4]"
-                        }`}
-                      >
-                        <Icon className="w-4 h-4 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-medium leading-tight">{label}</p>
-                          <p className="text-[10px] text-gray-500 truncate mt-0.5">{desc}</p>
-                        </div>
-                        {viewAs === id && <div className="w-1.5 h-1.5 bg-amber-400 rounded-full flex-shrink-0" />}
-                      </button>
-                    ))}
+
+                  {/* ── Influenciadores ── */}
+                  <div className="p-2">
+                    <p className="text-[10px] text-gray-500 uppercase tracking-wide px-1 mb-2 font-semibold flex items-center gap-1.5">
+                      <Crown className="w-3 h-3" />Influenciadores
+                    </p>
+                    <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5">
+                      <Search className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                      <input type="text" placeholder="Pesquisar influenciador..." value={influencerSearch}
+                        onChange={(e) => searchInfluencers(e.target.value)}
+                        className="bg-transparent text-xs text-[#EEE6E4] placeholder-gray-500 flex-1 outline-none"
+                      />
+                      {influencerSearching && <div className="w-3 h-3 border border-[#009CD9] border-t-transparent rounded-full animate-spin flex-shrink-0" />}
+                    </div>
+                    {influencerResults.length > 0 && (
+                      <div className="mt-1 space-y-0.5">
+                        {influencerResults.map((u) => (
+                          <button key={u.id}
+                            onClick={() => { setViewAs("INFLUENCER_ADMIN"); setViewAsUser({ id: u.id, name: `${u.firstName} ${u.lastName}`.trim(), role: u.role }); setViewAsOpen(false); setInfluencerSearch(""); setInfluencerResults([]); }}
+                            className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs transition-all text-left hover:bg-white/5 ${viewAsUser?.id === u.id ? "text-amber-400 bg-amber-500/10" : "text-gray-400 hover:text-[#EEE6E4]"}`}>
+                            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-[#007A99] to-[#009CD9] flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0">
+                              {(u.firstName[0] ?? "").toUpperCase()}{(u.lastName[0] ?? "").toUpperCase()}
+                            </div>
+                            <span className="flex-1 truncate">{u.firstName} {u.lastName}</span>
+                            <span className="text-[9px] text-[#009CD9]">Influenciador</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {influencerSearch && influencerResults.length === 0 && !influencerSearching && (
+                      <p className="text-[11px] text-gray-600 px-2 py-2">Nenhum influenciador encontrado.</p>
+                    )}
                   </div>
+
                   {/* Clear */}
                   {viewAs && (
                     <div className="p-2 border-t border-white/10">
                       <button
-                        onClick={() => { setViewAs(null); setViewAsOpen(false); router.push("/dashboard"); }}
+                        onClick={() => { setViewAs(null); setViewAsUser(null); setViewAsOpen(false); setMemberSearch(""); setMemberResults([]); setInfluencerSearch(""); setInfluencerResults([]); router.push("/dashboard"); }}
                         className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all"
                       >
                         <X className="w-3.5 h-3.5" />
@@ -728,7 +805,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           >
             <Menu className="w-5 h-5" />
           </button>
-          <Link href="/" className="flex items-center flex-1">
+          <Link href="/dashboard" className="flex items-center flex-1">
             <LogoType height={22} variant="light" />
           </Link>
           <NotificationBell />
@@ -740,13 +817,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 sm:px-6 py-2 flex items-center gap-3 flex-shrink-0">
             <Eye className="w-4 h-4 text-amber-400 flex-shrink-0" />
             <span className="text-amber-300 text-sm font-medium">
-              Visualizando como: {VIEW_AS_LABELS[viewAs]}
+              Visualizando como: {viewAsUser ? viewAsUser.name : VIEW_AS_LABELS[viewAs] ?? viewAs}
             </span>
-            <span className="hidden sm:inline text-amber-500/70 text-xs truncate">
-              — {VIEW_AS_DESCS[viewAs]}
-            </span>
+            {viewAsUser && (
+              <span className="hidden sm:inline text-amber-500/70 text-xs truncate">
+                — {viewAsUser.role === "INFLUENCER_ADMIN" ? "Influenciador" : "Membro"}
+              </span>
+            )}
             <button
-              onClick={() => { setViewAs(null); router.push("/dashboard"); }}
+              onClick={() => { setViewAs(null); setViewAsUser(null); router.push("/dashboard"); }}
               className="ml-auto flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 px-3 py-1 rounded-lg transition-all flex-shrink-0"
             >
               <ArrowLeft className="w-3 h-3" />

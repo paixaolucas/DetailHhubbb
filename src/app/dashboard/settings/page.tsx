@@ -34,6 +34,7 @@ interface UserData {
   role: string;
   createdAt: string;
   referralCode: string | null;
+  lastLoginAt: string | null;
   notificationPrefs?: Record<string, boolean>;
 }
 
@@ -68,12 +69,53 @@ interface PaymentItem {
   createdAt: string;
 }
 
-const NOTIF_KEYS = [
+const NOTIF_KEYS_BASE = [
   { key: "newLives", label: "Novas lives", desc: "Aviso quando uma live começar" },
   { key: "newContent", label: "Novos conteúdos", desc: "Módulos e aulas publicadas" },
+];
+const NOTIF_KEYS_ADMIN = [
+  ...NOTIF_KEYS_BASE,
   { key: "newMembers", label: "Novos membros", desc: "Quando alguém entrar na sua comunidade" },
   { key: "payments", label: "Pagamentos", desc: "Confirmações de assinatura e receita" },
 ];
+
+// ─── Module-level sub-components (must be outside SettingsPage to avoid remount on every keystroke) ──
+
+function InputField({ label, value, onChange, type = "text", disabled = false, placeholder = "" }: {
+  label: string;
+  value: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  type?: string;
+  disabled?: boolean;
+  placeholder?: string;
+}) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-400 mb-1.5">{label}</label>
+      <input
+        type={type}
+        value={value}
+        onChange={onChange}
+        disabled={disabled}
+        placeholder={placeholder}
+        className="w-full bg-white/5 border border-white/10 hover:border-[#009CD9]/20 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl px-4 py-3 text-[#EEE6E4] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 focus:border-[#009CD9] transition-all text-sm"
+      />
+    </div>
+  );
+}
+
+function AlertBanner({ msg }: { msg: { type: "success" | "error"; text: string } }) {
+  return (
+    <div className={`flex items-center gap-2 text-sm px-4 py-3 rounded-xl border ${
+      msg.type === "success"
+        ? "bg-green-500/10 border-green-500/30 text-green-400"
+        : "bg-red-500/10 border-red-500/30 text-red-400"
+    }`}>
+      {msg.type === "success" ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+      {msg.text}
+    </div>
+  );
+}
 
 export default function SettingsPage() {
   const toast = useToast();
@@ -85,6 +127,7 @@ export default function SettingsPage() {
     lastName: "",
     phone: "",
     avatarUrl: "",
+    bio: "",
   });
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: "",
@@ -167,10 +210,21 @@ export default function SettingsPage() {
             lastName: u.lastName ?? "",
             phone: u.phone ?? "",
             avatarUrl: u.avatarUrl ?? "",
+            bio: "",
           });
           if (u.notificationPrefs && typeof u.notificationPrefs === "object") {
             setNotifPrefs((prev) => ({ ...prev, ...(u.notificationPrefs as Record<string, boolean>) }));
           }
+          // Fetch bio from UserProfile
+          const uid = u.id;
+          fetch(`/api/users/${uid}/profile`, { headers: { Authorization: `Bearer ${token}` } })
+            .then((r) => r.json())
+            .then((pd) => {
+              if (pd.success && pd.data?.bio) {
+                setProfileForm((p) => ({ ...p, bio: pd.data.bio ?? "" }));
+              }
+            })
+            .catch(() => {});
         }
       })
       .finally(() => setIsLoading(false));
@@ -275,6 +329,12 @@ export default function SettingsPage() {
     }).format(Number(amount));
   }
 
+  function formatDateTime(dateStr: string) {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" }) +
+      " às " + d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  }
+
   function formatDate(dateStr: string) {
     return new Date(dateStr).toLocaleDateString("pt-BR");
   }
@@ -322,6 +382,14 @@ export default function SettingsPage() {
         return;
       }
       localStorage.setItem(STORAGE_KEYS.USER_NAME, `${profileForm.firstName} ${profileForm.lastName}`);
+      // Also save bio to UserProfile
+      if (data.data?.id) {
+        fetch(`/api/users/${data.data.id}/profile`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ bio: profileForm.bio || undefined }),
+        }).catch(() => {});
+      }
       setProfileMsg({ type: "success", text: "Perfil atualizado com sucesso!" });
       setUser((prev) => prev ? { ...prev, ...data.data } : null);
     } finally {
@@ -445,35 +513,6 @@ export default function SettingsPage() {
       : []),
   ];
 
-  function InputField({ label, value, onChange, type = "text", disabled = false, placeholder = "" }: any) {
-    return (
-      <div>
-        <label className="block text-sm font-medium text-gray-400 mb-1.5">{label}</label>
-        <input
-          type={type}
-          value={value}
-          onChange={onChange}
-          disabled={disabled}
-          placeholder={placeholder}
-          className="w-full bg-white/5 border border-white/10 hover:border-[#009CD9]/20 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl px-4 py-3 text-[#EEE6E4] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 focus:border-[#009CD9] transition-all text-sm"
-        />
-      </div>
-    );
-  }
-
-  function AlertBanner({ msg }: { msg: { type: "success" | "error"; text: string } }) {
-    return (
-      <div className={`flex items-center gap-2 text-sm px-4 py-3 rounded-xl border ${
-        msg.type === "success"
-          ? "bg-green-500/10 border-green-500/30 text-green-400"
-          : "bg-red-500/10 border-red-500/30 text-red-400"
-      }`}>
-        {msg.type === "success" ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
-        {msg.text}
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6 max-w-2xl">
       <div>
@@ -488,10 +527,22 @@ export default function SettingsPage() {
             <Image src={user.avatarUrl} alt={user.firstName} width={64} height={64} className="w-full h-full rounded-2xl object-cover" />
           ) : initials}
         </div>
-        <div>
+        <div className="flex-1 min-w-0">
           <p className="font-semibold text-[#EEE6E4]">{user.firstName} {user.lastName}</p>
           <p className="text-sm text-gray-400 mb-1">{user.email}</p>
           <RoleBadge role={user.role} />
+          <div className="mt-2 space-y-0.5">
+            <p className="text-xs text-gray-500 flex items-center gap-1.5">
+              <Clock className="w-3 h-3 flex-shrink-0" />
+              Membro desde: {formatDateTime(user.createdAt)}
+            </p>
+            {user.lastLoginAt && (
+              <p className="text-xs text-gray-500 flex items-center gap-1.5">
+                <Clock className="w-3 h-3 flex-shrink-0" />
+                Visto por último: {formatDateTime(user.lastLoginAt)}
+              </p>
+            )}
+          </div>
         </div>
       </div>
 
@@ -539,6 +590,18 @@ export default function SettingsPage() {
             type="tel"
             placeholder="+55 11 99999-9999"
           />
+          <div>
+            <label className="block text-sm font-medium text-gray-400 mb-1.5">Bio</label>
+            <textarea
+              value={profileForm.bio}
+              onChange={(e) => setProfileForm((p) => ({ ...p, bio: e.target.value }))}
+              placeholder="Conte um pouco sobre você..."
+              rows={3}
+              maxLength={500}
+              className="w-full bg-white/5 border border-white/10 hover:border-[#009CD9]/20 rounded-xl px-4 py-3 text-[#EEE6E4] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 focus:border-[#009CD9] transition-all text-sm resize-none"
+            />
+            <p className="text-xs text-gray-600 text-right mt-1">{profileForm.bio.length}/500</p>
+          </div>
           <div>
             <label className="block text-sm font-medium text-gray-400 mb-1.5">Foto de perfil</label>
             <div className="flex items-center gap-4">
@@ -623,7 +686,7 @@ export default function SettingsPage() {
         <div className="glass-card p-6 space-y-4">
           <h2 className="text-base font-semibold text-[#EEE6E4]">Notificações</h2>
           <div className="space-y-3">
-            {NOTIF_KEYS.map(({ key, label, desc }) => {
+            {(user.role === "COMMUNITY_MEMBER" ? NOTIF_KEYS_BASE : NOTIF_KEYS_ADMIN).map(({ key, label, desc }) => {
               const isOn = notifPrefs[key] !== false;
               return (
                 <div key={key} className="flex items-center justify-between p-4 bg-white/5 rounded-xl">
