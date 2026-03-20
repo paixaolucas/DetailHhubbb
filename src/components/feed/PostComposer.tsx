@@ -38,6 +38,7 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
 
   const [showVideoInput, setShowVideoInput] = useState(false);
   const [videoUrl, setVideoUrl] = useState("");
+  const [videoAspect, setVideoAspect] = useState<"16:9" | "9:16" | "4:3">("16:9");
 
   const [userName, setUserName] = useState("");
   const [initials, setInitials] = useState("?");
@@ -152,7 +153,10 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
       };
       if (showTitle && title.trim()) payload.title = title.trim();
       if (attachments.length > 0) payload.attachments = attachments;
-      if (videoUrl.trim()) payload.videoUrl = videoUrl.trim();
+      if (videoUrl.trim()) {
+        payload.videoUrl = videoUrl.trim();
+        payload.videoAspect = videoAspect;
+      }
 
       const res = await fetch(`/api/spaces/${spaceId}/posts`, {
         method: "POST",
@@ -178,6 +182,7 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
       setPreviewUrls([]);
       setFocused(false);
       setVideoUrl("");
+      setVideoAspect("16:9");
       setShowVideoInput(false);
     } catch {
       setError("Erro de conexão. Tente novamente.");
@@ -291,8 +296,26 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
             placeholder="Cole a URL do YouTube ou Vimeo..."
             className="w-full bg-white/5 border border-white/10 hover:border-[#006079]/40 focus:border-[#009CD9]/40 rounded-lg px-3 py-2 text-[#EEE6E4] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/20 text-sm transition-all"
           />
+          {/* Aspect ratio selector */}
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-gray-500">Proporção:</span>
+            {(["16:9", "9:16", "4:3"] as const).map((ar) => (
+              <button
+                key={ar}
+                type="button"
+                onClick={() => setVideoAspect(ar)}
+                className={`text-xs px-2 py-0.5 rounded border transition-colors ${
+                  videoAspect === ar
+                    ? "bg-[#006079]/20 border-[#009CD9]/40 text-[#009CD9]"
+                    : "border-white/10 text-gray-500 hover:text-gray-300"
+                }`}
+              >
+                {ar}
+              </button>
+            ))}
+          </div>
           {videoUrl.trim() && (
-            <VideoEmbed url={videoUrl.trim()} className="mt-1" />
+            <VideoEmbed url={videoUrl.trim()} aspectRatio={videoAspect} className="mt-1" />
           )}
         </div>
       )}

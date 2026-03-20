@@ -8,9 +8,15 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, Circle, BookOpen, AlertCircle, Loader2 } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Circle, BookOpen, AlertCircle, Loader2, FileText, Download, File } from "lucide-react";
 import VideoEmbed from "@/components/ui/VideoEmbed";
 import { STORAGE_KEYS } from "@/lib/constants";
+
+interface LessonFile {
+  url: string;
+  name: string;
+  size?: number;
+}
 
 interface Lesson {
   id: string;
@@ -20,6 +26,7 @@ interface Lesson {
   videoUrl?: string | null;
   videoDuration?: number | null;
   content?: string | null;
+  attachments?: LessonFile[] | string[];
   isCompleted?: boolean;
   isFree?: boolean;
   isPublished?: boolean;
@@ -55,6 +62,7 @@ export default function LessonViewerPage() {
   const [error, setError] = useState("");
   const [completing, setCompleting] = useState(false);
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
+  const [activeTab, setActiveTab] = useState<"aula" | "arquivos">("aula");
 
   useEffect(() => {
     async function load() {
@@ -232,64 +240,151 @@ export default function LessonViewerPage() {
           </aside>
 
           {/* Main content */}
-          <main className="flex-1 p-4 lg:p-8">
+          <main className="flex-1 flex flex-col min-w-0">
             {!currentLesson ? (
               <div className="flex items-center justify-center h-64">
                 <p className="text-gray-500 text-sm">Selecione uma aula para começar.</p>
               </div>
             ) : (
-              <div className="max-w-3xl">
-                <h1 className="text-xl font-bold text-[#EEE6E4] mb-4">{currentLesson.title}</h1>
+              <>
+                {/* Tabs */}
+                {(() => {
+                  const files: LessonFile[] = Array.isArray(currentLesson.attachments)
+                    ? (currentLesson.attachments as (LessonFile | string)[]).map((a) =>
+                        typeof a === "string" ? { url: a, name: a.split("/").pop() ?? "arquivo" } : a
+                      )
+                    : [];
+                  return (
+                    <>
+                      <div className="border-b border-white/10 px-4 lg:px-8 flex gap-1 bg-[#181818] flex-shrink-0">
+                        <button
+                          onClick={() => setActiveTab("aula")}
+                          className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                            activeTab === "aula"
+                              ? "border-[#009CD9] text-[#009CD9]"
+                              : "border-transparent text-gray-500 hover:text-gray-300"
+                          }`}
+                        >
+                          <BookOpen className="w-4 h-4 inline mr-1.5" />
+                          Aula
+                        </button>
+                        <button
+                          onClick={() => setActiveTab("arquivos")}
+                          className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-1.5 ${
+                            activeTab === "arquivos"
+                              ? "border-[#009CD9] text-[#009CD9]"
+                              : "border-transparent text-gray-500 hover:text-gray-300"
+                          }`}
+                        >
+                          <FileText className="w-4 h-4" />
+                          Arquivos
+                          {files.length > 0 && (
+                            <span className="bg-[#006079]/30 text-[#009CD9] text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                              {files.length}
+                            </span>
+                          )}
+                        </button>
+                      </div>
 
-                {/* Video */}
-                {currentLesson.videoUrl && (
-                  <VideoEmbed
-                    url={currentLesson.videoUrl}
-                    title={currentLesson.title}
-                    className="mb-6"
-                  />
-                )}
+                      {activeTab === "aula" ? (
+                        <div className="flex-1 p-4 lg:p-8">
+                          <div className="max-w-3xl">
+                            <h1 className="text-xl font-bold text-[#EEE6E4] mb-4">{currentLesson.title}</h1>
 
-                {/* Description / Content */}
-                {currentLesson.description && (
-                  <p className="text-gray-300 text-sm leading-relaxed mb-4">
-                    {currentLesson.description}
-                  </p>
-                )}
-                {currentLesson.content && (
-                  <div className="prose prose-invert prose-sm max-w-none mb-6 text-gray-300">
-                    {currentLesson.content}
-                  </div>
-                )}
+                            {currentLesson.videoUrl && (
+                              <VideoEmbed
+                                url={currentLesson.videoUrl}
+                                title={currentLesson.title}
+                                className="mb-6"
+                              />
+                            )}
 
-                {/* Mark complete button */}
-                <div className="pt-4 border-t border-white/10">
-                  {isCompleted ? (
-                    <div className="flex items-center gap-2 text-[#009CD9]">
-                      <CheckCircle2 className="w-5 h-5" />
-                      <span className="text-sm font-medium">Aula concluída!</span>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={handleMarkComplete}
-                      disabled={completing}
-                      className="inline-flex items-center gap-2 bg-[#006079] hover:bg-[#007A99] disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all"
-                    >
-                      {completing ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          Salvando...
-                        </>
+                            {currentLesson.description && (
+                              <p className="text-gray-300 text-sm leading-relaxed mb-4">
+                                {currentLesson.description}
+                              </p>
+                            )}
+                            {currentLesson.content && (
+                              <div className="prose prose-invert prose-sm max-w-none mb-6 text-gray-300">
+                                {currentLesson.content}
+                              </div>
+                            )}
+
+                            <div className="pt-4 border-t border-white/10">
+                              {isCompleted ? (
+                                <div className="flex items-center gap-2 text-[#009CD9]">
+                                  <CheckCircle2 className="w-5 h-5" />
+                                  <span className="text-sm font-medium">Aula concluída!</span>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={handleMarkComplete}
+                                  disabled={completing}
+                                  className="inline-flex items-center gap-2 bg-[#006079] hover:bg-[#007A99] disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all"
+                                >
+                                  {completing ? (
+                                    <>
+                                      <Loader2 className="w-4 h-4 animate-spin" />
+                                      Salvando...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <CheckCircle2 className="w-4 h-4" />
+                                      Marcar como concluída
+                                    </>
+                                  )}
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
                       ) : (
-                        <>
-                          <CheckCircle2 className="w-4 h-4" />
-                          Marcar como concluída
-                        </>
+                        <div className="flex-1 p-4 lg:p-8">
+                          <div className="max-w-3xl">
+                            <h2 className="text-base font-semibold text-[#EEE6E4] mb-4">
+                              Arquivos desta aula
+                            </h2>
+                            {files.length === 0 ? (
+                              <div className="bg-white/5 border border-white/10 rounded-xl p-10 text-center">
+                                <File className="w-8 h-8 text-gray-600 mx-auto mb-3" />
+                                <p className="text-gray-500 text-sm">Nenhum arquivo disponível para esta aula.</p>
+                              </div>
+                            ) : (
+                              <div className="space-y-2">
+                                {files.map((file, idx) => (
+                                  <a
+                                    key={idx}
+                                    href={file.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    download
+                                    className="flex items-center gap-3 bg-white/5 border border-white/10 hover:border-[#006079]/40 hover:bg-white/10 rounded-xl px-4 py-3 transition-all group"
+                                  >
+                                    <div className="w-9 h-9 rounded-lg bg-[#006079]/20 flex items-center justify-center flex-shrink-0">
+                                      <FileText className="w-4 h-4 text-[#009CD9]" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-sm text-[#EEE6E4] truncate font-medium">
+                                        {file.name}
+                                      </p>
+                                      {file.size != null && (
+                                        <p className="text-xs text-gray-500">
+                                          {(file.size / 1024 / 1024).toFixed(1)} MB
+                                        </p>
+                                      )}
+                                    </div>
+                                    <Download className="w-4 h-4 text-gray-600 group-hover:text-[#009CD9] flex-shrink-0 transition-colors" />
+                                  </a>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       )}
-                    </button>
-                  )}
-                </div>
-              </div>
+                    </>
+                  );
+                })()}
+              </>
             )}
           </main>
         </div>

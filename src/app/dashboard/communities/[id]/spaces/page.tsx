@@ -70,6 +70,7 @@ const SPACE_TYPES: { value: SpaceType; label: string; description: string }[] = 
   { value: "ANNOUNCEMENT", label: "Avisos",     description: "Avisos do administrador"          },
   { value: "QA",           label: "Perguntas",  description: "Dúvidas e respostas"              },
   { value: "SHOWCASE",     label: "Showcase",   description: "Compartilhe seu trabalho"         },
+  { value: "COURSE",       label: "Trilha",     description: "Módulos e aulas em sequência"     },
 ];
 
 const TYPE_COLORS: Record<SpaceType, string> = {

@@ -47,6 +47,7 @@ export interface PostCardProps {
     reactions?: PostReaction[];
     reactionCounts?: Record<string, number>;
     userReactions?: string[];
+    videoAspect?: string | null;
     _count?: { reactions?: number; comments?: number };
   };
   communitySlug: string;
@@ -369,7 +370,11 @@ function PostCard({
         {/* Video embed */}
         {post.type === "VIDEO" && post.body && post.body.trim() && (
           <div className="mt-3" onClick={(e) => e.stopPropagation()}>
-            <VideoEmbed url={post.body.trim()} title={post.title ?? undefined} />
+            <VideoEmbed
+              url={post.body.trim()}
+              title={post.title ?? undefined}
+              aspectRatio={(post.videoAspect as "16:9" | "9:16" | "4:3") ?? "16:9"}
+            />
           </div>
         )}
 

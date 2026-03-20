@@ -19,7 +19,7 @@ export const GET = withAuth(async (req, { session, params }) => {
     const contentMod = await db.contentModule.findFirst({
       where: { id: moduleId, communityId, spaceId },
     });
-    if (!module) {
+    if (!contentMod) {
       return NextResponse.json({ success: false, error: "Módulo não encontrado" }, { status: 404 });
     }
 
@@ -69,7 +69,7 @@ export const POST = withAuth(async (req, { session, params }) => {
     const contentMod = await db.contentModule.findFirst({
       where: { id: moduleId, communityId, spaceId },
     });
-    if (!module) {
+    if (!contentMod) {
       return NextResponse.json({ success: false, error: "Módulo não encontrado" }, { status: 404 });
     }
 
@@ -85,6 +85,7 @@ export const POST = withAuth(async (req, { session, params }) => {
       sortOrder,
       isPublished,
       isFree,
+      attachments,
     } = body;
 
     if (!title?.trim()) {
@@ -104,6 +105,7 @@ export const POST = withAuth(async (req, { session, params }) => {
         sortOrder: typeof sortOrder === "number" ? sortOrder : 0,
         isPublished: isPublished ?? false,
         isFree: isFree ?? false,
+        attachments: Array.isArray(attachments) ? attachments : [],
       },
     });
 

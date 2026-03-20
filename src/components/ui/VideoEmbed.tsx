@@ -11,6 +11,7 @@ interface VideoEmbedProps {
   url: string;
   title?: string;
   className?: string;
+  aspectRatio?: "16:9" | "9:16" | "4:3";
 }
 
 function parseVideoUrl(url: string): { type: "youtube" | "vimeo" | "unknown"; id: string } {
@@ -39,7 +40,13 @@ function parseVideoUrl(url: string): { type: "youtube" | "vimeo" | "unknown"; id
   return { type: "unknown", id: "" };
 }
 
-export default function VideoEmbed({ url, title, className = "" }: VideoEmbedProps) {
+const ASPECT_PADDING: Record<string, string> = {
+  "16:9": "56.25%",
+  "9:16": "177.78%",
+  "4:3":  "75%",
+};
+
+export default function VideoEmbed({ url, title, className = "", aspectRatio = "16:9" }: VideoEmbedProps) {
   const { type, id } = parseVideoUrl(url);
 
   if (type === "unknown" || !id) {
@@ -61,8 +68,19 @@ export default function VideoEmbed({ url, title, className = "" }: VideoEmbedPro
       ? `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1`
       : `https://player.vimeo.com/video/${id}?byline=0&portrait=0`;
 
+  const paddingTop = ASPECT_PADDING[aspectRatio] ?? "56.25%";
+
+  // For 9:16 vertical video, constrain max-width so it doesn't stretch too wide
+  const wrapperClass = aspectRatio === "9:16"
+    ? `relative rounded-xl overflow-hidden mx-auto ${className}`
+    : `relative w-full rounded-xl overflow-hidden ${className}`;
+
+  const wrapperStyle = aspectRatio === "9:16"
+    ? { paddingTop, maxWidth: "360px" }
+    : { paddingTop };
+
   return (
-    <div className={`relative w-full rounded-xl overflow-hidden ${className}`} style={{ paddingTop: "56.25%" }}>
+    <div className={wrapperClass} style={wrapperStyle}>
       <iframe
         src={embedSrc}
         title={title ?? (type === "youtube" ? "YouTube video" : "Vimeo video")}

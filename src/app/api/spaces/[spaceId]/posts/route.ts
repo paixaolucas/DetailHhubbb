@@ -208,7 +208,7 @@ export const POST = withAuth(async (req, { session, params }) => {
       );
     }
 
-    const { title, body: postBody, type, videoUrl } = parsed.data;
+    const { title, body: postBody, type, videoUrl, videoAspect } = parsed.data;
 
     // Determine final type and content for VIDEO posts
     const finalType = videoUrl ? "VIDEO" : type;
@@ -222,6 +222,7 @@ export const POST = withAuth(async (req, { session, params }) => {
         title,
         body: finalBody,
         type: finalType,
+        ...(videoUrl && videoAspect ? { videoAspect } : {}),
       },
       include: {
         author: { select: AUTHOR_SELECT },

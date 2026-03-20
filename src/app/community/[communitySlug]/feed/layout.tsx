@@ -170,11 +170,11 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
           Canais
         </p>
 
-        {spaces.length === 0 && (
+        {spaces.filter((s) => s.type !== "COURSE").length === 0 && (
           <p className="text-xs text-gray-600 px-2 py-2">Nenhum canal disponível</p>
         )}
 
-        {spaces.slice(0, 3).map((space) => {
+        {spaces.filter((s) => s.type !== "COURSE").slice(0, 3).map((space) => {
           const href = `/community/${communitySlug}/feed/${space.slug}`;
           const isActive = space.slug === activeSpaceSlug;
           return (
@@ -258,16 +258,14 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
 
         {/* ── Extra nav links ── */}
         <div className="mt-4 pt-3 border-t border-white/8 flex flex-col gap-0.5">
-          {spaces.some((s) => s.type === "COURSE") && (
-            <Link
-              href={`/community/${communitySlug}/trilhas`}
-              onClick={() => setSidebarOpen(false)}
-              className="flex items-center gap-2 px-2.5 py-2 rounded-xl text-sm text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-all"
-            >
-              <BookOpen className="w-4 h-4 text-gray-600" />
-              <span>Trilhas</span>
-            </Link>
-          )}
+          <Link
+            href={`/community/${communitySlug}/trilhas`}
+            onClick={() => setSidebarOpen(false)}
+            className="flex items-center gap-2 px-2.5 py-2 rounded-xl text-sm text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-all"
+          >
+            <BookOpen className="w-4 h-4 text-gray-600" />
+            <span>Trilhas</span>
+          </Link>
           <Link
             href={`/community/${communitySlug}/members`}
             onClick={() => setSidebarOpen(false)}

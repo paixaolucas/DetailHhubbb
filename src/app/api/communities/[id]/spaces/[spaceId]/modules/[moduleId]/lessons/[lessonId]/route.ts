@@ -63,7 +63,7 @@ export const PATCH = withAuth(async (req, { session, params }) => {
     }
 
     const body = await req.json();
-    const { title, description, videoUrl, videoProvider, videoDuration, type, content, sortOrder, isPublished, isFree } = body;
+    const { title, description, videoUrl, videoProvider, videoDuration, type, content, sortOrder, isPublished, isFree, attachments } = body;
 
     const updated = await db.contentLesson.update({
       where: { id: lessonId },
@@ -78,6 +78,7 @@ export const PATCH = withAuth(async (req, { session, params }) => {
         ...(sortOrder !== undefined && { sortOrder }),
         ...(isPublished !== undefined && { isPublished }),
         ...(isFree !== undefined && { isFree }),
+        ...(attachments !== undefined && { attachments: Array.isArray(attachments) ? attachments : [] }),
       },
     });
 

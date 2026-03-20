@@ -243,6 +243,7 @@ model Post {
   isLocked     Boolean        @default(false)
   isHidden     Boolean        @default(false)
   attachments  Json           @default("[]")
+  videoAspect  String?
   likeCount    Int            @default(0)
   commentCount Int            @default(0)
   viewCount    Int            @default(0)

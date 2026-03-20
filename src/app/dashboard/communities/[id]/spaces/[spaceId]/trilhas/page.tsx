@@ -5,7 +5,7 @@
 // Route: /dashboard/communities/[id]/spaces/[spaceId]/trilhas
 // =============================================================================
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -23,9 +23,13 @@ import {
   Loader2,
   Eye,
   EyeOff,
+  FileText,
+  Upload,
+  Download,
 } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { STORAGE_KEYS } from "@/lib/constants";
+import { useUploadThing } from "@/utils/uploadthing";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -61,6 +65,12 @@ interface ModuleForm {
   isPublished: boolean;
 }
 
+interface LessonFile {
+  url: string;
+  name: string;
+  size?: number;
+}
+
 interface LessonForm {
   title: string;
   videoUrl: string;
@@ -68,11 +78,12 @@ interface LessonForm {
   type: string;
   isFree: boolean;
   isPublished: boolean;
+  attachments: LessonFile[];
 }
 
 const EMPTY_MODULE: ModuleForm = { title: "", description: "", sortOrder: 0, isPublished: false };
 const EMPTY_LESSON: LessonForm = {
-  title: "", videoUrl: "", videoDuration: "", type: "VIDEO", isFree: false, isPublished: false,
+  title: "", videoUrl: "", videoDuration: "", type: "VIDEO", isFree: false, isPublished: false, attachments: [],
 };
 
 function fieldClass(extra?: string) {
@@ -116,6 +127,11 @@ export default function TrilhasManagerPage() {
   const [confirmState, setConfirmState] = useState<{
     open: boolean; title: string; description: string; onConfirm: () => void;
   }>({ open: false, title: "", description: "", onConfirm: () => {} });
+
+  // File upload
+  const [uploadingFiles, setUploadingFiles] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { startUpload } = useUploadThing("lessonFileUploader");
 
   // ---------------------------------------------------------------------------
 
@@ -273,6 +289,26 @@ export default function TrilhasManagerPage() {
   // Lesson CRUD
   // ---------------------------------------------------------------------------
 
+  async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    if (!files.length) return;
+    setUploadingFiles(true);
+    try {
+      const uploaded = await startUpload(files);
+      const newFiles: LessonFile[] = (uploaded ?? []).map((f) => ({
+        url: f.url,
+        name: (f as { name?: string }).name ?? f.url.split("/").pop() ?? "arquivo",
+        size: (f as { size?: number }).size,
+      }));
+      setLessonForm((prev) => ({ ...prev, attachments: [...prev.attachments, ...newFiles] }));
+    } catch {
+      setLessonError("Erro ao fazer upload dos arquivos.");
+    } finally {
+      setUploadingFiles(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
   async function handleLessonSubmit(e: React.FormEvent, moduleId: string) {
     e.preventDefault();
     setLessonLoading(true);
@@ -293,6 +329,7 @@ export default function TrilhasManagerPage() {
           type: lessonForm.type,
           isFree: lessonForm.isFree,
           isPublished: lessonForm.isPublished,
+          attachments: lessonForm.attachments,
         }),
       });
       const json = await res.json();
@@ -623,6 +660,7 @@ export default function TrilhasManagerPage() {
                                   type: lesson.type,
                                   isFree: lesson.isFree,
                                   isPublished: lesson.isPublished,
+                                  attachments: [],
                                 });
                                 setEditingLessonId(lesson.id);
                                 setLessonError("");
@@ -751,6 +789,50 @@ export default function TrilhasManagerPage() {
                             <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-md ${lessonForm.isPublished ? "translate-x-6" : "translate-x-1"}`} />
                           </button>
                         </div>
+                      </div>
+
+                      {/* File attachments */}
+                      <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-1.5">
+                          Arquivos da aula (PDF, DOC, planilhas...)
+                        </label>
+                        {lessonForm.attachments.length > 0 && (
+                          <div className="space-y-1.5 mb-2">
+                            {lessonForm.attachments.map((file, idx) => (
+                              <div key={idx} className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-2">
+                                <FileText className="w-3.5 h-3.5 text-[#009CD9] flex-shrink-0" />
+                                <span className="flex-1 text-xs text-gray-300 truncate">{file.name}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => setLessonForm((f) => ({ ...f, attachments: f.attachments.filter((_, i) => i !== idx) }))}
+                                  className="text-gray-600 hover:text-red-400 transition-colors flex-shrink-0"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          multiple
+                          accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,.png,.jpg,.jpeg"
+                          className="hidden"
+                          onChange={handleFileSelect}
+                        />
+                        <button
+                          type="button"
+                          disabled={uploadingFiles}
+                          onClick={() => fileInputRef.current?.click()}
+                          className="w-full flex items-center justify-center gap-2 py-2.5 border border-dashed border-white/10 hover:border-[#006079]/40 rounded-xl text-sm text-gray-500 hover:text-[#009CD9] transition-all disabled:opacity-50"
+                        >
+                          {uploadingFiles ? (
+                            <><Loader2 className="w-4 h-4 animate-spin" /> Enviando...</>
+                          ) : (
+                            <><Upload className="w-4 h-4" /> Adicionar arquivos</>
+                          )}
+                        </button>
                       </div>
 
                       {lessonError && (
