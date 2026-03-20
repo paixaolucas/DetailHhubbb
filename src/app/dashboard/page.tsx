@@ -276,7 +276,7 @@ interface RecentMember {
   user: { firstName: string; lastName: string; avatarUrl: string | null };
 }
 
-function InfluencerDashboard({ userName }: { userName: string }) {
+function InfluencerDashboard({ userName, viewAsUserId }: { userName: string; viewAsUserId?: string }) {
   const [summary, setSummary] = useState<any>(null);
   const [timeSeries, setTimeSeries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -289,8 +289,11 @@ function InfluencerDashboard({ userName }: { userName: string }) {
   const fetchData = useCallback(() => {
     const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     if (!token) return;
+    const url = viewAsUserId
+      ? `/api/dashboard/influencer-summary?asUserId=${viewAsUserId}`
+      : "/api/dashboard/influencer-summary";
     // Single request returns all dashboard data — no sequential dependencies
-    fetch("/api/dashboard/influencer-summary", { headers: { Authorization: `Bearer ${token}` } })
+    fetch(url, { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.json())
       .then((d) => {
         if (d.success) {
@@ -306,7 +309,7 @@ function InfluencerDashboard({ userName }: { userName: string }) {
       })
       .catch(console.error)
       .finally(() => { setLoading(false); setMembersLoading(false); });
-  }, []);
+  }, [viewAsUserId]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
   useAutoRefresh(fetchData, 60_000);
@@ -1136,7 +1139,7 @@ export default function DashboardPage() {
   const [actualRole, setActualRole] = useState<string | null>(null);
   const [actualName, setActualName] = useState("");
   const router = useRouter();
-  const { viewAs, effectiveRole, effectiveName } = useViewAs();
+  const { viewAs, viewAsUser, effectiveRole, effectiveName } = useViewAs();
 
   useEffect(() => {
     const storedRole = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
@@ -1166,7 +1169,7 @@ export default function DashboardPage() {
 
   switch (role) {
     case "SUPER_ADMIN": return <AdminDashboard />;
-    case "INFLUENCER_ADMIN": return <InfluencerDashboard userName={userName} />;
+    case "INFLUENCER_ADMIN": return <InfluencerDashboard userName={userName} viewAsUserId={viewAsUser?.id} />;
     case "COMMUNITY_MEMBER": return (
       <Suspense fallback={<DashboardSkeleton />}>
         <MemberDashboardInner userName={userName} forcePaid={forcePaid} />
