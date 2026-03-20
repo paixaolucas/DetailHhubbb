@@ -43,7 +43,7 @@ export interface PostCardProps {
     createdAt: string;
     isPinned: boolean;
     isHidden?: boolean;
-    attachments?: (string | { url: string; name: string; size?: number })[];
+    attachments?: (string | { url: string; name: string; size?: number; mediaType?: string })[];
     reactions?: PostReaction[];
     reactionCounts?: Record<string, number>;
     userReactions?: string[];
@@ -367,8 +367,8 @@ function PostCard({
           </p>
         )}
 
-        {/* Video embed */}
-        {post.type === "VIDEO" && post.body && post.body.trim() && (
+        {/* Video embed — only for YouTube/Vimeo URLs in body (legacy) */}
+        {post.type === "VIDEO" && post.body && /^https?:\/\/(www\.)?(youtube\.com|youtu\.be|vimeo\.com)/.test(post.body.trim()) && (
           <div className="mt-3" onClick={(e) => e.stopPropagation()}>
             <VideoEmbed
               url={post.body.trim()}
@@ -378,13 +378,77 @@ function PostCard({
           </div>
         )}
 
-        {/* Image thumbnails */}
+        {/* Attachments: images, videos, PDFs, files */}
         {post.attachments && post.attachments.length > 0 && (() => {
-          const images = post.attachments.filter((a): a is string => typeof a === "string");
-          const files = post.attachments.filter((a): a is { url: string; name: string; size?: number } => typeof a === "object");
+          type AttObj = { url: string; name: string; size?: number; mediaType?: string };
+          const imageUrls: string[] = [];
+          const videos: AttObj[] = [];
+          const pdfs: AttObj[] = [];
+          const files: AttObj[] = [];
+
+          for (const att of post.attachments) {
+            if (typeof att === "string") {
+              imageUrls.push(att); // legacy: plain URL = image
+            } else {
+              const ext = att.name.split(".").pop()?.toLowerCase() ?? "";
+              const mt = att.mediaType;
+              if (mt === "video" || (!mt && ["mp4", "webm", "mov"].includes(ext))) {
+                videos.push(att);
+              } else if (mt === "pdf" || (!mt && ext === "pdf")) {
+                pdfs.push(att);
+              } else if (["jpg", "jpeg", "png", "webp", "gif", "avif"].includes(ext)) {
+                imageUrls.push(att.url);
+              } else {
+                files.push(att);
+              }
+            }
+          }
+
           return (
             <>
-              {images.length > 0 && <ImageGrid urls={images} />}
+              {/* Images / GIFs grid */}
+              {imageUrls.length > 0 && <ImageGrid urls={imageUrls} />}
+
+              {/* Inline videos */}
+              {videos.map((v, idx) => (
+                <div key={idx} className="mt-3" onClick={(e) => e.stopPropagation()}>
+                  {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+                  <video
+                    src={v.url}
+                    controls
+                    preload="metadata"
+                    className="w-full max-h-80 rounded-lg border border-white/10 bg-black"
+                  />
+                </div>
+              ))}
+
+              {/* PDF cards */}
+              {pdfs.length > 0 && (
+                <div className="flex flex-col gap-1.5 mt-2" onClick={(e) => e.stopPropagation()}>
+                  {pdfs.map((file, idx) => (
+                    <a
+                      key={idx}
+                      href={file.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2.5 bg-red-500/5 border border-red-500/20 hover:border-red-500/40 hover:bg-red-500/10 rounded-lg px-3 py-2.5 transition-all group"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center flex-shrink-0">
+                        <FileText className="w-4 h-4 text-red-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-[#EEE6E4] truncate font-medium">{file.name}</p>
+                        <p className="text-[10px] text-gray-500">
+                          PDF{file.size != null ? ` · ${(file.size / 1024).toFixed(0)} KB` : ""}
+                        </p>
+                      </div>
+                      <Download className="w-3.5 h-3.5 text-gray-600 group-hover:text-red-400 flex-shrink-0 transition-colors" />
+                    </a>
+                  ))}
+                </div>
+              )}
+
+              {/* Other files */}
               {files.length > 0 && (
                 <div className="flex flex-col gap-1.5 mt-2" onClick={(e) => e.stopPropagation()}>
                   {files.map((file, idx) => (
@@ -401,9 +465,7 @@ function PostCard({
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-[#EEE6E4] truncate font-medium">{file.name}</p>
-                        {file.size != null && (
-                          <p className="text-[10px] text-gray-500">{(file.size / 1024).toFixed(0)} KB</p>
-                        )}
+                        {file.size != null && <p className="text-[10px] text-gray-500">{(file.size / 1024).toFixed(0)} KB</p>}
                       </div>
                       <Download className="w-3.5 h-3.5 text-gray-600 group-hover:text-[#009CD9] flex-shrink-0 transition-colors" />
                     </a>

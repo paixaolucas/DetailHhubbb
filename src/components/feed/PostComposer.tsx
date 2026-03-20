@@ -1,20 +1,44 @@
 "use client";
 
 // =============================================================================
-// PostComposer — textarea-based form to create a new post in a space
-// Calls POST /api/spaces/${spaceId}/posts, fires onPost callback on success
-// Supports text and image posts via UploadThing
-// Shows a motivational card if user score < 70 pts
+// PostComposer — cria posts com imagens (comprimidas), vídeo direto, GIF, PDF
+// e emoji picker estilo Circle.
 // =============================================================================
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import Image from "next/image";
-import { Send, Plus, Minus, ImageIcon, X, Lock, Rocket, Video, Paperclip, FileText } from "lucide-react";
+import {
+  Send, Plus, Minus, ImageIcon, X, Lock, Rocket,
+  Video, Paperclip, Smile, FileText,
+} from "lucide-react";
 import { uploadFiles } from "@/utils/upload";
 import { STORAGE_KEYS } from "@/lib/constants";
 import { getMemberLevel, getMemberLevelColor, POST_THRESHOLD } from "@/lib/points";
-import VideoEmbed from "@/components/ui/VideoEmbed";
+import { compressImage, validateVideoFile, checkVideoDuration } from "@/lib/media-optimize";
+
+// ─── Emoji picker data ────────────────────────────────────────────────────────
+
+const EMOJI_CATS = [
+  {
+    label: "😊", title: "Expressões",
+    emojis: ["😀","😂","🥹","😊","😍","🤩","🥳","😎","🤔","😅","😭","🥺","😤","🤯","🥰","😘","😏","😇","🫡","🫠","😮","😆","😁","😋","😛","🤑","😜","🙄","😑","😐"],
+  },
+  {
+    label: "👍", title: "Gestos",
+    emojis: ["👍","👎","👏","🙌","💪","✌️","🤘","👋","🫵","🤙","🙏","🫂","🤝","🫶","🤞","🤟","👊","🖐️","💀","👻"],
+  },
+  {
+    label: "❤️", title: "Reações",
+    emojis: ["❤️","🧡","💛","💚","💙","💜","🖤","🤍","💔","❤️‍🔥","💕","💞","💗","💖","✨","🔥","⭐","🌟","💯","⚡","🎉","🎊","🏆","🎯","🚀","💡","💎","🥇","🎸","🏁"],
+  },
+  {
+    label: "🚗", title: "Automotivo",
+    emojis: ["🚗","🚕","🏎️","🚙","🏍️","🛻","⛽","🔧","🛞","🪛","🔩","⚙️","🛠️","🏁","💨","🛣️","🚦","🚧","🔑","🧰","🔦","💡","🔋","🪙"],
+  },
+];
+
+// ─── Types ───────────────────────────────────────────────────────────────────
 
 interface PostComposerProps {
   spaceId: string;
@@ -22,6 +46,8 @@ interface PostComposerProps {
   onPost: (post: unknown) => void;
   scoreTrigger?: number;
 }
+
+// ─── Component ───────────────────────────────────────────────────────────────
 
 export default function PostComposer({ spaceId, communityId, onPost, scoreTrigger }: PostComposerProps) {
   const [body, setBody] = useState("");
@@ -31,20 +57,31 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
   const [error, setError] = useState("");
   const [focused, setFocused] = useState(false);
 
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  // Images / GIFs
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
-  // Non-image file attachments
+  // Video (direct upload)
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [videoPreviewUrl, setVideoPreviewUrl] = useState("");
+  const [videoError, setVideoError] = useState("");
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+
+  // Docs (PDF, DOC, XLS, ZIP)
   const [docFiles, setDocFiles] = useState<{ name: string; size: number; file: File }[]>([]);
   const [uploadingDocs, setUploadingDocs] = useState(false);
   const docInputRef = useRef<HTMLInputElement>(null);
 
-  const [showVideoInput, setShowVideoInput] = useState(false);
-  const [videoUrl, setVideoUrl] = useState("");
-  const [videoAspect, setVideoAspect] = useState<"16:9" | "9:16" | "4:3">("16:9");
+  // Emoji picker
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [emojiTab, setEmojiTab] = useState(0);
+  const emojiPickerRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // User info
   const [userName, setUserName] = useState("");
   const [initials, setInitials] = useState("?");
 
@@ -52,7 +89,8 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
   const [userScore, setUserScore] = useState<number | null>(null);
   const [scoreLoading, setScoreLoading] = useState(true);
 
-  // Poll score silently (called on mount and every 10s)
+  // ── Score polling ─────────────────────────────────────────────────────────
+
   const pollScore = useCallback(() => {
     const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     const userId = localStorage.getItem(STORAGE_KEYS.USER_ID);
@@ -62,11 +100,7 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
     })
       .then((r) => r.json())
       .then((d) => {
-        if (d.success && typeof d.data?.points === "number") {
-          setUserScore(d.data.points);
-        } else {
-          setUserScore(0);
-        }
+        setUserScore(d.success && typeof d.data?.points === "number" ? d.data.points : 0);
       })
       .catch(() => setUserScore(0));
   }, [communityId]);
@@ -77,61 +111,95 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
     if (name.trim()) {
       const parts = name.trim().split(/\s+/);
       const first = parts[0]?.[0] ?? "";
-      const last = parts.length > 1 ? parts[parts.length - 1][0] ?? "" : "";
+      const last = parts.length > 1 ? (parts[parts.length - 1][0] ?? "") : "";
       setInitials((first + last).toUpperCase() || "?");
     }
-
-    // Initial fetch with loading indicator
     const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     const userId = localStorage.getItem(STORAGE_KEYS.USER_ID);
-    if (!token || !userId || !communityId) {
-      setScoreLoading(false);
-      return;
-    }
+    if (!token || !userId || !communityId) { setScoreLoading(false); return; }
     fetch(`/api/communities/${communityId}/leaderboard?userId=${userId}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => r.json())
       .then((d) => {
-        if (d.success && typeof d.data?.points === "number") {
-          setUserScore(d.data.points);
-        } else {
-          setUserScore(0);
-        }
+        setUserScore(d.success && typeof d.data?.points === "number" ? d.data.points : 0);
       })
       .catch(() => setUserScore(0))
       .finally(() => setScoreLoading(false));
   }, [communityId]);
 
-  // Re-poll score every 60s (instant refresh still happens on reactions/comments)
   useAutoRefresh(pollScore, 60_000);
+  useEffect(() => { if (scoreTrigger) pollScore(); }, [scoreTrigger, pollScore]);
 
-  // Instant re-fetch when parent signals a reaction/comment was made
+  // Close emoji picker on outside click
   useEffect(() => {
-    if (scoreTrigger) pollScore();
-  }, [scoreTrigger, pollScore]);
+    if (!showEmojiPicker) return;
+    function handleOutside(e: MouseEvent) {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(e.target as Node)) {
+        setShowEmojiPicker(false);
+      }
+    }
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, [showEmojiPicker]);
 
+  // ── Emoji insertion ───────────────────────────────────────────────────────
 
-  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+  function insertEmoji(emoji: string) {
+    const textarea = textareaRef.current;
+    if (!textarea) { setBody((prev) => prev + emoji); return; }
+    const start = textarea.selectionStart ?? body.length;
+    const end = textarea.selectionEnd ?? body.length;
+    const newBody = body.substring(0, start) + emoji + body.substring(end);
+    setBody(newBody);
+    setTimeout(() => {
+      textarea.selectionStart = start + emoji.length;
+      textarea.selectionEnd = start + emoji.length;
+      textarea.focus();
+    }, 0);
+  }
+
+  // ── File handlers ─────────────────────────────────────────────────────────
+
+  function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     if (!files.length) return;
-    const combined = [...selectedFiles, ...files].slice(0, 10);
-    setSelectedFiles(combined);
-    const previews = combined.map((f) => URL.createObjectURL(f));
-    setPreviewUrls(previews);
-    if (fileInputRef.current) fileInputRef.current.value = "";
+    const combined = [...imageFiles, ...files].slice(0, 10);
+    setImageFiles(combined);
+    setImagePreviews(combined.map((f) => URL.createObjectURL(f)));
+    if (imageInputRef.current) imageInputRef.current.value = "";
   }
 
   function removeImage(idx: number) {
-    setSelectedFiles((prev) => prev.filter((_, i) => i !== idx));
-    setPreviewUrls((prev) => prev.filter((_, i) => i !== idx));
+    URL.revokeObjectURL(imagePreviews[idx]);
+    setImageFiles((prev) => prev.filter((_, i) => i !== idx));
+    setImagePreviews((prev) => prev.filter((_, i) => i !== idx));
+  }
+
+  async function handleVideoSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (videoInputRef.current) videoInputRef.current.value = "";
+    setVideoError("");
+    const sizeErr = validateVideoFile(file);
+    if (sizeErr) { setVideoError(sizeErr); return; }
+    const durErr = await checkVideoDuration(file);
+    if (durErr) { setVideoError(durErr); return; }
+    setVideoFile(file);
+    setVideoPreviewUrl(URL.createObjectURL(file));
+  }
+
+  function removeVideo() {
+    if (videoPreviewUrl) URL.revokeObjectURL(videoPreviewUrl);
+    setVideoFile(null);
+    setVideoPreviewUrl("");
+    setVideoError("");
   }
 
   function handleDocSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     if (!files.length) return;
-    const newDocs = files.map((f) => ({ name: f.name, size: f.size, file: f }));
-    setDocFiles((prev) => [...prev, ...newDocs].slice(0, 5));
+    setDocFiles((prev) => [...prev, ...files.map((f) => ({ name: f.name, size: f.size, file: f }))].slice(0, 5));
     if (docInputRef.current) docInputRef.current.value = "";
   }
 
@@ -139,35 +207,61 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
     setDocFiles((prev) => prev.filter((_, i) => i !== idx));
   }
 
+  // ── Submit ────────────────────────────────────────────────────────────────
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!body.trim() && selectedFiles.length === 0 && !videoUrl.trim() && docFiles.length === 0) return;
+    if (!body.trim() && !imageFiles.length && !videoFile && !docFiles.length) return;
 
     setIsLoading(true);
     setError("");
 
     try {
       const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
-      let attachments: (string | { url: string; name: string; size: number })[] = [];
+      type AttItem = string | { url: string; name: string; size: number; mediaType?: string };
+      let attachments: AttItem[] = [];
 
-      if (selectedFiles.length > 0) {
-        setUploading(true);
+      // Upload images (compress non-GIFs to max 1MB)
+      if (imageFiles.length > 0) {
+        setUploadingImages(true);
         try {
-          const uploaded = await uploadFiles(selectedFiles, "posts");
+          const compressed = await Promise.all(imageFiles.map((f) => compressImage(f, 1)));
+          const uploaded = await uploadFiles(compressed, "posts");
+          // Store images as plain URL strings (backward compat)
           attachments = uploaded.map((f) => f.url);
         } catch {
           setError("Erro ao fazer upload das imagens. Tente novamente.");
           return;
         } finally {
-          setUploading(false);
+          setUploadingImages(false);
         }
       }
 
+      // Upload video
+      if (videoFile) {
+        setUploadingVideo(true);
+        try {
+          const uploaded = await uploadFiles([videoFile], "posts");
+          const v = uploaded[0];
+          attachments = [...attachments, { url: v.url, name: v.name, size: v.size, mediaType: "video" }];
+        } catch {
+          setError("Erro ao fazer upload do vídeo. Tente novamente.");
+          return;
+        } finally {
+          setUploadingVideo(false);
+        }
+      }
+
+      // Upload docs (PDFs and other)
       if (docFiles.length > 0) {
         setUploadingDocs(true);
         try {
           const uploaded = await uploadFiles(docFiles.map((d) => d.file), "posts");
-          attachments = [...attachments, ...uploaded];
+          const withTypes = uploaded.map((f) => {
+            const ext = f.name.split(".").pop()?.toLowerCase() ?? "";
+            return { url: f.url, name: f.name, size: f.size, mediaType: ext === "pdf" ? "pdf" : "doc" };
+          });
+          attachments = [...attachments, ...withTypes];
         } catch {
           setError("Erro ao fazer upload dos arquivos. Tente novamente.");
           return;
@@ -176,44 +270,27 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
         }
       }
 
-      const payload: Record<string, unknown> = {
-        body: body.trim() || " ",
-        type: videoUrl.trim() ? "VIDEO" : (selectedFiles.length > 0 || docFiles.length > 0) ? "IMAGE" : "TEXT",
-      };
+      const type = videoFile ? "VIDEO" : imageFiles.length > 0 || docFiles.length > 0 ? "IMAGE" : "TEXT";
+      const payload: Record<string, unknown> = { body: body.trim() || " ", type };
       if (showTitle && title.trim()) payload.title = title.trim();
       if (attachments.length > 0) payload.attachments = attachments;
-      if (videoUrl.trim()) {
-        payload.videoUrl = videoUrl.trim();
-        payload.videoAspect = videoAspect;
-      }
 
       const res = await fetch(`/api/spaces/${spaceId}/posts`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(payload),
       });
-
       const json = await res.json();
-
-      if (!res.ok || !json.success) {
-        setError(json.error ?? "Erro ao publicar.");
-        return;
-      }
+      if (!res.ok || !json.success) { setError(json.error ?? "Erro ao publicar."); return; }
 
       onPost(json.data);
-      setBody("");
-      setTitle("");
-      setShowTitle(false);
-      setSelectedFiles([]);
-      setPreviewUrls([]);
+      setBody(""); setTitle(""); setShowTitle(false);
+      imagePreviews.forEach((u) => URL.revokeObjectURL(u));
+      setImageFiles([]); setImagePreviews([]);
       setDocFiles([]);
       setFocused(false);
-      setVideoUrl("");
-      setVideoAspect("16:9");
-      setShowVideoInput(false);
+      if (videoPreviewUrl) URL.revokeObjectURL(videoPreviewUrl);
+      setVideoFile(null); setVideoPreviewUrl(""); setVideoError("");
     } catch {
       setError("Erro de conexão. Tente novamente.");
     } finally {
@@ -221,7 +298,8 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
     }
   }
 
-  // Loading skeleton
+  // ── Score gate loading ────────────────────────────────────────────────────
+
   if (scoreLoading) {
     return (
       <div className="bg-white/5 border border-white/10 rounded-xl p-4 animate-pulse">
@@ -236,7 +314,8 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
     );
   }
 
-  // Motivational gate card
+  // ── Score gate card ───────────────────────────────────────────────────────
+
   if (userScore !== null && userScore < POST_THRESHOLD) {
     const pct = Math.min(100, Math.round((userScore / POST_THRESHOLD) * 100));
     const remaining = POST_THRESHOLD - userScore;
@@ -277,14 +356,13 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
     );
   }
 
-  const busy = isLoading || uploading || uploadingDocs;
-  const expanded = focused || body.length > 0 || selectedFiles.length > 0 || docFiles.length > 0 || showVideoInput;
+  const busy = isLoading || uploadingImages || uploadingVideo || uploadingDocs;
+  const hasContent = !!(body.trim() || imageFiles.length || videoFile || docFiles.length);
+  const expanded = focused || body.length > 0 || !!imageFiles.length || !!docFiles.length || !!videoFile;
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-3"
-    >
+    <form onSubmit={handleSubmit} className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-3">
+      {/* Optional title */}
       {showTitle && (
         <input
           type="text"
@@ -296,7 +374,7 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
         />
       )}
 
-      {/* Composer row: avatar + textarea */}
+      {/* Avatar + textarea */}
       <div className="flex items-start gap-3">
         <div
           className="w-9 h-9 rounded-full bg-gradient-to-br from-[#006079] to-[#009CD9] flex items-center justify-center text-sm font-bold text-white flex-shrink-0 select-none"
@@ -304,8 +382,8 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
         >
           {initials}
         </div>
-
         <textarea
+          ref={textareaRef}
           value={body}
           onChange={(e) => setBody(e.target.value)}
           onFocus={() => setFocused(true)}
@@ -316,50 +394,17 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
         />
       </div>
 
-      {/* Video URL input */}
-      {showVideoInput && (
-        <div className="pl-12 flex flex-col gap-2">
-          <input
-            type="url"
-            value={videoUrl}
-            onChange={(e) => setVideoUrl(e.target.value)}
-            placeholder="Cole a URL do YouTube ou Vimeo..."
-            className="w-full bg-white/5 border border-white/10 hover:border-[#006079]/40 focus:border-[#009CD9]/40 rounded-lg px-3 py-2 text-[#EEE6E4] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/20 text-sm transition-all"
-          />
-          {/* Aspect ratio selector */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs text-gray-500">Proporção:</span>
-            {(["16:9", "9:16", "4:3"] as const).map((ar) => (
-              <button
-                key={ar}
-                type="button"
-                onClick={() => setVideoAspect(ar)}
-                className={`text-xs px-2 py-0.5 rounded border transition-colors ${
-                  videoAspect === ar
-                    ? "bg-[#006079]/20 border-[#009CD9]/40 text-[#009CD9]"
-                    : "border-white/10 text-gray-500 hover:text-gray-300"
-                }`}
-              >
-                {ar}
-              </button>
-            ))}
-          </div>
-          {videoUrl.trim() && (
-            <VideoEmbed url={videoUrl.trim()} aspectRatio={videoAspect} className="mt-1" />
-          )}
-        </div>
-      )}
-
-      {/* Image previews */}
-      {previewUrls.length > 0 && (
+      {/* Image / GIF previews */}
+      {imagePreviews.length > 0 && (
         <div className="flex flex-wrap gap-2 pl-12">
-          {previewUrls.map((url, idx) => (
+          {imagePreviews.map((url, idx) => (
             <div key={idx} className="relative group">
               <Image
                 src={url}
                 alt=""
                 width={80}
                 height={80}
+                unoptimized={imageFiles[idx]?.type === "image/gif"}
                 className="w-20 h-20 object-cover rounded-lg border border-white/10"
               />
               <button
@@ -367,139 +412,203 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
                 onClick={() => removeImage(idx)}
                 className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
               >
-                <X className="w-3 h-3 text-[#EEE6E4]" />
+                <X className="w-3 h-3 text-white" />
               </button>
+              {imageFiles[idx]?.type === "image/gif" && (
+                <span className="absolute bottom-1 left-1 text-[9px] font-bold bg-black/70 text-white rounded px-1">GIF</span>
+              )}
             </div>
           ))}
         </div>
       )}
 
-      {/* Doc file previews */}
+      {/* Video preview */}
+      {videoPreviewUrl && (
+        <div className="pl-12">
+          {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+          <video
+            src={videoPreviewUrl}
+            controls
+            className="w-full max-h-48 rounded-lg border border-white/10 bg-black"
+          />
+          <div className="flex items-center justify-between mt-1.5 px-0.5">
+            <span className="text-xs text-gray-400 truncate">
+              {videoFile?.name} · {videoFile ? (videoFile.size / 1024 / 1024).toFixed(1) : 0}MB
+            </span>
+            <button
+              type="button"
+              onClick={removeVideo}
+              className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1 ml-2 flex-shrink-0 transition-colors"
+            >
+              <X className="w-3 h-3" /> Remover
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Video error */}
+      {videoError && (
+        <p className="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2">
+          {videoError}
+        </p>
+      )}
+
+      {/* Doc previews */}
       {docFiles.length > 0 && (
         <div className="flex flex-col gap-1.5 pl-12">
-          {docFiles.map((doc, idx) => (
-            <div key={idx} className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-2">
-              <FileText className="w-3.5 h-3.5 text-[#009CD9] flex-shrink-0" />
-              <span className="flex-1 text-xs text-gray-300 truncate">{doc.name}</span>
-              <span className="text-xs text-gray-600 flex-shrink-0">
-                {(doc.size / 1024).toFixed(0)} KB
-              </span>
-              <button
-                type="button"
-                onClick={() => removeDoc(idx)}
-                className="text-gray-600 hover:text-red-400 transition-colors flex-shrink-0 ml-1"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          ))}
+          {docFiles.map((doc, idx) => {
+            const isPDF = doc.name.toLowerCase().endsWith(".pdf");
+            return (
+              <div key={idx} className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-2">
+                <FileText className={`w-3.5 h-3.5 flex-shrink-0 ${isPDF ? "text-red-400" : "text-[#009CD9]"}`} />
+                <span className="flex-1 text-xs text-gray-300 truncate">{doc.name}</span>
+                <span className="text-xs text-gray-600 flex-shrink-0">{(doc.size / 1024).toFixed(0)} KB</span>
+                <button type="button" onClick={() => removeDoc(idx)} className="text-gray-600 hover:text-red-400 transition-colors flex-shrink-0 ml-1">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            );
+          })}
         </div>
       )}
 
       {error && (
-        <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
-          {error}
-        </p>
+        <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{error}</p>
       )}
 
-      <div className="flex items-center justify-between gap-3 border-t border-white/10 pt-3">
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              setShowTitle((v) => !v);
-              if (showTitle) setTitle("");
-            }}
-            className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-400 transition-colors"
-          >
-            {showTitle ? (
-              <>
-                <Minus className="w-3 h-3" /> Remover título
-              </>
-            ) : (
-              <>
-                <Plus className="w-3 h-3" /> Título
-              </>
-            )}
-          </button>
+      {/* ── Toolbar ── */}
+      <div className="flex items-center gap-1 border-t border-white/10 pt-3">
+        <div className="flex items-center gap-0.5 flex-1 min-w-0 overflow-x-auto">
 
+          {/* Emoji picker */}
+          <div className="relative flex-shrink-0" ref={emojiPickerRef}>
+            <button
+              type="button"
+              onClick={() => setShowEmojiPicker((v) => !v)}
+              className={`inline-flex items-center gap-1.5 text-xs px-2 py-1.5 rounded-lg transition-colors ${
+                showEmojiPicker ? "bg-[#006079]/20 text-[#009CD9]" : "text-gray-500 hover:text-[#009CD9] hover:bg-white/5"
+              }`}
+              title="Emoji"
+            >
+              <Smile className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Emoji</span>
+            </button>
+
+            {showEmojiPicker && (
+              <div className="absolute bottom-full mb-2 left-0 w-72 bg-[#252525] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden">
+                {/* Category tabs */}
+                <div className="flex border-b border-white/10">
+                  {EMOJI_CATS.map((cat, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setEmojiTab(i)}
+                      title={cat.title}
+                      className={`flex-1 py-2 text-base transition-colors hover:bg-white/5 ${emojiTab === i ? "bg-white/10" : ""}`}
+                    >
+                      {cat.label}
+                    </button>
+                  ))}
+                </div>
+                {/* Emoji grid */}
+                <div className="p-2">
+                  <p className="text-[10px] text-gray-500 px-1 mb-1.5 font-medium uppercase tracking-wide">
+                    {EMOJI_CATS[emojiTab].title}
+                  </p>
+                  <div className="grid grid-cols-8 gap-0.5 max-h-44 overflow-y-auto">
+                    {EMOJI_CATS[emojiTab].emojis.map((emoji, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => insertEmoji(emoji)}
+                        className="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-lg transition-colors"
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Foto / GIF */}
           <button
             type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={selectedFiles.length >= 10 || showVideoInput}
-            className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#009CD9] transition-colors disabled:opacity-40"
+            onClick={() => imageInputRef.current?.click()}
+            disabled={imageFiles.length >= 10 || !!videoFile}
+            className="inline-flex items-center gap-1.5 text-xs px-2 py-1.5 rounded-lg text-gray-500 hover:text-[#009CD9] hover:bg-white/5 transition-colors disabled:opacity-40 flex-shrink-0"
+            title="Foto ou GIF (máx 10, imagens comprimidas p/ 1MB)"
           >
             <ImageIcon className="w-3.5 h-3.5" />
-            Foto
-            {selectedFiles.length > 0 && (
-              <span className="text-[#009CD9]">({selectedFiles.length})</span>
-            )}
+            <span className="hidden sm:inline">Foto/GIF</span>
+            {imageFiles.length > 0 && <span className="text-[#009CD9]">({imageFiles.length})</span>}
           </button>
 
+          {/* Vídeo */}
           <button
             type="button"
-            onClick={() => {
-              setShowVideoInput((v) => !v);
-              if (showVideoInput) setVideoUrl("");
-            }}
-            disabled={selectedFiles.length > 0}
-            className={`inline-flex items-center gap-1.5 text-xs transition-colors disabled:opacity-40 ${
-              showVideoInput ? "text-[#009CD9]" : "text-gray-500 hover:text-[#009CD9]"
+            onClick={() => videoInputRef.current?.click()}
+            disabled={!!videoFile || imageFiles.length > 0}
+            className={`inline-flex items-center gap-1.5 text-xs px-2 py-1.5 rounded-lg transition-colors disabled:opacity-40 flex-shrink-0 ${
+              videoFile ? "text-[#009CD9] bg-[#006079]/20" : "text-gray-500 hover:text-[#009CD9] hover:bg-white/5"
             }`}
+            title="Vídeo direto (máx 10MB / 1 min, MP4/WebM/MOV)"
           >
             <Video className="w-3.5 h-3.5" />
-            Vídeo
+            <span className="hidden sm:inline">Vídeo</span>
           </button>
 
+          {/* PDF / Arquivo */}
           <button
             type="button"
             onClick={() => docInputRef.current?.click()}
-            disabled={docFiles.length >= 5 || showVideoInput}
-            className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#009CD9] transition-colors disabled:opacity-40"
+            disabled={docFiles.length >= 5 || !!videoFile}
+            className="inline-flex items-center gap-1.5 text-xs px-2 py-1.5 rounded-lg text-gray-500 hover:text-[#009CD9] hover:bg-white/5 transition-colors disabled:opacity-40 flex-shrink-0"
+            title="PDF ou arquivo (máx 5)"
           >
             <Paperclip className="w-3.5 h-3.5" />
-            Arquivo
-            {docFiles.length > 0 && (
-              <span className="text-[#009CD9]">({docFiles.length})</span>
-            )}
+            <span className="hidden sm:inline">PDF</span>
+            {docFiles.length > 0 && <span className="text-[#009CD9]">({docFiles.length})</span>}
           </button>
 
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={handleFileSelect}
-          />
-          <input
-            ref={docInputRef}
-            type="file"
-            accept=".pdf,.doc,.docx,.xls,.xlsx,.zip"
-            multiple
-            className="hidden"
-            onChange={handleDocSelect}
-          />
+          {/* Título toggle */}
+          <button
+            type="button"
+            onClick={() => { setShowTitle((v) => !v); if (showTitle) setTitle(""); }}
+            className="inline-flex items-center gap-1.5 text-xs px-2 py-1.5 rounded-lg text-gray-500 hover:text-gray-400 hover:bg-white/5 transition-colors flex-shrink-0"
+          >
+            {showTitle ? <Minus className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
+            <span className="hidden sm:inline">{showTitle ? "Remover título" : "Título"}</span>
+          </button>
         </div>
 
+        {/* Publicar */}
         <button
           type="submit"
-          disabled={busy || (!body.trim() && selectedFiles.length === 0 && !videoUrl.trim() && docFiles.length === 0)}
-          className="inline-flex items-center gap-2 bg-[#006079] hover:bg-[#007A99] disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-4 py-2 rounded-lg transition-all"
+          disabled={busy || !hasContent}
+          className="inline-flex items-center gap-2 bg-[#006079] hover:bg-[#007A99] disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-4 py-2 rounded-lg transition-all flex-shrink-0 ml-2"
         >
           {busy ? (
             <>
               <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              {uploading || uploadingDocs ? "Enviando..." : "Publicando..."}
+              <span className="hidden sm:inline">
+                {uploadingImages ? "Enviando fotos..." : uploadingVideo ? "Enviando vídeo..." : uploadingDocs ? "Enviando arquivo..." : "Publicando..."}
+              </span>
             </>
           ) : (
             <>
               <Send className="w-4 h-4" />
-              Publicar
+              <span className="hidden sm:inline">Publicar</span>
             </>
           )}
         </button>
       </div>
+
+      {/* Hidden file inputs */}
+      <input ref={imageInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleImageSelect} />
+      <input ref={videoInputRef} type="file" accept="video/mp4,video/webm,video/quicktime" className="hidden" onChange={handleVideoSelect} />
+      <input ref={docInputRef} type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.zip" multiple className="hidden" onChange={handleDocSelect} />
     </form>
   );
 }

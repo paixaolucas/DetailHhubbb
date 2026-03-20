@@ -42,6 +42,13 @@ import {
   Car,
   Search,
   Kanban,
+  Eye,
+  ArrowLeft,
+  UserCheck,
+  Crown,
+  Lock,
+  Link2,
+  Layers,
 } from "lucide-react";
 import { RoleBadge } from "@/components/ui/badge";
 import { Logo, LogoType } from "@/components/ui/logo";
@@ -236,6 +243,40 @@ function getNavItems(role: string): NavEntry[] {
   }
 }
 
+// ─── View As ─────────────────────────────────────────────────────────────────
+
+interface ViewAsOption {
+  id: string;
+  label: string;
+  icon: React.ElementType;
+  desc: string;
+  navigateTo?: string;
+}
+
+const VIEW_AS_OPTIONS: ViewAsOption[] = [
+  { id: "MEMBER",       label: "Membros",          icon: UserCheck, desc: "Como um assinante vê a plataforma" },
+  { id: "INFLUENCER",   label: "Influenciadores",  icon: Crown,     desc: "Como um criador de comunidade vê" },
+  { id: "PAYWALL",      label: "Paywalls",          icon: Lock,      desc: "O que não-assinantes enxergam",        navigateTo: "/dashboard/assinar" },
+  { id: "INVITE_LINK",  label: "Links de Convite", icon: Link2,     desc: "Espaços e grupos via link de convite", navigateTo: "/dashboard/admin/comunidades" },
+  { id: "ACCESS_GROUP", label: "Grupos de Acesso", icon: Layers,    desc: "Espaços e grupos disponíveis",         navigateTo: "/dashboard/communities" },
+];
+
+const VIEW_AS_LABELS: Record<string, string> = {
+  MEMBER:       "Membro",
+  INFLUENCER:   "Influenciador",
+  PAYWALL:      "Paywall (sem assinatura)",
+  INVITE_LINK:  "Link de Convite",
+  ACCESS_GROUP: "Grupo de Acesso",
+};
+
+const VIEW_AS_DESCS: Record<string, string> = {
+  MEMBER:       "Você está vendo a plataforma como um membro comum.",
+  INFLUENCER:   "Você está vendo como um influenciador.",
+  PAYWALL:      "Você está vendo o que usuários sem assinatura enxergam.",
+  INVITE_LINK:  "Você está vendo o que novos membros veem via link de convite.",
+  ACCESS_GROUP: "Você está vendo os grupos e espaços disponíveis.",
+};
+
 // ─── Layout ──────────────────────────────────────────────────────────────────
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -247,6 +288,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [userName, setUserName] = useState("");
   const [authChecked, setAuthChecked] = useState(false);
   const [openGroups, setOpenGroups] = useState<Set<string>>(new Set());
+  const [viewAs, setViewAs] = useState<string | null>(null);
+  const [viewAsOpen, setViewAsOpen] = useState(false);
+  const [viewAsSearch, setViewAsSearch] = useState("");
 
   useEffect(() => {
     async function checkAuth() {
@@ -313,6 +357,33 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
 
     checkAuth();
+
+    // Proactively refresh token every 5 minutes to prevent idle logout
+    const refreshInterval = setInterval(async () => {
+      const t = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+      if (!t) return;
+      try {
+        const parts = t.split(".");
+        if (parts.length === 3) {
+          const padded = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+          const payload = JSON.parse(atob(padded));
+          const now = Math.floor(Date.now() / 1000);
+          if (payload.exp && payload.exp - now < 600) {
+            const res = await fetch("/api/auth/refresh", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+            });
+            const data = await res.json();
+            if (res.ok && data.data?.accessToken) {
+              localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, data.data.accessToken);
+            }
+          }
+        }
+      } catch { /* ignore */ }
+    }, 5 * 60 * 1000);
+
+    return () => clearInterval(refreshInterval);
   }, [router]);
 
   // Auto-expand groups that contain the active route
@@ -409,7 +480,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Nav */}
       <nav className="flex-1 py-3 overflow-y-auto space-y-0.5 px-2">
-        {(getNavItems(role) as NavEntry[]).map((entry) => {
+        {((viewAs === "MEMBER" ? MEMBER_NAV : viewAs === "INFLUENCER" ? INFLUENCER_NAV : getNavItems(role)) as NavEntry[]).map((entry) => {
           if (!entry.type || entry.type === "link") {
             const item = entry as NavLink;
             const isActive = item.exact
@@ -492,6 +563,88 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Footer */}
       <div className="p-2 border-t border-white/10 flex-shrink-0 space-y-0.5">
+        {/* Visualizar Como — só para SUPER_ADMIN */}
+        {role === "SUPER_ADMIN" && (
+          <div className="relative">
+            <button
+              onClick={() => setViewAsOpen((v) => !v)}
+              title={collapsed ? "Visualizar como" : undefined}
+              className={`flex items-center gap-3 px-3 py-2.5 w-full rounded-xl text-sm transition-all ${
+                viewAs
+                  ? "text-amber-400 bg-amber-500/10 border border-amber-500/20"
+                  : "text-gray-500 hover:text-[#EEE6E4] hover:bg-white/5"
+              }`}
+            >
+              <Eye className="w-5 h-5 flex-shrink-0" />
+              {!collapsed && (
+                <>
+                  <span className="flex-1 text-left">Visualizar como</span>
+                  {viewAs && <span className="w-2 h-2 bg-amber-400 rounded-full flex-shrink-0" />}
+                </>
+              )}
+            </button>
+
+            {viewAsOpen && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setViewAsOpen(false)} />
+                <div className="absolute bottom-full mb-2 left-0 right-0 bg-[#252525] border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50">
+                  {/* Header */}
+                  <div className="p-2 border-b border-white/10">
+                    <p className="text-[10px] text-gray-500 uppercase tracking-wide px-1 mb-1.5 font-medium">Visualizar como</p>
+                    <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5">
+                      <Search className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                      <input
+                        type="text"
+                        placeholder="Pesquisar membro..."
+                        value={viewAsSearch}
+                        onChange={(e) => setViewAsSearch(e.target.value)}
+                        className="bg-transparent text-xs text-[#EEE6E4] placeholder-gray-500 flex-1 outline-none"
+                      />
+                    </div>
+                  </div>
+                  {/* Options */}
+                  <div className="p-1">
+                    {VIEW_AS_OPTIONS.filter((o) =>
+                      !viewAsSearch || o.label.toLowerCase().includes(viewAsSearch.toLowerCase())
+                    ).map(({ id, label, icon: Icon, desc, navigateTo }) => (
+                      <button
+                        key={id}
+                        onClick={() => {
+                          setViewAs(id);
+                          setViewAsOpen(false);
+                          setViewAsSearch("");
+                          if (navigateTo) router.push(navigateTo);
+                        }}
+                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left hover:bg-white/5 ${
+                          viewAs === id ? "text-amber-400" : "text-gray-400 hover:text-[#EEE6E4]"
+                        }`}
+                      >
+                        <Icon className="w-4 h-4 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium leading-tight">{label}</p>
+                          <p className="text-[10px] text-gray-500 truncate mt-0.5">{desc}</p>
+                        </div>
+                        {viewAs === id && <div className="w-1.5 h-1.5 bg-amber-400 rounded-full flex-shrink-0" />}
+                      </button>
+                    ))}
+                  </div>
+                  {/* Clear */}
+                  {viewAs && (
+                    <div className="p-2 border-t border-white/10">
+                      <button
+                        onClick={() => { setViewAs(null); setViewAsOpen(false); router.push("/dashboard"); }}
+                        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                        Sair do modo visualização
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        )}
         <button
           onClick={handleLogout}
           title={collapsed ? "Sair" : undefined}
@@ -581,6 +734,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <NotificationBell />
           <RoleBadge role={role} />
         </div>
+
+        {/* ViewAs Banner */}
+        {viewAs && (
+          <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 sm:px-6 py-2 flex items-center gap-3 flex-shrink-0">
+            <Eye className="w-4 h-4 text-amber-400 flex-shrink-0" />
+            <span className="text-amber-300 text-sm font-medium">
+              Visualizando como: {VIEW_AS_LABELS[viewAs]}
+            </span>
+            <span className="hidden sm:inline text-amber-500/70 text-xs truncate">
+              — {VIEW_AS_DESCS[viewAs]}
+            </span>
+            <button
+              onClick={() => { setViewAs(null); router.push("/dashboard"); }}
+              className="ml-auto flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 px-3 py-1 rounded-lg transition-all flex-shrink-0"
+            >
+              <ArrowLeft className="w-3 h-3" />
+              <span className="hidden sm:inline">Voltar ao normal</span>
+              <span className="sm:hidden">Voltar</span>
+            </button>
+          </div>
+        )}
 
         {/* Page content */}
         <div className="flex-1 p-4 sm:p-6">
