@@ -135,10 +135,10 @@ Inclua no resumo tudo que encontrar:
 Forneça o máximo de informações possível em português.`;
 
   const res = (await openai.responses.create({
-    model: "gpt-4o-mini",
+    model: "gpt-4o", // web_search_preview só é compatível com gpt-4o (não funciona com mini)
     tools: [{ type: "web_search_preview" as const }],
     input: [{ role: "user" as const, content: userMsg }],
-    max_output_tokens: 2000,
+    max_output_tokens: 3000,
   })) as OpenAIResponse;
 
   return res.output_text ?? "";
