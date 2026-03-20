@@ -16,7 +16,7 @@ export const GET = withAuth(async (req, { session, params }) => {
       return NextResponse.json({ success: false, error: "IDs obrigatórios" }, { status: 400 });
     }
 
-    const module = await db.contentModule.findFirst({
+    const contentMod = await db.contentModule.findFirst({
       where: { id: moduleId, communityId, spaceId },
     });
     if (!module) {
@@ -66,7 +66,7 @@ export const POST = withAuth(async (req, { session, params }) => {
       return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
     }
 
-    const module = await db.contentModule.findFirst({
+    const contentMod = await db.contentModule.findFirst({
       where: { id: moduleId, communityId, spaceId },
     });
     if (!module) {
