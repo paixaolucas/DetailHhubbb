@@ -10,7 +10,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import Image from "next/image";
-import { Send, Plus, Minus, ImageIcon, X, Lock, Rocket, Video } from "lucide-react";
+import { Send, Plus, Minus, ImageIcon, X, Lock, Rocket, Video, Paperclip, FileText } from "lucide-react";
 import { useUploadThing } from "@/utils/uploadthing";
 import { STORAGE_KEYS } from "@/lib/constants";
 import { getMemberLevel, getMemberLevelColor, POST_THRESHOLD } from "@/lib/points";
@@ -35,6 +35,11 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Non-image file attachments
+  const [docFiles, setDocFiles] = useState<{ name: string; size: number; file: File }[]>([]);
+  const [uploadingDocs, setUploadingDocs] = useState(false);
+  const docInputRef = useRef<HTMLInputElement>(null);
 
   const [showVideoInput, setShowVideoInput] = useState(false);
   const [videoUrl, setVideoUrl] = useState("");
@@ -107,6 +112,7 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
   }, [scoreTrigger, pollScore]);
 
   const { startUpload } = useUploadThing("postAttachmentUploader");
+  const { startUpload: startFileUpload } = useUploadThing("postFileUploader");
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
@@ -123,16 +129,28 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
     setPreviewUrls((prev) => prev.filter((_, i) => i !== idx));
   }
 
+  function handleDocSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    if (!files.length) return;
+    const newDocs = files.map((f) => ({ name: f.name, size: f.size, file: f }));
+    setDocFiles((prev) => [...prev, ...newDocs].slice(0, 5));
+    if (docInputRef.current) docInputRef.current.value = "";
+  }
+
+  function removeDoc(idx: number) {
+    setDocFiles((prev) => prev.filter((_, i) => i !== idx));
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!body.trim() && selectedFiles.length === 0 && !videoUrl.trim()) return;
+    if (!body.trim() && selectedFiles.length === 0 && !videoUrl.trim() && docFiles.length === 0) return;
 
     setIsLoading(true);
     setError("");
 
     try {
       const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
-      let attachments: string[] = [];
+      let attachments: (string | { url: string; name: string; size: number })[] = [];
 
       if (selectedFiles.length > 0) {
         setUploading(true);
@@ -147,9 +165,27 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
         }
       }
 
+      if (docFiles.length > 0) {
+        setUploadingDocs(true);
+        try {
+          const uploaded = await startFileUpload(docFiles.map((d) => d.file));
+          const fileObjs = (uploaded ?? []).map((f, i) => ({
+            url: f.url,
+            name: docFiles[i]?.name ?? f.url.split("/").pop() ?? "arquivo",
+            size: docFiles[i]?.size ?? 0,
+          }));
+          attachments = [...attachments, ...fileObjs];
+        } catch {
+          setError("Erro ao fazer upload dos arquivos. Tente novamente.");
+          return;
+        } finally {
+          setUploadingDocs(false);
+        }
+      }
+
       const payload: Record<string, unknown> = {
         body: body.trim() || " ",
-        type: videoUrl.trim() ? "VIDEO" : attachments.length > 0 ? "IMAGE" : "TEXT",
+        type: videoUrl.trim() ? "VIDEO" : (selectedFiles.length > 0 || docFiles.length > 0) ? "IMAGE" : "TEXT",
       };
       if (showTitle && title.trim()) payload.title = title.trim();
       if (attachments.length > 0) payload.attachments = attachments;
@@ -180,6 +216,7 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
       setShowTitle(false);
       setSelectedFiles([]);
       setPreviewUrls([]);
+      setDocFiles([]);
       setFocused(false);
       setVideoUrl("");
       setVideoAspect("16:9");
@@ -247,8 +284,8 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
     );
   }
 
-  const busy = isLoading || uploading;
-  const expanded = focused || body.length > 0 || selectedFiles.length > 0 || showVideoInput;
+  const busy = isLoading || uploading || uploadingDocs;
+  const expanded = focused || body.length > 0 || selectedFiles.length > 0 || docFiles.length > 0 || showVideoInput;
 
   return (
     <form
@@ -344,6 +381,28 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
         </div>
       )}
 
+      {/* Doc file previews */}
+      {docFiles.length > 0 && (
+        <div className="flex flex-col gap-1.5 pl-12">
+          {docFiles.map((doc, idx) => (
+            <div key={idx} className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-2">
+              <FileText className="w-3.5 h-3.5 text-[#009CD9] flex-shrink-0" />
+              <span className="flex-1 text-xs text-gray-300 truncate">{doc.name}</span>
+              <span className="text-xs text-gray-600 flex-shrink-0">
+                {(doc.size / 1024).toFixed(0)} KB
+              </span>
+              <button
+                type="button"
+                onClick={() => removeDoc(idx)}
+                className="text-gray-600 hover:text-red-400 transition-colors flex-shrink-0 ml-1"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
       {error && (
         <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
           {error}
@@ -398,6 +457,20 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
             <Video className="w-3.5 h-3.5" />
             Vídeo
           </button>
+
+          <button
+            type="button"
+            onClick={() => docInputRef.current?.click()}
+            disabled={docFiles.length >= 5 || showVideoInput}
+            className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#009CD9] transition-colors disabled:opacity-40"
+          >
+            <Paperclip className="w-3.5 h-3.5" />
+            Arquivo
+            {docFiles.length > 0 && (
+              <span className="text-[#009CD9]">({docFiles.length})</span>
+            )}
+          </button>
+
           <input
             ref={fileInputRef}
             type="file"
@@ -406,17 +479,25 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
             className="hidden"
             onChange={handleFileSelect}
           />
+          <input
+            ref={docInputRef}
+            type="file"
+            accept=".pdf,.doc,.docx,.xls,.xlsx,.zip"
+            multiple
+            className="hidden"
+            onChange={handleDocSelect}
+          />
         </div>
 
         <button
           type="submit"
-          disabled={busy || (!body.trim() && selectedFiles.length === 0 && !videoUrl.trim())}
+          disabled={busy || (!body.trim() && selectedFiles.length === 0 && !videoUrl.trim() && docFiles.length === 0)}
           className="inline-flex items-center gap-2 bg-[#006079] hover:bg-[#007A99] disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-4 py-2 rounded-lg transition-all"
         >
           {busy ? (
             <>
               <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              {uploading ? "Enviando..." : "Publicando..."}
+              {uploading || uploadingDocs ? "Enviando..." : "Publicando..."}
             </>
           ) : (
             <>

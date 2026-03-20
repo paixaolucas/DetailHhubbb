@@ -8,7 +8,7 @@
 import { useState, useRef, useEffect, memo } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { MessageCircle, ThumbsUp, Pin, MoreHorizontal, EyeOff, Eye, Trash2 } from "lucide-react";
+import { MessageCircle, ThumbsUp, Pin, MoreHorizontal, EyeOff, Eye, Trash2, FileText, Download } from "lucide-react";
 import ReactionBar from "@/components/feed/ReactionBar";
 import { useToast } from "@/components/ui/toast-provider";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
@@ -43,7 +43,7 @@ export interface PostCardProps {
     createdAt: string;
     isPinned: boolean;
     isHidden?: boolean;
-    attachments?: string[];
+    attachments?: (string | { url: string; name: string; size?: number })[];
     reactions?: PostReaction[];
     reactionCounts?: Record<string, number>;
     userReactions?: string[];
@@ -379,9 +379,40 @@ function PostCard({
         )}
 
         {/* Image thumbnails */}
-        {post.attachments && post.attachments.length > 0 && (
-          <ImageGrid urls={post.attachments} />
-        )}
+        {post.attachments && post.attachments.length > 0 && (() => {
+          const images = post.attachments.filter((a): a is string => typeof a === "string");
+          const files = post.attachments.filter((a): a is { url: string; name: string; size?: number } => typeof a === "object");
+          return (
+            <>
+              {images.length > 0 && <ImageGrid urls={images} />}
+              {files.length > 0 && (
+                <div className="flex flex-col gap-1.5 mt-2" onClick={(e) => e.stopPropagation()}>
+                  {files.map((file, idx) => (
+                    <a
+                      key={idx}
+                      href={file.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      download
+                      className="flex items-center gap-2.5 bg-white/5 border border-white/10 hover:border-[#006079]/40 hover:bg-white/10 rounded-lg px-3 py-2 transition-all group"
+                    >
+                      <div className="w-7 h-7 rounded-lg bg-[#006079]/20 flex items-center justify-center flex-shrink-0">
+                        <FileText className="w-3.5 h-3.5 text-[#009CD9]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-[#EEE6E4] truncate font-medium">{file.name}</p>
+                        {file.size != null && (
+                          <p className="text-[10px] text-gray-500">{(file.size / 1024).toFixed(0)} KB</p>
+                        )}
+                      </div>
+                      <Download className="w-3.5 h-3.5 text-gray-600 group-hover:text-[#009CD9] flex-shrink-0 transition-colors" />
+                    </a>
+                  ))}
+                </div>
+              )}
+            </>
+          );
+        })()}
 
         {/* Footer: reactions + comments */}
         <div

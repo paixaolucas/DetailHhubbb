@@ -47,6 +47,23 @@ export const ourFileRouter = {
       return { url: file.url };
     }),
 
+  postFileUploader: f({
+    pdf: { maxFileSize: "32MB", maxFileCount: 5 },
+    "application/msword": { maxFileSize: "16MB", maxFileCount: 5 },
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": { maxFileSize: "16MB", maxFileCount: 5 },
+    "application/vnd.ms-excel": { maxFileSize: "16MB", maxFileCount: 5 },
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": { maxFileSize: "16MB", maxFileCount: 5 },
+    "application/zip": { maxFileSize: "64MB", maxFileCount: 1 },
+  })
+    .middleware(async ({ req }) => {
+      const authHeader = req.headers.get("authorization");
+      if (!authHeader?.startsWith("Bearer ")) throw new Error("Unauthorized");
+      return {};
+    })
+    .onUploadComplete(async ({ file }) => {
+      return { url: file.url, name: file.name, size: file.size };
+    }),
+
   lessonFileUploader: f({
     pdf: { maxFileSize: "32MB", maxFileCount: 5 },
     "application/zip": { maxFileSize: "64MB", maxFileCount: 1 },

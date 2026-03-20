@@ -20,7 +20,12 @@ export const createPostSchema = z.object({
     .optional()
     .default(""),
   type: z.enum(POST_TYPES).default("TEXT"),
-  attachments: z.array(z.string().url()).max(MAX_POST_ATTACHMENTS).optional().default([]),
+  attachments: z.array(
+    z.union([
+      z.string().url(),
+      z.object({ url: z.string().url(), name: z.string(), size: z.number().optional() }),
+    ])
+  ).max(MAX_POST_ATTACHMENTS).optional().default([]),
   videoUrl: z.string().url("URL de vídeo inválida").optional(),
   videoAspect: z.enum(["16:9", "9:16", "4:3"]).optional(),
 });
