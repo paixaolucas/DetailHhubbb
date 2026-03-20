@@ -81,6 +81,7 @@ async function main() {
       lastName: "Admin",
       role: UserRole.SUPER_ADMIN,
       referralCode: "ADMIN001",
+      emailVerified: new Date(),
     },
   });
   console.log("✅ SuperAdmin created:", superAdmin.email);
@@ -96,6 +97,7 @@ async function main() {
       lastName: "Oficial",
       role: UserRole.INFLUENCER_ADMIN,
       referralCode: "BARBA001",
+      emailVerified: new Date(),
     },
   });
 
@@ -107,6 +109,7 @@ async function main() {
       lastName: "ZK",
       role: UserRole.INFLUENCER_ADMIN,
       referralCode: "CORUJAO001",
+      emailVerified: new Date(),
     },
   });
 
@@ -118,6 +121,7 @@ async function main() {
       lastName: "NoMel",
       role: UserRole.INFLUENCER_ADMIN,
       referralCode: "NETO001",
+      emailVerified: new Date(),
     },
   });
 
@@ -619,6 +623,7 @@ async function main() {
       lastName: "Oliveira",
       role: UserRole.COMMUNITY_MEMBER,
       referralCode: "CARLOS001",
+      emailVerified: new Date(),
     },
   });
 
