@@ -171,8 +171,12 @@ export default function SettingsPage() {
       const [result] = await uploadFiles([file], "avatars");
       setProfileForm((p) => ({ ...p, avatarUrl: result.url }));
       setAvatarPreview(result.url);
-    } catch {
-      // mantém preview local, não bloqueia
+      toast.success("Foto atualizada! Salve o perfil para confirmar.");
+    } catch (err) {
+      URL.revokeObjectURL(preview);
+      setAvatarPreview(null);
+      if (avatarInputRef.current) avatarInputRef.current.value = "";
+      toast.error(err instanceof Error ? err.message : "Erro ao enviar foto. Tente novamente.");
     } finally {
       setAvatarUploading(false);
     }

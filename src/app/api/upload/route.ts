@@ -65,9 +65,15 @@ export const POST = withAuth(async (req, { session }) => {
     );
 
     if (!uploadRes.ok) {
-      const err = await uploadRes.text();
-      console.error("[Upload] Supabase Storage error:", err);
-      return NextResponse.json({ success: false, error: "Falha no upload" }, { status: 500 });
+      const errText = await uploadRes.text();
+      console.error("[Upload] Supabase Storage error:", uploadRes.status, errText);
+      let userMsg = "Falha no upload";
+      try {
+        const errJson = JSON.parse(errText);
+        if (errJson?.error === "Bucket not found") userMsg = "Bucket de storage não encontrado. Configure os buckets no Supabase.";
+        else if (errJson?.message) userMsg = errJson.message;
+      } catch { /* not json */ }
+      return NextResponse.json({ success: false, error: userMsg }, { status: 500 });
     }
 
     const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`;
