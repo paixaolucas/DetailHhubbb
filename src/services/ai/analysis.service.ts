@@ -121,18 +121,21 @@ async function searchUrlContent(url: string, type: AIAnalysisType, platform?: st
     SITE_ANALYSIS: "site/landing page",
   };
 
-  const userMsg = `Pesquise e forneça um resumo DETALHADO sobre este ${typeLabels[type]}:
+  const userMsg = `Use sua ferramenta de busca web para pesquisar informações sobre este ${typeLabels[type]}.
 
-URL: ${url}
+IMPORTANTE: NÃO tente acessar a URL diretamente — redes sociais como Instagram bloqueiam acesso direto.
+Em vez disso, use a busca web com a query abaixo para encontrar informações públicas indexadas.
+
+Query de busca: ${searchQuery}
+Referência: ${url}
 ${platform ? `Plataforma: ${platform}` : ""}
-Busca sugerida: ${searchQuery}
 
-Inclua no resumo tudo que encontrar:
-- Para perfis: bio completa, número de seguidores, nicho, tipo de conteúdo, frequência de posts, destaques, engajamento
-- Para sites: headline, proposta de valor, copy principal, CTAs, preços, prova social, estrutura
-- Para posts: conteúdo do post, legenda, hashtags, engajamento
+Com base nos resultados da busca, forneça um resumo DETALHADO incluindo:
+- Para perfis: bio, número de seguidores, nicho, tipo de conteúdo, frequência de posts, engajamento
+- Para sites: headline, proposta de valor, copy principal, CTAs, preços, prova social
+- Para posts: conteúdo, legenda, hashtags, engajamento
 
-Forneça o máximo de informações possível em português.`;
+Se encontrar informações parciais, inclua tudo que encontrar. Responda em português.`;
 
   const res = (await openai.responses.create({
     model: "gpt-4o", // web_search_preview só é compatível com gpt-4o (não funciona com mini)
@@ -393,7 +396,16 @@ export async function runAnalysis(params: {
         // Threshold não aplicado ao web_search: ele é explicitamente solicitado a retornar
         // um resumo detalhado — qualquer resultado não-vazio é válido para análise.
         const searched = await searchUrlContent(inputUrl, type, platform);
-        if (searched && searched.trim().length > 0) {
+        // Rejeitar resultado se o modelo indicou que o perfil/conteúdo não está disponível
+        const unavailablePatterns = [
+          "não está disponível", "not available", "não foi possível", "unable to access",
+          "não consegui acessar", "perfil privado", "conta privada", "login required",
+          "não encontrei informações", "sem informações suficientes",
+        ];
+        const isUnavailable = unavailablePatterns.some((p) =>
+          searched.toLowerCase().includes(p)
+        ) && searched.trim().length < 500; // curto + menciona indisponibilidade = inútil
+        if (searched && searched.trim().length > 0 && !isUnavailable) {
           contentParts.push("\n--- CONTEÚDO OBTIDO VIA BUSCA WEB ---");
           contentParts.push(searched);
           contentParts.push("--- FIM ---");
