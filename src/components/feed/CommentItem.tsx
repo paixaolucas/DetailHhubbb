@@ -600,6 +600,10 @@ export default function CommentItem({
                             {cat.label}
                           </button>
                         ))}
+                        <button type="button" onClick={() => setReplyEmojiOpen(false)}
+                          className="px-2 text-gray-500 hover:text-[#EEE6E4] hover:bg-white/5 transition-colors flex-shrink-0" title="Fechar">
+                          <X className="w-3 h-3" />
+                        </button>
                       </div>
                       <div className="p-2">
                         <div className="grid grid-cols-8 gap-0.5 max-h-36 overflow-y-auto">

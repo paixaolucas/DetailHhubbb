@@ -567,7 +567,7 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
 
             {showEmojiPicker && (
               <div className="absolute bottom-full mb-2 left-0 w-72 bg-[#252525] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden">
-                {/* Category tabs */}
+                {/* Category tabs + close */}
                 <div className="flex border-b border-white/10">
                   {EMOJI_CATS.map((cat, i) => (
                     <button
@@ -580,6 +580,14 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
                       {cat.label}
                     </button>
                   ))}
+                  <button
+                    type="button"
+                    onClick={() => setShowEmojiPicker(false)}
+                    className="px-2.5 text-gray-500 hover:text-[#EEE6E4] hover:bg-white/5 transition-colors flex-shrink-0"
+                    title="Fechar"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
                 </div>
                 {/* Emoji grid */}
                 <div className="p-2">

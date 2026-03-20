@@ -712,6 +712,10 @@ export default function PostDetail({ postId, communitySlug }: PostDetailProps) {
                           {cat.label}
                         </button>
                       ))}
+                      <button type="button" onClick={() => setCommentEmojiOpen(false)}
+                        className="px-2.5 text-gray-500 hover:text-[#EEE6E4] hover:bg-white/5 transition-colors flex-shrink-0" title="Fechar">
+                        <X className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                     <div className="p-2">
                       <p className="text-[10px] text-gray-500 px-1 mb-1.5 font-medium uppercase tracking-wide">{EMOJI_CATS[commentEmojiTab].title}</p>

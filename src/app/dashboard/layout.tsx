@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
@@ -267,10 +268,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [memberSearch, setMemberSearch] = useState("");
   const [influencerSearch, setInfluencerSearch] = useState("");
   const [viewAsUser, setViewAsUser] = useState<{ id: string; name: string; role: string } | null>(null);
-  const [memberResults, setMemberResults] = useState<{ id: string; firstName: string; lastName: string; role: string }[]>([]);
-  const [influencerResults, setInfluencerResults] = useState<{ id: string; firstName: string; lastName: string; role: string }[]>([]);
+  const [memberResults, setMemberResults] = useState<{ id: string; firstName: string; lastName: string; avatarUrl?: string | null }[]>([]);
+  const [influencerResults, setInfluencerResults] = useState<{ id: string; firstName: string; lastName: string; avatarUrl?: string | null }[]>([]);
+  const [preloadedMembers, setPreloadedMembers] = useState<{ id: string; firstName: string; lastName: string; avatarUrl?: string | null }[]>([]);
+  const [preloadedInfluencers, setPreloadedInfluencers] = useState<{ id: string; firstName: string; lastName: string; avatarUrl?: string | null }[]>([]);
   const [memberSearching, setMemberSearching] = useState(false);
   const [influencerSearching, setInfluencerSearching] = useState(false);
+  const [viewAsPreloaded, setViewAsPreloaded] = useState(false);
   const memberDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
   const influencerDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -375,6 +379,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return () => clearInterval(refreshInterval);
   }, [router]);
 
+  // Pre-load influencers + members when ViewAs panel opens
+  useEffect(() => {
+    if (!viewAsOpen || viewAsPreloaded) return;
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+    const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
+    Promise.all([
+      fetch("/api/users?role=INFLUENCER_ADMIN&pageSize=20", { headers }).then((r) => r.json()),
+      fetch("/api/users?role=COMMUNITY_MEMBER&pageSize=12", { headers }).then((r) => r.json()),
+    ]).then(([infData, memData]) => {
+      if (infData.success) setPreloadedInfluencers(infData.data ?? []);
+      if (memData.success) setPreloadedMembers(memData.data ?? []);
+      setViewAsPreloaded(true);
+    }).catch(() => {});
+  }, [viewAsOpen, viewAsPreloaded]);
+
   // Auto-expand groups that contain the active route
   useEffect(() => {
     const nav = getNavItems(role);
@@ -434,13 +453,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       setMemberSearching(true);
       try {
         const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
-        const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&types=members`, {
+        const res = await fetch(`/api/users?role=COMMUNITY_MEMBER&search=${encodeURIComponent(q)}&pageSize=10`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         const data = await res.json();
-        if (data.success && data.data?.members) {
-          setMemberResults(data.data.members.filter((u: { role: string }) => u.role === "COMMUNITY_MEMBER").slice(0, 5));
-        }
+        if (data.success) setMemberResults(data.data ?? []);
       } catch { /* ignore */ } finally {
         setMemberSearching(false);
       }
@@ -455,13 +472,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       setInfluencerSearching(true);
       try {
         const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
-        const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&types=members`, {
+        const res = await fetch(`/api/users?role=INFLUENCER_ADMIN&search=${encodeURIComponent(q)}&pageSize=10`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         const data = await res.json();
-        if (data.success && data.data?.members) {
-          setInfluencerResults(data.data.members.filter((u: { role: string }) => u.role === "INFLUENCER_ADMIN").slice(0, 5));
-        }
+        if (data.success) setInfluencerResults(data.data ?? []);
       } catch { /* ignore */ } finally {
         setInfluencerSearching(false);
       }
@@ -622,90 +637,114 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {viewAsOpen && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setViewAsOpen(false)} />
-                <div className="absolute bottom-full mb-2 left-0 right-0 bg-[#252525] border border-white/10 rounded-xl overflow-y-auto shadow-2xl z-50 max-h-[80vh]">
+                <div className="absolute bottom-full mb-2 left-0 right-0 bg-[#252525] border border-white/10 rounded-xl overflow-y-auto shadow-2xl z-50 max-h-[82vh]">
 
                   {/* ── Membros ── */}
-                  <div className="p-2 border-b border-white/10">
-                    <p className="text-[10px] text-gray-500 uppercase tracking-wide px-1 mb-2 font-semibold flex items-center gap-1.5">
-                      <UserCheck className="w-3 h-3" />Membros
+                  <div className="p-2.5 border-b border-white/10">
+                    <p className="text-[10px] text-gray-500 uppercase tracking-wide px-0.5 mb-2 font-semibold flex items-center gap-1.5">
+                      <UserCheck className="w-3 h-3" /> Membros
                     </p>
-                    {/* Presets */}
-                    <div className="space-y-0.5 mb-2">
+
+                    {/* Preset options */}
+                    <div className="grid grid-cols-2 gap-1 mb-2">
                       {[
-                        { id: "MEMBER_PAID",   label: "Membro assinante",     desc: "Já pagou a plataforma",     icon: UserCheck },
-                        { id: "MEMBER_UNPAID", label: "Membro sem assinatura", desc: "Ainda não assinou",          icon: Lock },
-                      ].map(({ id, label, desc, icon: Icon }) => (
+                        { id: "MEMBER_PAID",   label: "Assinante",        icon: UserCheck, desc: "Pagou a plataforma" },
+                        { id: "MEMBER_UNPAID", label: "Sem assinatura",    icon: Lock,      desc: "Ainda não assinou" },
+                      ].map(({ id, label, icon: Icon, desc }) => (
                         <button key={id}
-                          onClick={() => { setViewAs(id); setViewAsUser(null); setViewAsOpen(false); if (id === "MEMBER_UNPAID") router.push("/dashboard/assinar"); }}
-                          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left hover:bg-white/5 ${viewAs === id && !viewAsUser ? "text-amber-400 bg-amber-500/10" : "text-gray-400 hover:text-[#EEE6E4]"}`}>
-                          <Icon className="w-4 h-4 flex-shrink-0" />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-medium leading-tight">{label}</p>
-                            <p className="text-[10px] text-gray-500">{desc}</p>
-                          </div>
-                          {viewAs === id && !viewAsUser && <div className="w-1.5 h-1.5 bg-amber-400 rounded-full flex-shrink-0" />}
+                          onClick={() => {
+                            setViewAs(id); setViewAsUser(null); setViewAsOpen(false);
+                            router.push("/dashboard");
+                          }}
+                          title={desc}
+                          className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all text-center hover:bg-white/5 border ${viewAs === id && !viewAsUser ? "border-amber-500/40 bg-amber-500/10 text-amber-400" : "border-white/5 text-gray-400 hover:text-[#EEE6E4]"}`}>
+                          <Icon className="w-4 h-4" />
+                          <span className="text-[10px] font-medium leading-tight">{label}</span>
                         </button>
                       ))}
                     </div>
+
                     {/* Member search */}
-                    <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5">
-                      <Search className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-                      <input type="text" placeholder="Pesquisar membro..." value={memberSearch}
+                    <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 mb-1.5">
+                      <Search className="w-3 h-3 text-gray-500 flex-shrink-0" />
+                      <input type="text" placeholder="Buscar membro específico..." value={memberSearch}
                         onChange={(e) => searchMembers(e.target.value)}
-                        className="bg-transparent text-xs text-[#EEE6E4] placeholder-gray-500 flex-1 outline-none"
+                        className="bg-transparent text-xs text-[#EEE6E4] placeholder-gray-600 flex-1 outline-none"
                       />
                       {memberSearching && <div className="w-3 h-3 border border-[#009CD9] border-t-transparent rounded-full animate-spin flex-shrink-0" />}
                     </div>
-                    {memberResults.length > 0 && (
-                      <div className="mt-1 space-y-0.5">
-                        {memberResults.map((u) => (
-                          <button key={u.id}
-                            onClick={() => { setViewAs("COMMUNITY_MEMBER"); setViewAsUser({ id: u.id, name: `${u.firstName} ${u.lastName}`.trim(), role: u.role }); setViewAsOpen(false); setMemberSearch(""); setMemberResults([]); }}
-                            className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs transition-all text-left hover:bg-white/5 ${viewAsUser?.id === u.id ? "text-amber-400 bg-amber-500/10" : "text-gray-400 hover:text-[#EEE6E4]"}`}>
-                            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-[#006079] to-[#009CD9] flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0">
-                              {(u.firstName[0] ?? "").toUpperCase()}{(u.lastName[0] ?? "").toUpperCase()}
-                            </div>
-                            <span className="flex-1 truncate">{u.firstName} {u.lastName}</span>
-                          </button>
-                        ))}
-                      </div>
-                    )}
+
+                    {/* Member icons grid */}
+                    {(() => {
+                      const list = memberSearch ? memberResults : preloadedMembers;
+                      return list.length > 0 ? (
+                        <div className="flex flex-wrap gap-1.5 py-1">
+                          {list.map((u) => {
+                            const name = `${u.firstName} ${u.lastName}`.trim();
+                            const ini = `${u.firstName[0] ?? ""}${u.lastName[0] ?? ""}`.toUpperCase();
+                            const active = viewAsUser?.id === u.id;
+                            return (
+                              <button key={u.id} title={name}
+                                onClick={() => { setViewAs("COMMUNITY_MEMBER"); setViewAsUser({ id: u.id, name, role: "COMMUNITY_MEMBER" }); setViewAsOpen(false); setMemberSearch(""); setMemberResults([]); router.push("/dashboard"); }}
+                                className={`w-9 h-9 rounded-full flex items-center justify-center text-[10px] font-bold text-white transition-all ring-2 ${active ? "ring-amber-400 scale-110" : "ring-transparent hover:ring-[#009CD9]/50 hover:scale-105"} bg-gradient-to-br from-[#006079] to-[#009CD9]`}>
+                                {u.avatarUrl ? (
+                                  <Image src={u.avatarUrl} alt={name} width={36} height={36} className="w-full h-full rounded-full object-cover" />
+                                ) : ini}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      ) : memberSearch && !memberSearching ? (
+                        <p className="text-[11px] text-gray-600 py-1">Nenhum membro encontrado.</p>
+                      ) : null;
+                    })()}
                   </div>
 
                   {/* ── Influenciadores ── */}
-                  <div className="p-2">
-                    <p className="text-[10px] text-gray-500 uppercase tracking-wide px-1 mb-2 font-semibold flex items-center gap-1.5">
-                      <Crown className="w-3 h-3" />Influenciadores
+                  <div className="p-2.5">
+                    <p className="text-[10px] text-gray-500 uppercase tracking-wide px-0.5 mb-2 font-semibold flex items-center gap-1.5">
+                      <Crown className="w-3 h-3" /> Influenciadores
                     </p>
-                    <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5">
-                      <Search className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-                      <input type="text" placeholder="Pesquisar influenciador..." value={influencerSearch}
+
+                    {/* Influencer search */}
+                    <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 mb-1.5">
+                      <Search className="w-3 h-3 text-gray-500 flex-shrink-0" />
+                      <input type="text" placeholder="Buscar influenciador..." value={influencerSearch}
                         onChange={(e) => searchInfluencers(e.target.value)}
-                        className="bg-transparent text-xs text-[#EEE6E4] placeholder-gray-500 flex-1 outline-none"
+                        className="bg-transparent text-xs text-[#EEE6E4] placeholder-gray-600 flex-1 outline-none"
                       />
                       {influencerSearching && <div className="w-3 h-3 border border-[#009CD9] border-t-transparent rounded-full animate-spin flex-shrink-0" />}
                     </div>
-                    {influencerResults.length > 0 && (
-                      <div className="mt-1 space-y-0.5">
-                        {influencerResults.map((u) => (
-                          <button key={u.id}
-                            onClick={() => { setViewAs("INFLUENCER_ADMIN"); setViewAsUser({ id: u.id, name: `${u.firstName} ${u.lastName}`.trim(), role: u.role }); setViewAsOpen(false); setInfluencerSearch(""); setInfluencerResults([]); }}
-                            className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs transition-all text-left hover:bg-white/5 ${viewAsUser?.id === u.id ? "text-amber-400 bg-amber-500/10" : "text-gray-400 hover:text-[#EEE6E4]"}`}>
-                            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-[#007A99] to-[#009CD9] flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0">
-                              {(u.firstName[0] ?? "").toUpperCase()}{(u.lastName[0] ?? "").toUpperCase()}
-                            </div>
-                            <span className="flex-1 truncate">{u.firstName} {u.lastName}</span>
-                            <span className="text-[9px] text-[#009CD9]">Influenciador</span>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                    {influencerSearch && influencerResults.length === 0 && !influencerSearching && (
-                      <p className="text-[11px] text-gray-600 px-2 py-2">Nenhum influenciador encontrado.</p>
-                    )}
+
+                    {/* Influencer icons grid */}
+                    {(() => {
+                      const list = influencerSearch ? influencerResults : preloadedInfluencers;
+                      return list.length > 0 ? (
+                        <div className="flex flex-wrap gap-1.5 py-1">
+                          {list.map((u) => {
+                            const name = `${u.firstName} ${u.lastName}`.trim();
+                            const ini = `${u.firstName[0] ?? ""}${u.lastName[0] ?? ""}`.toUpperCase();
+                            const active = viewAsUser?.id === u.id;
+                            return (
+                              <button key={u.id} title={name}
+                                onClick={() => { setViewAs("INFLUENCER_ADMIN"); setViewAsUser({ id: u.id, name, role: "INFLUENCER_ADMIN" }); setViewAsOpen(false); setInfluencerSearch(""); setInfluencerResults([]); router.push("/dashboard"); }}
+                                className={`w-9 h-9 rounded-full flex items-center justify-center text-[10px] font-bold text-white transition-all ring-2 ${active ? "ring-amber-400 scale-110" : "ring-transparent hover:ring-[#009CD9]/50 hover:scale-105"} bg-gradient-to-br from-[#007A99] to-[#009CD9]`}>
+                                {u.avatarUrl ? (
+                                  <Image src={u.avatarUrl} alt={name} width={36} height={36} className="w-full h-full rounded-full object-cover" />
+                                ) : ini}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      ) : influencerSearch && !influencerSearching ? (
+                        <p className="text-[11px] text-gray-600 py-1">Nenhum influenciador encontrado.</p>
+                      ) : !viewAsPreloaded ? (
+                        <p className="text-[11px] text-gray-600 py-1">Carregando...</p>
+                      ) : null;
+                    })()}
                   </div>
 
-                  {/* Clear */}
+                  {/* Sair do modo */}
                   {viewAs && (
                     <div className="p-2 border-t border-white/10">
                       <button
@@ -750,7 +789,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           collapsed ? "w-16" : "w-60"
         } hidden md:flex flex-col bg-[#222222] border-r border-white/10 transition-all duration-300 fixed h-full z-30`}
       >
-        <SidebarContent />
+        {SidebarContent()}
       </aside>
 
       {/* Mobile overlay */}
@@ -775,7 +814,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <X className="w-4 h-4" />
           </button>
         </div>
-        <SidebarContent />
+        {SidebarContent()}
       </aside>
 
       {/* Main */}
