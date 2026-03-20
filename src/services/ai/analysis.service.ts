@@ -13,6 +13,72 @@ import type {
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // =============================================================================
+// URL CONTENT FETCHER — busca conteúdo real da página no servidor
+// Complementa o web_search_preview (que faz busca mas não acessa URLs diretamente)
+// =============================================================================
+
+async function fetchUrlContent(url: string): Promise<string> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000);
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8",
+      },
+    });
+    clearTimeout(timeout);
+    if (!res.ok) return "";
+    const html = await res.text();
+    // Check if page is mostly JavaScript (SPA like Instagram/TikTok) — not useful
+    const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+    const bodyContent = bodyMatch?.[1] ?? html;
+    const scriptRatio = (bodyContent.match(/<script/gi)?.length ?? 0) / Math.max(bodyContent.length / 1000, 1);
+    if (scriptRatio > 5) return ""; // SPA — let web_search handle it
+
+    const extracted: string[] = [];
+    const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+    if (titleMatch) extracted.push(`TÍTULO: ${titleMatch[1].trim()}`);
+    const descMatch = html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']{10,})["']/i)
+      || html.match(/<meta[^>]+content=["']([^"']{10,})["'][^>]+name=["']description["']/i);
+    if (descMatch) extracted.push(`DESCRIÇÃO: ${descMatch[1].trim()}`);
+    const ogTitle = html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i);
+    const ogDesc = html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i);
+    const ogSite = html.match(/<meta[^>]+property=["']og:site_name["'][^>]+content=["']([^"']+)["']/i);
+    if (ogSite) extracted.push(`PLATAFORMA: ${ogSite[1].trim()}`);
+    if (ogTitle) extracted.push(`OG TÍTULO: ${ogTitle[1].trim()}`);
+    if (ogDesc) extracted.push(`OG DESCRIÇÃO: ${ogDesc[1].trim()}`);
+
+    // Headings
+    const h1Raw: string[] = [];
+    let m: RegExpExecArray | null;
+    const h1re = /<h1[^>]*>([^<]+)<\/h1>/gi;
+    while ((m = h1re.exec(html)) !== null) h1Raw.push(m[1].trim());
+    const h2Raw: string[] = [];
+    const h2re = /<h2[^>]*>([^<]+)<\/h2>/gi;
+    while ((m = h2re.exec(html)) !== null && h2Raw.length < 6) h2Raw.push(m[1].trim());
+    if (h1Raw.length > 0) extracted.push(`H1: ${h1Raw.join(" | ")}`);
+    if (h2Raw.length > 0) extracted.push(`H2: ${h2Raw.join(" | ")}`);
+
+    // Visible body text (strip scripts/styles)
+    const bodyText = html
+      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, " ")
+      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 3000);
+    if (bodyText.length > 200) extracted.push(`\nCONTEÚDO:\n${bodyText}`);
+
+    return extracted.join("\n");
+  } catch {
+    return "";
+  }
+}
+
+// =============================================================================
 // JSON EXTRACTOR — parse JSON from model output (no response_format available
 // with web_search_preview tool, so we extract from free text)
 // =============================================================================
@@ -245,21 +311,39 @@ export async function runAnalysis(params: {
       }
       userContent = parts;
     } else {
-      // URL or text — web_search_preview will fetch the URL automatically
+      // URL or text — fetch content server-side + use web_search as complement
       const lines: string[] = [];
-      if (inputUrl) lines.push(`URL para análise: ${inputUrl}`);
-      if (platform) lines.push(`Plataforma: ${platform}`);
+
+      if (inputUrl) {
+        lines.push(`URL PARA ANÁLISE: ${inputUrl}`);
+        if (platform) lines.push(`Plataforma: ${platform}`);
+
+        // Try server-side fetch first (works for most sites)
+        const fetched = await fetchUrlContent(inputUrl);
+        if (fetched) {
+          lines.push("\n--- CONTEÚDO EXTRAÍDO DA PÁGINA ---");
+          lines.push(fetched);
+          lines.push("--- FIM DO CONTEÚDO EXTRAÍDO ---");
+          lines.push("\nUSE TAMBÉM a ferramenta de busca web para obter mais contexto sobre este site/perfil e complementar a análise.");
+        } else {
+          // SPA or blocked — rely entirely on web search
+          lines.push("\nO conteúdo da página não pôde ser extraído diretamente (provavelmente uma SPA como Instagram/TikTok).");
+          lines.push("USE a ferramenta de busca web para pesquisar informações sobre esta URL/perfil e fazer a análise completa.");
+        }
+      }
+
       if (pastedContent) {
-        lines.push("\nInformações adicionais fornecidas pelo usuário:");
+        lines.push("\n--- INFORMAÇÕES ADICIONAIS DO USUÁRIO ---");
         lines.push(pastedContent);
       }
+
       if (lines.length === 0) {
         throw new Error("Nenhum conteúdo foi fornecido para análise.");
       }
       userContent = lines.join("\n");
     }
 
-    // Decide tools: use web_search_preview only for URL/text analysis
+    // Always use web_search for URL analysis
     const useWebSearch = inputType === "url";
 
     // Build request
