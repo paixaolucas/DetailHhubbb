@@ -50,8 +50,8 @@ export const POST = withAuth(async (req, { session, params }) => {
       return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
     }
 
-    // Enforce max 3 spaces per community
-    const spaceCount = await db.space.count({ where: { communityId } });
+    // Enforce max 3 non-COURSE spaces per community
+    const spaceCount = await db.space.count({ where: { communityId, type: { not: "COURSE" } } });
     if (spaceCount >= 3) {
       return NextResponse.json(
         { success: false, error: "Limite atingido: cada comunidade pode ter no máximo 3 canais." },

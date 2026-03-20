@@ -10,7 +10,7 @@ import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import {
   Hash, Menu, X, Users, Trophy, UserPlus, UserCheck,
-  Loader2, ChevronRight, LayoutDashboard,
+  Loader2, ChevronRight, LayoutDashboard, BookOpen,
 } from "lucide-react";
 import { LogoType } from "@/components/ui/logo";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
@@ -258,6 +258,16 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
 
         {/* ── Extra nav links ── */}
         <div className="mt-4 pt-3 border-t border-white/8 flex flex-col gap-0.5">
+          {spaces.some((s) => s.type === "COURSE") && (
+            <Link
+              href={`/community/${communitySlug}/trilhas`}
+              onClick={() => setSidebarOpen(false)}
+              className="flex items-center gap-2 px-2.5 py-2 rounded-xl text-sm text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-all"
+            >
+              <BookOpen className="w-4 h-4 text-gray-600" />
+              <span>Trilhas</span>
+            </Link>
+          )}
           <Link
             href={`/community/${communitySlug}/members`}
             onClick={() => setSidebarOpen(false)}

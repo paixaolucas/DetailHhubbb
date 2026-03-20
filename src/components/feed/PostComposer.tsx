@@ -10,10 +10,11 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import Image from "next/image";
-import { Send, Plus, Minus, ImageIcon, X, Lock, Rocket } from "lucide-react";
+import { Send, Plus, Minus, ImageIcon, X, Lock, Rocket, Video } from "lucide-react";
 import { useUploadThing } from "@/utils/uploadthing";
 import { STORAGE_KEYS } from "@/lib/constants";
 import { getMemberLevel, getMemberLevelColor, POST_THRESHOLD } from "@/lib/points";
+import VideoEmbed from "@/components/ui/VideoEmbed";
 
 interface PostComposerProps {
   spaceId: string;
@@ -34,6 +35,9 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [showVideoInput, setShowVideoInput] = useState(false);
+  const [videoUrl, setVideoUrl] = useState("");
 
   const [userName, setUserName] = useState("");
   const [initials, setInitials] = useState("?");
@@ -120,7 +124,7 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!body.trim() && selectedFiles.length === 0) return;
+    if (!body.trim() && selectedFiles.length === 0 && !videoUrl.trim()) return;
 
     setIsLoading(true);
     setError("");
@@ -144,10 +148,11 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
 
       const payload: Record<string, unknown> = {
         body: body.trim() || " ",
-        type: attachments.length > 0 ? "IMAGE" : "TEXT",
+        type: videoUrl.trim() ? "VIDEO" : attachments.length > 0 ? "IMAGE" : "TEXT",
       };
       if (showTitle && title.trim()) payload.title = title.trim();
       if (attachments.length > 0) payload.attachments = attachments;
+      if (videoUrl.trim()) payload.videoUrl = videoUrl.trim();
 
       const res = await fetch(`/api/spaces/${spaceId}/posts`, {
         method: "POST",
@@ -172,6 +177,8 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
       setSelectedFiles([]);
       setPreviewUrls([]);
       setFocused(false);
+      setVideoUrl("");
+      setShowVideoInput(false);
     } catch {
       setError("Erro de conexão. Tente novamente.");
     } finally {
@@ -236,7 +243,7 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
   }
 
   const busy = isLoading || uploading;
-  const expanded = focused || body.length > 0 || selectedFiles.length > 0;
+  const expanded = focused || body.length > 0 || selectedFiles.length > 0 || showVideoInput;
 
   return (
     <form
@@ -273,6 +280,22 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
           className="flex-1 bg-transparent text-gray-300 placeholder-gray-400 focus:outline-none resize-none text-sm leading-relaxed transition-all duration-200"
         />
       </div>
+
+      {/* Video URL input */}
+      {showVideoInput && (
+        <div className="pl-12 flex flex-col gap-2">
+          <input
+            type="url"
+            value={videoUrl}
+            onChange={(e) => setVideoUrl(e.target.value)}
+            placeholder="Cole a URL do YouTube ou Vimeo..."
+            className="w-full bg-white/5 border border-white/10 hover:border-[#006079]/40 focus:border-[#009CD9]/40 rounded-lg px-3 py-2 text-[#EEE6E4] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/20 text-sm transition-all"
+          />
+          {videoUrl.trim() && (
+            <VideoEmbed url={videoUrl.trim()} className="mt-1" />
+          )}
+        </div>
+      )}
 
       {/* Image previews */}
       {previewUrls.length > 0 && (
@@ -328,7 +351,7 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            disabled={selectedFiles.length >= 10}
+            disabled={selectedFiles.length >= 10 || showVideoInput}
             className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#009CD9] transition-colors disabled:opacity-40"
           >
             <ImageIcon className="w-3.5 h-3.5" />
@@ -336,6 +359,21 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
             {selectedFiles.length > 0 && (
               <span className="text-[#009CD9]">({selectedFiles.length})</span>
             )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setShowVideoInput((v) => !v);
+              if (showVideoInput) setVideoUrl("");
+            }}
+            disabled={selectedFiles.length > 0}
+            className={`inline-flex items-center gap-1.5 text-xs transition-colors disabled:opacity-40 ${
+              showVideoInput ? "text-[#009CD9]" : "text-gray-500 hover:text-[#009CD9]"
+            }`}
+          >
+            <Video className="w-3.5 h-3.5" />
+            Vídeo
           </button>
           <input
             ref={fileInputRef}
@@ -349,7 +387,7 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
 
         <button
           type="submit"
-          disabled={busy || (!body.trim() && selectedFiles.length === 0)}
+          disabled={busy || (!body.trim() && selectedFiles.length === 0 && !videoUrl.trim())}
           className="inline-flex items-center gap-2 bg-[#006079] hover:bg-[#007A99] disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-4 py-2 rounded-lg transition-all"
         >
           {busy ? (

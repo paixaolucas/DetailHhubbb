@@ -200,7 +200,19 @@ export const POST = withAuth(async (req, { session, params }) => {
       );
     }
 
-    const { title, body: postBody, type } = parsed.data;
+    // Require either body content or a videoUrl
+    if (!parsed.data.videoUrl && (!parsed.data.body || !parsed.data.body.trim())) {
+      return NextResponse.json(
+        { success: false, error: "O conteúdo do post é obrigatório" },
+        { status: 400 }
+      );
+    }
+
+    const { title, body: postBody, type, videoUrl } = parsed.data;
+
+    // Determine final type and content for VIDEO posts
+    const finalType = videoUrl ? "VIDEO" : type;
+    const finalBody = videoUrl ? (videoUrl) : (postBody || " ");
 
     const post = await db.post.create({
       data: {
@@ -208,8 +220,8 @@ export const POST = withAuth(async (req, { session, params }) => {
         authorId: session.userId,
         communityId: space.communityId,
         title,
-        body: postBody,
-        type,
+        body: finalBody,
+        type: finalType,
       },
       include: {
         author: { select: AUTHOR_SELECT },

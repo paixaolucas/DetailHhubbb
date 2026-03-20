@@ -13,6 +13,7 @@ import ReactionBar from "@/components/feed/ReactionBar";
 import { useToast } from "@/components/ui/toast-provider";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { STORAGE_KEYS } from "@/lib/constants";
+import VideoEmbed from "@/components/ui/VideoEmbed";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -363,6 +364,13 @@ function PostCard({
           <p className="text-sm text-gray-300 leading-relaxed line-clamp-3 whitespace-pre-wrap break-words">
             {post.body}
           </p>
+        )}
+
+        {/* Video embed */}
+        {post.type === "VIDEO" && post.body && post.body.trim() && (
+          <div className="mt-3" onClick={(e) => e.stopPropagation()}>
+            <VideoEmbed url={post.body.trim()} title={post.title ?? undefined} />
+          </div>
         )}
 
         {/* Image thumbnails */}
