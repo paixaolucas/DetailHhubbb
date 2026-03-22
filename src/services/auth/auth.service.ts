@@ -448,7 +448,7 @@ export async function refreshAccessToken(
     where: { token: refreshTokenString },
     include: {
       user: {
-        select: { id: true, email: true, role: true, firstName: true, lastName: true, isActive: true },
+        select: { id: true, email: true, role: true, firstName: true, lastName: true, isActive: true, isBanned: true },
       },
     },
   });
@@ -471,6 +471,10 @@ export async function refreshAccessToken(
 
   if (!storedToken.user.isActive) {
     throw new AppError("Account deactivated", 403, "ACCOUNT_INACTIVE");
+  }
+
+  if (storedToken.user.isBanned) {
+    throw new AppError("Account banned", 403, "ACCOUNT_BANNED");
   }
 
   // Rotate refresh token (embed hasPlatform claim for fast-path membership checks)

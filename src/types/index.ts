@@ -3,6 +3,7 @@
 // =============================================================================
 
 export type { UserRole, SubscriptionStatus, PaymentStatus, PaymentType } from "@prisma/client";
+import type { UserRole } from "@prisma/client"; // local use in AuthSession below
 
 // =============================================================================
 // AUTH TYPES
@@ -28,9 +29,10 @@ export interface AuthTokens {
 export interface AuthSession {
   userId: string;
   email: string;
-  role: string;
+  role: UserRole;
   firstName: string;
   lastName: string;
+  /** Always null — avatarUrl is not embedded in JWT. Query the DB when needed. */
   avatarUrl: string | null;
   hasPlatform?: boolean;
 }

@@ -17,7 +17,15 @@ export const POST = withAuth(async (req, { session }) => {
     );
   }
 
-  const body = await req.json().catch(() => ({}));
+  let body: Record<string, unknown>;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json(
+      { success: false, error: "Invalid request body" },
+      { status: 400 }
+    );
+  }
   const { platformPlanId } = body;
 
   if (!platformPlanId || typeof platformPlanId !== "string") {

@@ -79,6 +79,26 @@ npx tsc --noEmit                       # checar erros TypeScript (deve retornar 
 - `CommunityMembership` + `SubscriptionPlan` — membros por comunidade individual
 - Preservado para dados históricos, não é mais o fluxo principal
 
+### Valores de referência (source of truth)
+> Agentes: ao mencionar preços ou splits, referenciar esta seção — não hardcodar valores.
+
+| Item | Valor |
+|---|---|
+| Assinatura | R$948/ano = R$79/mês |
+| Receita líquida por membro | ~R$71 (após gateway ~R$3 + Simples ~R$4,74) |
+| Split influenciador (dono do membro) | 35% (~R$24,85) |
+| Caixa de performance coletiva | 15% (~R$10,65) |
+| Plataforma | 50% (~R$35,50) |
+| Break-even | 150 membros ativos |
+
+**Infra atual:**
+- Gateway: Stripe (migração planejada → Asaas)
+- Deploy: Vercel
+- DB: Supabase (PostgreSQL, host apenas)
+- VPS auxiliar: Hostinger KVM1
+- Email: Resend
+- Upload: UploadThing
+
 ---
 
 ## Arquitetura

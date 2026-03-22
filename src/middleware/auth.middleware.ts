@@ -5,7 +5,9 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAccessToken } from "@/lib/auth/jwt";
-import { hasPermission, requirePermission } from "@/lib/auth/rbac";
+import { hasPermission, ROLE_HIERARCHY } from "@/lib/auth/rbac";
+// Note: withPermission (below) is defined but not yet used in API routes —
+// kept for future granular permission checks.
 import { db } from "@/lib/db";
 import type { Permission } from "@/lib/auth/rbac";
 import type { AuthSession } from "@/types";
@@ -40,7 +42,7 @@ export async function getSessionFromRequest(
     return {
       userId: payload.sub,
       email: payload.email,
-      role: payload.role,
+      role: payload.role as UserRole, // JWT payloads are strings; UserRole is the runtime value
       firstName: payload.firstName ?? "",
       lastName: payload.lastName ?? "",
       avatarUrl: null,
@@ -77,9 +79,9 @@ export function withAuth(handler: AuthenticatedHandler) {
       if (viewAsUserId) {
         const targetUser = await db.user.findUnique({
           where: { id: viewAsUserId },
-          select: { role: true },
+          select: { role: true, isActive: true, isBanned: true },
         });
-        if (targetUser) {
+        if (targetUser && targetUser.isActive && !targetUser.isBanned) {
           session.userId = viewAsUserId;
           session.role = targetUser.role;
           session.hasPlatform = false; // força verificação real no banco para o usuário alvo
@@ -109,15 +111,8 @@ export function withPermission(permission: Permission) {
 export function withRole(role: UserRole) {
   return (handler: AuthenticatedHandler) =>
     withAuth(async (req, context) => {
-      const roleHierarchy: Record<UserRole, number> = {
-        [UserRole.SUPER_ADMIN]: 100,
-        [UserRole.INFLUENCER_ADMIN]: 50,
-        [UserRole.MARKETPLACE_PARTNER]: 30,
-        [UserRole.COMMUNITY_MEMBER]: 10,
-      };
-
-      const userLevel = roleHierarchy[context.session.role as UserRole] ?? 0;
-      const requiredLevel = roleHierarchy[role];
+      const userLevel = ROLE_HIERARCHY[context.session.role as UserRole] ?? 0;
+      const requiredLevel = ROLE_HIERARCHY[role];
 
       if (userLevel < requiredLevel) {
         return NextResponse.json(
@@ -157,7 +152,15 @@ export async function verifyCommunityOwnership(
 
 export async function verifyPlatformMembership(
   userId: string,
-  /** Fast-path: if true (from JWT claim), skip DB query */
+  /** Fast-path: if true (from JWT claim), skip DB query.
+   *
+   * KNOWN DESIGN DECISION: a cancelled subscription is reflected in the DB
+   * immediately (via Stripe webhook), but a user whose JWT still carries
+   * hasPlatform=true will bypass this check for up to 2h (access token TTL).
+   * This is an accepted tradeoff — the window is short and avoids a DB round-
+   * trip on every request. If instant revocation is required, implement a
+   * short-lived blocklist (e.g. Redis or an in-memory Set on Hostinger) that
+   * the Stripe webhook populates on cancellation. */
   hasPlatformClaim?: boolean
 ): Promise<boolean> {
   if (hasPlatformClaim === true) return true;
@@ -174,7 +177,9 @@ export async function verifyPlatformMembership(
 export async function verifyMembership(
   userId: string,
   communityId: string,
-  /** Fast-path: pass session.hasPlatform from JWT to skip DB query when possible */
+  /** Fast-path: pass session.hasPlatform from JWT to skip DB query when possible.
+   *  Note: if falsy, the fallback to verifyPlatformMembership always hits the DB
+   *  regardless of what hasPlatformClaim was set to — this is intentional. */
   hasPlatformClaim?: boolean
 ): Promise<boolean> {
   // Fast path: JWT claims active platform membership

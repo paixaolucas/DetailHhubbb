@@ -8,6 +8,7 @@ import { db } from "@/lib/db";
 import { AppError, NotFoundError } from "@/types";
 import { commissionService } from "@/services/commission/commission.service";
 import { syncMemberCount } from "@/services/community/community.service";
+import { sendPlatformMembershipEmail } from "@/lib/email/send";
 import Stripe from "stripe";
 
 // =============================================================================
@@ -151,7 +152,10 @@ export async function createPlatformCheckoutSession(params: {
     allow_promotion_codes: true,
   });
 
-  return { sessionId: session.id, url: session.url! };
+  if (!session.url) {
+    throw new AppError("Stripe did not return a checkout URL", 500, "STRIPE_NO_URL");
+  }
+  return { sessionId: session.id, url: session.url };
 }
 
 // =============================================================================
@@ -330,7 +334,7 @@ async function handleCheckoutCompleted(
     // Validate that the Stripe customer matches the userId in metadata
     const userRecord = await db.user.findUnique({
       where: { id: userId },
-      select: { stripeCustomerId: true },
+      select: { stripeCustomerId: true, email: true, firstName: true },
     });
     if (
       userRecord?.stripeCustomerId &&
@@ -341,6 +345,12 @@ async function handleCheckoutCompleted(
     }
 
     const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
+
+    const existingMembership = await db.platformMembership.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+
     await db.platformMembership.upsert({
       where: { userId },
       create: {
@@ -364,6 +374,24 @@ async function handleCheckoutCompleted(
         ...(referredByInfluencerId ? { referredByInfluencerId } : {}),
       },
     });
+
+    // Send welcome email only on first activation (not reactivations)
+    if (!existingMembership && userRecord?.email && userRecord?.firstName) {
+      const plan = await db.platformPlan.findUnique({
+        where: { id: platformPlanId },
+        select: { name: true, price: true },
+      });
+      const amount = plan
+        ? `R$${(Number(plan.price) / 100).toFixed(2).replace(".", ",")}`
+        : "R$948,00";
+      await sendPlatformMembershipEmail(
+        { email: userRecord.email, firstName: userRecord.firstName },
+        { planName: plan?.name ?? "Assinatura Anual", amount }
+      ).catch((err) =>
+        console.error("[Email] Failed to send platform welcome email:", err)
+      );
+    }
+
     return;
   }
 

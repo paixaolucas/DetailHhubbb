@@ -4,8 +4,9 @@
 // Replaces polling in ChatWidget when running on a persistent server (Hostinger).
 // On Vercel Hobby (10s timeout) the client falls back to polling automatically.
 //
-// Auth: JWT token passed as ?token=<accessToken> query param
-// (EventSource API does not support custom headers)
+// Auth: short-lived SSE ticket passed as ?ticket=<sseTicket> query param.
+// Obtain the ticket via POST /api/communities/[id]/chat/token (Bearer required).
+// Tickets expire in 30s — scoped to communityId to prevent cross-community access.
 // =============================================================================
 
 export const dynamic = "force-dynamic";
@@ -13,7 +14,7 @@ export const runtime = "nodejs";
 
 import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
-import { verifyAccessToken } from "@/lib/auth/jwt";
+import { verifySseTicket } from "@/lib/auth/jwt";
 import { verifyMembership } from "@/middleware/auth.middleware";
 
 const POLL_MS = 3000; // how often to check for new messages server-side
@@ -25,22 +26,29 @@ export async function GET(
 ) {
   const communityId = params?.id;
   const { searchParams } = new URL(req.url);
-  const token = searchParams.get("token");
+  const ticket = searchParams.get("ticket");
   const spaceId = searchParams.get("spaceId") ?? undefined;
 
   // ── Auth ────────────────────────────────────────────────────────────────────
-  if (!token) {
+  // Clients obtain a ticket via POST /api/communities/[id]/chat/token (Bearer).
+  // Tickets are scoped to communityId and expire after 30 seconds.
+  if (!ticket) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  let session: Awaited<ReturnType<typeof verifyAccessToken>>;
+  let ticketPayload: { userId: string; communityId: string };
   try {
-    session = await verifyAccessToken(token);
+    ticketPayload = await verifySseTicket(ticket);
   } catch {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const isMember = await verifyMembership(session.sub, communityId, session.hasPlatform);
+  // Verify ticket is scoped to this community
+  if (ticketPayload.communityId !== communityId) {
+    return new Response("Forbidden", { status: 403 });
+  }
+
+  const isMember = await verifyMembership(ticketPayload.userId, communityId);
   if (!isMember) {
     return new Response("Forbidden", { status: 403 });
   }
