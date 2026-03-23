@@ -103,7 +103,7 @@ function LoginFormContent() {
             <h1
               style={{
                 fontSize: '20px',
-                fontWeight: 500,
+                fontWeight: 600,
                 color: '#EEE6E4',
                 marginBottom: '24px',
                 textAlign: 'center',
@@ -121,7 +121,7 @@ function LoginFormContent() {
 
             {/* Erro */}
             {error && (
-              <div className="mb-5 p-3.5 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm">
+              <div role="alert" className="mb-5 p-3.5 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm">
                 {error}
               </div>
             )}
@@ -143,46 +143,59 @@ function LoginFormContent() {
             {/* Divisor */}
             <div className="flex items-center gap-3 mb-5">
               <div className="flex-1 h-px bg-white/10" />
-              <span className="text-xs text-gray-500">ou entre com email</span>
+              <span className="text-xs text-gray-400">ou entre com email</span>
               <div className="flex-1 h-px bg-white/10" />
             </div>
 
             {/* Formulário */}
-            <form onSubmit={handleSubmit} className="space-y-3">
-              <input
-                type="email"
-                required
-                placeholder="Seu email"
-                value={form.email}
-                onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                autoComplete="email"
-                className="w-full bg-white/5 border border-white/10 hover:border-[#007A99] focus:border-[#009CD9] rounded-xl px-4 py-3 text-[#EEE6E4] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 transition-all text-sm"
-              />
-
-              <div className="relative">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="email" className="block text-sm text-gray-400 mb-1.5">
+                  Email
+                </label>
                 <input
-                  type={showPassword ? "text" : "password"}
+                  id="email"
+                  type="email"
                   required
-                  placeholder="Sua senha"
-                  value={form.password}
-                  onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                  autoComplete="current-password"
-                  className="w-full bg-white/5 border border-white/10 hover:border-[#007A99] focus:border-[#009CD9] rounded-xl px-4 py-3 pr-11 text-[#EEE6E4] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 transition-all text-sm"
+                  placeholder="Seu email"
+                  value={form.email}
+                  onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                  autoComplete="email"
+                  className="w-full bg-white/5 border border-white/10 hover:border-[#007A99] focus:border-[#009CD9] rounded-xl px-4 py-3 text-[#EEE6E4] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 transition-all text-sm"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-400 transition-colors"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
+              </div>
+
+              <div>
+                <label htmlFor="password" className="block text-sm text-gray-400 mb-1.5">
+                  Senha
+                </label>
+                <div className="relative">
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    placeholder="Sua senha"
+                    value={form.password}
+                    onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+                    autoComplete="current-password"
+                    className="w-full bg-white/5 border border-white/10 hover:border-[#007A99] focus:border-[#009CD9] rounded-xl px-4 py-3 pr-11 text-[#EEE6E4] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 transition-all text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-400 transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
 
               {/* Esqueceu senha — copy mais humano */}
               <div className="flex justify-end">
                 <Link
                   href="/forgot-password"
-                  className="text-xs text-gray-500 hover:text-[#009CD9] transition-colors"
+                  className="text-xs text-gray-400 hover:text-[#009CD9] transition-colors"
                 >
                   Esqueci minha senha
                 </Link>
@@ -205,7 +218,7 @@ function LoginFormContent() {
             </form>
 
             {/* Criar conta — copy mais direto */}
-            <p className="text-sm text-gray-500 text-center mt-6">
+            <p className="text-sm text-gray-400 text-center mt-6">
               Ainda não tem acesso?{" "}
               <Link
                 href="/register"
@@ -230,7 +243,7 @@ function LoginFormContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense>
+    <Suspense fallback={null}>
       <LoginFormContent />
     </Suspense>
   );

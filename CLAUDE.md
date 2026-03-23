@@ -108,7 +108,7 @@ npx tsc --noEmit                       # checar erros TypeScript (deve retornar 
 SUPER_ADMIN        → acesso total à plataforma
 INFLUENCER_ADMIN   → gerencia suas comunidades
 COMMUNITY_MEMBER   → assina a plataforma, acessa tudo
-MARKETPLACE_PARTNER → vende produtos no marketplace
+MARKETPLACE_PARTNER → vende produtos no marketplace (Phase 1: dormente — tratar como COMMUNITY_MEMBER na UI)
 ```
 
 ### Auth
@@ -147,6 +147,17 @@ const ok = await verifyMembership(session.userId, communityId);
 ```
 
 Todos em `src/middleware/auth.middleware.ts`.
+
+### Infraestrutura Role-Based (UI)
+- **Navegação centralizada**: `src/lib/navigation.ts` — `NAV_ITEMS`, `getNavItems(role)`, `getNavGroups(role)`, `GROUP_LABELS`
+  - Single source of truth para itens do sidebar. Para adicionar/remover itens de menu, editar apenas este arquivo.
+  - Grupos: `principal` (ALL), `conteudo` (membros), `gestao` (influencers), `admin` (super admin)
+- **Hook de role**: `src/hooks/useRole.ts` — `useRole()` retorna `{ role, isAdmin, isInfluencer, isMember, isPartner, can(permission) }`
+  - Permissions: `view:analytics`, `view:admin`, `view:all_communities`, `view:own_communities`, `manage:users`, `manage:own_community`, `create:live`, `create:content`, `view:member_content`
+- **Renderização condicional**: `src/components/ui/ShowFor.tsx`
+  - `<ShowFor roles={[UserRole.SUPER_ADMIN]}>` — mostra por role
+  - `<Can do="view:analytics">` — mostra por permission
+- **Sidebar**: `src/components/layout/DashboardSidebar.tsx` — sidebar colapsável com "Visualizar Como" (SUPER_ADMIN only)
 
 ---
 
@@ -210,12 +221,12 @@ src/
 │       └── admin/           # páginas admin (SUPER_ADMIN)
 ├── components/
 │   ├── feed/                # PostCard, PostComposer, PostDetail, CommentItem
-│   ├── layout/              # navbar.tsx, footer.tsx
+│   ├── layout/              # navbar.tsx, footer.tsx, DashboardSidebar.tsx
 │   ├── community/           # membership-section, plan-checkout-button, OnboardingChecklist
 │   ├── marketplace/         # buy-button, sell-button
 │   ├── notifications/       # NotificationBell
 │   ├── search/              # SearchBar
-│   └── ui/                  # badge, logo, toast-provider, confirm-modal, loading-spinner, etc.
+│   └── ui/                  # badge, logo, toast-provider, confirm-modal, loading-spinner, ShowFor.tsx, Can, etc.
 ├── emails/                  # React Email templates (Resend)
 │   ├── WelcomeEmail.tsx
 │   ├── PasswordResetEmail.tsx
@@ -224,7 +235,8 @@ src/
 │   └── LiveSessionReminderEmail.tsx
 ├── hooks/
 │   ├── useAuth.ts           # hook de autenticação
-│   └── useNotifications.ts
+│   ├── useNotifications.ts
+│   └── useRole.ts           # role + permissions do usuário logado
 ├── lib/
 │   ├── auth/                # jwt.ts, rbac.ts
 │   ├── api-client.ts        # fetch wrapper (30s timeout, auto-refresh)
@@ -236,6 +248,7 @@ src/
 │   ├── logger.ts
 │   ├── messages.ts          # mensagens PT-BR padronizadas
 │   ├── rate-limit.ts        # sliding window (10/min auth, 20/min AI, 30/min search)
+│   ├── navigation.ts        # NAV_ITEMS, getNavItems, getNavGroups, GROUP_LABELS
 │   └── stripe/stripe.ts
 ├── middleware/
 │   └── auth.middleware.ts   # withAuth, withRole, withPermission, verifyMembership, verifyPlatformMembership
@@ -316,6 +329,8 @@ return NextResponse.json({ success: false, error: "mensagem" }, { status: 400 })
 - `PATCH /api/admin/reports/[id]` — resolver denúncia
 
 ### Componentes UI criados
+- `ShowFor` / `Can` — renderização condicional por role/permission (`src/components/ui/ShowFor.tsx`)
+- `DashboardSidebar` — sidebar colapsável role-aware com "Visualizar Como" (`src/components/layout/DashboardSidebar.tsx`)
 - `ConfirmModal` — modal de confirmação genérico
 - `ToastProvider` / `useToast` — sistema de notificações in-app
 - `SkeletonTable` — skeleton para tabelas
@@ -357,3 +372,28 @@ return NextResponse.json({ success: false, error: "mensagem" }, { status: 400 })
 - Verificar `npx tsc --noEmit` após mudanças (deve retornar 0 erros)
 - Usar `db.$transaction` em operações com múltiplas escritas
 - Inputs em dark: `bg-white/5 border border-white/10 text-[#EEE6E4] placeholder-gray-500`
+- Usar `<ShowFor>`/`<Can>` para condicionar UI por role — não usar `if (role === ...)` inline
+- Usar `getNavItems()`/`getNavGroups()` de `src/lib/navigation.ts` para itens de menu — não hardcodar listas de nav
+- Seguir o feature-pipeline (`.claude/agents/pipelines/feature-pipeline.md`) antes de criar novas telas de dashboard
+
+---
+
+## Agentes e Pipelines
+
+### Agentes especializados (`.claude/agents/`)
+13 agentes + 5 pipelines em `.claude/agents/`. Áreas cobertas:
+- **engineering**: `backend-architect`, `frontend-developer`, `devops-infra`
+- **design**: `brand-guardian`, `ui-ux-designer`
+- **security**: `code-reviewer`, `payment-security`, `data-security`
+- **product**: `product-rules`, `sprint-prioritizer`
+- **growth**: `retention-analyst`, `influencer-strategist`
+- **community**: `community-manager`
+- **pipelines**: `orchestrator`, `feature-pipeline`, `bug-fix-pipeline`, `sprint-planning-pipeline`, `security-review-pipeline`
+
+### Protocolo obrigatório para novas telas de dashboard
+Antes de implementar qualquer nova tela de dashboard, seguir `.claude/agents/pipelines/feature-pipeline.md`:
+1. **Product Validation** — verificar se é Phase 1, não viola regras imutáveis de negócio
+2. **Backend Architecture** — definir models Prisma, rotas, services, middleware
+3. **Frontend Implementation** — componentes/páginas seguindo design system
+4. **Code Review** — TypeScript limpo, sem `any`, convenções seguidas, segurança OK
+5. **Final Checklist** — pass/fail antes de entregar

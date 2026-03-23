@@ -253,7 +253,7 @@ export default function LoginBackground({ className = '' }: LoginBackgroundProps
   return (
     <canvas
       ref={canvasRef}
-      // Problem 4: outline-none removes browser default focus ring on canvas
+      aria-hidden="true"
       className={`w-full h-full outline-none ${className}`}
       style={{ display: 'block' }}
     />

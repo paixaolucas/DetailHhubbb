@@ -107,60 +107,32 @@ export function middleware(request: NextRequest) {
 
     // Role-based route guards (decoded without signature verification — routing only)
     // Full cryptographic verification happens at the API layer
+    const PROTECTED_ROUTES: Array<{ pattern: RegExp; allowed: string[] }> = [
+      // SUPER_ADMIN only
+      { pattern: /^\/dashboard\/admin/, allowed: ['SUPER_ADMIN'] },
+      { pattern: /^\/dashboard\/usuarios/, allowed: ['SUPER_ADMIN'] },
+      { pattern: /^\/dashboard\/communities\/new/, allowed: ['SUPER_ADMIN'] },
+      { pattern: /^\/dashboard\/tools/, allowed: ['SUPER_ADMIN'] },
+      // INFLUENCER_ADMIN + SUPER_ADMIN
+      { pattern: /^\/dashboard\/analytics/, allowed: ['INFLUENCER_ADMIN', 'SUPER_ADMIN'] },
+      { pattern: /^\/dashboard\/live$/, allowed: ['INFLUENCER_ADMIN', 'SUPER_ADMIN'] },
+      { pattern: /^\/dashboard\/content/, allowed: ['INFLUENCER_ADMIN', 'SUPER_ADMIN'] },
+      { pattern: /^\/dashboard\/financeiro/, allowed: ['INFLUENCER_ADMIN', 'SUPER_ADMIN'] },
+      { pattern: /^\/dashboard\/performance/, allowed: ['INFLUENCER_ADMIN', 'SUPER_ADMIN'] },
+      { pattern: /^\/dashboard\/entregas/, allowed: ['INFLUENCER_ADMIN', 'SUPER_ADMIN'] },
+      { pattern: /^\/dashboard\/milestones/, allowed: ['INFLUENCER_ADMIN', 'SUPER_ADMIN'] },
+      { pattern: /^\/dashboard\/email-sequences/, allowed: ['INFLUENCER_ADMIN', 'SUPER_ADMIN'] },
+      { pattern: /^\/dashboard\/anuncios/, allowed: ['INFLUENCER_ADMIN', 'SUPER_ADMIN'] },
+      { pattern: /^\/dashboard\/projeto/, allowed: ['INFLUENCER_ADMIN', 'SUPER_ADMIN'] },
+      // INFLUENCER_ADMIN + MARKETPLACE_PARTNER + SUPER_ADMIN
+      { pattern: /^\/dashboard\/meus-produtos/, allowed: ['INFLUENCER_ADMIN', 'MARKETPLACE_PARTNER', 'SUPER_ADMIN'] },
+      { pattern: /^\/dashboard\/vendas/, allowed: ['INFLUENCER_ADMIN', 'MARKETPLACE_PARTNER', 'SUPER_ADMIN'] },
+    ];
+
     const role = extractRole(request);
-
-    // Routes for SUPER_ADMIN only
-    const ADMIN_ONLY = [
-      "/dashboard/admin",
-      "/dashboard/usuarios",
-      "/dashboard/communities/new",
-    ];
-    if (ADMIN_ONLY.some((p) => pathname.startsWith(p)) && role !== "SUPER_ADMIN") {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
-    }
-
-    // Routes for INFLUENCER_ADMIN + SUPER_ADMIN only
-    const INFLUENCER_ONLY = [
-      "/dashboard/tools",
-      "/dashboard/financeiro",
-      "/dashboard/performance",
-      "/dashboard/entregas",
-      "/dashboard/milestones",
-      "/dashboard/content",
-      "/dashboard/communities",
-      "/dashboard/live",
-      "/dashboard/email-sequences",
-      "/dashboard/anuncios",
-      "/dashboard/projeto",
-    ];
-    if (
-      INFLUENCER_ONLY.some((p) => pathname.startsWith(p)) &&
-      role !== "SUPER_ADMIN" &&
-      role !== "INFLUENCER_ADMIN"
-    ) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
-    }
-
-    // Routes for INFLUENCER_ADMIN + MARKETPLACE_PARTNER + SUPER_ADMIN
-    const ANALYTICS_ROUTES = ["/dashboard/analytics"];
-    if (
-      ANALYTICS_ROUTES.some((p) => pathname.startsWith(p)) &&
-      role !== "SUPER_ADMIN" &&
-      role !== "INFLUENCER_ADMIN" &&
-      role !== "MARKETPLACE_PARTNER"
-    ) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
-    }
-
-    // Routes for sellers (MARKETPLACE_PARTNER + INFLUENCER_ADMIN + SUPER_ADMIN)
-    const SELLER_ROUTES = ["/dashboard/meus-produtos", "/dashboard/vendas"];
-    if (
-      SELLER_ROUTES.some((p) => pathname.startsWith(p)) &&
-      role !== "SUPER_ADMIN" &&
-      role !== "INFLUENCER_ADMIN" &&
-      role !== "MARKETPLACE_PARTNER"
-    ) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+    const restricted = PROTECTED_ROUTES.find((r) => r.pattern.test(pathname));
+    if (restricted && !restricted.allowed.includes(role)) {
+      return NextResponse.redirect(new URL('/dashboard', request.url));
     }
   }
 

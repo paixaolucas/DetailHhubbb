@@ -5,7 +5,7 @@
 
 import { db } from "@/lib/db";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
-import { sendWelcomeEmail, sendEmailVerificationEmail } from "@/lib/email/send";
+import { sendEmailVerificationEmail } from "@/lib/email/send";
 import {
   createAccessToken,
   createRefreshToken,
@@ -17,6 +17,21 @@ import type { RegisterInput, LoginInput } from "@/lib/validations/auth";
 import type { AuthTokens, AuthSession } from "@/types";
 import { UserRole } from "@prisma/client";
 import crypto from "crypto";
+
+// ─── Streak helper ────────────────────────────────────────────────────────────
+
+function computeStreak(lastLoginAt: Date | null, currentStreak: number): number {
+  if (!lastLoginAt) return 1;
+  const now = new Date();
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const lastDay = lastLoginAt.toDateString();
+  const todayStr = now.toDateString();
+  const yestStr = yesterday.toDateString();
+  if (lastDay === todayStr) return currentStreak; // already logged in today
+  if (lastDay === yestStr) return currentStreak + 1; // consecutive day
+  return 1; // gap — reset streak
+}
 
 /** Returns true if userId has an active PlatformMembership */
 async function hasActivePlatform(userId: string): Promise<boolean> {
@@ -34,9 +49,8 @@ async function hasActivePlatform(userId: string): Promise<boolean> {
 // =============================================================================
 
 export async function registerUser(
-  input: RegisterInput,
-  ipAddress?: string
-): Promise<{ user: AuthSession; tokens: AuthTokens }> {
+  input: RegisterInput
+): Promise<{ user: AuthSession }> {
   const existing = await db.user.findUnique({
     where: { email: input.email },
     select: { id: true },
@@ -81,25 +95,6 @@ export async function registerUser(
     },
   });
 
-  const [accessToken, refreshToken] = await Promise.all([
-    createAccessToken({ userId: user.id, email: user.email, role: user.role, firstName: user.firstName, lastName: user.lastName }),
-    createRefreshToken(user.id),
-  ]);
-
-  // Store refresh token
-  const expiresAt = new Date(
-    Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days
-  );
-
-  await db.refreshToken.create({
-    data: {
-      token: refreshToken,
-      userId: user.id,
-      expiresAt,
-      ipAddress,
-    },
-  });
-
   const session: AuthSession = {
     userId: user.id,
     email: user.email,
@@ -114,14 +109,7 @@ export async function registerUser(
     (err) => console.error("[Auth] verification email failed:", err)
   );
 
-  return {
-    user: session,
-    tokens: {
-      accessToken,
-      refreshToken,
-      expiresIn: getAccessTokenExpiry(),
-    },
-  };
+  return { user: session };
 }
 
 // =============================================================================
@@ -139,8 +127,7 @@ interface GoogleAuthInput {
 
 export async function loginOrRegisterWithGoogle(
   input: GoogleAuthInput,
-  ipAddress?: string,
-  referralCode?: string
+  ipAddress?: string
 ): Promise<{ user: AuthSession; tokens: AuthTokens }> {
   // Check if user already exists by googleId or email
   const existingUser = await db.user.findFirst({
@@ -158,6 +145,8 @@ export async function loginOrRegisterWithGoogle(
       isActive: true,
       isBanned: true,
       bannedReason: true,
+      lastLoginAt: true,
+      loginStreak: true,
     },
   });
 
@@ -172,7 +161,11 @@ export async function loginOrRegisterWithGoogle(
     }
 
     if (!existingUser.isActive) {
-      throw new AppError("Account deactivated", 403, "ACCOUNT_INACTIVE");
+      throw new AppError(
+        "Conta inativa. Para acessar a plataforma, é necessário ter uma assinatura ativa.",
+        403,
+        "ACCOUNT_INACTIVE"
+      );
     }
 
     // Link Google ID if not yet linked (user registered with email/password before)
@@ -216,7 +209,11 @@ export async function loginOrRegisterWithGoogle(
       }),
       db.user.update({
         where: { id: existingUser.id },
-        data: { lastLoginAt: new Date(), lastLoginIp: ipAddress },
+        data: {
+          lastLoginAt: new Date(),
+          lastLoginIp: ipAddress,
+          loginStreak: computeStreak(existingUser.lastLoginAt, existingUser.loginStreak),
+        },
       }),
     ]);
 
@@ -237,76 +234,12 @@ export async function loginOrRegisterWithGoogle(
     };
   }
 
-  // New user — register
-  const newReferralCode = crypto.randomBytes(6).toString("hex").toUpperCase();
-
-  let referredById: string | undefined;
-  if (referralCode) {
-    const referrer = await db.user.findUnique({
-      where: { referralCode },
-      select: { id: true },
-    });
-    if (referrer) referredById = referrer.id;
-  }
-
-  const user = await db.user.create({
-    data: {
-      email: input.email,
-      googleId: input.googleId,
-      firstName: input.firstName,
-      lastName: input.lastName,
-      avatarUrl: input.avatarUrl,
-      emailVerified: input.emailVerified ? new Date() : null,
-      role: UserRole.COMMUNITY_MEMBER,
-      referralCode: newReferralCode,
-      ...(referredById ? { referredById } : {}),
-    },
-    select: {
-      id: true,
-      email: true,
-      role: true,
-      firstName: true,
-      lastName: true,
-      avatarUrl: true,
-    },
-  });
-
-  const [accessToken, refreshToken] = await Promise.all([
-    createAccessToken({ userId: user.id, email: user.email, role: user.role, firstName: user.firstName, lastName: user.lastName }),
-    createRefreshToken(user.id),
-  ]);
-
-  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-
-  await db.refreshToken.create({
-    data: {
-      token: refreshToken,
-      userId: user.id,
-      expiresAt,
-      ipAddress,
-    },
-  });
-
-  // Send welcome email (non-blocking)
-  sendWelcomeEmail({ email: user.email, firstName: user.firstName }).catch(
-    (err) => console.error("[Auth] welcome email failed:", err)
+  // New user — Google login is only for existing subscribers
+  throw new AppError(
+    "Conta não encontrada. Para acessar a plataforma, é necessário ter uma assinatura ativa.",
+    403,
+    "GOOGLE_NEW_USER"
   );
-
-  return {
-    user: {
-      userId: user.id,
-      email: user.email,
-      role: user.role,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      avatarUrl: user.avatarUrl,
-    },
-    tokens: {
-      accessToken,
-      refreshToken,
-      expiresIn: getAccessTokenExpiry(),
-    },
-  };
 }
 
 // =============================================================================
@@ -333,6 +266,8 @@ export async function loginUser(
       isActive: true,
       isBanned: true,
       bannedReason: true,
+      lastLoginAt: true,
+      loginStreak: true,
     },
   });
 
@@ -351,7 +286,11 @@ export async function loginUser(
   }
 
   if (!user.isActive) {
-    throw new AppError("Account deactivated", 403, "ACCOUNT_INACTIVE");
+    throw new AppError(
+      "Conta inativa. Para acessar a plataforma, é necessário ter uma assinatura ativa.",
+      403,
+      "ACCOUNT_INACTIVE"
+    );
   }
 
   // Block login if email not verified (Google accounts are auto-verified)
@@ -412,6 +351,7 @@ export async function loginUser(
       data: {
         lastLoginAt: new Date(),
         lastLoginIp: ipAddress,
+        loginStreak: computeStreak(user.lastLoginAt, user.loginStreak),
       },
     }),
   ]);
