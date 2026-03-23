@@ -26,6 +26,7 @@ model User {
   bannedReason           String?
   lastLoginAt            DateTime?
   lastLoginIp            String?
+  loginStreak            Int                     @default(0)
   twoFactorEnabled       Boolean                 @default(false)
   twoFactorSecret        String?
   stripeCustomerId       String?                 @unique
@@ -873,6 +874,7 @@ model LiveSession {
   actualAttendees Int                   @default(0)
   isRecorded      Boolean               @default(true)
   isPublic        Boolean               @default(false)
+  isFeatured      Boolean               @default(false)
   metadata        Json                  @default("{}")
   createdAt       DateTime              @default(now())
   updatedAt       DateTime              @updatedAt

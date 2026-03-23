@@ -131,7 +131,7 @@ export async function GET(request: Request) {
     const forwarded = request.headers.get("x-forwarded-for");
     const ipAddress = forwarded?.split(",")[0]?.trim() || "unknown";
 
-    // Login or register user
+    // Login — Google is only for existing active users
     const result = await loginOrRegisterWithGoogle(
       {
         googleId: googleUser.sub,
@@ -141,8 +141,7 @@ export async function GET(request: Request) {
         avatarUrl: googleUser.picture,
         emailVerified: googleUser.email_verified,
       },
-      ipAddress,
-      refCode
+      ipAddress
     );
 
     // Build redirect URL with tokens in hash (not query params for security)
@@ -196,6 +195,22 @@ export async function GET(request: Request) {
     return response;
   } catch (error) {
     console.error("[Google OAuth] Error:", error);
+
+    // Redirect to subscription page for users not found or inactive
+    if (error instanceof Error && "code" in error) {
+      const appError = error as { code: string; message: string };
+      if (appError.code === "GOOGLE_NEW_USER" || appError.code === "ACCOUNT_INACTIVE") {
+        return NextResponse.redirect(
+          `${APP_URL}/dashboard/assinar?motivo=${encodeURIComponent(appError.code)}`
+        );
+      }
+      if (appError.code === "ACCOUNT_BANNED") {
+        return NextResponse.redirect(
+          `${APP_URL}/login?error=${encodeURIComponent(appError.message)}`
+        );
+      }
+    }
+
     const message =
       error instanceof Error ? error.message : "Erro ao autenticar com Google";
     return NextResponse.redirect(

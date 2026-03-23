@@ -8,6 +8,7 @@ import { WelcomeEmail } from "@/emails/WelcomeEmail";
 import { PasswordResetEmail } from "@/emails/PasswordResetEmail";
 import { EmailVerificationEmail } from "@/emails/EmailVerificationEmail";
 import { PaymentConfirmationEmail } from "@/emails/PaymentConfirmationEmail";
+import { PlatformWelcomeEmail } from "@/emails/PlatformWelcomeEmail";
 import { LiveSessionReminderEmail } from "@/emails/LiveSessionReminderEmail";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
@@ -75,6 +76,23 @@ export async function sendPaymentConfirmationEmail(
     user.email,
     "Pagamento confirmado — Detailer'HUB",
     PaymentConfirmationEmail({
+      firstName: user.firstName,
+      dashboardUrl: `${APP_URL}/dashboard`,
+      ...details,
+    })
+  );
+}
+
+// ─── Platform Membership Welcome ─────────────────────────────────────────────
+
+export async function sendPlatformMembershipEmail(
+  user: { email: string; firstName: string },
+  details: { planName: string; amount: string }
+) {
+  await send(
+    user.email,
+    "Bem-vindo ao Detailer'HUB — assinatura confirmada!",
+    PlatformWelcomeEmail({
       firstName: user.firstName,
       dashboardUrl: `${APP_URL}/dashboard`,
       ...details,

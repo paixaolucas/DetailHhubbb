@@ -170,6 +170,14 @@ export function requirePermission(
   }
 }
 
+// Single source of truth for role hierarchy — imported by auth.middleware.ts
+export const ROLE_HIERARCHY: Record<UserRole, number> = {
+  [UserRole.SUPER_ADMIN]: 100,
+  [UserRole.INFLUENCER_ADMIN]: 50,
+  [UserRole.MARKETPLACE_PARTNER]: 30,
+  [UserRole.COMMUNITY_MEMBER]: 10,
+};
+
 export function requireRole(
   userRole: UserRole | undefined,
   requiredRole: UserRole
@@ -178,14 +186,7 @@ export function requireRole(
     throw new UnauthorizedError("Authentication required");
   }
 
-  const roleHierarchy: Record<UserRole, number> = {
-    [UserRole.SUPER_ADMIN]: 100,
-    [UserRole.INFLUENCER_ADMIN]: 50,
-    [UserRole.MARKETPLACE_PARTNER]: 30,
-    [UserRole.COMMUNITY_MEMBER]: 10,
-  };
-
-  if (roleHierarchy[userRole] < roleHierarchy[requiredRole]) {
+  if (ROLE_HIERARCHY[userRole] < ROLE_HIERARCHY[requiredRole]) {
     throw new ForbiddenError("Insufficient role");
   }
 }

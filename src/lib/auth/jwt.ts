@@ -111,6 +111,44 @@ export function extractTokenFromHeader(
   return parts[1];
 }
 
+// =============================================================================
+// SSE TICKET — short-lived (30s), scoped to communityId
+// Avoids exposing the main access token in the URL (EventSource does not
+// support custom headers, so the caller exchanges a Bearer token for a ticket).
+// =============================================================================
+
+export async function createSseTicket(payload: {
+  userId: string;
+  communityId: string;
+}): Promise<string> {
+  return await new SignJWT({ communityId: payload.communityId, type: "sse" })
+    .setProtectedHeader({ alg: "HS256" })
+    .setSubject(payload.userId)
+    .setIssuedAt()
+    .setExpirationTime("30s")
+    .sign(JWT_SECRET);
+}
+
+export async function verifySseTicket(
+  ticket: string
+): Promise<{ userId: string; communityId: string }> {
+  try {
+    const { payload } = await jwtVerify(ticket, JWT_SECRET, {
+      algorithms: ["HS256"],
+    });
+    if (payload.type !== "sse") {
+      throw new AppError("Invalid ticket type", 401, "INVALID_TOKEN");
+    }
+    return {
+      userId: payload.sub as string,
+      communityId: payload.communityId as string,
+    };
+  } catch (error) {
+    if (error instanceof AppError) throw error;
+    throw new AppError("Invalid or expired ticket", 401, "INVALID_TOKEN");
+  }
+}
+
 export function getAccessTokenExpiry(): number {
   const match = ACCESS_TOKEN_EXPIRY.match(/^(\d+)([smhd])$/);
   if (!match) return 15 * 60;

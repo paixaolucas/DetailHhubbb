@@ -20,45 +20,16 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const input = registerSchema.parse(body);
 
-    const ipAddress =
-      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-      req.headers.get("x-real-ip") ??
-      "unknown";
+    const result = await registerUser(input);
 
-    const result = await registerUser(input, ipAddress);
-
-    const response = NextResponse.json(
+    // No tokens issued at registration — user must verify email first
+    return NextResponse.json(
       {
         success: true,
-        data: {
-          user: result.user,
-          tokens: {
-            accessToken: result.tokens.accessToken,
-            expiresIn: result.tokens.expiresIn,
-          },
-        },
+        data: { user: result.user },
       },
       { status: 201 }
     );
-
-    // Set secure HTTP-only cookie for access token
-    response.cookies.set("detailhub_access_token", result.tokens.accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: result.tokens.expiresIn,
-      path: "/",
-    });
-
-    response.cookies.set("detailhub_refresh_token", result.tokens.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60, // 7 days
-      path: "/",
-    });
-
-    return response;
   } catch (error) {
     if (error instanceof ZodError) {
       return NextResponse.json(

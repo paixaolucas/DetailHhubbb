@@ -233,7 +233,7 @@ export default function MessagesPage() {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
-        if (data.success) setUserResults(data.data ?? []);
+        if (data.success) setUserResults(data.data?.members ?? []);
       } finally {
         setUserSearching(false);
       }

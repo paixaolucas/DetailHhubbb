@@ -122,8 +122,6 @@ describe("registerUser", () => {
       lastName: "Silva",
     });
 
-    expect(result.tokens.accessToken).toBe("mock_access_token");
-    expect(result.tokens.refreshToken).toBe("mock_refresh_token");
     expect(result.user.email).toBe("joao@example.com");
   });
 
