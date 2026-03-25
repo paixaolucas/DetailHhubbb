@@ -73,7 +73,7 @@ export function NavBar() {
             /* ── Logged in ── */
             <>
               <Link
-                href="/dashboard"
+                href="/inicio"
                 className="hidden sm:flex items-center gap-1.5 text-sm text-gray-400 hover:text-[#EEE6E4] transition-colors"
               >
                 <LayoutDashboard className="w-4 h-4" />
@@ -105,7 +105,7 @@ export function NavBar() {
                       </div>
                       <div className="py-1">
                         <Link
-                          href="/dashboard"
+                          href="/inicio"
                           onClick={() => setProfileOpen(false)}
                           className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 transition-colors"
                         >
@@ -201,7 +201,7 @@ export function NavBar() {
                   </div>
                 </div>
                 <Link
-                  href="/dashboard"
+                  href="/inicio"
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center gap-2 text-gray-300 hover:text-[#EEE6E4] py-2.5 text-sm mb-1"
                 >

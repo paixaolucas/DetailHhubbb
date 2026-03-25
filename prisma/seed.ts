@@ -66,6 +66,9 @@ async function main() {
   await db.marketplaceListing.deleteMany();
   await db.saasTool.deleteMany();
   await db.notification.deleteMany();
+  await db.directMessage.deleteMany();
+  await db.conversationParticipant.deleteMany();
+  await db.conversation.deleteMany();
   await db.user.deleteMany();
 
   const saltRounds = 12;

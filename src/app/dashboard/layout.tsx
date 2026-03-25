@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { ArrowLeft, Eye, Menu, X } from "lucide-react";
 import { RoleBadge } from "@/components/ui/badge";
 import { LogoType } from "@/components/ui/logo";
@@ -27,6 +27,7 @@ interface ViewAsUser {
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [role, setRole] = useState("INFLUENCER_ADMIN");
@@ -253,19 +254,34 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         {/* Mobile header */}
-        <div className="md:hidden h-14 bg-[#1A1A1A] border-b border-white/10 flex items-center px-4 gap-3 flex-shrink-0">
-          <button
-            onClick={() => setMobileOpen(true)}
-            className="text-gray-500 hover:text-[#EEE6E4] transition-colors"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
-          <Link href="/dashboard" className="flex items-center flex-1">
-            <LogoType height={22} variant="light" />
-          </Link>
-          <NotificationBell />
-          <RoleBadge role={role} />
-        </div>
+        {(() => {
+          const isHome = pathname === "/inicio" || pathname === "/dashboard";
+          return (
+            <div className="md:hidden h-14 bg-[#1A1A1A] border-b border-white/10 flex items-center px-4 gap-3 flex-shrink-0">
+              {isHome ? (
+                <button
+                  onClick={() => setMobileOpen(true)}
+                  className="text-gray-500 hover:text-[#EEE6E4] transition-colors"
+                >
+                  <Menu className="w-5 h-5" />
+                </button>
+              ) : (
+                <button
+                  onClick={() => router.back()}
+                  className="text-gray-400 hover:text-[#EEE6E4] transition-colors p-1 -ml-1 rounded-lg hover:bg-white/5"
+                  aria-label="Voltar"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
+              )}
+              <Link href="/inicio" className="flex items-center flex-1">
+                <LogoType height={22} variant="light" />
+              </Link>
+              <NotificationBell />
+              <RoleBadge role={role} />
+            </div>
+          );
+        })()}
 
         {/* ViewAs Banner */}
         {viewAs && (
@@ -292,7 +308,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* Page content */}
         <div className="flex-1">
-          <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+          <div className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           <ViewAsContext.Provider value={{
             viewAs,
             viewAsUser,

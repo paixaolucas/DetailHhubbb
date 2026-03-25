@@ -7,11 +7,13 @@ import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import { apiClient } from "@/lib/api-client";
 import { HeroBanner } from "./HeroBanner";
 import { HealthScore } from "./HealthScore";
+import { getGreeting } from "@/lib/greeting";
 import { TrackInProgress } from "./TrackInProgress";
 import { CommunitiesRow } from "./CommunitiesRow";
 import { RankingBlock } from "./RankingBlock";
 import { NextLiveCard } from "./NextLiveCard";
 import { TrendingFeed } from "./TrendingFeed";
+import { MemberHealthWidget } from "./MemberHealthWidget";
 
 export function MemberDashboard({
   userName,
@@ -36,10 +38,10 @@ export function MemberDashboard({
     const payment = searchParams.get("payment");
     if (payment === "success") {
       toast.success("Assinatura confirmada! Bem-vindo à plataforma.");
-      router.replace("/dashboard");
+      router.replace("/inicio");
     } else if (payment === "canceled") {
       toast.error("Pagamento cancelado. Tente novamente se quiser.");
-      router.replace("/dashboard");
+      router.replace("/inicio");
     }
   }, [searchParams, toast, router]);
 
@@ -53,38 +55,48 @@ export function MemberDashboard({
   useEffect(() => { fetchMembership(); }, [fetchMembership]);
   useAutoRefresh(fetchMembership, 60_000);
 
+  const [greeting, setGreeting] = useState("");
+
+  // Calcula no cliente com o timezone real do browser — evita SSR com UTC do servidor
+  useEffect(() => {
+    setGreeting(getGreeting(firstName));
+  }, [firstName]);
+
   return (
     <div className="space-y-4">
-      {/* Block 1: Hero banner com saudação integrada */}
-      <HeroBanner firstName={firstName} />
+      {/* Block 1: Hero banner */}
+      <HeroBanner />
 
-      {/* Block 2: Score — barra horizontal compacta */}
-      <div className="animate-fade-in">
+      {/* Block 2: Saudação + Score */}
+      <div className="animate-fade-in space-y-3">
+        <div className="flex items-baseline gap-2 px-1">
+          <h2 className="text-2xl sm:text-3xl font-black text-[#EEE6E4] leading-tight">
+            {greeting}
+          </h2>
+          <span className="text-gray-500 text-sm hidden sm:inline">que bom que voltou.</span>
+        </div>
         <HealthScore />
       </div>
 
-      {/* Block 3: Comunidades (2/3) + Ranking (1/3) — lado a lado em telas médias+ */}
-      <div className="animate-slide-up delay-75 grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2">
-          <CommunitiesRow hasPlatform={hasPlatform} />
-        </div>
-        <div className="lg:col-span-1">
-          <RankingBlock userId={userId} />
-        </div>
+      {/* Block 3: Comunidades — largura total */}
+      <div className="animate-slide-up delay-75">
+        <CommunitiesRow hasPlatform={hasPlatform} />
       </div>
 
-      {/* Block 4: Trilha em andamento (só aparece se tiver progresso ativo) */}
+      {/* Block 4: Trilha em andamento */}
       <div className="animate-slide-up delay-150">
         <TrackInProgress />
       </div>
 
-      {/* Block 5: Feed em alta + Próxima live */}
-      <div className="animate-slide-up delay-225 grid grid-cols-1 xl:grid-cols-3 gap-4">
-        <div className="xl:col-span-2">
+      {/* Block 5: Em alta (2/3) + Ranking (1/3) */}
+      <div className="animate-slide-up delay-225 grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2 space-y-4">
           <TrendingFeed />
-        </div>
-        <div className="xl:col-span-1">
           <NextLiveCard />
+        </div>
+        <div className="lg:col-span-1 space-y-4">
+          <MemberHealthWidget />
+          <RankingBlock userId={userId} />
         </div>
       </div>
     </div>

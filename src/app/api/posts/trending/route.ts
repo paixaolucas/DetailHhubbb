@@ -1,7 +1,8 @@
 // =============================================================================
-// GET /api/posts/trending — returns trending posts by engagement in last N hours
+// GET /api/posts/trending — posts em alta nas comunidades por engajamento real
 // Protected — members only
-// Query params: limit (default 5, max 10), hours (default 48)
+// Query params: limit (default 5, max 10), hours (default 168 = 7 days)
+// Ordered by: likeCount*2 + commentCount*3 + viewCount (weighted engagement score)
 // =============================================================================
 
 import { NextRequest, NextResponse } from "next/server";
@@ -11,7 +12,7 @@ import { db } from "@/lib/db";
 export const GET = withAuth(async (req: NextRequest) => {
   const { searchParams } = new URL(req.url);
   const limit = Math.min(10, Math.max(1, parseInt(searchParams.get("limit") ?? "5")));
-  const hours = Math.max(1, parseInt(searchParams.get("hours") ?? "48"));
+  const hours = Math.max(1, parseInt(searchParams.get("hours") ?? "168"));
 
   const since = new Date(Date.now() - hours * 60 * 60 * 1000);
 

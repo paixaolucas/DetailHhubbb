@@ -6,6 +6,9 @@
 import { NextResponse } from "next/server";
 import { withAuth } from "@/middleware/auth.middleware";
 
+// Aumenta o timeout para 5 minutos no Vercel (necessário para vídeos grandes)
+export const maxDuration = 300;
+
 const SUPABASE_URL = process.env.SUPABASE_URL!;
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 

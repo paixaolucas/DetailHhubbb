@@ -86,7 +86,6 @@ export function Footer() {
                 {[
                   { label: "Monetização", href: "/register" },
                   { label: "Analytics", href: "/dashboard/analytics" },
-                  { label: "Ferramentas", href: "/dashboard/tools" },
                 ].map(({ label, href }) => (
                   <li key={label}>
                     <Link

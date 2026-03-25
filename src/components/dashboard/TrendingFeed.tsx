@@ -26,47 +26,6 @@ interface TrendingPost {
   spaceSlug: string | null;
 }
 
-const MOCK_POSTS: TrendingPost[] = [
-  {
-    id: "mock-1",
-    title: "Como preparar seu carro para o verão",
-    body: "Dicas essenciais de detailing para os meses mais quentes do ano.",
-    type: "TEXT",
-    likeCount: 42,
-    commentCount: 8,
-    viewCount: 310,
-    createdAt: new Date().toISOString(),
-    author: { id: "u1", name: "João Silva", avatarUrl: null },
-    community: { id: "c1", name: "Detailing Pro", slug: "detailing-pro", primaryColor: "#009CD9", logoUrl: null },
-    spaceSlug: "feed",
-  },
-  {
-    id: "mock-2",
-    title: "Vitrificação vs Cristalização: qual escolher?",
-    body: "Um comparativo completo dos dois processos mais populares.",
-    type: "TEXT",
-    likeCount: 31,
-    commentCount: 14,
-    viewCount: 220,
-    createdAt: new Date().toISOString(),
-    author: { id: "u2", name: "Carlos Mendes", avatarUrl: null },
-    community: { id: "c2", name: "AutoCare BR", slug: "autocare-br", primaryColor: "#006079", logoUrl: null },
-    spaceSlug: "feed",
-  },
-  {
-    id: "mock-3",
-    title: "Produtos que valem cada centavo",
-    body: "Review honesto dos melhores produtos de polimento do mercado.",
-    type: "TEXT",
-    likeCount: 27,
-    commentCount: 6,
-    viewCount: 180,
-    createdAt: new Date().toISOString(),
-    author: { id: "u3", name: "Marcos Lima", avatarUrl: null },
-    community: { id: "c3", name: "Polimento Total", slug: "polimento-total", primaryColor: "#007A99", logoUrl: null },
-    spaceSlug: "feed",
-  },
-];
 
 function PostSkeleton() {
   return (
@@ -82,13 +41,11 @@ function PostSkeleton() {
 }
 
 function PostCard({ post }: { post: TrendingPost }) {
-  const postHref = post.spaceSlug
-    ? `/community/${post.community.slug}/${post.spaceSlug}/${post.id}`
-    : `/community/${post.community.slug}/feed`;
+  const postHref = `/community/${post.community.slug}/posts/${post.id}`;
   const displayTitle = post.title ?? post.body.slice(0, 80);
 
   return (
-    <div className="p-4 border-b border-white/[0.06] last:border-0 space-y-2 hover:bg-white/[0.02] transition-colors">
+    <div className="px-5 py-4 border-b border-white/[0.06] last:border-0 space-y-2.5 hover:bg-white/[0.02] transition-colors">
       {/* Community + Author */}
       <div className="flex items-center gap-2 flex-wrap">
         <div className="flex items-center gap-1.5">
@@ -96,20 +53,20 @@ function PostCard({ post }: { post: TrendingPost }) {
             <Image
               src={post.community.logoUrl}
               alt={post.community.name}
-              width={14}
-              height={14}
-              className="w-3.5 h-3.5 rounded object-cover"
+              width={16}
+              height={16}
+              className="w-4 h-4 rounded object-cover"
             />
           ) : (
             <div
-              className="w-3.5 h-3.5 rounded flex items-center justify-center text-white text-[7px] font-bold"
+              className="w-4 h-4 rounded flex items-center justify-center text-white text-[9px] font-bold"
               style={{ backgroundColor: post.community.primaryColor }}
             >
               {post.community.name[0]}
             </div>
           )}
           <span
-            className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full"
+            className="text-xs font-semibold px-2 py-0.5 rounded-full"
             style={{
               backgroundColor: `${post.community.primaryColor}20`,
               color: post.community.primaryColor,
@@ -118,28 +75,37 @@ function PostCard({ post }: { post: TrendingPost }) {
             {post.community.name}
           </span>
         </div>
-        <span className="text-gray-700 text-[10px]">·</span>
-        <span className="text-[10px] text-gray-500">{post.author.name}</span>
+        <span className="text-gray-700 text-xs">·</span>
+        <div className="flex items-center gap-1.5">
+          {post.author.avatarUrl ? (
+            <Image src={post.author.avatarUrl} alt={post.author.name} width={16} height={16} className="w-4 h-4 rounded-full object-cover" />
+          ) : (
+            <div className="w-4 h-4 rounded-full bg-[#006079]/60 flex items-center justify-center text-white text-[8px] font-bold flex-shrink-0">
+              {post.author.name[0]}
+            </div>
+          )}
+          <span className="text-xs text-gray-500">{post.author.name}</span>
+        </div>
       </div>
 
       {/* Title */}
-      <p className="text-sm font-semibold text-[#EEE6E4] leading-tight line-clamp-2">
+      <p className="text-base font-semibold text-[#EEE6E4] leading-snug line-clamp-2">
         {displayTitle}
       </p>
 
       {/* Engagement + Link */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3 text-gray-600">
-          <span className="flex items-center gap-1 text-[11px]">
-            <Heart className="w-3 h-3" /> {post.likeCount}
+        <div className="flex items-center gap-3 text-gray-500">
+          <span className="flex items-center gap-1 text-sm">
+            <Heart className="w-3.5 h-3.5" /> {post.likeCount}
           </span>
-          <span className="flex items-center gap-1 text-[11px]">
-            <MessageCircle className="w-3 h-3" /> {post.commentCount}
+          <span className="flex items-center gap-1 text-sm">
+            <MessageCircle className="w-3.5 h-3.5" /> {post.commentCount}
           </span>
         </div>
         <Link
           href={postHref}
-          className="text-[11px] text-[#009CD9] font-medium hover:underline"
+          className="text-sm text-[#009CD9] font-medium hover:underline"
         >
           Ver na comunidade →
         </Link>
@@ -153,45 +119,42 @@ export function TrendingFeed() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiClient<TrendingPost[]>("/api/posts/trending?limit=5&hours=48")
-      .then((d) => {
+    // Tenta últimos 7 dias; se vazio, tenta 30 dias
+    apiClient<TrendingPost[]>("/api/posts/trending?limit=5&hours=168")
+      .then(async (d) => {
         if (d.success) {
           const fetched = d.data ?? [];
-          if (fetched.length === 0 && process.env.NODE_ENV === "development") {
-            setPosts(MOCK_POSTS);
-          } else {
-            setPosts(fetched);
-          }
+          if (fetched.length > 0) { setPosts(fetched); return; }
+          const d2 = await apiClient<TrendingPost[]>("/api/posts/trending?limit=5&hours=720");
+          if (d2.success) setPosts(d2.data ?? []);
         }
       })
-      .catch(() => {
-        if (process.env.NODE_ENV === "development") setPosts(MOCK_POSTS);
-      })
+      .catch(() => {}) // sem mock — mostra empty state
       .finally(() => setLoading(false));
   }, []);
 
-  if (!loading && posts.length === 0) return null;
-
   return (
     <div className="bg-[#111] border border-white/[0.06] rounded-xl overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
-        <h2 className="text-sm font-bold text-[#EEE6E4] flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-[#009CD9]" />
-          Em alta agora
-        </h2>
-        <Link
-          href="/dashboard"
-          className="text-xs text-[#009CD9] font-medium hover:underline"
-        >
-          Ver mais →
-        </Link>
+      <div className="flex items-center gap-2 px-5 py-4 border-b border-white/[0.06]">
+        <TrendingUp className="w-5 h-5 text-[#009CD9]" />
+        <h2 className="text-xl font-bold text-[#EEE6E4]">Em alta nas comunidades</h2>
       </div>
 
-      <div className="divide-y divide-white/[0.06]">
-        {loading
-          ? [1, 2, 3].map((i) => <PostSkeleton key={i} />)
-          : posts.map((post) => <PostCard key={post.id} post={post} />)}
-      </div>
+      {loading ? (
+        <div className="divide-y divide-white/[0.06]">
+          {[1, 2, 3].map((i) => <PostSkeleton key={i} />)}
+        </div>
+      ) : posts.length === 0 ? (
+        <div className="px-5 py-10 text-center">
+          <TrendingUp className="w-8 h-8 text-gray-700 mx-auto mb-3" />
+          <p className="text-sm font-medium text-gray-400">Ainda sem posts em alta</p>
+          <p className="text-xs text-gray-600 mt-1">Explore as comunidades e seja o primeiro a engajar!</p>
+        </div>
+      ) : (
+        <div className="divide-y divide-white/[0.06]">
+          {posts.map((post) => <PostCard key={post.id} post={post} />)}
+        </div>
+      )}
     </div>
   );
 }

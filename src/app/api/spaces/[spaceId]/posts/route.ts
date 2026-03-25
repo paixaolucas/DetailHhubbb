@@ -179,17 +179,6 @@ export const POST = withAuth(async (req, { session, params }) => {
       return NextResponse.json({ success: false, error: "Membership required" }, { status: 403 });
     }
 
-    // Score gate: user needs ≥70 pts to create posts
-    const userPoints = await db.userPoints.findUnique({
-      where: { userId_communityId: { userId: session.userId, communityId: space.communityId } },
-      select: { points: true },
-    });
-    if ((userPoints?.points ?? 0) < 70) {
-      return NextResponse.json(
-        { success: false, error: "Score insuficiente para criar posts. Engaje com a comunidade para desbloquear." },
-        { status: 403 }
-      );
-    }
 
     const rawBody = await req.json();
     const parsed = createPostSchema.safeParse(rawBody);

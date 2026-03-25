@@ -134,10 +134,10 @@ export default function BoasVindasPage() {
       {/* Skip */}
       <div className="text-center">
         <Link
-          href="/dashboard"
+          href="/inicio"
           className="text-gray-500 hover:text-gray-400 text-sm transition-colors"
         >
-          Explorar o dashboard primeiro →
+          Explorar o início primeiro →
         </Link>
       </div>
     </div>

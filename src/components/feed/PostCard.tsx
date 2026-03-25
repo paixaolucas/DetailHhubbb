@@ -90,20 +90,18 @@ function ImageGrid({ urls }: { urls: string[] }) {
   if (urls.length === 0) return null;
   if (urls.length === 1) {
     return (
-      <Image
-        src={urls[0]}
-        alt=""
-        width={800}
-        height={288}
-        className="w-full max-h-72 object-cover rounded-lg mt-3 border border-white/10"
-      />
+      <div className="relative aspect-video mt-3 rounded-lg overflow-hidden border border-white/10">
+        <Image src={urls[0]} alt="" fill className="object-cover" />
+      </div>
     );
   }
   if (urls.length === 2) {
     return (
       <div className="grid grid-cols-2 gap-1 mt-3">
         {urls.map((url, i) => (
-          <Image key={i} src={url} alt="" width={400} height={144} className="w-full h-36 object-cover rounded-lg border border-white/10" />
+          <div key={i} className="relative aspect-square rounded-lg overflow-hidden border border-white/10">
+            <Image src={url} alt="" fill className="object-cover" />
+          </div>
         ))}
       </div>
     );
@@ -113,10 +111,10 @@ function ImageGrid({ urls }: { urls: string[] }) {
   return (
     <div className="grid grid-cols-2 gap-1 mt-3">
       {shown.map((url, i) => (
-        <div key={i} className="relative">
-          <Image src={url} alt="" width={400} height={144} className="w-full h-36 object-cover rounded-lg border border-white/10" />
+        <div key={i} className="relative aspect-square rounded-lg overflow-hidden border border-white/10">
+          <Image src={url} alt="" fill className="object-cover" />
           {i === 3 && extra > 0 && (
-            <div className="absolute inset-0 bg-black/60 rounded-lg flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
               <span className="text-white font-bold text-lg">+{extra}</span>
             </div>
           )}
@@ -257,12 +255,12 @@ function PostCard({
         onKeyDown={handleKeyDown}
         className={`bg-white/5 border rounded-xl p-4 hover:bg-white/10 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 relative ${
           post.isHidden ? "opacity-50 border-white/5" : "border-white/10"
-        } ${post.isPinned ? "border-l-4 border-l-amber-400" : ""}`}
+        } ${post.isPinned ? "border-t-2 border-t-amber-400" : ""}`}
       >
         {/* Pinned badge */}
         {post.isPinned && (
-          <div className="flex items-center gap-1.5 text-xs text-amber-500 font-medium mb-3">
-            <Pin className="w-3.5 h-3.5" />
+          <div className="flex items-center gap-1.5 text-xs font-semibold mb-3 px-2 py-1 rounded-lg bg-amber-400/10 text-amber-400 w-fit">
+            <Pin className="w-3 h-3" />
             Fixado
           </div>
         )}

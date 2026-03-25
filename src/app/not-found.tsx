@@ -17,10 +17,10 @@ export default function NotFound() {
             Ir para o início
           </Link>
           <Link
-            href="/dashboard"
+            href="/inicio"
             className="px-5 py-2.5 bg-white/10 hover:bg-white/20 text-[#EEE6E4] rounded-xl text-sm font-semibold transition-colors"
           >
-            Dashboard
+            Início
           </Link>
         </div>
       </div>

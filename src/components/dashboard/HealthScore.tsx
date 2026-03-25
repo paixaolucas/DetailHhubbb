@@ -73,37 +73,38 @@ export function HealthScore() {
     data.xp_next > 0 ? Math.min(100, Math.round((data.xp_current / data.xp_next) * 100)) : 100;
 
   return (
-    <div className="bg-[#111] border border-white/[0.06] rounded-xl px-4 py-3 flex items-center gap-3 sm:gap-5">
+    <div className="bg-[#111] border border-white/[0.06] rounded-xl px-5 py-4 flex items-center gap-4 sm:gap-6">
       {/* Icon */}
-      <div className="w-8 h-8 bg-[#007A99]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-        <Shield className="w-4 h-4 text-[#009CD9]" />
+      <div className="w-10 h-10 bg-[#007A99]/10 rounded-xl flex items-center justify-center flex-shrink-0">
+        <Shield className="w-5 h-5 text-[#009CD9]" />
       </div>
 
       {/* Label + level badge */}
       <div className="flex items-center gap-2 flex-shrink-0">
-        <span className="text-xs font-semibold text-gray-400 hidden sm:inline">
-          Seu score na plataforma
-        </span>
-        <span className="text-xs font-semibold text-gray-400 sm:hidden">Score</span>
-        <span className="text-[10px] font-bold bg-[#006079]/30 text-[#009CD9] border border-[#009CD9]/20 px-2 py-0.5 rounded-full">
+        <div className="hidden sm:block">
+          <p className="text-sm font-semibold text-gray-400 leading-none">Seu score na plataforma</p>
+          <p className="text-xs text-gray-600 mt-0.5">Engaje para subir de nível</p>
+        </div>
+        <p className="text-sm font-semibold text-gray-400 sm:hidden">Score</p>
+        <span className="text-xs font-bold bg-[#006079]/30 text-[#009CD9] border border-[#009CD9]/20 px-2.5 py-0.5 rounded-full">
           {data.level}
         </span>
       </div>
 
       {/* Score number */}
-      <span className={`text-2xl font-black tabular-nums flex-shrink-0 ${scoreTextColor(data.score)}`}>
+      <span className={`text-3xl font-black tabular-nums flex-shrink-0 ${scoreTextColor(data.score)}`}>
         {data.score}
       </span>
 
       {/* Progress bar + xp info */}
-      <div className="flex-1 min-w-0 space-y-1">
-        <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+      <div className="flex-1 min-w-0 space-y-1.5">
+        <div className="h-2.5 bg-white/10 rounded-full overflow-hidden">
           <div
             className={`h-full rounded-full bg-gradient-to-r transition-all duration-700 ${barColor(data.score)}`}
             style={{ width: `${xpPct}%` }}
           />
         </div>
-        <p className="text-[10px] text-gray-500 truncate tabular-nums">
+        <p className="text-xs text-gray-500 truncate tabular-nums">
           {data.xp_current.toLocaleString("pt-BR")} xp
           {data.level !== "Superfã" && (
             <> · próximo nível: {data.xp_next.toLocaleString("pt-BR")} xp</>
@@ -114,8 +115,8 @@ export function HealthScore() {
       {/* Streak badge (optional) */}
       {data.streak > 0 && (
         <div className="flex-shrink-0 text-center hidden sm:block">
-          <p className="text-sm font-bold text-[#EEE6E4] tabular-nums leading-none">{data.streak}</p>
-          <p className="text-[10px] text-gray-500 leading-tight">
+          <p className="text-base font-bold text-[#EEE6E4] tabular-nums leading-none">{data.streak}</p>
+          <p className="text-xs text-gray-500 leading-tight">
             {data.streak === 1 ? "dia" : "dias"}
           </p>
         </div>

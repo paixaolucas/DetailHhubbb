@@ -12,6 +12,18 @@
 - Membros assinam a **plataforma** (assinatura única R$948/ano = R$79/mês) e acessam TUDO
 - Inspirado no modelo Circle (uma assinatura, acesso a todas as comunidades)
 
+### Base intelectual do projeto
+Toda decisão de produto, UX, comunidade e modelo de negócio deve ser alinhada com estes livros:
+
+| Livro | Autor(es) | Aplicação principal |
+|-------|-----------|---------------------|
+| **Wiki Brands** | Sean Moffitt e Mike Dover | Marca colaborativa, comunidade de marca, co-criação com audiência |
+| **Superfãs** | Pat Flynn | Transformar seguidores em fãs ativos — modelo influenciador + membro |
+| **Continuous Discovery Habits** | Teresa Torres | Discovery contínuo, entrevistas, árvore de oportunidades, testes rápidos |
+| **Hooked** | Nir Eyal | Modelo de hábito (trigger→action→reward→investment) — gamificação e retenção |
+| **Estratégia de Plataforma** | Tero Ojanpera e Timo Vuori | Modelo de dois lados, efeitos de rede, monetização e governança |
+| **Gestão de Produtos** | Joaquim Torres | Roadmap, priorização, métricas e backlog no contexto brasileiro |
+
 **Stack**: Next.js 14 App Router, TypeScript, Prisma, PostgreSQL (Supabase), Stripe, OpenAI, Resend, UploadThing
 **Deploy**: Vercel (previsto)
 
@@ -381,14 +393,53 @@ return NextResponse.json({ success: false, error: "mensagem" }, { status: 400 })
 ## Agentes e Pipelines
 
 ### Agentes especializados (`.claude/agents/`)
-13 agentes + 5 pipelines em `.claude/agents/`. Áreas cobertas:
-- **engineering**: `backend-architect`, `frontend-developer`, `devops-infra`
-- **design**: `brand-guardian`, `ui-ux-designer`
-- **security**: `code-reviewer`, `payment-security`, `data-security`
-- **product**: `product-rules`, `sprint-prioritizer`
-- **growth**: `retention-analyst`, `influencer-strategist`
-- **community**: `community-manager`
-- **pipelines**: `orchestrator`, `feature-pipeline`, `bug-fix-pipeline`, `sprint-planning-pipeline`, `security-review-pipeline`
+13 agentes + 5 pipelines em `.claude/agents/`. Cada agente tem frontmatter `name`, `description` e `tools`.
+
+#### Engineering
+| Agente | Arquivo | Descrição |
+|--------|---------|-----------|
+| `backend-architect` | `engineering/backend-architect.md` | Implementa rotas de API, lógica de negócio, queries Prisma, middleware de auth e decisões de arquitetura server-side |
+| `frontend-developer` | `engineering/frontend-developer.md` | Implementa componentes React/Next.js, páginas, layouts e UI seguindo o design system da plataforma |
+| `devops-infra` | `engineering/devops-infra.md` | Deploy, configuração de servidor, variáveis de ambiente, CI/CD, custos operacionais e monitoramento |
+
+#### Design
+| Agente | Arquivo | Descrição |
+|--------|---------|-----------|
+| `brand-guardian` | `design/brand-guardian.md` | Revisão de textos, validação de tom de voz, criação de copy e consistência visual/editorial da marca |
+| `ui-ux-designer` | `design/ui-ux-designer.md` | Wireframes, fluxos de UX, revisão de interfaces e novos componentes seguindo o design system |
+
+#### Security
+| Agente | Arquivo | Descrição |
+|--------|---------|-----------|
+| `code-reviewer` | `security/code-reviewer.md` | Revisão de PRs/código em busca de bugs, vulnerabilidades de segurança e inconsistências com regras de negócio |
+| `data-security` | `security/data-security.md` | Auditoria de proteção de dados pessoais, conformidade com LGPD, autenticação e controle de acesso |
+| `payment-security` | `security/payment-security.md` | Revisão de lógica de split de receita, webhooks de pagamento, idempotência de transações e cenários financeiros |
+
+#### Product
+| Agente | Arquivo | Descrição |
+|--------|---------|-----------|
+| `product-rules` | `product/product-rules.md` | Valida se uma feature faz sentido no Phase 1, verifica consistência com o modelo de negócio e classifica itens por horizonte |
+| `sprint-prioritizer` | `product/sprint-prioritizer.md` | Organiza sprints e prioriza features por impacto no Horizonte 1, identifica dependências e estima esforço |
+
+#### Growth
+| Agente | Arquivo | Descrição |
+|--------|---------|-----------|
+| `influencer-strategist` | `growth/influencer-strategist.md` | Materiais de abordagem, argumentos de entrada, estruturação de onboarding de criadores e antecipação de objeções |
+| `retention-analyst` | `growth/retention-analyst.md` | Calcula e projeta churn, identifica sinais de risco, propõe intervenções de retenção e analisa coortes de membros |
+
+#### Community
+| Agente | Arquivo | Descrição |
+|--------|---------|-----------|
+| `community-manager` | `community/community-manager.md` | Analisa saúde de comunidades, identifica padrões de churn, cria scripts de comunicação para influenciadores e propõe ações de retenção |
+
+#### Pipelines (orquestram múltiplos agentes)
+| Pipeline | Arquivo | Descrição |
+|----------|---------|-----------|
+| `orchestrator` | `pipelines/orchestrator.md` | Analisa o escopo e aciona os subagentes corretos na ordem correta, consolidando o resultado final |
+| `feature-pipeline` | `pipelines/feature-pipeline.md` | Ciclo completo de entrega: validação de produto → backend → frontend → code review → security |
+| `bug-fix-pipeline` | `pipelines/bug-fix-pipeline.md` | Diagnóstico (classifica severidade) → correção mínima → verificação sem coordenação manual |
+| `sprint-planning-pipeline` | `pipelines/sprint-planning-pipeline.md` | Diagnóstico H1 → classificação do backlog → sprint organizado com foco nos gatilhos do Horizonte 1 |
+| `security-review-pipeline` | `pipelines/security-review-pipeline.md` | Auditoria em 3 camadas: autenticação/autorização → dados/privacidade → pagamentos |
 
 ### Protocolo obrigatório para novas telas de dashboard
 Antes de implementar qualquer nova tela de dashboard, seguir `.claude/agents/pipelines/feature-pipeline.md`:

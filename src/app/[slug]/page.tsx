@@ -58,7 +58,7 @@ export default function SlugPage() {
         .catch(() => null);
 
       if (!communityRes?.success) {
-        router.replace("/dashboard");
+        router.replace("/inicio");
         return;
       }
 
@@ -93,8 +93,8 @@ export default function SlugPage() {
         <div className="text-center">
           <p className="text-2xl font-bold text-[#EEE6E4] mb-2">Comunidade não encontrada</p>
           <p className="text-gray-400 text-sm mb-6">O endereço <strong>/{slug}</strong> não existe na plataforma.</p>
-          <a href="/dashboard" className="text-[#007A99] hover:text-[#009CD9] font-medium text-sm transition-colors">
-            Voltar ao Dashboard →
+          <a href="/inicio" className="text-[#007A99] hover:text-[#009CD9] font-medium text-sm transition-colors">
+            Voltar ao início →
           </a>
         </div>
       </div>

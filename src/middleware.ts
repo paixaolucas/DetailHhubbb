@@ -34,7 +34,7 @@ const PUBLIC_PATHS = [
   "/api/platform/plan",
 ];
 
-const PROTECTED_PREFIXES = ["/dashboard", "/admin", "/ai-assistant"];
+const PROTECTED_PREFIXES = ["/dashboard", "/inicio", "/admin", "/ai-assistant"];
 
 function isPublic(pathname: string): boolean {
   return PUBLIC_PATHS.some(
@@ -112,7 +112,6 @@ export function middleware(request: NextRequest) {
       { pattern: /^\/dashboard\/admin/, allowed: ['SUPER_ADMIN'] },
       { pattern: /^\/dashboard\/usuarios/, allowed: ['SUPER_ADMIN'] },
       { pattern: /^\/dashboard\/communities\/new/, allowed: ['SUPER_ADMIN'] },
-      { pattern: /^\/dashboard\/tools/, allowed: ['SUPER_ADMIN'] },
       // INFLUENCER_ADMIN + SUPER_ADMIN
       { pattern: /^\/dashboard\/analytics/, allowed: ['INFLUENCER_ADMIN', 'SUPER_ADMIN'] },
       { pattern: /^\/dashboard\/live$/, allowed: ['INFLUENCER_ADMIN', 'SUPER_ADMIN'] },

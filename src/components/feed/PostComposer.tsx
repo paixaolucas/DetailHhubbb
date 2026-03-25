@@ -5,16 +5,13 @@
 // e emoji picker estilo Circle.
 // =============================================================================
 
-import { useState, useRef, useEffect, useCallback } from "react";
-import { useAutoRefresh } from "@/hooks/useAutoRefresh";
-import Image from "next/image";
+import { useState, useRef, useEffect } from "react";
 import {
-  Send, Plus, Minus, ImageIcon, X, Lock, Rocket,
+  Send, Plus, Minus, ImageIcon, X,
   Video, Paperclip, Smile, FileText, Link2,
 } from "lucide-react";
 import { uploadFiles } from "@/utils/upload";
 import { STORAGE_KEYS } from "@/lib/constants";
-import { getMemberLevel, getMemberLevelColor, POST_THRESHOLD } from "@/lib/points";
 import { compressImage, validateVideoFile, checkVideoDuration } from "@/lib/media-optimize";
 import { EMOJI_CATS } from "@/lib/emoji-data";
 
@@ -24,12 +21,11 @@ interface PostComposerProps {
   spaceId: string;
   communityId: string;
   onPost: (post: unknown) => void;
-  scoreTrigger?: number;
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export default function PostComposer({ spaceId, communityId, onPost, scoreTrigger }: PostComposerProps) {
+export default function PostComposer({ spaceId, communityId, onPost }: PostComposerProps) {
   const [body, setBody] = useState("");
   const [title, setTitle] = useState("");
   const [showTitle, setShowTitle] = useState(false);
@@ -75,26 +71,6 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
   const [userName, setUserName] = useState("");
   const [initials, setInitials] = useState("?");
 
-  // Score gate
-  const [userScore, setUserScore] = useState<number | null>(null);
-  const [scoreLoading, setScoreLoading] = useState(true);
-
-  // ── Score polling ─────────────────────────────────────────────────────────
-
-  const pollScore = useCallback(() => {
-    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
-    const userId = localStorage.getItem(STORAGE_KEYS.USER_ID);
-    if (!token || !userId || !communityId) return;
-    fetch(`/api/communities/${communityId}/leaderboard?userId=${userId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((r) => r.json())
-      .then((d) => {
-        setUserScore(d.success && typeof d.data?.points === "number" ? d.data.points : 0);
-      })
-      .catch(() => setUserScore(0));
-  }, [communityId]);
-
   useEffect(() => {
     const name = localStorage.getItem(STORAGE_KEYS.USER_NAME) ?? "";
     setUserName(name);
@@ -104,22 +80,7 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
       const last = parts.length > 1 ? (parts[parts.length - 1][0] ?? "") : "";
       setInitials((first + last).toUpperCase() || "?");
     }
-    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
-    const userId = localStorage.getItem(STORAGE_KEYS.USER_ID);
-    if (!token || !userId || !communityId) { setScoreLoading(false); return; }
-    fetch(`/api/communities/${communityId}/leaderboard?userId=${userId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((r) => r.json())
-      .then((d) => {
-        setUserScore(d.success && typeof d.data?.points === "number" ? d.data.points : 0);
-      })
-      .catch(() => setUserScore(0))
-      .finally(() => setScoreLoading(false));
-  }, [communityId]);
-
-  useAutoRefresh(pollScore, 60_000);
-  useEffect(() => { if (scoreTrigger) pollScore(); }, [scoreTrigger, pollScore]);
+  }, []);
 
   // Close emoji picker on outside click
   useEffect(() => {
@@ -307,63 +268,7 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
     }
   }
 
-  // ── Score gate loading ────────────────────────────────────────────────────
 
-  if (scoreLoading) {
-    return (
-      <div className="bg-white/5 border border-white/10 rounded-xl p-4 animate-pulse">
-        <div className="flex items-start gap-3">
-          <div className="w-9 h-9 rounded-full bg-white/10 flex-shrink-0" />
-          <div className="flex-1 space-y-2">
-            <div className="h-4 bg-white/10 rounded w-1/3" />
-            <div className="h-3 bg-white/10 rounded w-1/4" />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ── Score gate card ───────────────────────────────────────────────────────
-
-  if (userScore !== null && userScore < POST_THRESHOLD) {
-    const pct = Math.min(100, Math.round((userScore / POST_THRESHOLD) * 100));
-    const remaining = POST_THRESHOLD - userScore;
-    const level = getMemberLevel(userScore);
-    const levelColor = getMemberLevelColor(level);
-    return (
-      <div className="bg-white/5 border border-white/10 rounded-xl p-5">
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#006079]/20 flex items-center justify-center flex-shrink-0">
-            <Lock className="w-5 h-5 text-[#009CD9]" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-0.5">
-              <p className="font-semibold text-[#EEE6E4] text-sm">Você está quase lá!</p>
-              <span className={`text-xs px-2 py-0.5 rounded-full font-semibold border ${levelColor}`}>{level}</span>
-            </div>
-            <p className="text-gray-400 text-xs leading-relaxed mb-3">
-              Engaje com o conteúdo da comunidade para desbloquear a criação de posts.
-              Faltam <span className="text-[#009CD9] font-semibold">{remaining} pts</span> para <strong>Participante</strong>.
-            </p>
-            <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-[#006079] to-[#009CD9] rounded-full transition-all duration-500"
-                style={{ width: `${pct}%` }}
-              />
-            </div>
-            <div className="flex items-center justify-between mt-1">
-              <span className="text-xs text-gray-500">{userScore} pts</span>
-              <span className="text-xs text-gray-500">{POST_THRESHOLD} pts</span>
-            </div>
-            <div className="mt-3 flex items-center gap-1.5 text-xs text-[#009CD9]">
-              <Rocket className="w-3.5 h-3.5" />
-              Comente, reaja e assista conteúdos para ganhar pontos!
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   const busy = isLoading || uploadingImages || uploadingVideo || uploadingDocs;
   const hasContent = !!(body.trim() || imageFiles.length || videoFile || docFiles.length || videoEmbedUrl.trim());
@@ -408,12 +313,10 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
         <div className="flex flex-wrap gap-2 pl-12">
           {imagePreviews.map((url, idx) => (
             <div key={idx} className="relative group">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={url}
                 alt=""
-                width={80}
-                height={80}
-                unoptimized={imageFiles[idx]?.type === "image/gif"}
                 className="w-20 h-20 object-cover rounded-lg border border-white/10"
               />
               <button
@@ -438,6 +341,8 @@ export default function PostComposer({ spaceId, communityId, onPost, scoreTrigge
           <video
             src={videoPreviewUrl}
             controls
+            preload="metadata"
+            playsInline
             className="w-full max-h-48 rounded-lg border border-white/10 bg-black"
           />
           <div className="flex items-center justify-between mt-1.5 px-0.5">

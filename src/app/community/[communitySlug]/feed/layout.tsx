@@ -288,11 +288,11 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
       {/* ── Back to dashboard ── */}
       <div className="p-3 border-t border-white/8 flex-shrink-0">
         <Link
-          href="/dashboard"
+          href="/inicio"
           className="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs text-gray-600 hover:text-gray-400 hover:bg-white/5 transition-all"
         >
           <LayoutDashboard className="w-3.5 h-3.5" />
-          Dashboard
+          Início
         </Link>
       </div>
     </div>
@@ -345,7 +345,7 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
           </button>
 
           {/* Breadcrumb */}
-          <Link href="/dashboard" className="flex items-center flex-shrink-0">
+          <Link href="/inicio" className="flex items-center flex-shrink-0">
             <LogoType height={18} variant="light" />
           </Link>
 

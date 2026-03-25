@@ -50,7 +50,7 @@ function buildSections(hasLiveToday: boolean): NavSection[] {
       label: 'Principal',
       roles: 'ALL',
       items: [
-        { label: 'Inicio', href: '/dashboard', icon: Home },
+        { label: 'Inicio', href: '/inicio', icon: Home },
         { label: 'Calendario', href: '/dashboard/calendar', icon: CalendarDays, liveIndicator: hasLiveToday },
         { label: 'Mensagens', href: '/dashboard/messages', icon: MessageSquare },
       ],
@@ -217,11 +217,11 @@ export function DashboardSidebar({
       {/* Logo */}
       <div className={`h-16 flex items-center border-b border-white/10 flex-shrink-0 ${collapsed ? 'px-3 justify-center' : 'px-4'}`}>
         {collapsed ? (
-          <Link href="/dashboard" onClick={onMobileClose}>
+          <Link href={navRole === UserRole.COMMUNITY_MEMBER || navRole === UserRole.MARKETPLACE_PARTNER ? "/inicio" : "/dashboard"} onClick={onMobileClose}>
             <Logo size="md" />
           </Link>
         ) : (
-          <Link href="/dashboard" className="flex items-center flex-1 min-w-0" onClick={onMobileClose}>
+          <Link href={navRole === UserRole.COMMUNITY_MEMBER || navRole === UserRole.MARKETPLACE_PARTNER ? "/inicio" : "/dashboard"} className="flex items-center flex-1 min-w-0" onClick={onMobileClose}>
             <LogoType height={24} variant="light" />
           </Link>
         )}
@@ -352,7 +352,7 @@ export function DashboardSidebar({
                         ] as Array<{ id: string; label: string; Icon: React.ComponentType<{ className?: string }>; desc: string }>
                       ).map(({ id, label, Icon, desc }) => (
                         <button key={id}
-                          onClick={() => { onViewAsChange(id, null); setViewAsOpen(false); router.push('/dashboard'); }}
+                          onClick={() => { onViewAsChange(id, null); setViewAsOpen(false); router.push('/inicio'); }}
                           title={desc}
                           className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all text-center hover:bg-white/5 border ${viewAs === id && !viewAsUser ? 'border-amber-500/40 bg-amber-500/10 text-amber-400' : 'border-white/5 text-gray-400 hover:text-[#EEE6E4]'}`}
                         >
@@ -380,7 +380,7 @@ export function DashboardSidebar({
                             const active = viewAsUser?.id === u.id;
                             return (
                               <button key={u.id} title={name}
-                                onClick={() => { onViewAsChange('COMMUNITY_MEMBER', { id: u.id, name, role: 'COMMUNITY_MEMBER', hasPlatform: u.hasPlatform ?? false }); setViewAsOpen(false); setMemberSearch(''); setMemberResults([]); router.push('/dashboard'); }}
+                                onClick={() => { onViewAsChange('COMMUNITY_MEMBER', { id: u.id, name, role: 'COMMUNITY_MEMBER', hasPlatform: u.hasPlatform ?? false }); setViewAsOpen(false); setMemberSearch(''); setMemberResults([]); router.push('/inicio'); }}
                                 className={`w-9 h-9 rounded-full flex items-center justify-center text-[10px] font-bold text-white transition-all ring-2 ${active ? 'ring-amber-400 scale-110' : 'ring-transparent hover:ring-[#009CD9]/50 hover:scale-105'} bg-gradient-to-br from-[#006079] to-[#009CD9] overflow-hidden`}
                               >
                                 {u.avatarUrl ? <Image src={u.avatarUrl} alt={name} width={36} height={36} className="w-full h-full object-cover" /> : ini}

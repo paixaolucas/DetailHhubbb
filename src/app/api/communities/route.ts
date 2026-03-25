@@ -17,6 +17,18 @@ import { ZodError } from "zod";
 import { UserRole } from "@prisma/client";
 import { trackEvent } from "@/services/analytics/analytics.service";
 
+// Shuffle determinístico com seed (Fisher-Yates + LCG)
+function seededShuffle<T>(arr: T[], seed: number): T[] {
+  const result = [...arr];
+  let s = seed;
+  for (let i = result.length - 1; i > 0; i--) {
+    s = Math.imul(s, 1664525) + 1013904223;
+    const j = Math.abs(s) % (i + 1);
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -45,6 +57,10 @@ export async function GET(req: NextRequest) {
       const session = await getSessionFromRequest(req);
       const userId = session?.userId ?? null;
 
+      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+      const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+
+      // 1. Busca comunidades publicadas
       const communities = await db.community.findMany({
         where: { isPublished: true },
         select: {
@@ -56,22 +72,46 @@ export async function GET(req: NextRequest) {
           bannerUrl: true,
           primaryColor: true,
           memberCount: true,
+          createdAt: true,
           influencer: {
             select: {
               displayName: true,
               user: { select: { firstName: true, lastName: true, avatarUrl: true } },
             },
           },
-          optIns: userId
-            ? { where: { userId }, select: { id: true }, take: 1 }
-            : false,
+          ...(userId ? { optIns: { where: { userId }, select: { id: true }, take: 1 } } : {}),
         },
         orderBy: { memberCount: "desc" },
-        take: 20,
+        take: 50,
       });
 
-      const data = communities
-        .map((c) => ({
+      // 2. Engajamento — isolado: se falhar, segue sem personalização
+      const engagementMap = new Map<string, number>();
+      if (userId) {
+        try {
+          const engagementRaw = await db.analyticsEvent.groupBy({
+            by: ["communityId"],
+            where: {
+              userId,
+              communityId: { not: null },
+              createdAt: { gte: ninetyDaysAgo },
+              type: { in: ["PAGE_VIEW", "CONTENT_VIEW", "CONTENT_COMPLETE", "LIVE_SESSION_JOIN", "POST_CREATE", "CHAT_MESSAGE"] },
+            },
+            _count: { id: true },
+          });
+          for (const e of engagementRaw) {
+            if (e.communityId) engagementMap.set(e.communityId, e._count.id);
+          }
+        } catch {
+          // Falha silenciosa — comunidades aparecem sem personalização
+        }
+      }
+
+      const dailySeed = Math.floor(Date.now() / 86_400_000);
+
+      const mapped = communities.map((c) => {
+        const optIns = (c as any).optIns as { id: string }[] | undefined;
+        return {
           id: c.id,
           name: c.name,
           slug: c.slug,
@@ -81,14 +121,25 @@ export async function GET(req: NextRequest) {
           primaryColor: c.primaryColor,
           memberCount: c.memberCount,
           influencer: c.influencer,
-          isMember: userId ? (c.optIns as { id: string }[]).length > 0 : false,
-        }))
-        .sort((a, b) => {
-          if (a.isMember === b.isMember) return b.memberCount - a.memberCount;
-          return a.isMember ? -1 : 1;
-        });
+          isMember: userId ? (optIns?.length ?? 0) > 0 : false,
+          isNew: c.createdAt >= thirtyDaysAgo,
+          engagementCount: engagementMap.get(c.id) ?? 0,
+        };
+      });
 
-      return NextResponse.json({ success: true, communities: data });
+      const withEngagement = mapped
+        .filter((c) => engagementMap.has(c.id))
+        .sort((a, b) => b.engagementCount - a.engagementCount);
+
+      const noEngagement = seededShuffle(
+        mapped.filter((c) => !engagementMap.has(c.id)),
+        dailySeed
+      );
+
+      return NextResponse.json({
+        success: true,
+        communities: [...withEngagement, ...noEngagement].slice(0, 20),
+      });
     }
 
     const result = await listPublicCommunities({ page, pageSize, search, tags });

@@ -100,7 +100,7 @@ export default function SearchPage() {
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
           <Link
-            href="/dashboard"
+            href="/inicio"
             className="p-2 hover:bg-white/10 rounded-lg transition-colors text-gray-400 hover:text-[#EEE6E4]"
           >
             <ArrowLeft className="w-5 h-5" />

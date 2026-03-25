@@ -111,7 +111,7 @@ export function NextLiveCard() {
     <div className="bg-[#111] border border-white/[0.06] rounded-xl overflow-hidden">
       {/* Thumbnail */}
       {live.thumbnailUrl && (
-        <div className="relative h-28">
+        <div className="relative aspect-video">
           <Image src={live.thumbnailUrl} alt={live.title} fill className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           <div className="absolute top-2 left-2">
@@ -120,12 +120,12 @@ export function NextLiveCard() {
         </div>
       )}
 
-      <div className="p-4 space-y-3">
+      <div className="p-5 space-y-4">
         {/* Label + badge (when no thumbnail) */}
         <div className="flex items-center gap-2 justify-between">
           <div className="flex items-center gap-2">
-            <PlayCircle className="w-4 h-4 text-[#009CD9] flex-shrink-0" />
-            <p className="text-xs font-semibold text-[#009CD9] uppercase tracking-wide">
+            <PlayCircle className="w-5 h-5 text-[#009CD9] flex-shrink-0" />
+            <p className="text-sm font-semibold text-[#009CD9] uppercase tracking-wide">
               {isLive ? "Ao vivo agora" : "Próxima live"}
             </p>
           </div>
@@ -135,7 +135,7 @@ export function NextLiveCard() {
         </div>
 
         {/* Title */}
-        <p className="text-sm font-bold text-[#EEE6E4] leading-tight line-clamp-2">
+        <p className="text-base font-bold text-[#EEE6E4] leading-snug line-clamp-2">
           {live.title}
         </p>
 
@@ -145,40 +145,40 @@ export function NextLiveCard() {
             <Image
               src={live.host.avatarUrl}
               alt={live.host.name}
-              width={20}
-              height={20}
-              className="w-5 h-5 rounded-full object-cover"
+              width={24}
+              height={24}
+              className="w-6 h-6 rounded-full object-cover"
             />
           ) : (
-            <div className="w-5 h-5 rounded-full bg-[#006079] flex items-center justify-center text-white text-[10px] font-bold">
+            <div className="w-6 h-6 rounded-full bg-[#006079] flex items-center justify-center text-white text-xs font-bold">
               {live.host.name[0]}
             </div>
           )}
-          <p className="text-xs text-gray-400">{live.host.name}</p>
+          <p className="text-sm text-gray-400">{live.host.name}</p>
           <span className="text-gray-600">·</span>
-          <p className="text-xs text-gray-400 truncate">{live.community.name}</p>
+          <p className="text-sm text-gray-400 truncate">{live.community.name}</p>
         </div>
 
         {/* CTA */}
         {isLive ? (
           <Link
             href={`/community/${live.community.slug}/lives/${live.id}`}
-            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors"
+            className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors"
           >
             <PlayCircle className="w-4 h-4" /> Entrar na live
           </Link>
         ) : live.hasRSVP ? (
-          <div className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-semibold text-green-400 bg-green-500/10 border border-green-500/20">
-            <Bell className="w-3.5 h-3.5" /> Lembrete ativado · {live.rsvpCount} confirmados
+          <div className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold text-green-400 bg-green-500/10 border border-green-500/20">
+            <Bell className="w-4 h-4" /> Lembrete ativado · {live.rsvpCount} confirmados
           </div>
         ) : (
           <button
             onClick={handleRSVP}
             disabled={rsvping}
             aria-label={`Ativar lembrete para a live: ${live.title}`}
-            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-semibold text-[#009CD9] bg-[#006079]/20 hover:bg-[#006079]/30 border border-[#009CD9]/20 transition-colors disabled:opacity-50"
+            className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold text-[#009CD9] bg-[#006079]/20 hover:bg-[#006079]/30 border border-[#009CD9]/20 transition-colors disabled:opacity-50"
           >
-            <Bell className="w-3.5 h-3.5" />
+            <Bell className="w-4 h-4" />
             {rsvping ? "Salvando..." : `Lembrar · ${live.rsvpCount} confirmados`}
           </button>
         )}

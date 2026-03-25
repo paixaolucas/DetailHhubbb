@@ -105,8 +105,6 @@ export default function SpaceFeedPage() {
   const [pendingPosts, setPendingPosts] = useState<Post[]>([]);
   const postsRef = useRef<Post[]>([]);
 
-  // Triggers instant score re-fetch in PostComposer after a reaction
-  const [scoreTrigger, setScoreTrigger] = useState(0);
 
   // ---------------------------------------------------------------------------
 
@@ -259,8 +257,6 @@ export default function SpaceFeedPage() {
           };
         })
       );
-      // Trigger instant score refresh in PostComposer
-      setScoreTrigger((n) => n + 1);
     }
   }, []);
 
@@ -378,7 +374,7 @@ export default function SpaceFeedPage() {
 
           {/* Composer */}
           {!loading && activeSpace && (
-            <PostComposer spaceId={activeSpace.id} communityId={community?.id ?? ""} onPost={handleNewPost} scoreTrigger={scoreTrigger} />
+            <PostComposer spaceId={activeSpace.id} communityId={community?.id ?? ""} onPost={handleNewPost} />
           )}
 
           {/* Posts */}

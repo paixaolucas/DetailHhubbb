@@ -89,25 +89,25 @@ export function RankingBlock({ userId }: { userId: string }) {
   return (
     <div className="bg-[#111] border border-white/[0.06] rounded-xl overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-white/10">
+      <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-white/10">
         <div className="flex items-center gap-2">
-          <Trophy className="w-4 h-4 text-[#009CD9]" />
-          <h2 className="text-sm font-bold text-[#EEE6E4]">Ranking</h2>
+          <Trophy className="w-5 h-5 text-[#009CD9]" />
+          <h2 className="text-xl font-bold text-[#EEE6E4]">Ranking</h2>
         </div>
-        <Link href="/dashboard/leaderboard" className="text-xs text-[#009CD9] font-medium">
+        <Link href="/dashboard/leaderboard" className="text-sm text-[#009CD9] font-medium">
           Ver completo →
         </Link>
       </div>
 
       {/* Period toggle */}
-      <div className="flex items-center bg-white/5 m-3 rounded-xl p-0.5">
+      <div className="flex items-center bg-white/5 m-4 rounded-xl p-0.5">
         {(["month", "all"] as const).map((p) => (
           <button
             key={p}
             onClick={() => setPeriod(p)}
             aria-pressed={period === p}
             aria-label={`Ranking ${p === "month" ? "deste mês" : "geral"}`}
-            className={`flex-1 text-xs font-semibold py-1.5 rounded-lg transition-all ${
+            className={`flex-1 text-sm font-semibold py-2 rounded-lg transition-all ${
               period === p ? "bg-[#006079] text-white" : "text-gray-400 hover:text-gray-300"
             }`}
           >
@@ -138,7 +138,7 @@ export function RankingBlock({ userId }: { userId: string }) {
         <>
           {/* Podium — top 3 */}
           {top3.length >= 2 && (
-            <div className="flex items-end justify-center gap-4 px-4 pb-3 pt-2">
+            <div className="flex items-end justify-center gap-2 sm:gap-4 px-2 sm:px-4 pb-3 pt-2 min-w-0">
               {/* 2nd place */}
               {top3[1] && (
                 <div className="flex flex-col items-center gap-1">
@@ -150,7 +150,7 @@ export function RankingBlock({ userId }: { userId: string }) {
                   <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-gray-400/10 text-gray-400 text-xs font-bold">
                     2
                   </div>
-                  <p className="text-[10px] text-gray-400 max-w-[56px] text-center leading-tight truncate">
+                  <p className="text-[10px] text-gray-400 max-w-[48px] text-center leading-tight truncate">
                     {top3[1].user?.firstName ?? "—"}
                   </p>
                   <p className="text-[10px] font-bold text-[#007A99]">
@@ -171,7 +171,7 @@ export function RankingBlock({ userId }: { userId: string }) {
                   <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-yellow-500/10 text-yellow-500 text-xs font-bold">
                     1
                   </div>
-                  <p className="text-[10px] text-[#EEE6E4] max-w-[68px] text-center leading-tight truncate font-semibold">
+                  <p className="text-[10px] text-[#EEE6E4] max-w-[56px] text-center leading-tight truncate font-semibold">
                     {top3[0].user?.firstName ?? "—"}
                   </p>
                   <p className="text-[10px] font-bold text-[#009CD9]">
@@ -191,7 +191,7 @@ export function RankingBlock({ userId }: { userId: string }) {
                   <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-orange-500/10 text-orange-500 text-xs font-bold">
                     3
                   </div>
-                  <p className="text-[10px] text-gray-400 max-w-[56px] text-center leading-tight truncate">
+                  <p className="text-[10px] text-gray-400 max-w-[48px] text-center leading-tight truncate">
                     {top3[2].user?.firstName ?? "—"}
                   </p>
                   <p className="text-[10px] font-bold text-[#007A99]">
@@ -216,27 +216,27 @@ export function RankingBlock({ userId }: { userId: string }) {
                 return (
                   <div
                     key={entry.userId}
-                    className={`flex items-center gap-3 px-4 py-2.5 ${
+                    className={`flex items-center gap-3 px-5 py-3 ${
                       isMe ? "bg-[#006079]/10" : "hover:bg-white/5"
                     }`}
                   >
-                    <span className="w-5 text-center text-[10px] font-bold text-gray-500 flex-shrink-0">
+                    <span className="w-5 text-center text-xs font-bold text-gray-500 flex-shrink-0">
                       {rank}
                     </span>
-                    <Avatar entry={entry} size={28} isMe={isMe} />
+                    <Avatar entry={entry} size={32} isMe={isMe} />
                     <div className="flex-1 min-w-0">
-                      <p className={`text-xs font-semibold truncate ${isMe ? "text-[#009CD9]" : "text-[#EEE6E4]"}`}>
+                      <p className={`text-sm font-semibold truncate ${isMe ? "text-[#009CD9]" : "text-[#EEE6E4]"}`}>
                         {name}
                       </p>
-                      <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full border ${levelColor}`}>
+                      <span className={`text-xs font-medium px-1.5 py-0.5 rounded-full border ${levelColor}`}>
                         {level}
                       </span>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <p className="text-xs font-bold text-[#007A99]">
+                      <p className="text-sm font-bold text-[#007A99]">
                         {entry.totalPoints.toLocaleString("pt-BR")}
                       </p>
-                      <p className="text-[10px] text-gray-500">pts</p>
+                      <p className="text-xs text-gray-500">pts</p>
                     </div>
                   </div>
                 );
@@ -269,9 +269,9 @@ export function RankingBlock({ userId }: { userId: string }) {
 
       {/* My score footer — always visible */}
       {myScore !== null && (
-        <div className="border-t border-white/10 px-4 py-3 flex items-center justify-between bg-[#006079]/5">
-          <p className="text-xs text-gray-400">Meu score</p>
-          <p className="text-sm font-bold text-[#009CD9]">
+        <div className="border-t border-white/10 px-5 py-3.5 flex items-center justify-between bg-[#006079]/5">
+          <p className="text-sm text-gray-400">Meu score</p>
+          <p className="text-base font-bold text-[#009CD9]">
             {myScore.points.toLocaleString("pt-BR")} pts
           </p>
         </div>

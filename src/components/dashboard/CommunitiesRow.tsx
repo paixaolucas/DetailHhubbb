@@ -8,16 +8,17 @@ import { CommunityCard, type CommunityCardData } from "./CommunityCard";
 
 function CommunitySkeleton() {
   return (
-    <div className="rounded-xl overflow-hidden border border-white/10 animate-pulse">
-      <div className="h-[56px] sm:h-[140px] bg-white/10" />
-      <div className="p-3 space-y-2">
+    <div className="rounded-2xl overflow-hidden border border-white/10 animate-pulse">
+      <div className="aspect-[16/9] bg-white/10" />
+      <div className="p-4 space-y-2.5">
         <div className="flex items-center gap-2">
-          <div className="w-5 h-5 rounded-full bg-white/10" />
-          <div className="h-2.5 bg-white/10 rounded w-24" />
+          <div className="w-6 h-6 rounded-full bg-white/10" />
+          <div className="h-3 bg-white/10 rounded w-24" />
         </div>
-        <div className="h-4 bg-white/10 rounded w-3/4" />
-        <div className="h-3 bg-white/10 rounded w-full" />
-        <div className="h-7 bg-white/10 rounded-lg" />
+        <div className="h-5 bg-white/10 rounded w-3/4" />
+        <div className="h-3.5 bg-white/10 rounded w-full" />
+        <div className="h-3.5 bg-white/10 rounded w-2/3" />
+        <div className="h-9 bg-white/10 rounded-xl" />
       </div>
     </div>
   );
@@ -39,38 +40,53 @@ export function CommunitiesRow({ hasPlatform }: { hasPlatform: boolean | null })
       .finally(() => setLoading(false));
   }, []);
 
-  if (!loading && communities.length === 0) return null;
-
   const displayed = communities.slice(0, 6);
   const hasMore = communities.length > 6;
 
   return (
     <div className="bg-[#111] border border-white/[0.06] rounded-xl p-4">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-sm font-bold text-[#EEE6E4] flex items-center gap-2">
-          <Users className="w-4 h-4 text-[#009CD9]" /> Comunidades
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="text-xl font-bold text-[#EEE6E4] flex items-center gap-2">
+          <Users className="w-5 h-5 text-[#009CD9]" /> Comunidades
         </h2>
         {hasMore && !loading && (
           <Link
             href="/dashboard/communities"
-            className="text-xs text-[#009CD9] font-medium hover:underline"
+            className="text-sm text-[#009CD9] font-medium hover:underline"
           >
             Ver todas →
           </Link>
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-3">
-        {loading
-          ? [1, 2, 3].map((i) => <CommunitySkeleton key={i} />)
-          : displayed.map((community) => (
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+          {[1, 2, 3].map((i) => <CommunitySkeleton key={i} />)}
+        </div>
+      ) : communities.length === 0 ? (
+        <div className="py-10 text-center">
+          <Users className="w-10 h-10 text-gray-700 mx-auto mb-3" />
+          <p className="text-gray-400 text-sm">Nenhuma comunidade disponível ainda.</p>
+          <Link href="/dashboard/communities" className="text-sm text-[#009CD9] hover:underline mt-2 inline-block">
+            Explorar comunidades →
+          </Link>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+            {displayed.map((community) => (
               <CommunityCard
                 key={community.id}
                 community={community}
                 hasPlatform={hasPlatform}
               />
             ))}
-      </div>
+          </div>
+          <p className="text-xs text-gray-600 mt-4 text-right">
+            Ordem personalizada · novas comunidades mudam de posição diariamente
+          </p>
+        </>
+      )}
     </div>
   );
 }

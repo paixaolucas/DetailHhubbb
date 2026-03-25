@@ -21,26 +21,48 @@ export async function uploadFiles(
   bucket: UploadBucket = "posts"
 ): Promise<UploadResult[]> {
   const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
-  const results: UploadResult[] = [];
 
-  for (const file of files) {
+  const uploadOne = async (file: File): Promise<UploadResult> => {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("bucket", bucket);
 
-    const res = await fetch("/api/upload", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData,
-    });
+    // Timeout maior para vídeos (5min), padrão 2min para outros
+    const isVideo = file.type.startsWith("video/");
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), isVideo ? 300_000 : 120_000);
 
-    const json = await res.json();
-    if (!res.ok || !json.success) {
-      throw new Error(json.error ?? "Upload falhou");
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+        signal: controller.signal,
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.error ?? "Upload falhou");
+      }
+      return json.data as UploadResult;
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === "AbortError") {
+        throw new Error("Upload cancelado por timeout. Tente um arquivo menor.");
+      }
+      throw err;
+    } finally {
+      clearTimeout(timer);
     }
+  };
 
-    results.push(json.data as UploadResult);
+  // Imagens em paralelo, vídeos/docs sequencialmente (evitar sobrecarga)
+  if (bucket === "posts" && files.every((f) => f.type.startsWith("image/"))) {
+    return Promise.all(files.map(uploadOne));
   }
 
+  const results: UploadResult[] = [];
+  for (const file of files) {
+    results.push(await uploadOne(file));
+  }
   return results;
 }

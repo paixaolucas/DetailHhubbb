@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Users, CheckCircle } from "lucide-react";
+import { Users, CheckCircle, Sparkles, Flame } from "lucide-react";
 
 export interface CommunityCardData {
   id: string;
@@ -14,6 +14,8 @@ export interface CommunityCardData {
   primaryColor: string;
   memberCount: number;
   isMember: boolean;
+  isNew?: boolean;
+  engagementCount?: number;
   influencer: {
     displayName: string;
     user: { firstName: string; lastName: string | null; avatarUrl: string | null } | null;
@@ -26,16 +28,16 @@ interface Props {
 }
 
 export function CommunityCard({ community, hasPlatform }: Props) {
-  const href = hasPlatform ? `/community/${community.slug}/feed` : "/dashboard/assinar";
+  const href = hasPlatform ? `/community/${community.slug}` : "/dashboard/assinar";
   const locked = !hasPlatform;
 
   return (
     <Link
       href={href}
-      className={`rounded-xl overflow-hidden border border-white/10 bg-[#0D0D0D] transition-all hover:border-[#009CD9]/30 hover:shadow-lg hover:shadow-[#009CD9]/5 block ${locked ? "opacity-60" : ""}`}
+      className={`rounded-2xl overflow-hidden border border-white/10 bg-[#0D0D0D] transition-all hover:border-[#009CD9]/40 hover:shadow-xl hover:shadow-[#009CD9]/5 hover:-translate-y-0.5 block ${locked ? "opacity-60" : ""}`}
     >
-      {/* Banner — 56px mobile / 140px desktop */}
-      <div className="relative h-[56px] sm:h-[140px] overflow-hidden">
+      {/* Banner */}
+      <div className="relative aspect-[16/9] overflow-hidden">
         {community.bannerUrl ? (
           <Image
             src={community.bannerUrl}
@@ -44,93 +46,99 @@ export function CommunityCard({ community, hasPlatform }: Props) {
             className="object-cover object-center"
           />
         ) : (
-          <>
-            <div
-              className="absolute inset-0"
-              style={{
-                background: `linear-gradient(135deg, ${community.primaryColor} 0%, ${community.primaryColor}66 100%)`,
-              }}
-            />
-          </>
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(135deg, ${community.primaryColor} 0%, ${community.primaryColor}55 100%)`,
+            }}
+          />
         )}
 
-        {/* Member badge — hidden on mobile (56px too small) */}
-        {community.isMember && (
-          <div className="hidden sm:flex absolute top-2 left-2 items-center gap-1 bg-[#009CD9]/90 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
-            <CheckCircle className="w-3 h-3" />
-            Participando
-          </div>
-        )}
+        {/* Badges — topo esquerdo */}
+        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+          {community.isMember && (
+            <div className="flex items-center gap-1 bg-[#009CD9]/90 text-white text-xs font-semibold px-2.5 py-1 rounded-full">
+              <CheckCircle className="w-3.5 h-3.5" />
+              Participando
+            </div>
+          )}
+          {community.isNew && !community.isMember && (
+            <div className="flex items-center gap-1 bg-emerald-500/90 text-white text-xs font-semibold px-2.5 py-1 rounded-full">
+              <Sparkles className="w-3 h-3" />
+              Nova
+            </div>
+          )}
+          {!community.isNew && !community.isMember && (community.engagementCount ?? 0) > 0 && (
+            <div className="flex items-center gap-1 bg-amber-500/90 text-white text-xs font-semibold px-2.5 py-1 rounded-full">
+              <Flame className="w-3 h-3" />
+              Ativa pra você
+            </div>
+          )}
+        </div>
 
-        {/* Member count badge — desktop only */}
-        <div className="hidden sm:flex absolute top-2 right-2 items-center gap-1 bg-black/50 backdrop-blur-sm text-white/90 text-[10px] px-2 py-0.5 rounded-full">
-          <Users className="w-3 h-3" />
+        {/* Member count */}
+        <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-black/55 backdrop-blur-sm text-white/90 text-xs px-2.5 py-1 rounded-full">
+          <Users className="w-3.5 h-3.5" />
           <span>{community.memberCount.toLocaleString("pt-BR")}</span>
         </div>
 
-        {/* Brand color gradient at bottom — desktop only */}
+        {/* Bottom gradient */}
         <div
-          className="hidden sm:block absolute bottom-0 left-0 right-0 h-12"
+          className="absolute bottom-0 left-0 right-0 h-16"
           style={{
-            background: `linear-gradient(to top, ${community.primaryColor}CC, transparent)`,
+            background: `linear-gradient(to top, ${community.primaryColor}DD, transparent)`,
           }}
         />
       </div>
 
       {/* Content */}
-      <div className="p-3 space-y-1.5">
+      <div className="p-4 space-y-2.5">
         {/* Influencer info */}
         {community.influencer && (
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             {community.influencer.user?.avatarUrl ? (
               <Image
                 src={community.influencer.user.avatarUrl}
                 alt={community.influencer.displayName}
-                width={20}
-                height={20}
-                className="w-5 h-5 rounded-full object-cover flex-shrink-0"
+                width={24}
+                height={24}
+                className="w-6 h-6 rounded-full object-cover flex-shrink-0"
               />
             ) : (
               <div
-                className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0"
+                className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0"
                 style={{ backgroundColor: community.primaryColor }}
               >
                 {community.influencer.displayName[0]}
               </div>
             )}
-            <span className="text-[10px] text-gray-500 truncate">
+            <span className="text-xs text-gray-400 truncate">
               {community.influencer.displayName}
             </span>
-            {/* Mobile: member badge inline */}
-            {community.isMember && (
-              <span className="sm:hidden ml-auto text-[9px] font-semibold text-[#009CD9] flex-shrink-0">
-                Participando
-              </span>
-            )}
           </div>
         )}
 
         {/* Community name */}
-        <h3 className="font-semibold text-[#EEE6E4] text-xs leading-tight truncate">
+        <h3 className="font-bold text-[#EEE6E4] text-base leading-tight line-clamp-2">
           {community.name}
         </h3>
 
-        {/* Short description — desktop only */}
+        {/* Short description */}
         {community.shortDescription && (
-          <p className="hidden sm:block text-[11px] text-gray-500 line-clamp-2 leading-relaxed">
+          <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">
             {community.shortDescription}
           </p>
         )}
 
         {/* CTA */}
         <div
-          className={`text-center text-xs font-semibold py-1.5 rounded-lg ${
+          className={`text-center text-sm font-semibold py-2 rounded-xl mt-1 ${
             community.isMember
               ? "bg-[#006079]/20 text-[#009CD9]"
-              : "bg-white/5 text-gray-400"
+              : "bg-white/5 text-gray-400 hover:bg-white/10"
           }`}
         >
-          {community.isMember ? "Acessar →" : "Participar →"}
+          {community.isMember ? "Acessar comunidade →" : "Participar →"}
         </div>
       </div>
     </Link>
