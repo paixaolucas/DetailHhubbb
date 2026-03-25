@@ -28,14 +28,26 @@ interface Props {
 }
 
 export function CommunityCard({ community, hasPlatform }: Props) {
-  const href = hasPlatform ? `/community/${community.slug}` : "/dashboard/assinar";
-  const locked = !hasPlatform;
+  // null = membership ainda carregando — não navegar para evitar redirect falso para pagamento
+  const href =
+    hasPlatform === true
+      ? `/community/${community.slug}`
+      : hasPlatform === false
+        ? "/dashboard/assinar"
+        : null;
 
-  return (
-    <Link
-      href={href}
-      className={`rounded-2xl overflow-hidden border border-white/10 bg-[#0D0D0D] transition-all hover:border-[#009CD9]/40 hover:shadow-xl hover:shadow-[#009CD9]/5 hover:-translate-y-0.5 block ${locked ? "opacity-60" : ""}`}
-    >
+  const locked = hasPlatform !== true;
+  const isLoading = hasPlatform === null;
+
+  const cardClass = [
+    "rounded-2xl overflow-hidden border border-white/10 bg-[#0D0D0D]",
+    "transition-all hover:border-[#009CD9]/40 hover:shadow-xl hover:shadow-[#009CD9]/5 hover:-translate-y-0.5 block",
+    locked ? "opacity-60" : "",
+    isLoading ? "cursor-wait pointer-events-none" : "",
+  ].join(" ");
+
+  const inner = (
+    <>
       {/* Banner */}
       <div className="relative aspect-[16/9] overflow-hidden">
         {community.bannerUrl ? (
@@ -141,6 +153,16 @@ export function CommunityCard({ community, hasPlatform }: Props) {
           {community.isMember ? "Acessar comunidade →" : "Participar →"}
         </div>
       </div>
+    </>
+  );
+
+  if (!href) {
+    return <div className={cardClass}>{inner}</div>;
+  }
+
+  return (
+    <Link href={href} className={cardClass}>
+      {inner}
     </Link>
   );
 }
