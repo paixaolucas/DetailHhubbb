@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DetailerHUB — Gestão Estratégica</title>
+  <style>
+    :root {
+      --teal: #006079;
+      --teal-light: #009cd9;
+      --black: #1a1a1a;
+      --off-white: #eee6e4;
+      --gray: #2e2e2e;
+      --gray-mid: #444;
+      --gray-light: #888;
+      --green: #2ecc71;
+      --yellow: #f1c40f;
+      --red: #e74c3c;
+      --border: #333;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--black);
+      color: var(--off-white);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      background: linear-gradient(135deg, #0a0a0a 0%, #0d2a33 60%, #006079 100%);
+      padding: 80px 40px;
+      text-align: center;
+    }
+
+    .header-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--teal-light);
+      text-transform: uppercase;
+      border: 1px solid rgba(0, 156, 217, 0.4);
+      padding: 6px 16px;
+      border-radius: 100px;
+      margin-bottom: 28px;
+    }
+
+    .header h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+
+    .header-subtitle {
+      font-size: 1rem;
+      color: var(--gray-light);
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* ── CONTAINER ── */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    /* ── MOTOR MORAL ── */
+    .motor-moral {
+      background: linear-gradient(135deg, rgba(0, 96, 121, 0.2), rgba(0, 156, 217, 0.08));
+      border: 1px solid rgba(0, 156, 217, 0.3);
+      border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+      margin: 60px 0;
+    }
+
+    .motor-moral blockquote {
+      font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+      font-style: italic;
+      font-weight: 500;
+      color: var(--off-white);
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    .motor-valores {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px 24px;
+      font-size: 13px;
+      color: var(--teal-light);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .motor-valores span {
+      position: relative;
+    }
+
+    .motor-valores span:not(:last-child)::after {
+      content: '·';
+      position: absolute;
+      right: -14px;
+      color: var(--gray-light);
+    }
+
+    /* ── SECTIONS ── */
+    section {
+      padding: 60px 0;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--teal-light);
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-size: clamp(1.4rem, 3vw, 1.9rem);
+      font-weight: 800;
+      margin-bottom: 12px;
+      letter-spacing: -0.3px;
+    }
+
+    .section-intro {
+      font-size: 14px;
+      color: var(--gray-light);
+      max-width: 600px;
+      margin-bottom: 36px;
+      line-height: 1.6;
+    }
+
+    /* ── DOC CARDS ── */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .doc-card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      transition: border-color 0.2s, transform 0.2s;
+      cursor: pointer;
+    }
+
+    .doc-card:hover {
+      border-color: var(--teal);
+      transform: translateY(-2px);
+    }
+
+    .doc-card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+
+    .doc-card-icon {
+      font-size: 1.6rem;
+      flex-shrink: 0;
+      line-height: 1;
+      margin-top: 2px;
+    }
+
+    .doc-card-title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .doc-card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--off-white);
+    }
+
+    .badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 100px;
+    }
+
+    .badge-version {
+      background: rgba(0, 156, 217, 0.15);
+      color: var(--teal-light);
+      border: 1px solid rgba(0, 156, 217, 0.3);
+    }
+
+    .badge-green {
+      background: rgba(46, 204, 113, 0.15);
+      color: var(--green);
+      border: 1px solid rgba(46, 204, 113, 0.3);
+    }
+
+    .badge-teal {
+      background: rgba(0, 96, 121, 0.25);
+      color: var(--teal-light);
+      border: 1px solid rgba(0, 156, 217, 0.35);
+    }
+
+    .doc-card-desc {
+      font-size: 13px;
+      color: var(--gray-light);
+      line-height: 1.6;
+      padding-left: 42px;
+    }
+
+    /* ── MISSION CARDS ── */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .mission-card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      transition: border-color 0.2s, transform 0.2s;
+      cursor: pointer;
+    }
+
+    .mission-card:hover {
+      border-color: var(--teal);
+      transform: translateY(-2px);
+    }
+
+    .mission-number {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--teal-light);
+      margin-bottom: 10px;
+      opacity: 0.7;
+    }
+
+    .mission-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--off-white);
+      margin-bottom: 6px;
+    }
+
+    .mission-agent {
+      font-size: 11px;
+      color: var(--gray-light);
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+
+    .mission-summary {
+      font-size: 12px;
+      color: #a0a0a0;
+      line-height: 1.55;
+      margin-bottom: 16px;
+    }
+
+    /* ── STAT CARDS ── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .stat-card {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 24px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 800;
+      color: var(--teal-light);
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--gray-light);
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── DIVIDER ── */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 40px;
+      font-size: 12px;
+      color: var(--gray-light);
+      border-top: 1px solid var(--border);
+      letter-spacing: 0.5px;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .grid-3 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .header {
+        padding: 60px 24px;
+      }
+
+      .container {
+        padding: 0 24px;
+      }
+
+      .grid-2,
+      .grid-3,
+      .stat-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .motor-moral {
+        padding: 28px 20px;
+      }
+
+      .motor-valores span:not(:last-child)::after {
+        display: none;
+      }
+
+      .motor-valores {
+        flex-direction: column;
+        gap: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════ HEADER ══════════════════════════════════ -->
+  <header class="header">
+    <div class="header-badge">AMBIENTE ESTRATÉGICO · DETAILERHUB</div>
+    <h1>DetailerHUB — <span style="color: var(--teal-light)">Gestão Estratégica</span></h1>
+    <p class="header-subtitle">Documentação viva do negócio — fundação, estratégia e operação em um lugar só</p>
+    <div style="margin-top: 20px;">
+      <a href="pagina-de-venda.html" style="display:inline-block; background: var(--teal-light); color:#fff; font-size:13px; font-weight:700; padding:10px 22px; border-radius:6px; text-decoration:none; letter-spacing:0.5px;">Ver Página de Venda →</a>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- ══════════════════════════════ MOTOR MORAL ══════════════════════════════ -->
+    <div class="motor-moral">
+      <blockquote>"Criadores merecem ser donos da sua audiência, não inquilinos de algoritmos."</blockquote>
+      <div class="motor-valores">
+        <span>Transparência como Confiança</span>
+        <span>Ascensão Coletiva</span>
+        <span>Permanência sobre Vaidade</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════ FUNDAÇÃO ══════════════════════════════ -->
+    <hr class="section-divider">
+    <section>
+      <div class="section-label">FUNDAÇÃO</div>
+      <div class="section-title">Documentação Base</div>
+      <p class="section-intro">Os documentos que definem o que é o DetailerHUB, como funciona e para quem existe.</p>
+
+      <div class="grid-2">
+
+        <a href="fundacao/documentacao-fundacional-v8.html" class="doc-card">
+          <div class="doc-card-header">
+            <div class="doc-card-icon">📋</div>
+            <div>
+              <div class="doc-card-title-row">
+                <span class="doc-card-title">Documentação Fundacional</span>
+                <span class="badge badge-version">v8</span>
+              </div>
+            </div>
+          </div>
+          <p class="doc-card-desc">O documento-mãe. Cobertura completa de produto, modelo de negócio, métricas e visão de longo prazo.</p>
+        </a>
+
+        <a href="fundacao/plano-tecnico-detailerhub.html" class="doc-card">
+          <div class="doc-card-header">
+            <div class="doc-card-icon">⚙️</div>
+            <div>
+              <div class="doc-card-title-row">
+                <span class="doc-card-title">Plano Técnico e Financeiro</span>
+              </div>
+            </div>
+          </div>
+          <p class="doc-card-desc">Stack tecnológica, banco de dados, sprints de desenvolvimento, projeções financeiras e marcos.</p>
+        </a>
+
+        <a href="fundacao/motor-moral.md" class="doc-card">
+          <div class="doc-card-header">
+            <div class="doc-card-icon">🧭</div>
+            <div>
+              <div class="doc-card-title-row">
+                <span class="doc-card-title">Motor Moral</span>
+              </div>
+            </div>
+          </div>
+          <p class="doc-card-desc">Por que o DetailerHUB existe. Valores, filtros de decisão e manifesto estratégico.</p>
+        </a>
+
+        <a href="fundacao/business-facts.md" class="doc-card">
+          <div class="doc-card-header">
+            <div class="doc-card-icon">📊</div>
+            <div>
+              <div class="doc-card-title-row">
+                <span class="doc-card-title">Business Facts</span>
+              </div>
+            </div>
+          </div>
+          <p class="doc-card-desc">Fonte de verdade: preços, splits, influenciadores, tech stack e projeções consolidadas.</p>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════ TRILHA ESTRATÉGICA ══════════════════════════ -->
+    <hr class="section-divider">
+    <section>
+      <div class="section-label">ESTRATÉGIA</div>
+      <div class="section-title">Trilha de Direção</div>
+      <p class="section-intro">6 missões executadas por agentes especialistas — de dimensão de mercado à oferta final.</p>
+
+      <div class="grid-3">
+
+        <a href="estrategia/mission-1-dimensao-de-mercado/mission-1-dimensao-de-mercado.html" class="mission-card">
+          <div class="mission-number">MISSÃO 01</div>
+          <div class="mission-title">Dimensão de Mercado</div>
+          <div class="mission-agent">Agente: Philip Kotler</div>
+          <p class="mission-summary">TAM R$6B · SAM R$80M · SOM R$22–28M/ano</p>
+          <span class="badge badge-green">Concluído</span>
+        </a>
+
+        <a href="estrategia/mission-2-sinais-de-demanda/mission-2-sinais-de-demanda.html" class="mission-card">
+          <div class="mission-number">MISSÃO 02</div>
+          <div class="mission-title">Sinais de Demanda</div>
+          <div class="mission-agent">Agente: Philip Kotler</div>
+          <p class="mission-summary">PIC: Detailer autônomo · 25–38 anos · R$3–8K/mês</p>
+          <span class="badge badge-green">Concluído</span>
+        </a>
+
+        <a href="estrategia/mission-3-ima-de-problemas/mission-3-ima-de-problemas.html" class="mission-card">
+          <div class="mission-number">MISSÃO 03</div>
+          <div class="mission-title">Ímã de Problemas</div>
+          <div class="mission-agent">Agente: Charlie Munger</div>
+          <p class="mission-summary">Sabe executar serviços de alto valor — mas não consegue cobrar por eles</p>
+          <span class="badge badge-green">Concluído</span>
+        </a>
+
+        <a href="estrategia/mission-4-tese-de-valor/mission-4-tese-de-valor.html" class="mission-card">
+          <div class="mission-number">MISSÃO 04</div>
+          <div class="mission-title">Tese de Valor</div>
+          <div class="mission-agent">Agente: Munger + Cagan</div>
+          <p class="mission-summary">Gap de posicionamento = R$75.600/ano por membro deixados na mesa</p>
+          <span class="badge badge-green">Concluído</span>
+        </a>
+
+        <a href="estrategia/mission-5-a-oferta/mission-5-a-oferta.html" class="mission-card">
+          <div class="mission-number">MISSÃO 05</div>
+          <div class="mission-title">A Oferta</div>
+          <div class="mission-agent">Agente: Alex Hormozi</div>
+          <p class="mission-summary">Em 90 dias, domine as técnicas que pagam mais e aprenda a cobrar por elas. R$79/mês no lançamento.</p>
+          <span class="badge badge-green">Concluído</span>
+        </a>
+
+        <a href="estrategia/mission-6-direcao-estrategica/mission-6-direcao-estrategica.html" class="mission-card">
+          <div class="mission-number">MISSÃO 06</div>
+          <div class="mission-title">Direção Estratégica</div>
+          <div class="mission-agent">Agente: Ogilvy + Cagan</div>
+          <p class="mission-summary">Documento de referência ativa — motor moral, filtros, metas</p>
+          <span class="badge badge-teal">Referência Ativa</span>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════ OPERACIONAL ══════════════════════════════ -->
+    <hr class="section-divider">
+    <section>
+      <div class="section-label">OPERACIONAL</div>
+      <div class="section-title">Documentos de Execução</div>
+      <p class="section-intro" style="margin-bottom: 36px;">Materiais prontos para uso em campo — captação de parceiros e produção de conteúdo.</p>
+
+      <div class="grid-2">
+
+        <a href="operacional/apresentacao-influenciadores.html" class="doc-card">
+          <div class="doc-card-header">
+            <div class="doc-card-icon">🎯</div>
+            <div>
+              <div class="doc-card-title-row">
+                <span class="doc-card-title">Apresentação para Influenciadores</span>
+              </div>
+            </div>
+          </div>
+          <p class="doc-card-desc">Pitch deck completo — como apresentar o DetailerHUB e converter influenciadores.</p>
+        </a>
+
+        <a href="operacional/guia-gravacao-conteudo.html" class="doc-card">
+          <div class="doc-card-header">
+            <div class="doc-card-icon">🎬</div>
+            <div>
+              <div class="doc-card-title-row">
+                <span class="doc-card-title">Guia de Gravação de Conteúdo</span>
+              </div>
+            </div>
+          </div>
+          <p class="doc-card-desc">Padrões técnicos de áudio, vídeo, iluminação e estrutura para criadores de conteúdo.</p>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════ METAS ANO 1 ══════════════════════════════ -->
+    <hr class="section-divider">
+    <section>
+      <div class="section-label">METAS · ANO 1</div>
+      <div class="section-title">O que sucesso parece</div>
+
+      <div class="stat-grid">
+
+        <div class="stat-card">
+          <div class="stat-value">R$22–28M/ano</div>
+          <div class="stat-label">Receita Recorrente</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-value">25.000–30.000</div>
+          <div class="stat-label">Membros Ativos</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-value">&lt; 5%</div>
+          <div class="stat-label">Churn Mensal</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-value">&gt; 70</div>
+          <div class="stat-label">NPS</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-value">500+</div>
+          <div class="stat-label">Cases de Resultado</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-value">5</div>
+          <div class="stat-label">Parceiros Influenciadores</div>
+        </div>
+
+      </div>
+    </section>
+
+  </div><!-- /container -->
+
+  <!-- ══════════════════════════════════ FOOTER ══════════════════════════════════ -->
+  <footer>
+    DetailerHUB · Ambiente Estratégico · 2026 · Todos os documentos são documentos vivos
+  </footer>
+
+</body>
+</html>

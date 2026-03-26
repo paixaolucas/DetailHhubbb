@@ -39,7 +39,7 @@ const COMM_TYPE_LABEL: Record<string, string> = {
 };
 
 // Preços da plataforma
-const PRECO_ANUAL = 948;      // R$948/ano
+const PRECO_ANUAL = 708;      // R$708/ano (R$59/mês no plano anual)
 const PRECO_MENSAL = 79;      // R$79/mês
 const PRECO_PIX = PRECO_MENSAL; // alias for backward compat
 const COMISSAO = 0.15;        // 15% plataforma

@@ -99,12 +99,12 @@ export default function AssinarPage() {
             <div className="flex items-end justify-center gap-1 mb-2">
               <span className="text-gray-400 text-lg">R$</span>
               <span className="text-5xl font-bold text-[#EEE6E4]">
-                {plan ? Number(plan.price).toLocaleString("pt-BR") : "948"}
+                {plan ? Number(plan.price).toLocaleString("pt-BR") : "708"}
               </span>
               <span className="text-gray-400 text-lg mb-1">/ano</span>
             </div>
             <p className="text-gray-500 text-sm">
-              {plan?.name ?? "Detailer'HUB Anual"} — R$79/mês
+              {plan?.name ?? "Detailer'HUB Anual"} — R$59/mês
             </p>
           </div>
 
@@ -129,7 +129,7 @@ export default function AssinarPage() {
             ) : (
               <Zap className="w-4 h-4" />
             )}
-            {submitting ? "Redirecionando..." : "Assinar agora — R$948/ano"}
+            {submitting ? "Redirecionando..." : "Assinar agora — R$708/ano"}
           </button>
 
           <p className="text-center text-xs text-gray-400 mt-4">

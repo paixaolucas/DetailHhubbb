@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DetailerHub — Guia de Gravação de Conteúdo</title>
+<style>
+  :root {
+    --teal: #006079;
+    --teal-light: #009cd9;
+    --teal-glow: rgba(0,156,217,0.1);
+    --black: #0d0d0d;
+    --gray: #1a1a1a;
+    --gray2: #222;
+    --off-white: #eee6e4;
+    --muted: #777;
+    --border: #2a2a2a;
+    --green: #2ecc71;
+    --yellow: #f1c40f;
+    --red: #e74c3c;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--black);
+    color: var(--off-white);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* COVER */
+  .cover {
+    background: linear-gradient(135deg, #0a0a0a 0%, #0d2a33 60%, #006079 100%);
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 80px 40px;
+    position: relative;
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,156,217,0.07) 0%, transparent 70%);
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+  }
+
+  .cover-badge {
+    background: rgba(0,96,121,0.4);
+    border: 1px solid var(--teal);
+    color: var(--teal-light);
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase;
+    padding: 6px 18px; border-radius: 20px; margin-bottom: 28px;
+  }
+
+  .cover h1 {
+    font-size: clamp(2rem, 5vw, 3.8rem);
+    font-weight: 900; letter-spacing: -2px; line-height: 1.08; margin-bottom: 14px;
+  }
+
+  .cover h1 span { color: var(--teal-light); }
+
+  .cover-sub {
+    font-size: 1rem; color: var(--muted); max-width: 480px; line-height: 1.6;
+  }
+
+  /* LAYOUT */
+  .container { max-width: 860px; margin: 0 auto; padding: 0 32px; }
+
+  /* SECTION */
+  .section { padding: 64px 0; border-bottom: 1px solid var(--border); }
+  .section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--teal); font-weight: 700; margin-bottom: 10px;
+  }
+
+  .section-title {
+    font-size: clamp(1.4rem, 2.5vw, 2rem);
+    font-weight: 900; letter-spacing: -1px; margin-bottom: 10px; line-height: 1.2;
+  }
+
+  .section-intro { color: var(--muted); max-width: 660px; margin-bottom: 32px; font-size: 0.95rem; }
+
+  /* CARDS */
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+
+  .card {
+    background: var(--gray2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 22px 20px;
+  }
+
+  .card-icon { font-size: 1.4rem; margin-bottom: 10px; }
+  .card-title { font-weight: 800; font-size: 0.92rem; margin-bottom: 6px; }
+  .card-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.55; }
+
+  /* TIER TABLE (equipment) */
+  .tier-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 0.85rem; }
+
+  .tier-table th {
+    background: var(--gray2); color: var(--teal-light);
+    font-weight: 700; text-align: left;
+    padding: 11px 16px; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tier-table td {
+    padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: #bbb; vertical-align: top;
+  }
+
+  .tier-table tr:last-child td { border-bottom: none; }
+  .tier-table td strong { color: var(--off-white); }
+
+  .badge {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 10px; margin-right: 6px;
+  }
+
+  .badge.min { background: rgba(241,196,15,0.12); color: var(--yellow); border: 1px solid rgba(241,196,15,0.25); }
+  .badge.rec { background: rgba(46,204,113,0.12); color: var(--green); border: 1px solid rgba(46,204,113,0.25); }
+  .badge.pro { background: rgba(0,156,217,0.12); color: var(--teal-light); border: 1px solid rgba(0,156,217,0.25); }
+  .badge.no  { background: rgba(231,76,60,0.12); color: var(--red); border: 1px solid rgba(231,76,60,0.2); }
+
+  /* SPEC ROW */
+  .spec-list { display: flex; flex-direction: column; gap: 1px; margin: 20px 0; }
+
+  .spec-row {
+    display: flex; align-items: flex-start; gap: 0;
+    background: var(--gray2); border: 1px solid var(--border);
+    border-radius: 0; overflow: hidden;
+  }
+
+  .spec-row:first-child { border-radius: 10px 10px 0 0; }
+  .spec-row:last-child { border-radius: 0 0 10px 10px; }
+  .spec-row + .spec-row { border-top: none; }
+
+  .spec-key {
+    width: 200px; flex-shrink: 0;
+    background: rgba(255,255,255,0.02);
+    padding: 12px 16px;
+    font-size: 0.8rem; font-weight: 700; color: var(--teal-light);
+    border-right: 1px solid var(--border);
+  }
+
+  .spec-val {
+    padding: 12px 16px; font-size: 0.82rem; color: #bbb; line-height: 1.5; flex: 1;
+  }
+
+  .spec-val strong { color: var(--off-white); }
+
+  /* CHECKLIST */
+  .checklist { list-style: none; display: flex; flex-direction: column; gap: 8px; margin: 20px 0; }
+
+  .checklist li {
+    display: flex; align-items: flex-start; gap: 12px;
+    background: var(--gray2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 16px;
+    font-size: 0.85rem; color: #bbb;
+  }
+
+  .checklist li .ck {
+    width: 20px; height: 20px; border-radius: 4px;
+    border: 1px solid var(--border); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; margin-top: 1px;
+  }
+
+  .checklist li.ok .ck { background: rgba(46,204,113,0.15); border-color: rgba(46,204,113,0.3); color: var(--green); }
+  .checklist li.warn .ck { background: rgba(241,196,15,0.1); border-color: rgba(241,196,15,0.25); color: var(--yellow); }
+  .checklist li.no .ck { background: rgba(231,76,60,0.1); border-color: rgba(231,76,60,0.2); color: var(--red); }
+
+  /* HIGHLIGHT / WARNING */
+  .highlight {
+    background: var(--teal-glow); border: 1px solid rgba(0,156,217,0.22);
+    border-radius: 12px; padding: 18px 22px; margin: 20px 0; font-size: 0.88rem; color: #ccc;
+  }
+
+  .highlight strong { color: var(--teal-light); }
+
+  .warning {
+    background: rgba(241,196,15,0.07); border: 1px solid rgba(241,196,15,0.22);
+    border-radius: 12px; padding: 18px 22px; margin: 20px 0; font-size: 0.88rem; color: #ccc;
+  }
+
+  .warning strong { color: var(--yellow); }
+
+  /* TRILHA STRUCTURE */
+  .trilha-wrap { display: flex; flex-direction: column; gap: 12px; margin: 24px 0; }
+
+  .trilha-module {
+    background: var(--gray2); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+  }
+
+  .trilha-header {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px; border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+  }
+
+  .trilha-num {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--teal-glow); border: 1px solid var(--teal);
+    color: var(--teal-light); font-weight: 900; font-size: 0.85rem;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+
+  .trilha-title { font-weight: 800; font-size: 0.9rem; }
+  .trilha-sub { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+  .trilha-videos { padding: 12px 18px; display: flex; flex-direction: column; gap: 8px; }
+
+  .trilha-video {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 0.82rem; color: #999; padding: 8px 12px;
+    background: rgba(255,255,255,0.02); border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .trilha-video .v-icon { font-size: 0.9rem; flex-shrink: 0; }
+  .trilha-video .v-title { flex: 1; }
+  .trilha-video .v-dur { font-size: 0.75rem; color: #444; white-space: nowrap; }
+
+  /* VIDEO STRUCTURE */
+  .video-flow {
+    display: flex; gap: 0; margin: 24px 0; align-items: stretch;
+  }
+
+  .vf-step {
+    flex: 1; background: var(--gray2); border: 1px solid var(--border);
+    padding: 18px 16px; text-align: center; position: relative;
+  }
+
+  .vf-step:first-child { border-radius: 12px 0 0 12px; }
+  .vf-step:last-child { border-radius: 0 12px 12px 0; }
+  .vf-step + .vf-step { border-left: none; }
+
+  .vf-dur {
+    font-size: 1.4rem; font-weight: 900; color: var(--teal-light);
+    letter-spacing: -1px; line-height: 1;
+  }
+
+  .vf-label { font-size: 0.72rem; font-weight: 700; margin: 6px 0 4px; color: var(--off-white); }
+  .vf-desc { font-size: 0.72rem; color: var(--muted); line-height: 1.4; }
+
+  /* DURATION TABLE */
+  .dur-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 20px 0; }
+
+  .dur-card {
+    background: var(--gray2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px 16px;
+  }
+
+  .dur-type { font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; }
+  .dur-time { font-size: 1.6rem; font-weight: 900; color: var(--teal-light); letter-spacing: -1px; line-height: 1; }
+  .dur-unit { font-size: 0.72rem; color: var(--muted); margin-bottom: 8px; }
+  .dur-note { font-size: 0.75rem; color: #666; line-height: 1.4; }
+
+  /* FOOTER */
+  footer {
+    text-align: center; padding: 48px 32px;
+    color: var(--muted); font-size: 0.8rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .footer-logo { font-size: 1.1rem; font-weight: 900; color: var(--teal-light); margin-bottom: 6px; }
+
+  @media (max-width: 640px) {
+    .container { padding: 0 20px; }
+    .spec-key { width: 140px; }
+    .video-flow { flex-direction: column; }
+    .vf-step:first-child { border-radius: 12px 12px 0 0; }
+    .vf-step:last-child { border-radius: 0 0 12px 12px; }
+    .vf-step + .vf-step { border-left: 1px solid var(--border); border-top: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-badge">Uso interno · Criadores de Conteúdo</div>
+  <h1>Guia de <span>Gravação</span></h1>
+  <p class="cover-sub">Padrão técnico de áudio, vídeo e estrutura de conteúdo para as trilhas educacionais da plataforma.</p>
+</div>
+
+<div class="container">
+
+  <!-- PRINCÍPIO -->
+  <div class="section">
+    <div class="section-label">Antes de começar</div>
+    <h2 class="section-title">O conteúdo aqui é diferente.</h2>
+    <p class="section-intro">As trilhas do DetailerHub não são vídeos de venda. São aulas. O membro que está assistindo já pagou — ele quer aprender, não ser convencido. Isso muda tudo: o tom, o ritmo, a profundidade e o que você escolhe mostrar.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">✅</div>
+        <div class="card-title">O que é esse conteúdo</div>
+        <div class="card-desc">Aula técnica. Demonstração prática. Passo a passo de como executar. O profissional que assiste precisa conseguir replicar o que você ensinou.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">❌</div>
+        <div class="card-title">O que não é</div>
+        <div class="card-desc">Não é publi. Não é review de produto com CTA. Não é motivacional genérico. Não é teaser para outro curso. O membro já está dentro — entregue o conteúdo.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎯</div>
+        <div class="card-title">O critério de qualidade</div>
+        <div class="card-desc">Um profissional que assistiu sua aula conseguiu aplicar o que aprendeu no trabalho dele? Se sim, foi uma boa aula. Se não, precisa refazer.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ÁUDIO -->
+  <div class="section">
+    <div class="section-label">01 — Áudio</div>
+    <h2 class="section-title">Áudio ruim é motivo de<br/>cancelamento.</h2>
+    <p class="section-intro">O membro tolera imagem com qualidade mediana. Não tolera áudio ruim. Um vídeo com imagem mediana e áudio limpo é melhor do que o contrário. Áudio é prioridade número 1.</p>
+
+    <h3 style="font-size:0.95rem; font-weight:800; margin-bottom:14px; color:var(--off-white)">Equipamento de microfone</h3>
+
+    <table class="tier-table">
+      <thead>
+        <tr>
+          <th>Nível</th>
+          <th>Equipamento</th>
+          <th>Quando usar</th>
+          <th>Observação</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge min">Mínimo</span></td>
+          <td><strong>Microfone lapela com fio</strong><br/>Ex: Boya BY-M1, Fifine</td>
+          <td>Gravações estáticas, fala direta para câmera</td>
+          <td>Prender a 15–20 cm da boca, sob a roupa se possível para reduzir ruído de atrito</td>
+        </tr>
+        <tr>
+          <td><span class="badge rec">Recomendado</span></td>
+          <td><strong>Microfone lapela sem fio</strong><br/>Ex: Rode Wireless GO II, DJI Mic 2</td>
+          <td>Demonstrações em movimento, trabalho no carro</td>
+          <td>Liberdade de movimento sem perder qualidade. Essencial para quem grava demonstrações práticas em movimento.</td>
+        </tr>
+        <tr>
+          <td><span class="badge pro">Avançado</span></td>
+          <td><strong>Microfone condensador USB</strong><br/>Ex: Blue Yeti, Rode NT-USB</td>
+          <td>Gravações em mesa, aulas teóricas, narração</td>
+          <td>Exige ambiente tratado acusticamente. Pega tudo ao redor — inclusive o ventilador do ar-condicionado.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size:0.95rem; font-weight:800; margin: 28px 0 14px; color:var(--off-white)">Configuração e ambiente</h3>
+
+    <div class="spec-list">
+      <div class="spec-row">
+        <div class="spec-key">Nível de gravação</div>
+        <div class="spec-val">Entre <strong>-12 dB e -6 dB</strong>. Nunca chegar em 0 dB (clipping = distorção permanente). Teste antes de gravar e ajuste o ganho do microfone.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Ambiente controlado</div>
+        <div class="spec-val">Para partes teóricas e narração: quartos com carpete, closets, ambientes com móveis e cortinas pesadas. <strong>O interior de um carro estacionado</strong> é um dos melhores estúdios improvisados — isolamento natural, superfícies que absorvem som.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Ruídos de fundo</div>
+        <div class="spec-val">Em ambiente controlado: desligar ar-condicionado, ventilador e qualquer aparelho que emita som contínuo. O ruído que parece baixo ao vivo fica amplificado na gravação. <strong>Para demonstrações em garagem, ver a seção abaixo.</strong></div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Monitoramento</div>
+        <div class="spec-val">Sempre usar fone de ouvido para monitorar o áudio durante a gravação, quando possível. Gravar 30 segundos de teste e ouvir antes de começar o vídeo real.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Tratamento simples</div>
+        <div class="spec-val">Se o ambiente tiver eco: posicionar espumas de som atrás e nas laterais da câmera. Alternativa low-cost: gravar dentro de um closet cheio de roupas. Resultado surpreendente.</div>
+      </div>
+    </div>
+
+    <div class="warning">
+      <strong>⚠ Regra inegociável:</strong> Sempre gravar áudio de teste antes do vídeo completo. Ouvir no fone. Se tiver eco, ruído ou volume baixo — resolver antes, não depois. Regrabar áudio é perda de tempo de todos.
+    </div>
+
+    <div style="margin: 40px 0 0; border: 1px solid rgba(0,156,217,0.35); border-left: 4px solid var(--teal-light); border-radius: 0 16px 16px 0; background: linear-gradient(135deg, rgba(0,96,121,0.18) 0%, rgba(0,156,217,0.06) 100%); padding: 32px 32px 36px;">
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
+        <div style="font-size:1.8rem; line-height:1;">🏭</div>
+        <div>
+          <div style="font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--teal); font-weight:700; margin-bottom:4px;">Contexto real de trabalho</div>
+          <div style="font-size:clamp(1.1rem,2vw,1.5rem); font-weight:900; letter-spacing:-1px; line-height:1.1;">Gravando em garagem<br/>e ambientes abertos</div>
+        </div>
+      </div>
+      <p style="font-size:0.88rem; color:#aaa; margin-bottom:24px; max-width:660px; line-height:1.7">A maioria das aulas acontece no ambiente real de trabalho — garagem, box, área aberta. Isso é o correto: o membro quer ver a técnica no contexto real. O desafio é que esses ambientes têm ruído do próprio trabalho (politriz, compressor, lavagem) e acústica difícil (paredes de concreto, metal, pé-alto). <strong style="color:var(--off-white)">A solução não é evitar o ambiente — é adaptar a técnica de gravação.</strong></p>
+
+    <div class="spec-list">
+      <div class="spec-row">
+        <div class="spec-key">Microfone ideal</div>
+        <div class="spec-val"><strong>Lapela sem fio com deadcat</strong> (espuma de vento) é a melhor solução. Fica próximo à boca, rejeita ruído ambiente pelo posicionamento próximo à fonte, e o deadcat reduz vento em ambientes abertos. Rode Wireless GO II e DJI Mic 2 têm deadcat incluído ou como acessório.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Técnica principal: narração separada</div>
+        <div class="spec-val"><strong>A melhor solução para ambientes muito barulhentos é separar demonstração de narração.</strong> Gravar o trabalho sendo feito (imagem + som ambiente) e gravar a explicação depois em ambiente silencioso — interior do carro, escritório, closet. Editar o áudio limpo sobre a imagem da demonstração. Resultado profissional, sem concessão de qualidade.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Pausar o trabalho para falar</div>
+        <div class="spec-val">Quando a explicação for curta e necessitar mostrar o trabalho ao mesmo tempo: <strong>pausar a politriz, o compressor ou a ferramenta antes de falar.</strong> Gravar o movimento em silêncio → pausar → explicar → retomar o movimento. Na edição, o fluxo fica natural e o áudio fica limpo.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Eco em garagem</div>
+        <div class="spec-val">Paredes de concreto e pé-alto causam eco que nenhum microfone elimina sozinho. Soluções: posicionar a gravação num canto da garagem com carro próximo (absorve o som), pendurar cobertores ou carpetes atrás da câmera, ou usar o interior do carro aberto como backdrop da cena.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Vento em área aberta</div>
+        <div class="spec-val">Deadcat no microfone é obrigatório. Posicionar o corpo como barreira para o vento — de costas para a direção do vento, microfone protegido. <strong>Nunca gravar áudio de narração com vento direto no microfone</strong> — o ruído é inaceitável e não tem edição que corrija.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Compressor e politriz ligados</div>
+        <div class="spec-val">Se o ruído da ferramenta é parte da demonstração (mostrar a politriz funcionando), o áudio ambiente é esperado e aceitável. Se você está <em>explicando</em> enquanto a ferramenta roda: desligar para falar, religar para demonstrar. O espectador entende — e o áudio fica inteligível.</div>
+      </div>
+    </div>
+
+    <div class="highlight">
+      <strong>Fluxo recomendado para aulas em garagem:</strong> gravar toda a demonstração prática com som ambiente (a imagem é o que importa) → depois sentar no carro ou num canto silencioso e gravar a narração explicando o que foi feito → na edição, colocar o áudio limpo sobre o vídeo da demonstração. Esse é o padrão de produção de canais técnicos profissionais no mundo inteiro.
+    </div>
+
+    </div><!-- /garagem highlight -->
+
+    <h3 style="font-size:0.95rem; font-weight:800; margin: 36px 0 14px; color:var(--off-white)">O que nunca fazer no áudio</h3>
+
+    <ul class="checklist">
+      <li class="no"><div class="ck">✕</div>Gravar com fone bluetooth no ouvido — interfere na captação e faz você falar mais baixo</li>
+      <li class="no"><div class="ck">✕</div>Usar o microfone do celular para gravações longas ou em ambientes com ruído</li>
+      <li class="no"><div class="ck">✕</div>Deixar o microfone lapela preso sobre tecido grosso ou sintético que cause atrito</li>
+      <li class="no"><div class="ck">✕</div>Gravar com ar-condicionado ligado sem tratamento de ruído</li>
+      <li class="no"><div class="ck">✕</div>Postar vídeo sem ouvir o áudio completo antes</li>
+    </ul>
+  </div>
+
+  <!-- VÍDEO -->
+  <div class="section">
+    <div class="section-label">02 — Vídeo</div>
+    <h2 class="section-title">Imagem que ensina<br/>com <span>clareza.</span></h2>
+    <p class="section-intro">Para conteúdo técnico de estética automotiva, a câmera precisa mostrar o que as mãos estão fazendo. Resolução, enquadramento e iluminação servem a esse objetivo — não à estética do criador.</p>
+
+    <h3 style="font-size:0.95rem; font-weight:800; margin-bottom:14px; color:var(--off-white)">Câmera e resolução</h3>
+
+    <table class="tier-table">
+      <thead>
+        <tr>
+          <th>Nível</th>
+          <th>Equipamento</th>
+          <th>Configuração</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge min">Mínimo</span></td>
+          <td><strong>Celular flagship recente</strong><br/>iPhone 15 Pro ou superior · Samsung Galaxy S23 Ultra+ · Google Pixel 8 Pro+</td>
+          <td>1080p mínimo, idealmente 4K a 30fps. Câmera traseira sempre — a frontal não tem qualidade suficiente. Travar exposição e foco antes de gravar. Ativar estabilização (Action Mode / Cinematic Mode).</td>
+        </tr>
+        <tr>
+          <td><span class="badge rec">Recomendado</span></td>
+          <td><strong>Câmera mirrorless ou DSLR</strong><br/>Sony ZV-E10, Canon M50, Fuji X-T30</td>
+          <td>1080p a 30fps no mínimo. 4K se o computador de edição aguentar. Lente 24–50mm equivalente.</td>
+        </tr>
+        <tr>
+          <td><span class="badge pro">Avançado</span></td>
+          <td><strong>Câmera de ação para detalhes</strong><br/>GoPro Hero 12, DJI Action 4</td>
+          <td>Usar como câmera secundária fixada no carro ou na mão para mostrar detalhes de aplicação de produto.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size:0.95rem; font-weight:800; margin: 28px 0 14px; color:var(--off-white)">Configurações técnicas</h3>
+
+    <div class="spec-list">
+      <div class="spec-row">
+        <div class="spec-key">Resolução mínima</div>
+        <div class="spec-val"><strong>1920 × 1080 (Full HD)</strong>. Não entregar vídeos em 720p. A plataforma exibe em telas grandes e a baixa resolução aparece claramente.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Frame rate</div>
+        <div class="spec-val"><strong>30fps</strong> para aulas e demonstrações. 60fps se quiser câmera lenta em algum momento específico. Manter consistente dentro da mesma trilha.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Orientação</div>
+        <div class="spec-val"><strong>Horizontal (16:9) sempre.</strong> A plataforma exibe em formato landscape. Vertical não será aceito para trilhas.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Estabilização</div>
+        <div class="spec-val">Usar tripé sempre que possível. Para gravações em movimento, ativar estabilização eletrônica da câmera ou usar gimbal. Vídeo tremido cansa o espectador e prejudica o aprendizado.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Foco</div>
+        <div class="spec-val">Travar foco manual sempre que possível. Autofoco pode mudar de ponto durante uma demonstração — especialmente em câmeras de celular quando a mão entra no frame.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Formato de entrega</div>
+        <div class="spec-val"><strong>MP4 (H.264)</strong>. Não entregar em MOV, MKV ou outros formatos. Bitrate mínimo: 8 Mbps para 1080p.</div>
+      </div>
+    </div>
+
+    <h3 style="font-size:0.95rem; font-weight:800; margin: 28px 0 14px; color:var(--off-white)">Enquadramento para conteúdo técnico</h3>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">🎥</div>
+        <div class="card-title">Plano aberto — apresentação</div>
+        <div class="card-desc">Do peito para cima. Para introdução do módulo, explicação teórica e encerramento. Criador visível, fundo limpo e consistente.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🤲</div>
+        <div class="card-title">Plano médio — demonstração</div>
+        <div class="card-desc">Do quadril para cima, mostrando as mãos e o painel/superfície de trabalho. Para explicar movimentos de polimento, aplicação de produto, técnica de corte.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔍</div>
+        <div class="card-title">Close — detalhe</div>
+        <div class="card-desc">Câmera a 30–50 cm da superfície. Para mostrar resultado de correção, textura de produto, diferença antes/depois. Usar câmera secundária ou reposicionar.</div>
+      </div>
+    </div>
+
+    <div class="highlight" style="margin-top:20px">
+      <strong>Dica para demonstrações no carro:</strong> fixar câmera no painel ou no encosto do banco com um small rig ou suporte magnético. Isso libera as mãos para trabalhar e mantém o ângulo estável durante toda a demonstração.
+    </div>
+  </div>
+
+  <!-- ILUMINAÇÃO -->
+  <div class="section">
+    <div class="section-label">03 — Iluminação</div>
+    <h2 class="section-title">Luz boa é o que separa<br/>amador de <span>profissional.</span></h2>
+    <p class="section-intro">Para estética automotiva, a iluminação tem função dupla: mostrar o criador com clareza e revelar a superfície do veículo com precisão. São necessidades diferentes que podem exigir setups diferentes.</p>
+
+    <div class="spec-list">
+      <div class="spec-row">
+        <div class="spec-key">Luz natural</div>
+        <div class="spec-val">Excelente quando consistente. Posicionar a janela de lado (90°) — nunca atrás de você. Evitar gravações com sol direto que entra e sai da nuvem — a variação de exposição aparece no vídeo. Usar em dias encobertos para luz mais difusa e uniforme.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Ring light</div>
+        <div class="spec-val">Boa para plano aberto (criador falando). Posicionar na altura dos olhos, a 80–100 cm de distância. <strong>Não usar ring light para mostrar superfície do carro</strong> — o reflexo circular aparece na lataria e distrai.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Softbox / painel LED</div>
+        <div class="spec-val"><strong>Recomendado para demonstrações no carro.</strong> Luz difusa e direcional que revela a superfície sem reflexo exagerado. Posicionar a 45° do painel do carro para mostrar textura e correção de forma clara.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Consistência</div>
+        <div class="spec-val"><strong>Fundamental.</strong> Todos os vídeos de uma mesma trilha precisam ter iluminação similar. Variação de luz entre módulos passa percepção de improvisação. Montar setup fixo ou anotar posicionamento.</div>
+      </div>
+    </div>
+
+    <ul class="checklist">
+      <li class="no"><div class="ck">✕</div>Janela atrás de você — cria silhueta e esconde o rosto</li>
+      <li class="no"><div class="ck">✕</div>Luz de teto diretamente acima — cria sombras duras sob os olhos</li>
+      <li class="no"><div class="ck">✕</div>Misturar luz fria (fluorescente) com luz quente (incandescente) — deixa o branco do vídeo errado</li>
+      <li class="ok"><div class="ck">✓</div>Usar luz na mesma temperatura de cor (todas frias ou todas quentes)</li>
+      <li class="ok"><div class="ck">✓</div>Testar gravando 30 segundos e verificando exposição antes de começar</li>
+    </ul>
+  </div>
+
+  <!-- ESTRUTURA DO VÍDEO -->
+  <div class="section">
+    <div class="section-label">04 — Estrutura</div>
+    <h2 class="section-title">Todo vídeo tem<br/><span>começo, meio e fim.</span></h2>
+    <p class="section-intro">Cada vídeo da trilha é autocontido — o membro precisa entender o que vai aprender, aprender, e saber o que vem a seguir. Sem enrolação, sem introdução de 3 minutos, sem CTA de "curte e se inscreve".</p>
+
+    <div class="video-flow">
+      <div class="vf-step">
+        <div class="vf-dur">30s</div>
+        <div class="vf-label">Abertura</div>
+        <div class="vf-desc">O que você vai aprender neste vídeo. Uma frase. Direto. Sem saudação longa.</div>
+      </div>
+      <div class="vf-step">
+        <div class="vf-dur">80%</div>
+        <div class="vf-label">Desenvolvimento</div>
+        <div class="vf-desc">O conteúdo em si. Demonstração prática. Técnica. Passo a passo. Sem desvio do tema.</div>
+      </div>
+      <div class="vf-step">
+        <div class="vf-dur">60s</div>
+        <div class="vf-label">Encerramento</div>
+        <div class="vf-desc">O que foi ensinado em uma frase. O que vem no próximo vídeo. Nenhum CTA externo.</div>
+      </div>
+    </div>
+
+    <div class="warning">
+      <strong>⚠ Sem CTAs externos:</strong> Nenhum "segue meu Instagram", "acessa meu link na bio" ou "compra no meu site" dentro dos vídeos da trilha. O membro já pagou pela assinatura. CTAs externos enfraquecem a percepção de valor da plataforma.
+    </div>
+
+    <h3 style="font-size:0.95rem; font-weight:800; margin: 28px 0 14px; color:var(--off-white)">Duração por tipo de vídeo</h3>
+
+    <div class="dur-grid">
+      <div class="dur-card">
+        <div class="dur-type">Abertura de módulo</div>
+        <div class="dur-time">3–5</div>
+        <div class="dur-unit">minutos</div>
+        <div class="dur-note">Apresenta o módulo, o que será aprendido, pré-requisitos. Teórico e direto.</div>
+      </div>
+      <div class="dur-card">
+        <div class="dur-type">Demonstração de técnica</div>
+        <div class="dur-time">8–15</div>
+        <div class="dur-unit">minutos</div>
+        <div class="dur-note">O núcleo das trilhas. Mostra execução passo a passo. Uma técnica por vídeo.</div>
+      </div>
+      <div class="dur-card">
+        <div class="dur-type">Aula teórica</div>
+        <div class="dur-time">5–10</div>
+        <div class="dur-unit">minutos</div>
+        <div class="dur-note">Conceito, química do produto, diagnóstico. Sem demonstração prática.</div>
+      </div>
+      <div class="dur-card">
+        <div class="dur-type">Encerramento de trilha</div>
+        <div class="dur-time">5–8</div>
+        <div class="dur-unit">minutos</div>
+        <div class="dur-note">Revisão do que foi aprendido. Próximos passos práticos. Sem vídeo de venda.</div>
+      </div>
+    </div>
+
+    <div class="highlight">
+      <strong>Regra de ouro da duração:</strong> o vídeo termina quando o conteúdo acaba — não quando bater um tempo. Um vídeo de 6 minutos denso é melhor do que um de 12 minutos diluído. Cortar tudo que não ensina nada.
+    </div>
+  </div>
+
+  <!-- TRILHAS -->
+  <div class="section">
+    <div class="section-label">05 — Trilhas</div>
+    <h2 class="section-title">Como organizar<br/>uma <span>trilha.</span></h2>
+    <p class="section-intro">A trilha é o produto de aprendizado. Ela transforma vídeos isolados em uma jornada com início, progressão e conclusão. O membro que completa uma trilha obtém um badge e saiu melhor do que entrou.</p>
+
+    <div class="spec-list">
+      <div class="spec-row">
+        <div class="spec-key">Módulos por trilha</div>
+        <div class="spec-val"><strong>3 a 6 módulos.</strong> Menos de 3 é raso. Mais de 6 fica pesado e a conclusão parece distante. Ideal: 4 módulos com progressão clara de nível.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Vídeos por módulo</div>
+        <div class="spec-val"><strong>2 a 4 vídeos.</strong> Cada módulo tem foco único — não misturar técnicas diferentes no mesmo módulo. O membro completa um módulo em uma sessão de estudo.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Duração total da trilha</div>
+        <div class="spec-val">Entre <strong>1h30 e 4 horas</strong> de conteúdo total. Menos do que isso parece raso para o valor da assinatura. Mais do que isso pode intimidar o início.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Progressão de nível</div>
+        <div class="spec-val">Módulo 1: fundamentos e diagnóstico → Módulo 2: execução básica → Módulo 3: técnicas avançadas → Módulo 4: acabamento e controle de qualidade. O membro sente que está evoluindo.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Pré-requisito visível</div>
+        <div class="spec-val">Informar no início da trilha se há conhecimento prévio necessário. "Esta trilha assume que você já sabe aplicar produto de limpeza corretamente." Evita frustração.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Nomenclatura dos arquivos</div>
+        <div class="spec-val"><code>[TRILHA]_M[nº]_V[nº]_[titulo-curto].mp4</code><br/>Ex: <code>PPF_M2_V3_preparacao-de-superficie.mp4</code>. Facilita organização no upload e revisão.</div>
+      </div>
+    </div>
+
+    <h3 style="font-size:0.95rem; font-weight:800; margin: 32px 0 16px; color:var(--off-white)">Exemplo de estrutura — Trilha de PPF</h3>
+
+    <div class="trilha-wrap">
+      <div class="trilha-module">
+        <div class="trilha-header">
+          <div class="trilha-num">M1</div>
+          <div>
+            <div class="trilha-title">Fundamentos e Diagnóstico</div>
+            <div class="trilha-sub">2 vídeos · ~18 min</div>
+          </div>
+        </div>
+        <div class="trilha-videos">
+          <div class="trilha-video"><span class="v-icon">▶</span><span class="v-title">O que é PPF e quando indicar para o cliente</span><span class="v-dur">8 min</span></div>
+          <div class="trilha-video"><span class="v-icon">▶</span><span class="v-title">Diagnóstico da pintura antes da aplicação</span><span class="v-dur">10 min</span></div>
+        </div>
+      </div>
+      <div class="trilha-module">
+        <div class="trilha-header">
+          <div class="trilha-num">M2</div>
+          <div>
+            <div class="trilha-title">Preparação de Superfície</div>
+            <div class="trilha-sub">3 vídeos · ~35 min</div>
+          </div>
+        </div>
+        <div class="trilha-videos">
+          <div class="trilha-video"><span class="v-icon">▶</span><span class="v-title">Descontaminação química e física</span><span class="v-dur">12 min</span></div>
+          <div class="trilha-video"><span class="v-icon">▶</span><span class="v-title">Correção de pintura pré-PPF</span><span class="v-dur">14 min</span></div>
+          <div class="trilha-video"><span class="v-icon">▶</span><span class="v-title">Limpeza final e inspeção</span><span class="v-dur">9 min</span></div>
+        </div>
+      </div>
+      <div class="trilha-module">
+        <div class="trilha-header">
+          <div class="trilha-num">M3</div>
+          <div>
+            <div class="trilha-title">Aplicação</div>
+            <div class="trilha-sub">4 vídeos · ~55 min</div>
+          </div>
+        </div>
+        <div class="trilha-videos">
+          <div class="trilha-video"><span class="v-icon">▶</span><span class="v-title">Corte e posicionamento do filme</span><span class="v-dur">15 min</span></div>
+          <div class="trilha-video"><span class="v-icon">▶</span><span class="v-title">Aplicação em capô — passo a passo</span><span class="v-dur">18 min</span></div>
+          <div class="trilha-video"><span class="v-icon">▶</span><span class="v-title">Aplicação em retrovisores e detalhes</span><span class="v-dur">12 min</span></div>
+          <div class="trilha-video"><span class="v-icon">▶</span><span class="v-title">Tratamento de bolhas e imperfeições</span><span class="v-dur">10 min</span></div>
+        </div>
+      </div>
+      <div class="trilha-module">
+        <div class="trilha-header">
+          <div class="trilha-num">M4</div>
+          <div>
+            <div class="trilha-title">Acabamento e Entrega</div>
+            <div class="trilha-sub">2 vídeos · ~20 min</div>
+          </div>
+        </div>
+        <div class="trilha-videos">
+          <div class="trilha-video"><span class="v-icon">▶</span><span class="v-title">Cura e inspeção final</span><span class="v-dur">10 min</span></div>
+          <div class="trilha-video"><span class="v-icon">▶</span><span class="v-title">Orientações de pós-venda para o cliente</span><span class="v-dur">10 min</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKLIST PRÉ-GRAVAÇÃO -->
+  <div class="section">
+    <div class="section-label">06 — Checklist</div>
+    <h2 class="section-title">Antes de apertar<br/><span>o REC.</span></h2>
+    <p class="section-intro">Usar antes de cada gravação. Leva 5 minutos e evita retrabalho de horas.</p>
+
+    <ul class="checklist">
+      <li class="ok"><div class="ck">✓</div><div><strong>Áudio:</strong> microfone conectado, nível testado entre -12 e -6 dB, ruído de fundo eliminado</div></li>
+      <li class="ok"><div class="ck">✓</div><div><strong>Câmera:</strong> 1080p mínimo, orientação horizontal, foco travado, estabilização ativada</div></li>
+      <li class="ok"><div class="ck">✓</div><div><strong>Iluminação:</strong> sem janela atrás, temperatura de cor consistente, sem sombra dura no rosto</div></li>
+      <li class="ok"><div class="ck">✓</div><div><strong>Enquadramento:</strong> verificado no monitor/tela antes de começar, headroom adequado</div></li>
+      <li class="ok"><div class="ck">✓</div><div><strong>Bateria e espaço:</strong> câmera com carga suficiente, cartão/memória com espaço para o vídeo completo</div></li>
+      <li class="ok"><div class="ck">✓</div><div><strong>Teste de 30 segundos:</strong> gravou, assistiu com fone, áudio e imagem ok</div></li>
+      <li class="ok"><div class="ck">✓</div><div><strong>Roteiro ou guia:</strong> sabe o que vai cobrir no vídeo, na ordem certa</div></li>
+      <li class="warn"><div class="ck">!</div><div><strong>Notificações:</strong> modo não perturbe ativado no celular e em qualquer dispositivo próximo</div></li>
+      <li class="warn"><div class="ck">!</div><div><strong>Nomenclatura:</strong> já sabe o nome do arquivo que vai usar após a gravação</div></li>
+    </ul>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo">DetailerHub</div>
+  <p>Guia de Gravação de Conteúdo · Uso interno · Versão 1.0 · 2026</p>
+</footer>
+
+</body>
+</html>

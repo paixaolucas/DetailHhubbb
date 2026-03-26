@@ -8,7 +8,8 @@ import { withAuth, verifyMembership } from "@/middleware/auth.middleware";
 import { db } from "@/lib/db";
 import { createPostSchema } from "@/lib/validations/post";
 import { trackEvent } from "@/services/analytics/analytics.service";
-import { awardPoints, awardInfluencerPoints } from "@/lib/points";
+import { awardPoints, awardInfluencerPoints, POST_THRESHOLD } from "@/lib/points";
+import { UserRole } from "@prisma/client";
 
 const AUTHOR_SELECT = {
   id: true,
@@ -179,6 +180,19 @@ export const POST = withAuth(async (req, { session, params }) => {
       return NextResponse.json({ success: false, error: "Membership required" }, { status: 403 });
     }
 
+    // Enforce post threshold for regular members (COMMUNITY_MEMBER)
+    if (session.role === UserRole.COMMUNITY_MEMBER) {
+      const userPoints = await db.userPoints.findUnique({
+        where: { userId_communityId: { userId: session.userId, communityId: space.communityId } },
+        select: { points: true },
+      });
+      if ((userPoints?.points ?? 0) < POST_THRESHOLD) {
+        return NextResponse.json(
+          { success: false, error: `Você precisa de ${POST_THRESHOLD} pontos para criar posts. Reaja e comente para ganhar pontos.`, code: "BELOW_POST_THRESHOLD" },
+          { status: 403 }
+        );
+      }
+    }
 
     const rawBody = await req.json();
     const parsed = createPostSchema.safeParse(rawBody);

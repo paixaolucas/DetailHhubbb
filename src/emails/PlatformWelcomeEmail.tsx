@@ -55,8 +55,23 @@ export function PlatformWelcomeEmail({
               </Text>
             </Section>
 
+            <Section style={onboardingBox}>
+              <Text style={onboardingTitle}>🚀 Sua jornada de 7 dias — Quick Win</Text>
+              <Text style={onboardingSubtitle}>
+                Esses 5 passos vão te mostrar quanto você pode ganhar a mais no próximo serviço:
+              </Text>
+              <Text style={step}>1. Assista a Aula 1.1 — Preparação de Superfície</Text>
+              <Text style={step}>2. Abra a Planilha de Precificação</Text>
+              <Text style={step}>3. Calcule o custo real de 1 serviço que já faz</Text>
+              <Text style={step}>4. Assista a Aula 5.1 — Por que você cobra menos do que deveria</Text>
+              <Text style={step}>5. Defina o novo preço para esse serviço</Text>
+              <Text style={onboardingNote}>
+                Leva menos de 1 hora. A maioria dos membros descobre que cobra pelo menos 30% abaixo do mercado.
+              </Text>
+            </Section>
+
             <Button href={dashboardUrl} style={button}>
-              Acessar o Detailer&apos;HUB
+              Começar agora →
             </Button>
           </Section>
 
@@ -109,6 +124,17 @@ const button = {
   display: "inline-block",
   marginTop: "16px",
 };
+const onboardingBox = {
+  backgroundColor: "#0A2A35",
+  border: "1px solid #006079",
+  borderRadius: "8px",
+  padding: "16px 20px",
+  margin: "20px 0",
+};
+const onboardingTitle = { color: "#009CD9", fontSize: "14px", fontWeight: "bold" as const, margin: "0 0 4px 0" };
+const onboardingSubtitle = { color: "#9CA3AF", fontSize: "13px", margin: "0 0 12px 0" };
+const step = { color: "#EEE6E4", fontSize: "13px", margin: "4px 0", paddingLeft: "4px" };
+const onboardingNote = { color: "#6B7280", fontSize: "12px", fontStyle: "italic" as const, margin: "10px 0 0 0" };
 const hr = { borderColor: "#374151", margin: "20px 0" };
 const footer = { color: "#6B7280", fontSize: "12px", textAlign: "center" as const };
 

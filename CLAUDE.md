@@ -9,7 +9,7 @@
 
 **Detailer'HUB** é uma plataforma de comunidades automotivas premium.
 - Influencers criam comunidades
-- Membros assinam a **plataforma** (assinatura única R$948/ano = R$79/mês) e acessam TUDO
+- Membros assinam a **plataforma** (assinatura única R$708/ano = R$59/mês, ou R$79/mês mensal) e acessam TUDO
 - Inspirado no modelo Circle (uma assinatura, acesso a todas as comunidades)
 
 ### Base intelectual do projeto
@@ -122,6 +122,20 @@ INFLUENCER_ADMIN   → gerencia suas comunidades
 COMMUNITY_MEMBER   → assina a plataforma, acessa tudo
 MARKETPLACE_PARTNER → vende produtos no marketplace (Phase 1: dormente — tratar como COMMUNITY_MEMBER na UI)
 ```
+
+### Dois grupos de influenciadores (mesmo role, perfis diferentes)
+O role `INFLUENCER_ADMIN` abrange dois perfis operacionais distintos — **não criar sub-roles**, apenas documentar para decisões de produto:
+
+| Grupo | Perfil | Exemplos | Responsabilidade principal |
+|-------|--------|----------|---------------------------|
+| **Parceiros de Negócio** | Donos de audiência consolidada, co-fundadores do ecossistema, têm participação nos resultados da plataforma | Gimenez, Neto, Barba, Corujão, Geovane | Trazer membros (dono do membro = comissão 35%), gerar conteúdo técnico, representar a marca |
+| **Produtores de Conteúdo** | Especialistas convidados, produzem módulos pontuais, não necessariamente têm comunidade própria na plataforma | Tarcísio Vaglieri (Veneto), Gilberto Stockler, Igor Ao Raboni, Widnei | Gravar aulas para os 7 módulos estruturados da plataforma |
+
+**Regras de produto decorrentes:**
+- `referredByInfluencerId` — define o "dono do membro" e é **imutável** após criação da assinatura
+- Parceiros de Negócio recebem 35% de comissão recorrente sobre cada membro referido
+- Produtores de Conteúdo são remunerados por entrega de módulo (contrato separado, fora do split 35/15/50)
+- A distinção é operacional — na UI ambos usam o mesmo dashboard `INFLUENCER_ADMIN`
 
 ### Auth
 - JWT em localStorage com chaves **namespaced**:
@@ -432,10 +446,21 @@ return NextResponse.json({ success: false, error: "mensagem" }, { status: 400 })
 |--------|---------|-----------|
 | `community-manager` | `community/community-manager.md` | Analisa saúde de comunidades, identifica padrões de churn, cria scripts de comunicação para influenciadores e propõe ações de retenção |
 
+#### Conselho Estratégico (personas de referência)
+| Agente | Arquivo | Descrição |
+|--------|---------|-----------|
+| `conselho` | `conselho/conselho.md` | Meta-agente: guia qual dos 5 conselheiros acionar por tipo de decisão, hierarquia de veto e formato de sessão |
+| `cagan` | `conselho/cagan.md` | Marty Cagan — estratégia de produto, roadmap, retenção e experiência do membro |
+| `hormozi` | `conselho/hormozi.md` | Alex Hormozi — oferta, precificação, copy de venda, conversão e matemática de receita |
+| `kotler` | `conselho/kotler.md` | Philip Kotler — inteligência de mercado, segmentação, posicionamento e concorrência |
+| `munger` | `conselho/munger.md` | Charlie Munger — inversão de problemas, riscos, modelos mentais e incentivos |
+| `ogilvy` | `conselho/ogilvy.md` | David Ogilvy — comunicação, copy, voz da marca e titulares |
+
 #### Pipelines (orquestram múltiplos agentes)
 | Pipeline | Arquivo | Descrição |
 |----------|---------|-----------|
 | `orchestrator` | `pipelines/orchestrator.md` | Analisa o escopo e aciona os subagentes corretos na ordem correta, consolidando o resultado final |
+| `organizador` | `pipelines/organizador.md` | Mantém a estrutura documental do projeto organizada, consistente e navegável |
 | `feature-pipeline` | `pipelines/feature-pipeline.md` | Ciclo completo de entrega: validação de produto → backend → frontend → code review → security |
 | `bug-fix-pipeline` | `pipelines/bug-fix-pipeline.md` | Diagnóstico (classifica severidade) → correção mínima → verificação sem coordenação manual |
 | `sprint-planning-pipeline` | `pipelines/sprint-planning-pipeline.md` | Diagnóstico H1 → classificação do backlog → sprint organizado com foco nos gatilhos do Horizonte 1 |

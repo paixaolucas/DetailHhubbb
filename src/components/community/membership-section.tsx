@@ -145,7 +145,7 @@ export function MembershipSection({
           <p className="text-2xl font-black text-[#EEE6E4] mb-1">
             R$79<span className="text-gray-400 text-sm font-normal">/mês</span>
           </p>
-          <p className="text-gray-500 text-xs mb-6">ou R$948/ano — cancele quando quiser</p>
+          <p className="text-gray-500 text-xs mb-6">ou R$708/ano (R$59/mês) — cancele quando quiser</p>
           <Link
             href={`/register?community=${communitySlug}`}
             className="inline-flex items-center gap-2 bg-gradient-to-r from-[#006079] to-[#009CD9] hover:from-[#007A99] hover:to-[#009CD9] text-white px-8 py-3.5 rounded-xl font-semibold transition-all hover:shadow-lg hover:shadow-[#006079]/30"

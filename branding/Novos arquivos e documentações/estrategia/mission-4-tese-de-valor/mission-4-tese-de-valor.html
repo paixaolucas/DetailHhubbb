@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Missão 04 — Tese de Valor | DetailerHUB</title>
+  <style>
+    :root {
+      --teal: #006079;
+      --teal-light: #009cd9;
+      --black: #1a1a1a;
+      --off-white: #eee6e4;
+      --gray: #2e2e2e;
+      --gray-mid: #444;
+      --gray-light: #888;
+      --green: #2ecc71;
+      --yellow: #f1c40f;
+      --red: #e74c3c;
+      --border: #333;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--black);
+      color: var(--off-white);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    /* ── COVER ── */
+    .cover {
+      background: linear-gradient(135deg, #0a0a0a 0%, #0d2a33 60%, #006079 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 40px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(0, 96, 121, 0.4);
+      border: 1px solid var(--teal);
+      color: var(--teal-light);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 6px 18px;
+      border-radius: 20px;
+      margin-bottom: 36px;
+    }
+
+    .cover-title {
+      font-size: clamp(2.4rem, 6vw, 4.2rem);
+      font-weight: 900;
+      letter-spacing: -2px;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      color: var(--off-white);
+    }
+
+    .cover-title span {
+      color: var(--teal-light);
+    }
+
+    .cover-subtitle {
+      font-size: clamp(0.95rem, 2vw, 1.15rem);
+      color: var(--gray-light);
+      max-width: 580px;
+      margin-bottom: 52px;
+      letter-spacing: 0.5px;
+    }
+
+    .cover-meta {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .cover-meta-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .cover-meta-label {
+      font-size: 10px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--teal);
+      font-weight: 700;
+    }
+
+    .cover-meta-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--off-white);
+    }
+
+    /* ── LAYOUT ── */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    .section {
+      padding: 80px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section:last-of-type {
+      border-bottom: none;
+    }
+
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--teal);
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 12px;
+    }
+
+    .section-title span {
+      color: var(--teal-light);
+    }
+
+    .section-intro {
+      color: var(--gray-light);
+      max-width: 680px;
+      margin-bottom: 40px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--teal-light);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .card-body {
+      color: #ccc;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .cards-grid .card {
+      margin-bottom: 0;
+    }
+
+    /* ── HIGHLIGHT BOX ── */
+    .highlight-box {
+      background: rgba(0, 96, 121, 0.15);
+      border: 1px solid rgba(0, 156, 217, 0.3);
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-top: 28px;
+    }
+
+    .highlight-box .big-number {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 900;
+      color: var(--teal-light);
+      letter-spacing: -1px;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+
+    .highlight-box .big-label {
+      color: var(--gray-light);
+      font-size: 14px;
+    }
+
+    /* ── BIG STAT ── */
+    .big-stat {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .big-stat-number {
+      font-size: clamp(2.8rem, 7vw, 5rem);
+      font-weight: 900;
+      color: var(--teal-light);
+      letter-spacing: -3px;
+      line-height: 1;
+      display: block;
+    }
+
+    .big-stat-label {
+      font-size: 14px;
+      color: var(--gray-light);
+      margin-top: 8px;
+      display: block;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── IMPACT TEXT ── */
+    .impact-text {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--teal-light);
+      border-radius: 12px;
+      padding: 32px 36px;
+      margin-bottom: 28px;
+      font-size: 16px;
+      line-height: 1.8;
+      color: #ddd;
+    }
+
+    .impact-text p + p {
+      margin-top: 20px;
+    }
+
+    /* ── PIC CARD ── */
+    .pic-card {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+
+    .pic-col {
+      padding: 32px 28px;
+    }
+
+    .pic-col:first-child {
+      border-right: 1px solid var(--border);
+    }
+
+    .pic-col-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 20px;
+    }
+
+    .demo-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .demo-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      color: #ccc;
+      font-size: 14px;
+    }
+
+    .demo-list li::before {
+      content: "→";
+      color: var(--teal-light);
+      font-weight: 700;
+      min-width: 16px;
+      margin-top: 1px;
+    }
+
+    .quotes-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .quotes-list li {
+      background: rgba(0, 96, 121, 0.1);
+      border: 1px solid rgba(0, 156, 217, 0.2);
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 14px;
+      color: var(--off-white);
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    .quotes-list li::before {
+      content: '"';
+      color: var(--teal-light);
+      font-size: 20px;
+      font-weight: 900;
+      font-style: normal;
+      margin-right: 4px;
+      line-height: 1;
+    }
+
+    /* ── NUMBERED CARDS ── */
+    .numbered-card {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 16px;
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .numbered-card:last-child {
+      margin-bottom: 0;
+    }
+
+    .num-badge {
+      background: rgba(0, 96, 121, 0.35);
+      border: 1px solid var(--teal);
+      color: var(--teal-light);
+      font-size: 13px;
+      font-weight: 900;
+      min-width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .numbered-card-content .card-title {
+      margin-bottom: 8px;
+    }
+
+    /* ── PAIN CARDS GRID ── */
+    .pain-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .pain-card {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      border-left-width: 4px;
+      border-left-style: solid;
+    }
+
+    .pain-card.financial { border-left-color: var(--red); }
+    .pain-card.technical  { border-left-color: var(--yellow); }
+    .pain-card.emotional  { border-left-color: var(--teal-light); }
+    .pain-card.strategic  { border-left-color: var(--gray-light); }
+
+    .pain-card-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+
+    .pain-card.financial .pain-card-title { color: var(--red); }
+    .pain-card.technical  .pain-card-title { color: var(--yellow); }
+    .pain-card.emotional  .pain-card-title { color: var(--teal-light); }
+    .pain-card.strategic  .pain-card-title { color: var(--gray-light); }
+
+    .pain-card-body {
+      color: #ccc;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ── PILLARS GRID ── */
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 28px 0;
+    }
+
+    .pillar-card {
+      background: rgba(0, 96, 121, 0.1);
+      border: 1px solid rgba(0, 156, 217, 0.25);
+      border-radius: 12px;
+      padding: 24px 20px;
+      text-align: center;
+    }
+
+    .pillar-icon {
+      font-size: 28px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .pillar-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--teal-light);
+      margin-bottom: 8px;
+    }
+
+    .pillar-body {
+      color: #ccc;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    /* ── PROMISE ── */
+    .promise-box {
+      background: rgba(0, 96, 121, 0.2);
+      border: 1px solid rgba(0, 156, 217, 0.4);
+      border-radius: 12px;
+      padding: 28px 32px;
+      text-align: center;
+      margin-top: 28px;
+    }
+
+    .promise-text {
+      font-size: clamp(1rem, 2.2vw, 1.25rem);
+      font-weight: 700;
+      color: var(--off-white);
+      line-height: 1.5;
+      letter-spacing: -0.3px;
+    }
+
+    .promise-text span {
+      color: var(--teal-light);
+    }
+
+    /* ── TABLE ── */
+    .table-wrap {
+      overflow-x: auto;
+      margin-bottom: 28px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead th {
+      background: var(--gray);
+      color: var(--teal-light);
+      font-weight: 700;
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+
+    tbody td {
+      padding: 11px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: #ccc;
+      vertical-align: top;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .td-highlight {
+      color: var(--off-white);
+      font-weight: 600;
+    }
+
+    .td-accent {
+      color: var(--teal-light);
+      font-weight: 700;
+    }
+
+    /* ── DIFFERENTIATOR CARD ── */
+    .diff-card {
+      background: rgba(0, 96, 121, 0.12);
+      border: 1px solid rgba(0, 156, 217, 0.3);
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-top: 24px;
+    }
+
+    .diff-card-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 10px;
+    }
+
+    .diff-card-body {
+      font-size: 15px;
+      color: var(--off-white);
+      line-height: 1.6;
+    }
+
+    /* ── SYNTHESIS BOX ── */
+    .synthesis-box {
+      background: rgba(0, 96, 121, 0.15);
+      border: 1px solid rgba(0, 156, 217, 0.3);
+      border-radius: 12px;
+      padding: 40px 36px;
+    }
+
+    .synthesis-box p {
+      color: #ddd;
+      font-size: 15px;
+      line-height: 1.8;
+      margin-bottom: 24px;
+    }
+
+    .synthesis-box p:last-child {
+      margin-bottom: 0;
+    }
+
+    .roi-badge {
+      display: inline-block;
+      background: rgba(46, 204, 113, 0.15);
+      border: 1px solid rgba(46, 204, 113, 0.4);
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: 20px;
+      margin-top: 12px;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      background: #111;
+      border-top: 1px solid var(--border);
+      padding: 32px;
+      text-align: center;
+    }
+
+    .footer-text {
+      font-size: 12px;
+      color: var(--gray-light);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .footer-text span {
+      color: var(--teal);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 700px) {
+      .container { padding: 0 20px; }
+      .section { padding: 60px 0; }
+      .cover { padding: 60px 24px; }
+      .cover-meta { gap: 24px; }
+      .pain-grid { grid-template-columns: 1fr; }
+      .pillars-grid { grid-template-columns: 1fr; }
+      .pic-card { grid-template-columns: 1fr; }
+      .pic-col:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+      .cards-grid { grid-template-columns: 1fr; }
+      .numbered-card { flex-direction: column; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════
+       COVER
+  ══════════════════════════════════════════ -->
+  <section class="cover">
+    <div class="badge">MISSÃO 04 · TRILHA ESTRATÉGICA</div>
+
+    <h1 class="cover-title">Tese de <span>Valor</span></h1>
+
+    <p class="cover-subtitle">A espinha dorsal estratégica do DetailerHUB — dor real, público claro, solução profunda</p>
+
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <span class="cover-meta-label">Agente</span>
+        <span class="cover-meta-value">Munger + Cagan</span>
+      </div>
+      <div class="cover-meta-item">
+        <span class="cover-meta-label">Data</span>
+        <span class="cover-meta-value">25 Mar 2026</span>
+      </div>
+      <div class="cover-meta-item">
+        <span class="cover-meta-label">Status</span>
+        <span class="cover-meta-value" style="color: var(--green);">Concluído</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+
+    <!-- ══════════════════════════════════════════
+         DOR REAL E RELEVANTE
+    ══════════════════════════════════════════ -->
+    <section class="section">
+      <p class="section-label">Ponto de Partida</p>
+      <h2 class="section-title">Dor Real e <span>Relevante</span></h2>
+
+      <div class="big-stat">
+        <span class="big-stat-number">R$ 75.600</span>
+        <span class="big-stat-label">por membro / por ano deixados na mesa</span>
+      </div>
+
+      <div class="impact-text">
+        <p>
+          Todo mês, um detailer autônomo termina uma polição de três horas, olha para o carro impecável que acabou de entregar, e cobra R$180. Não porque o trabalho vale R$180. Mas porque ele não sabe — com segurança e argumentação — cobrar R$600.
+        </p>
+        <p>
+          Essa diferença não é abstrata. É a diferença entre pagar ou não pagar o aluguel. Um profissional que atende 15 carros por mês está deixando <strong style="color:var(--off-white)">R$6.300 por mês na mesa</strong> — R$75.600 por ano — não por falta de habilidade, mas por falta de posicionamento.
+        </p>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════
+         PÚBLICO-ALVO (PIC)
+    ══════════════════════════════════════════ -->
+    <section class="section">
+      <p class="section-label">Público</p>
+      <h2 class="section-title">Público-Alvo <span>(PIC)</span></h2>
+      <p class="section-intro">
+        Perfil ideal do membro DetailerHUB — construído a partir de frases reais coletadas no mercado.
+      </p>
+
+      <div class="pic-card">
+        <div class="pic-col">
+          <div class="pic-col-title">Dados Demográficos</div>
+          <ul class="demo-list">
+            <li>Homem · 25–38 anos</li>
+            <li>MEI ou autônomo</li>
+            <li>Capital ou cidade com frota expressiva</li>
+            <li>Faturamento R$3.000–8.000/mês</li>
+            <li>2–6 anos no mercado</li>
+          </ul>
+        </div>
+        <div class="pic-col">
+          <div class="pic-col-title">Frases Reais</div>
+          <ul class="quotes-list">
+            <li>Quanto vocês cobram por isso?</li>
+            <li>Tô cobrando R$250, mas acho que tô barato.</li>
+            <li>Trabalho mais que nunca, mas o dinheiro não aumenta.</li>
+            <li>Vejo detailer com equipamento pior cobrando o dobro. Como ele faz isso?</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════
+         CONTEXTO DE MERCADO
+    ══════════════════════════════════════════ -->
+    <section class="section">
+      <p class="section-label">Ambiente Externo</p>
+      <h2 class="section-title">Contexto de <span>Mercado</span></h2>
+      <p class="section-intro">
+        Três forças estruturais que tornam o DetailerHUB necessário agora.
+      </p>
+
+      <div class="numbered-card">
+        <div class="num-badge">1</div>
+        <div class="numbered-card-content">
+          <div class="card-title">Valorização do mercado automotivo</div>
+          <div class="card-body">O segmento de veículos acima de R$150.000 cresceu consistentemente. O cliente de alto poder aquisitivo existe, mas vai para centros especializados porque não encontra profissionais que se comuniquem na linguagem do luxo.</div>
+        </div>
+      </div>
+
+      <div class="numbered-card">
+        <div class="num-badge">2</div>
+        <div class="numbered-card-content">
+          <div class="card-title">A internet democratizou a técnica, não o posicionamento</div>
+          <div class="card-body">Qualquer detailer aprende polimento em vídeos gratuitos. A técnica virou commodity. O posicionamento virou vantagem competitiva — e ninguém está ensinando isso.</div>
+        </div>
+      </div>
+
+      <div class="numbered-card">
+        <div class="num-badge">3</div>
+        <div class="numbered-card-content">
+          <div class="card-title">A ascensão dos criadores criou nova competição</div>
+          <div class="card-body">Detailers com presença digital — mesmo sem ser os melhores — dominam o mercado local e cobram preços que parecem impossíveis para quem opera só no boca-a-boca.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════
+         MAPA DE DORES
+    ══════════════════════════════════════════ -->
+    <section class="section">
+      <p class="section-label">Diagnóstico</p>
+      <h2 class="section-title">Mapa de <span>Dores</span></h2>
+      <p class="section-intro">
+        As quatro dimensões do problema que mantêm o detailer autônomo travado.
+      </p>
+
+      <div class="pain-grid">
+
+        <div class="pain-card financial">
+          <div class="pain-card-title">Dor Financeira</div>
+          <div class="pain-card-body">
+            Gap estrutural: ticket independente R$150–400 vs. centros R$800–2.500. Faturamento travado em R$3–8K/mês independente de horas trabalhadas. O teto não é esforço — é posicionamento.
+          </div>
+        </div>
+
+        <div class="pain-card technical">
+          <div class="pain-card-title">Dor Tecnica</div>
+          <div class="pain-card-body">
+            O gap real não é em polimento ou ceramic — é em: montar pacotes, calcular margem, fotografar para justificar preço, apresentar proposta para cliente de maior ticket. Esse conhecimento não existe em cursos de detailing.
+          </div>
+        </div>
+
+        <div class="pain-card emotional">
+          <div class="pain-card-title">Dor Emocional</div>
+          <div class="pain-card-body">
+            Síndrome do impostor. Medo de rejeição. Vergonha de cobrar. Ver colega com menos habilidade cobrando mais e sentir frustração e confusão. Trabalha duro, faz a coisa certa, e não avança.
+          </div>
+        </div>
+
+        <div class="pain-card strategic">
+          <div class="pain-card-title">Dor Estrategica</div>
+          <div class="pain-card-body">
+            Em 3–5 anos, o mercado vai estar dominado por franquias e redes. O detailer autônomo que não construir posicionamento hoje vai ter duas opções: competir por preço mínimo ou virar funcionário de quem fez o que ele não fez.
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════
+         HIPÓTESE DE SOLUÇÃO
+    ══════════════════════════════════════════ -->
+    <section class="section">
+      <p class="section-label">A Solução</p>
+      <h2 class="section-title">Hipótese de <span>Solução</span></h2>
+
+      <div class="highlight-box" style="margin-top:0; margin-bottom:28px;">
+        <p style="font-size:16px; font-weight:700; color:var(--off-white); line-height:1.5;">
+          O DetailerHUB não é um curso de detailing.
+        </p>
+        <p style="color:#ccc; font-size:14px; margin-top:8px; line-height:1.6;">
+          É uma plataforma de membros construída para transformar detailers tecnicamente competentes em profissionais de alto padrão — com precificação, posicionamento e presença digital.
+        </p>
+      </div>
+
+      <div class="pillars-grid">
+        <div class="pillar-card">
+          <span class="pillar-icon">💰</span>
+          <div class="pillar-title">Precificação</div>
+          <div class="pillar-body">Aprende a calcular, montar pacotes e apresentar preços com confiança</div>
+        </div>
+        <div class="pillar-card">
+          <span class="pillar-icon">🎯</span>
+          <div class="pillar-title">Posicionamento</div>
+          <div class="pillar-body">Aprende a se comunicar como profissional de referência, não como mão de obra barata</div>
+        </div>
+        <div class="pillar-card">
+          <span class="pillar-icon">📱</span>
+          <div class="pillar-title">Presença Digital</div>
+          <div class="pillar-body">Aprende a usar o celular para atrair o cliente certo</div>
+        </div>
+      </div>
+
+      <div class="promise-box">
+        <p class="promise-text">
+          "Com método contínuo, você cobra diferente, comunica diferente e atrai um tipo de cliente diferente."
+        </p>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════
+         DIFERENCIAIS COMPETITIVOS
+    ══════════════════════════════════════════ -->
+    <section class="section">
+      <p class="section-label">Competição</p>
+      <h2 class="section-title">Diferenciais <span>Competitivos</span></h2>
+      <p class="section-intro">
+        O que cada alternativa entrega — e o que nenhuma delas faz.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Competidor</th>
+              <th>O que faz</th>
+              <th>O que NAO faz</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-highlight">YouTube gratuito</td>
+              <td>Ensina técnica</td>
+              <td>Não ensina posicionamento, não tem comunidade, sem progressão</td>
+            </tr>
+            <tr>
+              <td class="td-highlight">Cursos presenciais (R$800–3.000)</td>
+              <td>Técnica intensiva em 2 dias</td>
+              <td>Sem continuidade, sem comunidade, custo proibitivo</td>
+            </tr>
+            <tr>
+              <td class="td-highlight">Grupos de WhatsApp</td>
+              <td>Comunidade informal</td>
+              <td>Sem método, sem padrão, sem progressão</td>
+            </tr>
+            <tr>
+              <td class="td-highlight">Plataformas genéricas</td>
+              <td>Entregam conteúdo</td>
+              <td>Não é contextualizado para detailing</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="diff-card">
+        <div class="diff-card-title">Nosso Diferencial Defensável</div>
+        <div class="diff-card-body">
+          Especificidade de nicho + comunidade de padrão + continuidade + referência de mercado. Por <strong style="color:var(--teal-light)">R$79/mês no lançamento</strong>. Quanto mais a comunidade cresce, mais difícil é sair.
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════
+         SÍNTESE DA TESE DE VALOR
+    ══════════════════════════════════════════ -->
+    <section class="section">
+      <p class="section-label">Conclusão</p>
+      <h2 class="section-title">Síntese da <span>Tese de Valor</span></h2>
+
+      <div class="synthesis-box">
+        <p>
+          O Brasil tem aproximadamente <strong style="color:var(--off-white)">280.000 detailers autônomos</strong> que sabem executar serviços de alto valor mas cobram como iniciantes. O gap entre o ticket médio do profissional independente (R$150–400) e o do centro especializado (R$800–2.500) não existe porque um é tecnicamente melhor — a diferença não é só técnica. Quem cobra mais sabe precificar e comunicar melhor.
+        </p>
+        <p>
+          O DetailerHUB é a <strong style="color:var(--teal-light)">primeira plataforma de membros construída especificamente</strong> para transformar detailers tecnicamente competentes em profissionais de alto padrão — ensinando precificação, posicionamento e presença digital de forma contínua, em comunidade, por R$79/mês no lançamento.
+        </p>
+        <div style="text-align:center; padding-top:8px;">
+          <span class="roi-badge">ROI potencial: 45x – 60x o custo da assinatura</span>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /container -->
+
+  <!-- ══════════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════════ -->
+  <footer class="footer">
+    <p class="footer-text">
+      <span>DetailerHUB</span> &nbsp;·&nbsp; Trilha Estratégica &nbsp;·&nbsp; <span>Missão 04 de 06</span> &nbsp;·&nbsp; Agente: Charlie Munger + Marty Cagan
+    </p>
+  </footer>
+
+</body>
+</html>

@@ -28,7 +28,7 @@ const chartStyle = {
   },
 };
 
-const PRECO_ANUAL = 948;
+const PRECO_ANUAL = 708; // R$708/ano (R$59/mês no plano anual)
 const PRECO_PIX   = 79; // R$79/mês
 const COMISSAO    = 0.15;
 
@@ -499,7 +499,7 @@ export default function AnalyticsPage() {
                 </div>
                 <div className="mt-3 p-2.5 bg-emerald-500/5 rounded-xl border border-emerald-500/10">
                   <p className="text-xs text-emerald-400 text-center">
-                    Mesmo valor do plano anual fracionado: <strong>R$948 ÷ 12</strong>
+                    Mesmo valor do plano anual fracionado: <strong>R$708 ÷ 12</strong>
                   </p>
                 </div>
               </div>

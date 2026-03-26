@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Missão 3 — Ímã de Problemas · DetailerHUB</title>
+  <style>
+    :root {
+      --teal: #006079;
+      --teal-light: #009cd9;
+      --black: #1a1a1a;
+      --off-white: #eee6e4;
+      --gray: #2e2e2e;
+      --gray-mid: #444;
+      --gray-light: #888;
+      --green: #2ecc71;
+      --yellow: #f1c40f;
+      --red: #e74c3c;
+      --border: #333;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--black);
+      color: var(--off-white);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    /* ── COVER ─────────────────────────────────────────────── */
+    .cover {
+      background: linear-gradient(135deg, #0a0a0a 0%, #0d2a33 60%, #006079 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 40px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(0, 156, 217, 0.15);
+      border: 1px solid rgba(0, 156, 217, 0.4);
+      color: var(--teal-light);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      padding: 6px 18px;
+      border-radius: 20px;
+      margin-bottom: 32px;
+    }
+
+    .cover h1 {
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+
+    .cover h1 span {
+      color: var(--teal-light);
+    }
+
+    .cover .subtitle {
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      color: var(--gray-light);
+      max-width: 600px;
+      margin-bottom: 48px;
+    }
+
+    .cover-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 28px;
+      justify-content: center;
+    }
+
+    .cover-meta-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .cover-meta-item .label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gray-light);
+    }
+
+    .cover-meta-item .value {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--off-white);
+    }
+
+    .cover-meta-divider {
+      width: 1px;
+      height: 36px;
+      background: var(--border);
+      align-self: center;
+    }
+
+    /* ── CONTAINER ──────────────────────────────────────────── */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ── SECTION ────────────────────────────────────────────── */
+    .section {
+      padding: 72px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section:last-of-type {
+      border-bottom: none;
+    }
+
+    .section-eyebrow {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--teal-light);
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-size: clamp(1.4rem, 3vw, 1.9rem);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .section-desc {
+      color: var(--gray-light);
+      font-size: 14px;
+      margin-bottom: 40px;
+    }
+
+    /* ── PROBLEM GRID ───────────────────────────────────────── */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    @media (max-width: 680px) {
+      .problem-grid { grid-template-columns: 1fr; }
+    }
+
+    .problem-card {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .problem-number {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: var(--teal-light);
+      background: rgba(0, 156, 217, 0.12);
+      border-radius: 6px;
+      padding: 3px 8px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .problem-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--off-white);
+      line-height: 1.5;
+    }
+
+    /* ── TABLE ──────────────────────────────────────────────── */
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+
+    thead tr {
+      background: rgba(0, 96, 121, 0.3);
+    }
+
+    thead th {
+      padding: 14px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--teal-light);
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-top: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+
+    tbody tr:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    tbody td {
+      padding: 12px 16px;
+      vertical-align: middle;
+    }
+
+    .td-num {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gray-light);
+      width: 36px;
+    }
+
+    .td-problem {
+      font-weight: 500;
+      color: var(--off-white);
+      min-width: 220px;
+    }
+
+    .td-icon {
+      text-align: center;
+      font-size: 16px;
+      width: 80px;
+    }
+
+    .td-score {
+      font-weight: 700;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .score-full { color: var(--green); }
+    .score-mid  { color: var(--yellow); }
+    .score-low  { color: var(--red); }
+
+    /* ── HIGHLIGHT BOX ──────────────────────────────────────── */
+    .highlight-box {
+      background: rgba(0, 96, 121, 0.15);
+      border: 1px solid rgba(0, 156, 217, 0.3);
+      border-radius: 12px;
+      padding: 24px 28px;
+    }
+
+    .central-problem-title {
+      font-size: clamp(1.3rem, 3vw, 1.7rem);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.3;
+      color: #fff;
+      margin-bottom: 32px;
+    }
+
+    .central-problem-title span {
+      color: var(--teal-light);
+    }
+
+    /* ── JUSTIFY CARDS ──────────────────────────────────────── */
+    .justify-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    @media (max-width: 680px) {
+      .justify-grid { grid-template-columns: 1fr; }
+    }
+
+    .justify-card {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .justify-card-label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 10px;
+    }
+
+    .justify-card p {
+      font-size: 13.5px;
+      color: var(--off-white);
+      line-height: 1.65;
+    }
+
+    /* ── LEFT BORDER CARD (teal) ────────────────────────────── */
+    .lbcard-teal {
+      border-left: 4px solid var(--teal);
+      background: var(--gray);
+      border-radius: 0 12px 12px 0;
+      padding: 24px 28px;
+    }
+
+    .lbcard-teal h3 {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--off-white);
+      margin-bottom: 12px;
+    }
+
+    .lbcard-teal p {
+      font-size: 14px;
+      color: #c0b8b6;
+      line-height: 1.7;
+    }
+
+    /* ── TIMELINE ───────────────────────────────────────────── */
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-top: 28px;
+    }
+
+    .timeline-item {
+      display: flex;
+      gap: 20px;
+      position: relative;
+      padding-bottom: 28px;
+    }
+
+    .timeline-item:last-child {
+      padding-bottom: 0;
+    }
+
+    .timeline-line-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      width: 28px;
+    }
+
+    .timeline-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--teal-light);
+      flex-shrink: 0;
+      margin-top: 5px;
+    }
+
+    .timeline-dot.red  { background: var(--red); }
+    .timeline-dot.yellow { background: var(--yellow); }
+
+    .timeline-connector {
+      width: 2px;
+      flex: 1;
+      background: var(--border);
+      margin-top: 4px;
+    }
+
+    .timeline-item:last-child .timeline-connector {
+      display: none;
+    }
+
+    .timeline-content {}
+
+    .timeline-period {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--teal-light);
+      margin-bottom: 4px;
+    }
+
+    .timeline-period.yellow { color: var(--yellow); }
+    .timeline-period.red    { color: var(--red); }
+
+    .timeline-text {
+      font-size: 14px;
+      color: #c0b8b6;
+      line-height: 1.65;
+    }
+
+    /* ── LEFT BORDER CARD (red) ─────────────────────────────── */
+    .lbcard-red {
+      border-left: 4px solid var(--red);
+      background: var(--gray);
+      border-radius: 0 12px 12px 0;
+      padding: 20px 24px;
+      margin-bottom: 12px;
+    }
+
+    .lbcard-red:last-child {
+      margin-bottom: 0;
+    }
+
+    .lbcard-red h4 {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--red);
+      margin-bottom: 6px;
+    }
+
+    .lbcard-red p {
+      font-size: 13.5px;
+      color: #c0b8b6;
+      line-height: 1.65;
+    }
+
+    /* ── FOOTER ─────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+      color: var(--gray-light);
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    footer span {
+      color: var(--teal-light);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ COVER ═══════════════════════════════════════════════ -->
+  <section class="cover">
+    <div class="badge">MISSÃO 03 · TRILHA ESTRATÉGICA</div>
+
+    <h1>Ímã de <span>Problemas</span></h1>
+
+    <p class="subtitle">
+      Identificando o único problema que vale tudo — usando inversão e modelos mentais
+    </p>
+
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <span class="label">Agente</span>
+        <span class="value">Charlie Munger</span>
+      </div>
+      <div class="cover-meta-divider"></div>
+      <div class="cover-meta-item">
+        <span class="label">Data</span>
+        <span class="value">25 Mar 2026</span>
+      </div>
+      <div class="cover-meta-divider"></div>
+      <div class="cover-meta-item">
+        <span class="label">Status</span>
+        <span class="value">Concluído</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SECTION 1 — LISTA COMPLETA ═══════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <p class="section-eyebrow">Inventário Inicial</p>
+      <h2 class="section-title">Lista Completa de Problemas</h2>
+      <p class="section-desc">13 problemas mapeados no universo do detailer que busca reposicionamento de valor.</p>
+
+      <div class="problem-grid">
+
+        <div class="problem-card">
+          <span class="problem-number">01</span>
+          <span class="problem-title">Não consegue precificar serviços de alto valor com segurança</span>
+        </div>
+
+        <div class="problem-card">
+          <span class="problem-number">02</span>
+          <span class="problem-title">Aprendizado fragmentado sem progressão estruturada</span>
+        </div>
+
+        <div class="problem-card">
+          <span class="problem-number">03</span>
+          <span class="problem-title">Sem clareza sobre qual serviço dominar</span>
+        </div>
+
+        <div class="problem-card">
+          <span class="problem-number">04</span>
+          <span class="problem-title">Teto de renda visível mas intransponível</span>
+        </div>
+
+        <div class="problem-card">
+          <span class="problem-number">05</span>
+          <span class="problem-title">Isolamento técnico — sem par de referência</span>
+        </div>
+
+        <div class="problem-card">
+          <span class="problem-number">06</span>
+          <span class="problem-title">Medo de perder cliente ao reposicionar preço</span>
+        </div>
+
+        <div class="problem-card">
+          <span class="problem-number">07</span>
+          <span class="problem-title">Não converte conhecimento em argumento de venda</span>
+        </div>
+
+        <div class="problem-card">
+          <span class="problem-number">08</span>
+          <span class="problem-title">Cursos sem ROI mensurável</span>
+        </div>
+
+        <div class="problem-card">
+          <span class="problem-number">09</span>
+          <span class="problem-title">Renda instável e sem previsibilidade</span>
+        </div>
+
+        <div class="problem-card">
+          <span class="problem-number">10</span>
+          <span class="problem-title">Ausência de portfólio técnico que justifique preço</span>
+        </div>
+
+        <div class="problem-card">
+          <span class="problem-number">11</span>
+          <span class="problem-title">Não qualifica cliente para serviço de alto valor</span>
+        </div>
+
+        <div class="problem-card">
+          <span class="problem-number">12</span>
+          <span class="problem-title">Custo de insumos crescendo, margem comprimindo</span>
+        </div>
+
+        <div class="problem-card">
+          <span class="problem-number">13</span>
+          <span class="problem-title">Dificuldade de contratar e treinar ajudante</span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SECTION 2 — TRÊS FILTROS ══════════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <p class="section-eyebrow">Análise de Critérios</p>
+      <h2 class="section-title">Avaliação pelos Três Filtros</h2>
+      <p class="section-desc">Cada problema submetido a três critérios: urgência real, disposição de pagamento e alinhamento ao Motor Moral.</p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Problema</th>
+              <th class="td-icon">Urgente e Real?</th>
+              <th class="td-icon">Pagaria?</th>
+              <th class="td-icon">Motor Moral?</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-num">1</td>
+              <td class="td-problem">Não consegue precificar serviços de alto valor</td>
+              <td class="td-icon">✅</td>
+              <td class="td-icon">✅</td>
+              <td class="td-icon">✅</td>
+              <td class="td-score score-full">3/3</td>
+            </tr>
+            <tr>
+              <td class="td-num">7</td>
+              <td class="td-problem">Não converte conhecimento em argumento</td>
+              <td class="td-icon">✅</td>
+              <td class="td-icon">✅</td>
+              <td class="td-icon">✅</td>
+              <td class="td-score score-full">3/3</td>
+            </tr>
+            <tr>
+              <td class="td-num">4</td>
+              <td class="td-problem">Teto de renda intransponível</td>
+              <td class="td-icon">✅</td>
+              <td class="td-icon">✅</td>
+              <td class="td-icon">✅</td>
+              <td class="td-score score-full">3/3</td>
+            </tr>
+            <tr>
+              <td class="td-num">9</td>
+              <td class="td-problem">Renda instável</td>
+              <td class="td-icon">✅</td>
+              <td class="td-icon">✅</td>
+              <td class="td-icon">✅</td>
+              <td class="td-score score-full">3/3</td>
+            </tr>
+            <tr>
+              <td class="td-num">6</td>
+              <td class="td-problem">Medo de reposicionar preço</td>
+              <td class="td-icon">✅</td>
+              <td class="td-icon">✅</td>
+              <td class="td-icon">✅</td>
+              <td class="td-score score-full">3/3</td>
+            </tr>
+            <tr>
+              <td class="td-num">11</td>
+              <td class="td-problem">Não qualifica cliente de maior ticket</td>
+              <td class="td-icon">✅</td>
+              <td class="td-icon">✅</td>
+              <td class="td-icon">✅</td>
+              <td class="td-score score-full">3/3</td>
+            </tr>
+            <tr>
+              <td class="td-num">2</td>
+              <td class="td-problem">Aprendizado fragmentado</td>
+              <td class="td-icon">✅</td>
+              <td class="td-icon">⚠️</td>
+              <td class="td-icon">✅</td>
+              <td class="td-score score-mid">2,5/3</td>
+            </tr>
+            <tr>
+              <td class="td-num">8</td>
+              <td class="td-problem">Cursos sem ROI mensurável</td>
+              <td class="td-icon">✅</td>
+              <td class="td-icon">⚠️</td>
+              <td class="td-icon">✅</td>
+              <td class="td-score score-mid">2,5/3</td>
+            </tr>
+            <tr>
+              <td class="td-num">5</td>
+              <td class="td-problem">Isolamento técnico</td>
+              <td class="td-icon">✅</td>
+              <td class="td-icon">⚠️</td>
+              <td class="td-icon">⚠️</td>
+              <td class="td-score score-mid">2/3</td>
+            </tr>
+            <tr>
+              <td class="td-num">12</td>
+              <td class="td-problem">Margem comprimida</td>
+              <td class="td-icon">✅</td>
+              <td class="td-icon">⚠️</td>
+              <td class="td-icon">⚠️</td>
+              <td class="td-score score-mid">2/3</td>
+            </tr>
+            <tr>
+              <td class="td-num">3</td>
+              <td class="td-problem">Sem clareza de qual serviço</td>
+              <td class="td-icon">⚠️</td>
+              <td class="td-icon">⚠️</td>
+              <td class="td-icon">✅</td>
+              <td class="td-score score-mid">2/3</td>
+            </tr>
+            <tr>
+              <td class="td-num">10</td>
+              <td class="td-problem">Ausência de portfólio</td>
+              <td class="td-icon">⚠️</td>
+              <td class="td-icon">⚠️</td>
+              <td class="td-icon">✅</td>
+              <td class="td-score score-mid">2/3</td>
+            </tr>
+            <tr>
+              <td class="td-num">13</td>
+              <td class="td-problem">Não consegue delegar</td>
+              <td class="td-icon">⚠️</td>
+              <td class="td-icon">⚠️</td>
+              <td class="td-icon">⚠️</td>
+              <td class="td-score score-low">1,5/3</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SECTION 3 — PROBLEMA CENTRAL ══════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <p class="section-eyebrow">Decisão Final</p>
+      <h2 class="section-title">Problema Central Escolhido</h2>
+      <p class="section-desc">O problema que passa em todos os filtros e explica os demais como sintomas.</p>
+
+      <div class="highlight-box" style="margin-bottom: 32px;">
+        <p class="central-problem-title">
+          Sabe executar serviços de alto valor —<br>
+          mas não consegue <span>cobrar por eles.</span>
+        </p>
+
+        <div class="justify-grid">
+          <div class="justify-card">
+            <div class="justify-card-label">✅ Urgente e Real</div>
+            <p>Todo mês esse detailer entrega um polimento de 6 horas que levou R$120 em produtos e sai com R$280 na mão. A dor é financeira e acontece constantemente.</p>
+          </div>
+          <div class="justify-card">
+            <div class="justify-card-label">✅ Pagaria para Resolver</div>
+            <p>Já pagou R$2.000–4.000 em cursos presenciais buscando exatamente essa transformação de faturamento. A disposição está comprovada.</p>
+          </div>
+          <div class="justify-card">
+            <div class="justify-card-label">✅ Conecta ao Motor Moral</div>
+            <p>O detailer que não cobra pelo que entrega é o arquétipo do profissional competente que ainda não é dono do próprio negócio. Resolver isso é o Motor Moral em ação.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="lbcard-teal" style="margin-bottom: 32px;">
+        <h3>O que exatamente acontece</h3>
+        <p>
+          O detailer avalia o carro, identifica mentalmente que precisa de descontaminação + correção em 2 estágios + cerâmica de 3 anos. Ele sabe o que está olhando. Mas quando abre a boca para falar o preço, um travamento acontece. O número que sai é R$350 — não R$1.100. Não é só falta de técnica — a técnica está lá. É a ausência de linguagem de valor.
+        </p>
+      </div>
+
+      <div class="lbcard-teal">
+        <h3>Consequências ao longo do tempo</h3>
+        <div class="timeline">
+
+          <div class="timeline-item">
+            <div class="timeline-line-wrap">
+              <div class="timeline-dot yellow"></div>
+              <div class="timeline-connector"></div>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-period yellow">12 meses</div>
+              <p class="timeline-text">Continua no teto de R$5.000–7.000/mês. Novos entrantes com discurso melhor chegam.</p>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-line-wrap">
+              <div class="timeline-dot yellow"></div>
+              <div class="timeline-connector"></div>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-period yellow">24 meses</div>
+              <p class="timeline-text">Janela de diferenciação começa a fechar. Coating e PPF sendo comoditizados por franquias.</p>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-line-wrap">
+              <div class="timeline-dot red"></div>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-period red">36 meses</div>
+              <p class="timeline-text">Abandona o mercado ou aceita ser subcontratado de franquias — o oposto do Motor Moral.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ SECTION 4 — DESCARTADOS ════════════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <p class="section-eyebrow">Processo de Inversão</p>
+      <h2 class="section-title">Por que os outros foram descartados</h2>
+      <p class="section-desc">Aplicando o modelo de Munger: o que elimina primeiro as opções ruins isola a certa.</p>
+
+      <div class="lbcard-red">
+        <h4>Teto de renda (#4)</h4>
+        <p>É um sintoma, não uma causa. Resolver o sintoma sem a causa é tratar febre sem tratar a infecção.</p>
+      </div>
+
+      <div class="lbcard-red">
+        <h4>Renda instável (#9)</h4>
+        <p>Problema real, mas de modelo de negócio. Requer solução estrutural diferente. É o segundo problema a resolver.</p>
+      </div>
+
+      <div class="lbcard-red">
+        <h4>Aprendizado fragmentado (#2)</h4>
+        <p>Colocá-lo como central seria definir o problema pelo formato da solução. O detailer não acorda pensando "meu aprendizado não é estruturado."</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ═════════════════════════════════════════════════ -->
+  <footer>
+    <span>DetailerHUB</span> · Trilha Estratégica · Missão 03 de 06 · Agente: Charlie Munger
+  </footer>
+
+</body>
+</html>

@@ -14,6 +14,7 @@ import { RankingBlock } from "./RankingBlock";
 import { NextLiveCard } from "./NextLiveCard";
 import { TrendingFeed } from "./TrendingFeed";
 import { MemberHealthWidget } from "./MemberHealthWidget";
+import { MemberOnboarding } from "./MemberOnboarding";
 
 export function MemberDashboard({
   userName,
@@ -77,6 +78,13 @@ export function MemberDashboard({
         </div>
         <HealthScore />
       </div>
+
+      {/* Block 2.5: Onboarding quick win */}
+      {hasPlatform && (
+        <div className="animate-fade-in delay-75">
+          <MemberOnboarding />
+        </div>
+      )}
 
       {/* Block 3: Comunidades — largura total */}
       <div className="animate-slide-up delay-75">

@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DetailerHub & CrewHouse — Documentação Fundacional v8</title>
+  <style>
+    :root {
+      --teal: #006079;
+      --teal-light: #009cd9;
+      --black: #1a1a1a;
+      --off-white: #eee6e4;
+      --gray: #2e2e2e;
+      --gray-mid: #444;
+      --gray-light: #888;
+      --green: #2ecc71;
+      --yellow: #f1c40f;
+      --red: #e74c3c;
+      --border: #333;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--black);
+      color: var(--off-white);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    /* COVER */
+    .cover {
+      background: linear-gradient(135deg, #0a0a0a 0%, #0d2a33 60%, #006079 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cover::before {
+      content: '';
+      position: absolute;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(0,156,217,0.08) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .cover-badge {
+      background: rgba(0,96,121,0.4);
+      border: 1px solid var(--teal);
+      color: var(--teal-light);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 6px 18px;
+      border-radius: 20px;
+      margin-bottom: 32px;
+    }
+
+    .cover h1 {
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1.05;
+      margin-bottom: 16px;
+    }
+
+    .cover h1 span { color: var(--teal-light); }
+
+    .cover-subtitle {
+      font-size: 1.05rem;
+      color: var(--gray-light);
+      max-width: 560px;
+      margin: 0 auto 48px;
+    }
+
+    .cover-meta {
+      display: flex;
+      gap: 48px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .cover-meta-item { text-align: center; }
+    .cover-meta-item .label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gray-light); margin-bottom: 4px; }
+    .cover-meta-item .value { font-size: 1.1rem; font-weight: 700; color: var(--teal-light); }
+
+    /* PARTE DIVIDER */
+    .parte-divider {
+      background: linear-gradient(135deg, #0a0a0a 0%, #0d2a33 100%);
+      padding: 80px 40px;
+      text-align: center;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .parte-num {
+      font-size: 11px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--teal);
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .parte-title {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -2px;
+      margin-bottom: 12px;
+    }
+
+    .parte-sub {
+      color: var(--gray-light);
+      font-size: 0.95rem;
+    }
+
+    /* LAYOUT */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    /* SECTIONS */
+    .section {
+      padding: 80px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section:last-child { border-bottom: none; }
+
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--teal);
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+
+    .section-intro {
+      color: var(--gray-light);
+      max-width: 680px;
+      margin-bottom: 40px;
+      font-size: 1rem;
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 8px;
+      color: var(--off-white);
+    }
+
+    .card p { color: #bbb; font-size: 0.92rem; }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .card ul { list-style: none; padding: 0; }
+    .card ul li {
+      padding: 4px 0;
+      color: #bbb;
+      font-size: 0.9rem;
+    }
+    .card ul li::before { content: '•  '; color: var(--teal-light); }
+
+    /* TABLES */
+    .table-wrap { overflow-x: auto; margin: 24px 0; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    th {
+      background: var(--gray);
+      color: var(--teal-light);
+      font-weight: 700;
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 11px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      color: #ccc;
+      vertical-align: top;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    td strong { color: var(--off-white); }
+    td .ok { color: var(--green); font-weight: 700; }
+    td .no { color: var(--red); font-weight: 700; }
+    td .warn { color: var(--yellow); font-weight: 700; }
+
+    /* HIGHLIGHT BOX */
+    .highlight {
+      background: rgba(0,96,121,0.15);
+      border: 1px solid rgba(0,96,121,0.4);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin: 24px 0;
+    }
+
+    .highlight p { color: var(--off-white); font-size: 0.95rem; }
+
+    .alert {
+      background: rgba(231,76,60,0.1);
+      border: 1px solid rgba(231,76,60,0.35);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin: 24px 0;
+    }
+
+    .alert p { color: #f1948a; font-size: 0.9rem; }
+    .alert strong { color: var(--red); }
+
+    .warn-box {
+      background: rgba(241,196,15,0.08);
+      border: 1px solid rgba(241,196,15,0.3);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin: 24px 0;
+    }
+
+    .warn-box p { color: #f5e97b; font-size: 0.9rem; }
+
+    /* QUOTE */
+    .quote {
+      border-left: 3px solid var(--teal-light);
+      padding: 16px 24px;
+      margin: 32px 0;
+      background: rgba(0,156,217,0.05);
+      border-radius: 0 8px 8px 0;
+    }
+
+    .quote p {
+      font-size: 1.05rem;
+      font-style: italic;
+      color: var(--off-white);
+    }
+
+    /* STATUS BADGES */
+    .badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    .badge-green { background: rgba(46,204,113,0.15); color: var(--green); border: 1px solid rgba(46,204,113,0.3); }
+    .badge-yellow { background: rgba(241,196,15,0.15); color: var(--yellow); border: 1px solid rgba(241,196,15,0.3); }
+    .badge-teal { background: rgba(0,96,121,0.3); color: var(--teal-light); border: 1px solid var(--teal); }
+    .badge-red { background: rgba(231,76,60,0.15); color: var(--red); border: 1px solid rgba(231,76,60,0.3); }
+
+    /* HORIZON CARD */
+    .horizon-card {
+      border-left: 3px solid var(--teal);
+      background: var(--gray);
+      border-radius: 0 12px 12px 0;
+      padding: 24px 28px;
+      margin-bottom: 20px;
+    }
+
+    .horizon-card.h2 { border-left-color: var(--teal-light); }
+    .horizon-card.h3 { border-left-color: #555; }
+
+    .horizon-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .horizon-num {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--teal);
+      font-weight: 700;
+    }
+
+    .horizon-card.h2 .horizon-num { color: var(--teal-light); }
+    .horizon-card.h3 .horizon-num { color: var(--gray-light); }
+
+    .horizon-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 4px 0 2px;
+    }
+
+    /* FINANCE BARS */
+    .finance-bar-wrap { margin: 32px 0; }
+
+    .finance-bar-item { margin-bottom: 14px; }
+    .finance-bar-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 0.85rem;
+    }
+    .finance-bar-meta .name { color: #ccc; }
+    .finance-bar-meta .pct { color: var(--teal-light); font-weight: 700; }
+
+    .bar-bg {
+      background: #222;
+      border-radius: 4px;
+      height: 8px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 4px;
+    }
+
+    /* FORMULA */
+    .formula {
+      background: #111;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin: 20px 0;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.85rem;
+      color: var(--teal-light);
+    }
+
+    /* CANVAS GRID */
+    .canvas-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 24px 0;
+    }
+
+    @media (max-width: 640px) {
+      .canvas-grid { grid-template-columns: 1fr; }
+      .cover-meta { gap: 24px; }
+    }
+
+    .canvas-cell {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    .canvas-cell h4 {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--teal);
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .canvas-cell ul { list-style: none; }
+    .canvas-cell ul li { padding: 3px 0; color: #bbb; font-size: 0.88rem; }
+    .canvas-cell ul li::before { content: '• '; color: var(--teal-light); }
+
+    /* SCORE SYSTEM */
+    .score-table td:first-child { font-weight: 700; color: var(--off-white); }
+
+    /* POINT ITEM */
+    .point-item {
+      display: flex;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      align-items: flex-start;
+    }
+    .point-item:last-child { border-bottom: none; }
+
+    .point-icon {
+      font-size: 1.4rem;
+      flex-shrink: 0;
+      width: 40px;
+      text-align: center;
+    }
+
+    .point-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 3px; }
+    .point-desc { color: #999; font-size: 0.87rem; }
+    .point-val { color: var(--teal-light); font-weight: 700; font-size: 0.85rem; margin-top: 4px; }
+
+    /* TWO-PRODUCT TABLE */
+    .two-prod td:first-child { color: var(--gray-light); font-size: 0.85rem; font-weight: 600; }
+    .two-prod td:nth-child(2) { color: var(--teal-light); }
+    .two-prod td:nth-child(3) { color: #aaa; }
+
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--off-white);
+      margin: 32px 0 12px;
+    }
+
+    p { margin-bottom: 12px; color: #ccc; }
+    p:last-child { margin-bottom: 0; }
+
+    ul.doc-list { padding-left: 0; list-style: none; margin: 12px 0; }
+    ul.doc-list li { padding: 4px 0; color: #bbb; font-size: 0.92rem; }
+    ul.doc-list li::before { content: '•  '; color: var(--teal-light); }
+
+    ol.doc-ol { padding-left: 20px; margin: 12px 0; }
+    ol.doc-ol li { padding: 4px 0; color: #bbb; font-size: 0.92rem; }
+  </style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-badge">Documentação Fundacional</div>
+  <h1>DETAILERHUB<br><span>&amp; CREWHOUSE</span></h1>
+  <p class="cover-subtitle">Arquitetura de Dois Produtos · Modelo de Negócio · Estratégia de Marca · Roadmap de Expansão</p>
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <div class="label">Versão</div>
+      <div class="value">8.0</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Ano</div>
+      <div class="value">2026</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Status</div>
+      <div class="value">Confidencial</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Produto 1</div>
+      <div class="value">Em Curso</div>
+    </div>
+  </div>
+</div>
+
+<!-- PARTE I -->
+<div class="parte-divider">
+  <div class="parte-num">Parte I</div>
+  <div class="parte-title">O Ecossistema</div>
+  <div class="parte-sub">Visão estratégica · Arquitetura de dois produtos · Marca · Horizontes</div>
+</div>
+
+<!-- SEÇÃO 1 -->
+<div class="container">
+  <div class="section">
+    <div class="section-label">Seção 1</div>
+    <div class="section-title">Visão Geral — Arquitetura de Dois Produtos</div>
+    <p class="section-intro">Este documento descreve um ecossistema de dois produtos complementares com identidades, públicos e modelos de monetização distintos — construídos em fases, com o primeiro financiando e validando o segundo.</p>
+
+    <div class="table-wrap">
+      <table class="two-prod">
+        <thead>
+          <tr>
+            <th>Dimensão</th>
+            <th>DetailerHub</th>
+            <th>CrewHouse / Pitcrew</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>O que é</td><td>Plataforma fechada e paga para a comunidade de estética automotiva</td><td>Plataforma mãe gratuita para toda a cultura automotiva brasileira</td></tr>
+          <tr><td>Público</td><td>Profissionais e entusiastas de detalhamento, PPF, envelopamento e estética automotiva</td><td>Qualquer apaixonado por carro — profissionais, hobbistas, colecionadores, entusiastas</td></tr>
+          <tr><td>Acesso</td><td>Assinatura paga — clube fechado</td><td>Gratuito — comunidade aberta</td></tr>
+          <tr><td>Monetização</td><td>Assinaturas + marketplace + caixa de performance + anunciantes segmentados</td><td>Anunciantes, eventos, marketplace amplo, patrocínios, dados, funil para produtos pagos</td></tr>
+          <tr><td>Nome e marca</td><td>DetailerHub — reconhecimento imediato no nicho</td><td>CrewHouse ou Pitcrew — cultura automotiva ampla</td></tr>
+          <tr><td>Fase de lançamento</td><td><span class="badge badge-green">Produto 1 — lançar agora</span></td><td><span class="badge badge-yellow">Produto 2 — lançar quando H1 for atingido</span></td></tr>
+          <tr><td>Relação entre os dois</td><td>Produto âncora — prova o modelo, gera receita, valida a tecnologia</td><td>Plataforma mãe — escala o modelo para toda a cultura automotiva</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>A lógica estratégica da arquitetura de dois produtos</h3>
+    <ul class="doc-list">
+      <li>DetailerHub conquista uma "praia" específica com profundidade antes de atacar o oceano.</li>
+      <li>O aprendizado do DetailerHub informa a construção do CrewHouse.</li>
+      <li>O CrewHouse gratuito se torna o maior funil de aquisição do DetailerHub — entusiastas entram de graça e descobrem o produto principal.</li>
+      <li>O DetailerHub dentro do CrewHouse vira o "clube dos profissionais" — produto de maior valor percebido do ecossistema.</li>
+    </ul>
+
+    <h3>DetailerHub — Conceito Central</h3>
+    <p>Plataforma proprietária que hospeda influenciadores de estética automotiva, onde cada criador constrói sua comunidade de fãs. O membro paga uma assinatura única que dá acesso a todas as comunidades da plataforma — o influenciador que trouxe aquele membro recebe sua comissão proporcional, criando alinhamento total entre aquisição e receita.</p>
+
+    <div class="quote"><p>"O YouTube é sua vitrine. O WhatsApp é sua praça. O DetailerHub é a sua casa."</p></div>
+
+    <ul class="doc-list">
+      <li>O membro pertence ao influenciador que o trouxe — comissão perpétua enquanto ele permanecer ativo.</li>
+      <li>O influenciador não paga nada para estar na plataforma.</li>
+      <li>Somente ações dentro da plataforma contam para o ranqueamento e a caixa de performance.</li>
+    </ul>
+
+    <h3>CrewHouse / Pitcrew — Conceito Central</h3>
+    <p>Plataforma mãe gratuita que reúne toda a cultura automotiva brasileira em um único ecossistema. Eventos, lifestyle, conteúdo, comunidades abertas e parcerias com grandes marcas. O DetailerHub existe como produto principal dentro desse ecossistema — o espaço dos profissionais sérios dentro da comunidade maior.</p>
+
+    <div class="warn-box">
+      <p><strong>DECISÃO PENDENTE:</strong> o nome final da plataforma mãe — CrewHouse ou Pitcrew — será definido antes do Horizonte 2. Ambos os nomes estão em avaliação de disponibilidade de domínio, marca registrada (INPI classes 38 e 41) e redes sociais.</p>
+    </div>
+
+    <h3>Modelo de canais — válido para o DetailerHub</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Camada</th><th>Ferramenta</th><th>Função</th><th>O que NÃO deve acontecer aqui</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Vitrine</strong></td><td>YouTube / Instagram</td><td>Conteúdo público de descoberta. Atrai novos membros em potencial.</td><td>Conteúdo exclusivo reservado para membros pagantes.</td></tr>
+          <tr><td><strong>Velocidade</strong></td><td>WhatsApp (grupo)</td><td>Avisos rápidos, bastidores, convocações para a plataforma. Engajamento espontâneo.</td><td>Entrega de conteúdo principal. Debates com valor permanente.</td></tr>
+          <tr><td><strong>Profundidade</strong></td><td>DetailerHub</td><td>Vídeos exclusivos, fórum, trilhas, marketplace, conteúdo que o membro vai rever em meses.</td><td>Conversas efêmeras que somem sem deixar registro.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="alert">
+      <p><strong>ATENÇÃO OPERACIONAL — WhatsApp:</strong> limite de participantes, sem moderação robusta, dados não são seus. Planejar migração para Telegram quando necessário. Manter lista de e-mails dentro da plataforma como canal de backup.</p>
+    </div>
+
+    <h3>Saúde do modelo — avaliação crítica</h3>
+    <p>O modelo DetailerHub é <strong style="color:var(--green)">VIÁVEL e SUSTENTÁVEL</strong> com as seguintes premissas:</p>
+    <ol class="doc-ol">
+      <li>Entrada com 3–4 influenciadores comprometidos simultaneamente para massa crítica desde o dia 1.</li>
+      <li>Churn mensal abaixo de 8% (benchmark saudável para plataformas de nicho: 5–7%).</li>
+      <li>Receita de anunciantes e marketplace entrando até o mês 4–6.</li>
+      <li>Ticket de R$79/mês (preço de lançamento) como referência de modelagem (meio da faixa R$60–99).</li>
+    </ol>
+
+    <div class="alert">
+      <p><strong>RISCO PRINCIPAL:</strong> split de 35% distribuído por "dono do membro" — influenciadores com mais membros ganham mais desde o início. A caixa de performance (15%) é o mecanismo de equilíbrio. Entrada somente por convite nos primeiros meses garante que todos os influenciadores tenham perfil adequado.</p>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 2 -->
+  <div class="section">
+    <div class="section-label">Seção 2</div>
+    <div class="section-title">Estratégia de Marca — Identidade e Nomenclatura</div>
+
+    <p class="section-intro">A identidade visual do DetailerHub — dark, teal, tipografia limpa — está alinhada com o universo automotivo profissional. O símbolo H com as duas figuras humanas comunica a letra do produto e o conceito de comunidade de forma subliminar e memorável.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Dimensão</th><th>DetailerHub</th><th>CrewHouse / Pitcrew</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Nome</strong></td><td>DetailerHub</td><td>A definir — CrewHouse ou Pitcrew</td></tr>
+          <tr><td><strong>Paleta</strong></td><td>Teal (#006079) + azul (#009cd9) + preto (#1a1a1a) + off-white (#eee6e4)</td><td>A definir — mantendo DNA automotivo, mais amplo e acessível</td></tr>
+          <tr><td><strong>Personalidade</strong></td><td>Autoridade, precisão técnica, profissionalismo, exclusividade</td><td>Comunidade, cultura automotiva, modernidade, pertencimento</td></tr>
+          <tr><td><strong>Símbolo</strong></td><td>H com duas figuras humanas — letra + comunidade subliminar</td><td>A desenvolver no Horizonte 2</td></tr>
+          <tr><td><strong>Comunicação</strong></td><td>"O YouTube é sua vitrine. O DetailerHub é a sua casa."</td><td>A definir — cultura automotiva ampla</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Headlines sugeridas — DetailerHub</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Contexto</th><th>Headline</th></tr></thead>
+        <tbody>
+          <tr><td>Para o influenciador</td><td>"Sua audiência merece uma casa. O DetailerHub é essa casa."</td></tr>
+          <tr><td>Para o membro</td><td>"As melhores comunidades de estética automotiva do Brasil — em um só lugar."</td></tr>
+          <tr><td>Posicionamento geral</td><td>"O maior ecossistema de estética automotiva do Brasil — construído pelos maiores criadores do nicho."</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Candidatos ao nome da plataforma mãe</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Nome</th><th>Pontos fortes</th><th>Pontos de atenção</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Pitcrew ⭐</strong></td><td>Comunidade embutida no conceito. Escalável para qualquer profissional automotivo. Fácil em PT e EN. Cria identidade — "sou do Pitcrew".</td><td>Verificar disponibilidade de domínio e INPI.</td></tr>
+          <tr><td><strong>CrewHouse ⭐</strong></td><td>Carrega o conceito da metodologia (a casa) + comunidade (crew). "Esta é a sua casa." Memorável e descritivo.</td><td>Verificar disponibilidade de domínio e INPI.</td></tr>
+          <tr><td>Crewlab</td><td>Remete a aprendizado e experimentação.</td><td>Menos emocional — não gera pertencimento forte.</td></tr>
+          <tr><td>Pitclub</td><td>Exclusividade e pertencimento claros.</td><td>Clube sugere fechado — contradiz o modelo gratuito da plataforma mãe.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="highlight">
+      <p><strong>AÇÃO NECESSÁRIA antes do Horizonte 2:</strong></p>
+      <ol class="doc-ol" style="margin-top:8px">
+        <li>Verificar domínios: pitcrew.com.br · pitcrew.app · crewhouse.com.br · crewhouse.app</li>
+        <li>Consultar INPI — classes 38 (telecomunicações) e 41 (educação/entretenimento)</li>
+        <li>Verificar @pitcrew e @crewhouse no Instagram, YouTube e TikTok</li>
+        <li>Decisão final de nome antes de qualquer investimento em identidade visual</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 3 -->
+  <div class="section">
+    <div class="section-label">Seção 3</div>
+    <div class="section-title">Metas Estratégicas e Horizontes de Expansão</div>
+    <p class="section-intro">As metas são baseadas em gatilhos objetivos, não em datas arbitrárias. Cada horizonte só começa quando o anterior for completamente atingido — garantindo que a expansão seja construída sobre evidências reais, não suposições.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Horizonte</th><th>Foco</th><th>Produto</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Horizonte 1</strong></td><td>Provar o modelo</td><td>DetailerHub</td><td><span class="badge badge-green">Em Curso</span></td></tr>
+          <tr><td><strong>Horizonte 2</strong></td><td>Estruturar a expansão</td><td>DetailerHub + preparação do Produto 2</td><td><span class="badge badge-yellow">Aguarda H1</span></td></tr>
+          <tr><td><strong>Horizonte 3</strong></td><td>Lançar a plataforma mãe</td><td>CrewHouse / Pitcrew + DetailerHub como produto âncora</td><td><span class="badge badge-teal">Aguarda H2</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="horizon-card">
+      <div class="horizon-header">
+        <div>
+          <div class="horizon-num">Horizonte 1</div>
+          <div class="horizon-title">Provar o Modelo — DetailerHub</div>
+        </div>
+        <span class="badge badge-green">Em Curso</span>
+      </div>
+      <p style="color:#bbb;font-size:0.9rem;margin-bottom:16px">O Horizonte 1 está completo quando TODOS os gatilhos abaixo forem atingidos simultaneamente:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Gatilho</th><th>Meta</th><th>Justificativa</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Membros ativos</strong></td><td>5.000</td><td>Base suficiente para sustentar o estrutural com conforto, caixa de performance atrativa e prova de product-market fit.</td></tr>
+            <tr><td><strong>Churn mensal</strong></td><td>&lt; 7%</td><td>Abaixo desse número o modelo de retenção está funcionando. Acima indica problema de valor percebido.</td></tr>
+            <tr><td><strong>NPS dos influenciadores</strong></td><td>&gt; 50</td><td>Criadores satisfeitos e dispostos a indicar a plataforma para outros influenciadores.</td></tr>
+            <tr><td><strong>Influenciadores saudáveis</strong></td><td>≥ 80% por 6 meses</td><td>Modelo de entregas e incentivos funcionando sem depender de gestão ativa.</td></tr>
+            <tr><td><strong>Receita complementar</strong></td><td>Ativa e recorrente</td><td>Pelo menos 3 contratos de anunciantes ativos e GMV de marketplace crescente mês a mês.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="highlight" style="margin-top:16px">
+        <p><strong>Enquanto o H1 está em curso — não expandir. Foco é vantagem competitiva.</strong><br>
+        • Documentar o que funciona e onde há churn.<br>
+        • Identificar influenciadores de outros nichos automotivos com perfil para o H2.<br>
+        • Verificar disponibilidade de nome e marca do Produto 2.</p>
+      </div>
+    </div>
+
+    <div class="horizon-card h2">
+      <div class="horizon-header">
+        <div>
+          <div class="horizon-num">Horizonte 2</div>
+          <div class="horizon-title">Estruturar a Expansão</div>
+        </div>
+        <span class="badge badge-yellow">Aguarda H1</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Gatilho</th><th>Meta</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Autossuficiência</strong></td><td>DetailerHub financiando o desenvolvimento do Produto 2 sem capital externo.</td></tr>
+            <tr><td><strong>Novos nichos</strong></td><td>Pelo menos 2 nichos automotivos com influenciadores prontos e comprometidos.</td></tr>
+            <tr><td><strong>Equipe</strong></td><td>Time operando o DetailerHub com autonomia enquanto os fundadores constroem o Produto 2.</td></tr>
+            <tr><td><strong>Tecnologia</strong></td><td>Arquitetura validada e escalável para múltiplas comunidades.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="color:#bbb;font-size:0.9rem;margin-top:16px"><strong style="color:var(--off-white)">O que muda no DetailerHub no H2:</strong> Passa a ser o "clube dos profissionais" dentro do ecossistema maior. Trilhas ganham certificação profissional. Membros têm acesso automático ao Produto 2 como benefício da assinatura.</p>
+    </div>
+
+    <div class="horizon-card h3">
+      <div class="horizon-header">
+        <div>
+          <div class="horizon-num">Horizonte 3</div>
+          <div class="horizon-title">Lançar a Plataforma Mãe</div>
+        </div>
+        <span class="badge badge-teal">Aguarda H2</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Gatilho</th><th>Meta</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Lançamento</strong></td><td>CrewHouse / Pitcrew com DetailerHub como produto âncora.</td></tr>
+            <tr><td><strong>Comunidades pagas</strong></td><td>Pelo menos 3 comunidades pagas além do DetailerHub.</td></tr>
+            <tr><td><strong>Anunciantes</strong></td><td>Pelo menos 5 contratos ativos de marcas automotivas de médio e grande porte.</td></tr>
+            <tr><td><strong>Acesso</strong></td><td>Plataforma mãe completamente gratuita. Monetização por anunciantes, eventos, marketplace e funil para produtos pagos.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PARTE II -->
+<div class="parte-divider">
+  <div class="parte-num">Parte II</div>
+  <div class="parte-title">DetailerHub</div>
+  <div class="parte-sub">Modelo de negócio detalhado · Split financeiro · Plataforma · Comunidade · Influenciadores</div>
+</div>
+
+<div class="container">
+
+  <!-- SEÇÃO 4 -->
+  <div class="section">
+    <div class="section-label">Seção 4</div>
+    <div class="section-title">Canvas de Modelo de Negócio — DetailerHub</div>
+
+    <div class="canvas-grid">
+      <div class="canvas-cell">
+        <h4>Parcerias-Chave</h4>
+        <ul>
+          <li>Influenciadores fundadores</li>
+          <li>Marcas da estética automotiva</li>
+          <li>Fornecedores de IA (APIs/LLMs)</li>
+          <li>Plataformas de pagamento</li>
+          <li>Gateway antifraude/chargeback</li>
+        </ul>
+      </div>
+      <div class="canvas-cell">
+        <h4>Atividades-Chave</h4>
+        <ul>
+          <li>Curadoria de influenciadores</li>
+          <li>Desenvolvimento contínuo da plataforma</li>
+          <li>Algoritmo de performance e caixa</li>
+          <li>Operação do marketplace</li>
+          <li>Gestão de comunidades</li>
+        </ul>
+      </div>
+      <div class="canvas-cell">
+        <h4>Proposta de Valor</h4>
+        <ul>
+          <li>Renda recorrente e previsível</li>
+          <li>Propriedade da audiência</li>
+          <li>Acesso a todas as comunidades (membro)</li>
+          <li>Ferramentas de IA para membros</li>
+          <li>Marketplace do nicho integrado</li>
+          <li>Status e pertencimento curado</li>
+        </ul>
+      </div>
+      <div class="canvas-cell">
+        <h4>Relacionamento</h4>
+        <ul>
+          <li>Onboarding guiado</li>
+          <li>Dashboard de receita em tempo real</li>
+          <li>Comunidade entre criadores</li>
+          <li>Programa de performance transparente</li>
+          <li>Co-criação de features</li>
+        </ul>
+      </div>
+      <div class="canvas-cell">
+        <h4>Segmentos</h4>
+        <ul>
+          <li>Influenciadores de estética automotiva</li>
+          <li>Fãs e entusiastas (membros)</li>
+          <li>Marcas anunciantes do nicho</li>
+          <li>Pequenos negócios automotivos</li>
+        </ul>
+      </div>
+      <div class="canvas-cell">
+        <h4>Recursos-Chave</h4>
+        <ul>
+          <li>Plataforma tecnológica</li>
+          <li>Base de influenciadores</li>
+          <li>Dados de engajamento e comportamento</li>
+          <li>Equipe enxuta (2 devs + produto)</li>
+          <li>Marca e reputação no nicho</li>
+        </ul>
+      </div>
+      <div class="canvas-cell">
+        <h4>Canais</h4>
+        <ul>
+          <li>YouTube/Instagram (vitrine de aquisição)</li>
+          <li>Link na bio dos influenciadores</li>
+          <li>Indicação entre criadores</li>
+          <li>Mídia especializada automotiva</li>
+          <li>Eventos e feiras do setor</li>
+        </ul>
+      </div>
+      <div class="canvas-cell">
+        <h4>Fontes de Receita</h4>
+        <ul>
+          <li>Assinaturas mensais de membros (principal)</li>
+          <li>Comissão sobre vendas no marketplace</li>
+          <li>Anunciantes segmentados do nicho</li>
+          <li>Ingressos para eventos</li>
+          <li>Cursos e treinamentos (futura expansão)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Estrutura de Custos</div>
+      <ul>
+        <li>Infraestrutura de tecnologia</li>
+        <li>APIs de IA</li>
+        <li>Equipe (devs, suporte, produto)</li>
+        <li>Impostos e taxas legais</li>
+        <li>Operação do marketplace</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 5 -->
+  <div class="section">
+    <div class="section-label">Seção 5</div>
+    <div class="section-title">Canvas de Proposta de Valor — DetailerHub</div>
+
+    <h3>Segmento A — Influenciador de Estética Automotiva</h3>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-title">🎯 Mapa de Valor (O que entregamos)</div>
+        <ul>
+          <li>Receita recorrente: comissão de 35% sobre cada membro que ele trouxer, para sempre que ele permanecer</li>
+          <li>Previsibilidade: renda mensal calculável, sem dependência de algoritmo ou CPM</li>
+          <li>Propriedade da audiência: dados, histórico e relacionamento direto com seus fãs pagantes</li>
+          <li>Caixa de performance: bônus proporcional ao engajamento gerado</li>
+          <li>Sem custo de entrada: o influenciador não paga para estar na plataforma</li>
+          <li>Status e curadoria: ambiente exclusivo ao lado dos maiores nomes da estética automotiva BR</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title">👤 Perfil do Cliente (O que ele quer e teme)</div>
+        <ul>
+          <li><strong>Ganhos desejados:</strong> renda recorrente, reconhecimento, comunidade leal e engajada</li>
+          <li><strong>Tarefas a realizar:</strong> criar conteúdo, engajar fãs, crescer audiência, monetizar</li>
+          <li><strong>Dores atuais:</strong> CPM variável, algoritmo imprevisível, fãs "alugados", esforço sem escalabilidade</li>
+          <li><strong>Medos:</strong> perder relevância, depender de uma plataforma única, não monetizar além de publis</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Segmento B — Membro da Comunidade (Fã/Entusiasta)</h3>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-title">🎯 Mapa de Valor</div>
+        <ul>
+          <li>Acesso total: uma assinatura = todas as comunidades da plataforma, sem custo adicional</li>
+          <li>Conteúdo exclusivo: bastidores, lives, Q&As e conteúdo exclusivo do influenciador favorito</li>
+          <li>Ferramentas de IA: recursos práticos de estética automotiva disponíveis para membros</li>
+          <li>Comunidade qualificada: troca com outros apaixonados pelo nicho, moderada pelos criadores</li>
+          <li>Marketplace curado: produtos e serviços referendados pelos influenciadores</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title">👤 Perfil do Cliente</div>
+        <ul>
+          <li><strong>Ganhos desejados:</strong> aprender mais, acesso privilegiado ao criador, conexão com a comunidade</li>
+          <li><strong>Tarefas a realizar:</strong> consumir conteúdo, interagir, comprar produtos, melhorar habilidades</li>
+          <li><strong>Dores atuais:</strong> conteúdo gratuito superficial, falta de comunidade focada, produtos genéricos</li>
+          <li><strong>Motivação de upgrade:</strong> sentir que "faz parte" — não apenas consome, pertence</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 6 -->
+  <div class="section">
+    <div class="section-label">Seção 6</div>
+    <div class="section-title">Split Financeiro e Sustentabilidade — DetailerHub</div>
+
+    <h3>Distribuição de cada R$1,00 recebido de assinatura</h3>
+    <div class="finance-bar-wrap">
+      <div class="finance-bar-item">
+        <div class="finance-bar-meta"><span class="name">Comissão ao Influenciador (dono do membro)</span><span class="pct">35%</span></div>
+        <div class="bar-bg"><div class="bar-fill" style="width:35%;background:var(--teal-light)"></div></div>
+      </div>
+      <div class="finance-bar-item">
+        <div class="finance-bar-meta"><span class="name">Caixa dos Influenciadores (performance)</span><span class="pct">15%</span></div>
+        <div class="bar-bg"><div class="bar-fill" style="width:15%;background:var(--teal)"></div></div>
+      </div>
+      <div class="finance-bar-item">
+        <div class="finance-bar-meta"><span class="name">Custos Estruturais e Operacionais</span><span class="pct">35%</span></div>
+        <div class="bar-bg"><div class="bar-fill" style="width:35%;background:#555"></div></div>
+      </div>
+      <div class="finance-bar-item">
+        <div class="finance-bar-meta"><span class="name">Marketing e Aquisição</span><span class="pct">15%</span></div>
+        <div class="bar-bg"><div class="bar-fill" style="width:15%;background:#444"></div></div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Destinação</th><th>%</th><th>Função e Justificativa</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Comissão ao Influenciador</strong></td><td><span style="color:var(--teal-light);font-weight:700">35%</span></td><td>Remuneração direta proporcional aos membros que o influenciador trouxe. Cria alinhamento total entre aquisição e receita.</td></tr>
+          <tr><td><strong>Caixa dos Influenciadores</strong></td><td><span style="color:var(--teal-light);font-weight:700">15%</span></td><td>Pool coletivo distribuído mensalmente por métricas de engajamento e entrega. Recompensa quem produz com consistência.</td></tr>
+          <tr><td><strong>Custos Estruturais e Operacionais</strong></td><td><span style="color:var(--gray-light);font-weight:700">35%</span></td><td>Impostos, salários da equipe, infraestrutura tecnológica, APIs de IA, suporte jurídico e operação geral do negócio.</td></tr>
+          <tr><td><strong>Marketing e Aquisição</strong></td><td><span style="color:var(--gray-light);font-weight:700">15%</span></td><td>Investimento em crescimento da base de membros. Nos primeiros 2 anos, aquisição orgânica pode liberar parte desse orçamento para produto.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Projeção de sustentabilidade por cenário</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Cenário</th><th>Membros</th><th>MRR (R$79)</th><th>Influenciadores (35%)</th><th>Caixa Perf. (15%)</th><th>Estrutural (35%)</th><th>Marketing (15%)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Mínimo viável</strong></td><td>300</td><td>R$ 23.700</td><td>R$ 8.295</td><td>R$ 3.555</td><td>R$ 8.295</td><td>R$ 3.555</td></tr>
+          <tr><td><strong>Crescimento inicial</strong></td><td>600</td><td>R$ 47.400</td><td>R$ 16.590</td><td>R$ 7.110</td><td>R$ 16.590</td><td>R$ 7.110</td></tr>
+          <tr><td><strong>Tração</strong></td><td>1.200</td><td>R$ 94.800</td><td>R$ 33.180</td><td>R$ 14.220</td><td>R$ 33.180</td><td>R$ 14.220</td></tr>
+          <tr><td><strong>Escala</strong></td><td>2.500</td><td>R$ 197.500</td><td>R$ 69.125</td><td>R$ 29.625</td><td>R$ 69.125</td><td>R$ 29.625</td></tr>
+          <tr><td><strong>Referência ambiciosa</strong></td><td>5.000</td><td>R$ 395.000</td><td>R$ 138.250</td><td>R$ 59.250</td><td>R$ 138.250</td><td>R$ 59.250</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="highlight">
+      <p>📌 Os 35% de estrutural precisam cobrir impostos (estimativa 8–15% sobre receita bruta no regime Simples/Lucro Presumido), salários dos sócios-fundadores e dev adicional, infraestrutura e APIs. Com 300 membros, os R$8.295 mensais são apertados — o negócio começa a respirar com conforto acima de 600 membros.</p>
+    </div>
+
+    <h3>Receitas complementares que alimentam a caixa de performance</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Fonte de Receita</th><th>Como entra na caixa</th><th>Estimativa</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Anunciantes do nicho</strong></td><td>Percentual do valor dos pacotes de anúncio (ex: 30%) vai para a caixa</td><td>R$500–5.000/mês por anunciante</td></tr>
+          <tr><td><strong>Marketplace (comissão)</strong></td><td>Percentual da margem da plataforma sobre vendas (ex: 20%) vai para a caixa</td><td>Variável conforme GMV</td></tr>
+          <tr><td><strong>Eventos e ingressos</strong></td><td>Lucro líquido do evento dividido entre caixa e operacional</td><td>Esporádico, alto impacto</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 7 -->
+  <div class="section">
+    <div class="section-label">Seção 7</div>
+    <div class="section-title">Caixa de Performance — Regras e Cálculo</div>
+
+    <div class="highlight">
+      <p><strong>Princípio:</strong> A caixa é constituída mensalmente por 15% das assinaturas + percentuais de anunciantes e marketplace. É distribuída entre todos os influenciadores ativos proporcionalmente a uma Pontuação de Performance (PP) calculada automaticamente pela plataforma.</p>
+    </div>
+
+    <div class="alert">
+      <p><strong>REGRA FUNDAMENTAL:</strong> Somente ações realizadas DENTRO DA PLATAFORMA contam para o cálculo da PP. Engajamento no WhatsApp, Instagram, YouTube ou qualquer canal externo NÃO é contabilizado. Isso é intencional e transparente: cria alinhamento natural — o próprio influenciador passa a convocar sua audiência para interagir dentro da plataforma, pois é lá que o esforço dele gera pontuação e receita. Esta regra deve ser comunicada com clareza no contrato e visível em tempo real no dashboard.</p>
+    </div>
+
+    <h3>Composição da Pontuação de Performance (PP)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Métrica</th><th>Peso</th><th>Definição e critério</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Views Qualificados</strong></td><td><span style="color:var(--teal-light);font-weight:700">30%</span></td><td>Visualizações de vídeos DENTRO DA PLATAFORMA onde o membro assistiu ≥60% do conteúdo. Vídeos do YouTube não contam. Contagem semanal, média do mês.</td></tr>
+          <tr><td><strong>Engajamento na Comunidade</strong></td><td><span style="color:var(--teal-light);font-weight:700">25%</span></td><td>Comentários + reações + respostas gerados pelos membros nos conteúdos e fóruns DENTRO DA PLATAFORMA. Ponderado pelo número de membros.</td></tr>
+          <tr><td><strong>Novos Membros Ativos</strong></td><td><span style="color:var(--teal-light);font-weight:700">20%</span></td><td>Membros novos trazidos pelo influenciador no período que completaram 30 dias ativos sem cancelamento. Rastreado pelo link de convite personalizado.</td></tr>
+          <tr><td><strong>Retenção de Membros</strong></td><td><span style="color:var(--teal-light);font-weight:700">15%</span></td><td>Taxa de renovação mensal dos membros do influenciador. Mede consistência de entrega — quem retém bem, entregou valor real dentro da plataforma.</td></tr>
+          <tr><td><strong>Completude de Entregas Contratuais</strong></td><td><span style="color:var(--teal-light);font-weight:700">10%</span></td><td>Percentual das entregas mínimas do contrato cumpridas no mês — todas verificadas dentro da plataforma. 100% = pontuação cheia.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Fórmula de distribuição</h3>
+    <div class="formula">
+      PP_influenciador = (views_qual × 0,30) + (engajamento × 0,25) + (novos_membros × 0,20) + (retencao × 0,15) + (entregas × 0,10)<br><br>
+      Participação (%) = PP_influenciador ÷ Σ PP_todos_influenciadores_ativos<br><br>
+      Valor recebido = Participação (%) × Total da Caixa do mês
+    </div>
+
+    <div class="highlight">
+      <p>📌 <strong>Exemplo:</strong> influenciador com 22% da pontuação total, caixa de R$8.000 → recebe R$1.760 extras no mês.</p>
+    </div>
+
+    <h3>Periodicidade e tratamento de chargeback</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Evento</th><th>Regra</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Apuração da PP</strong></td><td>Contínua durante o mês. Dashboard em tempo real para o influenciador acompanhar sua posição.</td></tr>
+          <tr><td><strong>Fechamento do mês</strong></td><td>Dia 1 do mês seguinte. Período de apuração: do dia 1 ao último dia do mês anterior.</td></tr>
+          <tr><td><strong>Holdback para chargeback</strong></td><td>20% do valor da caixa retido por 30 dias adicionais antes do pagamento. Protege contra chargebacks e cancelamentos retroativos.</td></tr>
+          <tr><td><strong>Pagamento efetivo</strong></td><td>Dia 15 do mês seguinte ao fechamento (ex: competência janeiro → 80% pago em 15/fev, 20% em 15/mar).</td></tr>
+          <tr><td><strong>Chargeback confirmado</strong></td><td>Deduzido do próximo pagamento do influenciador cujo membro gerou o estorno. Rastreado por "dono do membro".</td></tr>
+          <tr><td><strong>Influenciador inativo</strong></td><td>Sem entregas contratuais no mês = excluído do rateio da caixa naquele período. Comissão de 35% sobre membros existentes é mantida.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 8 -->
+  <div class="section">
+    <div class="section-label">Seção 8</div>
+    <div class="section-title">Obrigações, Entregas e Recompensas dos Influenciadores</div>
+
+    <p class="section-intro">Modelo híbrido: contrato leve + bônus por performance. O influenciador assina um contrato com entregas mínimas que garantem a qualidade da plataforma. O contrato é leve o suficiente para não afugentar criadores, mas firme o suficiente para proteger a experiência dos membros.</p>
+
+    <h3>Entregas mínimas contratuais (por mês)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Entrega</th><th>Frequência mínima</th><th>Observação</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Vídeo exclusivo para membros</strong></td><td>2 por mês</td><td>Conteúdo diferente do que é publicado no YouTube. Mínimo de 10 minutos.</td></tr>
+          <tr><td><strong>Live ou Q&A com a comunidade</strong></td><td>1 por mês</td><td>Mínimo de 30 minutos. Pode ser substituída por uma sessão de perguntas respondidas em vídeo.</td></tr>
+          <tr><td><strong>Presença no fórum/chat</strong></td><td>4 interações/mês</td><td>Responder comentários, iniciar discussões, reagir a posts dos membros.</td></tr>
+          <tr><td><strong>Menção à plataforma</strong></td><td>2 por mês</td><td>Stories, vídeos ou posts externos mencionando o link da plataforma (link na bio conta como permanente).</td></tr>
+          <tr><td><strong>Link na bio</strong></td><td>Permanente</td><td>Link ativo para a comunidade na bio do Instagram, YouTube e demais redes ativas.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Sistema de recompensas</h3>
+    <p style="color:#bbb;font-size:0.9rem;margin-bottom:16px">Além do rateio mensal proporcional, marcos de performance desbloqueiam bônus fixos pagos da caixa coletiva. Cria aspiração e competição saudável entre os criadores.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Marco</th><th>Gatilho</th><th>Bônus (pago da caixa)</th></tr></thead>
+        <tbody>
+          <tr><td><strong>🥉 Influenciador Bronze</strong></td><td>Primeiro mês com ≥50 membros ativos</td><td><span style="color:var(--green);font-weight:700">R$ 500 único</span></td></tr>
+          <tr><td><strong>🥈 Influenciador Prata</strong></td><td>200 membros ativos por 2 meses consecutivos</td><td><span style="color:var(--green);font-weight:700">R$ 1.500 único</span></td></tr>
+          <tr><td><strong>🥇 Influenciador Ouro</strong></td><td>500 membros ativos por 3 meses consecutivos</td><td><span style="color:var(--green);font-weight:700">R$ 4.000 único</span></td></tr>
+          <tr><td><strong>💎 Top Creator do Mês</strong></td><td>Maior PP do mês (ranking #1)</td><td><span style="color:var(--teal-light);font-weight:700">R$ 800/mês enquanto mantiver o posto</span></td></tr>
+          <tr><td><strong>🚀 Crescimento Acelerado</strong></td><td>+100 novos membros em um único mês</td><td><span style="color:var(--yellow);font-weight:700">R$ 1.000 único por ocorrência (máx. 1×/trimestre)</span></td></tr>
+          <tr><td><strong>🎯 Embaixador da Plataforma</strong></td><td>12 meses consecutivos cumprindo 100% do contrato</td><td><span style="color:var(--teal-light);font-weight:700">Status especial + R$ 3.000 + destaque na home</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="highlight">
+      <p>📌 Os bônus de marcos são provisionados mensalmente na caixa. Se a caixa do mês não comportar todos os bônus, os pagamentos são priorizados por ordem de atingimento do marco (primeiro a atingir, primeiro a receber).</p>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 9 -->
+  <div class="section">
+    <div class="section-label">Seção 9</div>
+    <div class="section-title">Ecossistema de Canais — WhatsApp + DetailerHub</div>
+
+    <p class="section-intro">O modelo opera com três camadas de presença, cada uma com função específica e não substituível pelas outras. A disciplina em manter cada canal no seu papel é responsabilidade compartilhada entre a plataforma e os influenciadores.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Canal</th><th>Papel</th><th>Tipo de conteúdo</th><th>Conta para PP?</th></tr></thead>
+        <tbody>
+          <tr><td><strong>YouTube / Instagram</strong></td><td>Vitrine de aquisição</td><td>Conteúdo público, gratuito, de descoberta. Atrai novos membros em potencial.</td><td><span class="no">Não</span></td></tr>
+          <tr><td><strong>WhatsApp (grupo)</strong></td><td>Praça — velocidade e convocação</td><td>Avisos, bastidores, hype, chamadas para a plataforma. Engajamento efêmero e espontâneo.</td><td><span class="no">Não</span></td></tr>
+          <tr><td><strong>Plataforma</strong></td><td>Casa — profundidade e valor</td><td>Vídeos exclusivos, fórum, lives, cursos, marketplace. Conteúdo permanente e pesquisável.</td><td><span class="ok">Sim — 100%</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>O alinhamento de incentivos</h3>
+    <p>Como somente ações dentro da plataforma geram PP, o influenciador tem motivação financeira direta para puxar sua audiência para lá. Não é uma regra que você precisa fiscalizar — o modelo fiscaliza sozinho.</p>
+
+    <div class="highlight">
+      <p><strong>Fluxo natural que o modelo cria:</strong><br>
+      1. Influenciador posta vídeo novo → avisa no WhatsApp → audiência vai à plataforma comentar<br>
+      2. Influenciador abre debate no fórum → convoca pelo WhatsApp → discussão acontece na plataforma<br>
+      3. Live agendada → divulgada no WhatsApp e YouTube → realizada dentro da plataforma<br>
+      4. Cada interação na plataforma soma PP → mais PP = maior fatia da caixa de performance</p>
+    </div>
+
+    <h3>Riscos operacionais do WhatsApp e plano de contingência</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Risco</th><th>Probabilidade</th><th>Mitigação</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Grupo derrubado pelo Meta sem aviso</strong></td><td><span class="warn">Baixa, mas real</span></td><td>Manter lista de contatos (e-mail/SMS) de todos os membros dentro da plataforma como canal de backup.</td></tr>
+          <tr><td><strong>Membro confundir WhatsApp com o produto principal</strong></td><td><span class="warn">Média</span></td><td>Comunicação clara no onboarding. Influenciador treinado para sempre referenciar a plataforma como destino.</td></tr>
+          <tr><td><strong>Conteúdo valioso "vazando" para o WhatsApp</strong></td><td><span class="warn">Média</span></td><td>Contrato define que conteúdo exclusivo só é publicado na plataforma. WhatsApp = teaser, nunca o conteúdo completo.</td></tr>
+          <tr><td><strong>Limite de participantes por grupo</strong></td><td><span class="no">Alta conforme crescimento</span></td><td>Planejar migração para Telegram ou grupos segmentados quando necessário.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 10 -->
+  <div class="section">
+    <div class="section-label">Seção 10</div>
+    <div class="section-title">Estrutura da Plataforma — Arquitetura de Experiência</div>
+
+    <p class="section-intro">A plataforma opera em três níveis de profundidade — do geral para o específico — conectados por um sistema de saúde e gamificação que motiva membros a progredir e influenciadores a se manterem ativos.</p>
+
+    <div class="highlight">
+      <p><strong>SISTEMA DE SAÚDE — Dois sistemas separados, com visibilidades completamente diferentes:</strong><br><br>
+      • <strong>MEMBRO:</strong> experiência binária e simples. Ele só vê "pode postar" ou "ainda não pode postar". A complexidade interna existe para administradores — não aparece para o usuário.<br><br>
+      • <strong>INFLUENCIADOR:</strong> visível apenas para o próprio influenciador (dashboard privado) e para os administradores da plataforma. Nunca exposto para membros. O membro não vê status do influenciador — ele é sempre uma figura de autoridade.</p>
+    </div>
+
+    <h3>Saúde do Membro — O que o membro vê</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Situação</th><th>O que aparece para o membro</th></tr></thead>
+        <tbody>
+          <tr><td>Recém chegou ou pouco engajado</td><td>Nenhum aviso. Ele consome, comenta e reage normalmente. O botão de criar post simplesmente não aparece ainda.</td></tr>
+          <tr><td>Atingiu o threshold de engajamento</td><td>Uma notificação positiva: "Você já faz parte desta comunidade — agora pode criar posts!" Aparece como conquista, não como liberação burocrática.</td></tr>
+          <tr><td>Caiu abaixo do threshold por inatividade</td><td>O botão de criar post some silenciosamente. Sem alerta, sem penalidade visível. Se ele voltar a engajar, o botão retorna.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Saúde do Membro — O que o administrador vê (painel interno)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Nível</th><th>Score</th><th>Pode postar</th><th>Uso administrativo</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Novo</strong></td><td>&lt; 40 pts</td><td><span class="no">Não</span></td><td>Membro recém chegado ou inativo. Monitorar para evitar churn precoce.</td></tr>
+          <tr><td><strong>Ativo</strong></td><td>40–69 pts</td><td><span class="no">Não</span></td><td>Engajando mas ainda abaixo do threshold. Pode receber notificação de incentivo.</td></tr>
+          <tr><td><strong>Participante</strong></td><td>≥ 70 pts</td><td><span class="ok">Sim</span></td><td>Threshold de postagem atingido. Membro saudável e contribuinte.</td></tr>
+          <tr><td><strong>Superfã</strong></td><td>≥ 85 pts por 60 dias</td><td><span class="ok">Sim</span></td><td>Candidato a moderador. Pode receber reconhecimento especial do influenciador.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Pontuação do Membro — Eventos e limites diários</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Evento</th><th>Pontos</th><th>Limite diário</th></tr></thead>
+        <tbody>
+          <tr><td>Assistir vídeo exclusivo (≥60%)</td><td><span style="color:var(--green)">+12 pts</span></td><td>Máx. 3 vídeos/dia</td></tr>
+          <tr><td>Comentar em post</td><td><span style="color:var(--green)">+8 pts</span></td><td>Máx. 5 comentários/dia</td></tr>
+          <tr><td>Reagir em post</td><td><span style="color:var(--green)">+3 pts</span></td><td>Máx. 10 reações/dia</td></tr>
+          <tr><td>Criar post no feed (quando habilitado)</td><td><span style="color:var(--green)">+15 pts</span></td><td>Máx. 2 posts/dia</td></tr>
+          <tr><td>Responder comentário de outro membro</td><td><span style="color:var(--green)">+6 pts</span></td><td>Máx. 8 respostas/dia</td></tr>
+          <tr><td>Participar de live ao vivo (≥15 min)</td><td><span style="color:var(--green)">+20 pts</span></td><td>1 live/dia</td></tr>
+          <tr><td>Completar módulo de trilha</td><td><span style="color:var(--green)">+25 pts</span></td><td>Por módulo único</td></tr>
+          <tr><td>Inatividade</td><td><span style="color:var(--red)">-3 pts/dia</span></td><td>A partir do 3º dia sem ação</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="highlight">
+      <p>📌 O threshold de postagem (≥70 pts) é facilmente atingível com uso natural: assistir 2 vídeos + deixar 3 comentários em uma semana já coloca o membro próximo ou acima do limite. O sistema recompensa quem usa a plataforma, não quem decora as regras.</p>
+    </div>
+
+    <h3>Saúde do Influenciador — Privado e Motivacional</h3>
+    <p style="color:#bbb;font-size:0.9rem">Visível apenas para o próprio influenciador no dashboard pessoal e para os administradores. Nunca exposto para membros.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Status</th><th>Score</th><th>Visível para membros?</th><th>Efeito prático</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge badge-green">🟢 Saudável</span></td><td>≥ 70 pts</td><td><span class="no">Não</span></td><td>Total liberdade de criação. Elegível para a caixa de performance com fator 1,0×.</td></tr>
+          <tr><td><span class="badge badge-yellow">🟡 Atenção</span></td><td>40–69 pts</td><td><span class="no">Não</span></td><td>Alerta privado no dashboard. 15 dias para recuperar. Fator redutor 0,7× na caixa.</td></tr>
+          <tr><td><span class="badge badge-red">🔴 Crítico</span></td><td>&lt; 40 pts</td><td><span class="no">Não</span></td><td>Notificação direta da plataforma. Excluído da caixa no mês. Suporte ativo da equipe.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Pontuação do Influenciador</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Evento</th><th>Pontos</th><th>Observação</th></tr></thead>
+        <tbody>
+          <tr><td>Vídeo exclusivo postado na plataforma</td><td><span style="color:var(--green)">+30 pts</span></td><td>Principal métrica — conteúdo é o core</td></tr>
+          <tr><td>Live realizada na plataforma</td><td><span style="color:var(--green)">+25 pts</span></td><td>Presença ao vivo tem peso maior</td></tr>
+          <tr><td>Post/thread iniciada</td><td><span style="color:var(--green)">+10 pts</span></td><td>Discussão, pergunta, bastidor</td></tr>
+          <tr><td>Resposta a comentário de membro</td><td><span style="color:var(--green)">+8 pts</span></td><td>Cap de 20 pts/mês — evita spam</td></tr>
+          <tr><td>Novo membro ativo (30 dias)</td><td><span style="color:var(--green)">+5 pts</span></td><td>Prova que está trazendo audiência</td></tr>
+          <tr><td>Inatividade</td><td><span style="color:var(--red)">-3 pts/dia</span></td><td>A partir do 3º dia consecutivo sem ação</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="highlight">
+      <p><strong>Tom das notificações — sempre encorajamento, nunca ameaça:</strong><br>
+      "Você está a 2 posts de manter seu status Saudável este mês — seus membros estão esperando!"<br>
+      "Sua comunidade cresceu 12% este mês. Uma live agora pode acelerar ainda mais esse número."<br>
+      "Você está no top 3 de engajamento esta semana. Continue assim!"</p>
+    </div>
+
+    <h3>Nível 1 — Tela Principal (Home da Plataforma)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Bloco</th><th>Posição</th><th>Conteúdo e lógica</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Carrossel de banners</strong></td><td>Topo — full width</td><td>Banners rotativos de anunciantes, eventos, lançamentos e destaques da plataforma. Principal espaço comercial da plataforma. Máx. 5 banners com rotação automática.</td></tr>
+          <tr><td><strong>Botões de comunidades</strong></td><td>Logo abaixo dos banners</td><td>Botões grandes das comunidades que o membro assina — ordenados por última atividade. Indicador visual de conteúdo novo não visto.</td></tr>
+          <tr><td><strong>Feed de posts recomendados</strong></td><td>Centro da página</td><td>Posts mais engajados de todas as comunidades, priorizando as do membro. Algoritmo simples: engajamento × recência × relevância. Não mostra tudo — mostra o melhor.</td></tr>
+          <tr><td><strong>Chat ao vivo geral</strong></td><td>Lateral esquerda ou flutuante</td><td>Sala de conversa em tempo real. Aparece ativa visualmente apenas quando há ≥10 membros online. Abaixo disso, exibe histórico recente sem indicador "ao vivo".</td></tr>
+          <tr><td><strong>Barra lateral — Navegação</strong></td><td>Lateral esquerda fixa</td><td>Avisos e notificações, calendário de eventos e lives, grupos de estudos temáticos (Fase 2), ferramentas de IA, marketplace.</td></tr>
+          <tr><td><strong>Ranking de gamificação</strong></td><td>Lateral direita</td><td>Dois rankings visíveis: Top Membros da Plataforma (geral) e Top Membros de Cada Comunidade (local). Atualização em tempo real.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="warn-box">
+      <p><strong>FASE 2 — Grupos de estudos temáticos:</strong> Não lançar no dia 1. Grupos surgem organicamente: quando um tema aparece repetidamente nas conversas do fórum, a plataforma (ou o influenciador) o promove a grupo oficial. Grupos vazios são mais prejudiciais do que não ter grupos.</p>
+    </div>
+
+    <h3>Nível 2 — Comunidade do Influenciador</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Aba</th><th>O que contém</th><th>Quem pode postar</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Feed da Comunidade</strong></td><td>Posts do influenciador e posts de membros (quando habilitados pela saúde). Comentários, reações, discussões. Posts fixados pelo influenciador no topo.</td><td>Influenciador: sempre. Membro: quando score ≥70. Posts de membros são marcados visualmente como "da comunidade".</td></tr>
+          <tr><td><strong>Conteúdo</strong></td><td>Biblioteca de vídeos exclusivos e trilhas de aprendizado. Vídeos isolados e vídeos organizados em trilhas com progresso visível. Badge de conclusão ao completar trilha.</td><td>Somente o influenciador.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Nível 3 — Conteúdo do Influenciador</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Formato</th><th>Estrutura</th><th>Lógica de engajamento</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Vídeo isolado</strong></td><td>Título + vídeo + descrição + comentários. Simples, familiar — igual ao YouTube na experiência.</td><td>Comentários geram score para o membro. O influenciador pode fixar o melhor comentário. Sugestão de próximo vídeo da mesma comunidade ao final.</td></tr>
+          <tr><td><strong>Trilha de aprendizado</strong></td><td>Nome da trilha → módulos → vídeos dentro de cada módulo. Barra de progresso visível. Badge desbloqueado ao concluir.</td><td>Cada módulo concluído gera score elevado (+25 pts). Conclusão da trilha gera badge exibido no perfil. Cria senso de progressão e conquista.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card" style="font-family:'SF Mono','Fira Code',monospace;font-size:0.85rem">
+      <div class="card-title">Exemplo de trilha: "Do Zero ao PPF Profissional"</div>
+      <p style="margin-top:8px">Módulo 1 — Preparação de superfície &nbsp;(2 vídeos) &nbsp;✅<br>
+      Módulo 2 — Aplicação base &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(3 vídeos) &nbsp;✅<br>
+      Módulo 3 — Acabamento e correção &nbsp;&nbsp;(2 vídeos) &nbsp;🔒 (completar módulo 2 para desbloquear)<br><br>
+      Conclusão → Badge "PPF Profissional" desbloqueado e exibido no perfil</p>
+    </div>
+
+    <h3>Roadmap: Fase 1 (Lançamento) → Fase 2 (Expansão)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Feature</th><th>Fase 1 — Lançamento</th><th>Fase 2 — Expansão</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Feed da comunidade</strong></td><td>Influenciador posta. Membros comentam e reagem. Membros Ativos (score ≥70) podem postar.</td><td>Sistema de moderação por membros Superfã. Curadoria de melhores posts da semana.</td></tr>
+          <tr><td><strong>Conversa ao vivo</strong></td><td>Chat geral (ativo com ≥10 online).</td><td>Salas temáticas por comunidade. Chat privado entre membros.</td></tr>
+          <tr><td><strong>Grupos de estudos</strong></td><td>Não disponível.</td><td>Criados organicamente a partir de demanda identificada no fórum.</td></tr>
+          <tr><td><strong>Trilhas</strong></td><td>Disponível desde o lançamento — é diferencial imediato.</td><td>Trilhas certificadas com emissão de certificado digital.</td></tr>
+          <tr><td><strong>Ranking</strong></td><td>Top membros da plataforma + top por comunidade.</td><td>Ranking histórico (all-time) + ranking mensal com reset.</td></tr>
+          <tr><td><strong>Saúde do influenciador</strong></td><td>Score + alertas no dashboard. Badge no perfil.</td><td>Relatório mensal automático enviado ao influenciador com análise de tendência.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 11 -->
+  <div class="section">
+    <div class="section-label">Seção 11</div>
+    <div class="section-title">Perfil do Membro</div>
+
+    <p class="section-intro">O perfil é a identidade do membro dentro da plataforma — o espelho da sua jornada de pertencimento e conquista. Seguindo a metodologia de Superfãs (Pat Flynn) e Wiki Brands, o perfil não é um cadastro: é um artefato social que reforça vínculo, cria aspiração em outros membros e dá ao influenciador visibilidade sobre quem são seus membros mais engajados.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-title">Princípios que guiam o perfil</div>
+        <ul>
+          <li><strong>Privado por padrão</strong> — visível apenas para membros assinantes. Não há visitante público na plataforma.</li>
+          <li><strong>Pertencimento, não cadastro</strong> — campos mínimos de entrada, riqueza construída pelo uso.</li>
+          <li><strong>Conquistas visíveis, métricas ocultas</strong> — badges aparecem, scores ficam no dashboard privado.</li>
+          <li><strong>Controle do membro</strong> — ele decide o que expor. Nenhum dado é puxado automaticamente.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title">Acesso às Comunidades — Opt-in Leve</div>
+        <ul>
+          <li><strong>Acesso:</strong> Qualquer membro assinante pode visitar qualquer comunidade, sem restrição.</li>
+          <li><strong>Pertencimento (opt-in):</strong> O membro clica "Entrar nesta comunidade" e declara vínculo.</li>
+          <li><strong>Por que o opt-in importa:</strong> Cria um micro-compromisso — o primeiro passo para se tornar superfã.</li>
+          <li><strong>Saída:</strong> O membro pode sair a qualquer momento. Sem penalidade, sem impacto na assinatura.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Estrutura do Perfil — O que Cada Grupo Vê</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Seção do perfil</th><th>Visível para outros membros</th><th>Visível só para o próprio</th><th>Só administrador</th></tr></thead>
+        <tbody>
+          <tr><td>Foto, Nome/apelido, Bio curta, Cidade</td><td><span class="ok">Sim (se preenchido)</span></td><td>—</td><td>—</td></tr>
+          <tr><td>"Membro desde [data]"</td><td><span class="ok">Sim</span></td><td>—</td><td>—</td></tr>
+          <tr><td>Links de redes sociais</td><td><span class="ok">Sim (se preenchidos)</span></td><td>—</td><td>—</td></tr>
+          <tr><td>Comunidades que participa</td><td><span class="ok">Sim</span></td><td>—</td><td>—</td></tr>
+          <tr><td>Badges de trilhas concluídas</td><td><span class="ok">Sim</span></td><td>—</td><td>—</td></tr>
+          <tr><td>Score de saúde interno</td><td><span class="no">Não</span></td><td><span class="ok">Sim</span></td><td><span class="ok">Sim</span></td></tr>
+          <tr><td>Progresso em trilhas em andamento</td><td><span class="no">Não</span></td><td><span class="ok">Sim</span></td><td>—</td></tr>
+          <tr><td>Histórico de atividade</td><td><span class="no">Não</span></td><td><span class="ok">Sim</span></td><td><span class="ok">Sim</span></td></tr>
+          <tr><td>Nível interno (Novo/Ativo/Participante/Superfã)</td><td><span class="no">Não</span></td><td><span class="no">Não</span></td><td><span class="ok">Sim</span></td></tr>
+          <tr><td>E-mail e dados de contato</td><td><span class="no">Não</span></td><td><span class="ok">Sim</span></td><td><span class="ok">Sim</span></td></tr>
+          <tr><td>Histórico de pagamento e assinatura</td><td><span class="no">Não</span></td><td><span class="ok">Sim</span></td><td><span class="ok">Sim</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Conquistas — Badges</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Tipo de badge</th><th>Origem</th><th>Exemplo</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Conclusão de trilha</strong></td><td>Automático ao concluir todos os módulos</td><td>"PPF Profissional", "Envelopamento Básico", "Vinil Avançado"</td></tr>
+          <tr><td><strong>Indicador de postagem</strong></td><td>Automático ao atingir score ≥70</td><td>Ícone discreto que outros membros reconhecem como "membro ativo que contribui"</td></tr>
+          <tr><td><strong>Grupos de estudo (Fase 2)</strong></td><td>Ao entrar em grupo temático</td><td>"Grupo PPF SP", "Grupo Estética Competitiva"</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="alert">
+      <p><strong>O que NÃO aparece no perfil público — por decisão de metodologia:</strong><br>
+      • Contadores numéricos (X comentários, X posts) — métricas frias não criam pertencimento.<br>
+      • Nível interno ou score de saúde — complexidade oculta, experiência simples.<br>
+      • Feed de atividade recente — gera ansiedade de performance, dilui foco.<br>
+      • Conexões com outros membros — rede social dentro da plataforma é Fase 2, se houver demanda.</p>
+    </div>
+
+    <h3>Dashboard Privado do Membro</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Elemento</th><th>O que mostra</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Score de saúde atual</strong></td><td>Número atual + barra visual + tendência (subindo/descendo). Sem rótulo de nível — só o número e o que fazer para manter ou melhorar.</td></tr>
+          <tr><td><strong>Status de postagem</strong></td><td>"Você já pode criar posts" ou "Interaja mais um pouco para desbloquear". Simples, sem score visível.</td></tr>
+          <tr><td><strong>Progresso em trilhas</strong></td><td>Trilhas em andamento com percentual de conclusão e próximo módulo a assistir.</td></tr>
+          <tr><td><strong>Próxima conquista</strong></td><td>"Faltam 2 módulos para o badge PPF Profissional." Notificação de proximidade de conquista.</td></tr>
+          <tr><td><strong>Histórico de atividade</strong></td><td>Lista de ações recentes dentro da plataforma — para o membro entender seu próprio padrão de uso.</td></tr>
+          <tr><td><strong>Notificações</strong></td><td>Alertas de novos conteúdos nas comunidades que participa, respostas a seus comentários, conquistas desbloqueadas.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 12 -->
+  <div class="section">
+    <div class="section-label">Seção 12</div>
+    <div class="section-title">Canais de Monetização da Plataforma</div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Canal</th><th>Modelo</th><th>Impacto na caixa dos influenciadores</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Assinatura de membros</strong></td><td>R$60–99/mês por membro (ticket referência R$79). Receita recorrente principal.</td><td>Sim — 35% direto ao "dono do membro" + 15% na caixa de performance.</td></tr>
+          <tr><td><strong>Anunciantes do nicho</strong></td><td>Marcas de películas, PPF, detailing, acessórios pagam por presença segmentada (banners nativos, conteúdo patrocinado, destaque no marketplace).</td><td>Sim — % do valor do pacote vai para a caixa coletiva.</td></tr>
+          <tr><td><strong>Marketplace próprio</strong></td><td>Plataforma opera o marketplace e retém margem sobre cada venda. Influenciadores podem promover como afiliados (comissão adicional).</td><td>Sim — % da margem contribui para a caixa coletiva.</td></tr>
+          <tr><td><strong>Ferramentas de IA (membros)</strong></td><td>Recurso incluído na assinatura como benefício diferenciador. Eleva percepção de valor e reduz churn.</td><td>Indireto — aumenta retenção, protege a base de receita.</td></tr>
+          <tr><td><strong>Eventos e ingressos</strong></td><td>Meetups, masterclasses, feiras com os influenciadores. Receita por ingressos + cotas de patrocínio.</td><td>Sim — percentual do lucro líquido vai para a caixa.</td></tr>
+          <tr><td><strong>Cursos e treinamentos</strong></td><td>Conteúdo aprofundado na plataforma. Divisão de receita com o influenciador-instrutor.</td><td>Parcial — o influenciador recebe sua parte; o restante é receita da plataforma.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 13 -->
+  <div class="section">
+    <div class="section-label">Seção 13</div>
+    <div class="section-title">Proposta de Apresentação aos Influenciadores</div>
+
+    <div class="quote">
+      <p>"Estamos construindo o maior ambiente de estética automotiva do Brasil."</p>
+    </div>
+    <div class="quote">
+      <p>"Você não é um usuário. Você é um dos fundadores — e vai ganhar como fundador."</p>
+    </div>
+    <div class="quote">
+      <p>"Cada fã que você traz é seu. A comissão é para sempre, enquanto ele ficar ativo."</p>
+    </div>
+
+    <h3>Comparativo: nossa plataforma vs. caminhos alternativos</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Critério</th><th>YouTube / Instagram</th><th>WhatsApp (grupo)</th><th>Vender curso próprio</th><th>Nossa Plataforma</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Receita</strong></td><td>CPM variável + publis episódicas</td><td>Nenhuma</td><td>Lançamento único, sem recorrência</td><td><span style="color:var(--green)">35% fixo por membro + caixa mensal</span></td></tr>
+          <tr><td><strong>Previsibilidade</strong></td><td><span class="no">Zero — depende do algoritmo</span></td><td><span class="no">Zero</span></td><td><span class="warn">Baixa — depende de lançamentos</span></td><td><span class="ok">Alta — base de membros recorrentes</span></td></tr>
+          <tr><td><strong>Propriedade da audiência</strong></td><td><span class="no">Não — a plataforma é dona</span></td><td>Parcial — lista de contatos</td><td>Parcial — quem comprou o curso</td><td><span class="ok">Total — dados e contato direto</span></td></tr>
+          <tr><td><strong>Histórico e busca</strong></td><td>Comentários soltos</td><td>Some em dias</td><td>Depende da plataforma usada</td><td><span class="ok">Fórum permanente e pesquisável</span></td></tr>
+          <tr><td><strong>Infraestrutura</strong></td><td>Própria (custo e tempo)</td><td>Pronta, mas limitada</td><td>Própria (custo e tempo)</td><td><span class="ok">Pronta e mantida pela plataforma</span></td></tr>
+          <tr><td><strong>Custo para o criador</strong></td><td>Sem custo</td><td>Sem custo</td><td>Plataforma + marketing próprio</td><td><span class="ok">Zero — sem mensalidade</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Por que entrar agora — argumentos para early adopters</h3>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-title">🏗️ Condições de fundador</div>
+        <p>Os primeiros influenciadores definem regras, têm voz no produto e entram com o split mais favorável possível.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">⭐ Posição de destaque</div>
+        <p>Os fundadores ocupam os melhores espaços da plataforma antes que ela cresça.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">📈 Receita composta</div>
+        <p>Quem entra no mês 1 e traz 100 membros recebe comissão desses membros para sempre — o influenciador que entrar no mês 12 começa do zero.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">🛡️ Sem risco</div>
+        <p>Zero custo para entrar. O influenciador não abre mão do YouTube — expande para um novo canal de receita.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PARTE III -->
+<div class="parte-divider">
+  <div class="parte-num">Parte III</div>
+  <div class="parte-title">CrewHouse / Pitcrew</div>
+  <div class="parte-sub">Plataforma mãe · Cultura automotiva ampla · A ser desenvolvido no Horizonte 2</div>
+</div>
+
+<div class="container">
+
+  <!-- SEÇÃO 14 -->
+  <div class="section">
+    <div class="section-label">Seção 14</div>
+    <div class="section-title">CrewHouse / Pitcrew — Visão e Conceito</div>
+
+    <div class="warn-box">
+      <p>Este capítulo será desenvolvido em profundidade quando o Horizonte 1 for atingido. O que está documentado aqui é a visão estratégica definida até o momento — suficiente para orientar decisões de tecnologia e marca desde já.</p>
+    </div>
+
+    <h3>O que é</h3>
+    <p>Plataforma mãe gratuita que reúne toda a cultura automotiva brasileira em um único ecossistema. Eventos, lifestyle, conteúdo, comunidades abertas e parcerias com grandes marcas. O DetailerHub existe como produto principal dentro desse ecossistema — o clube dos profissionais sérios dentro da comunidade maior.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Dimensão</th><th>CrewHouse / Pitcrew</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Acesso</strong></td><td>Completamente gratuito para qualquer entusiasta automotivo</td></tr>
+          <tr><td><strong>Público</strong></td><td>Profissionais, hobbistas, colecionadores, entusiastas — qualquer apaixonado por carro</td></tr>
+          <tr><td><strong>Conteúdo</strong></td><td>Aberto — eventos, lifestyle, cultura automotiva ampla</td></tr>
+          <tr><td><strong>Relação com DetailerHub</strong></td><td>DetailerHub é o produto principal dentro da plataforma — o clube dos profissionais</td></tr>
+          <tr><td><strong>Funil</strong></td><td>Entusiasta entra gratuitamente → descobre o DetailerHub → converte para assinante pago</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Monetização da plataforma mãe</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Fonte de receita</th><th>Modelo</th><th>Diferença do DetailerHub</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Anunciantes</strong></td><td>Marcas automotivas de médio e grande porte pagam por acesso a audiência qualificada e segmentada</td><td>Escala maior — audiência ampla vs. nicho de estética</td></tr>
+          <tr><td><strong>Eventos</strong></td><td>Meetups, feiras, competições, experiências com patrocínio de grandes marcas</td><td>Eventos de cultura automotiva ampla, não só detalhamento</td></tr>
+          <tr><td><strong>Marketplace</strong></td><td>Aberto para qualquer produto automotivo — peças, acessórios, serviços, experiências</td><td>GMV muito maior pela amplitude do público</td></tr>
+          <tr><td><strong>Patrocínios</strong></td><td>Cotas de patrocínio para conteúdo, comunidades e eventos da plataforma</td><td>Acesso a marcas que não entrariam em plataforma de nicho</td></tr>
+          <tr><td><strong>Dados e inteligência</strong></td><td>Insights agregados e anonimizados do comportamento do consumidor automotivo brasileiro (LGPD)</td><td>Produto B2B de alto valor em estágio maduro</td></tr>
+          <tr><td><strong>Funil para produtos pagos</strong></td><td>DetailerHub e futuras comunidades pagas de nicho</td><td>Receita indireta — converte gratuito em assinante</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="alert">
+      <p><strong>DECISÃO PENDENTE — Nome final: CrewHouse ou Pitcrew</strong><br><br>
+      Ações necessárias antes do Horizonte 2:<br>
+      1. Verificar domínios: pitcrew.com.br · pitcrew.app · crewhouse.com.br · crewhouse.app<br>
+      2. Consultar INPI — classes 38 (telecomunicações) e 41 (educação/entretenimento)<br>
+      3. Verificar @pitcrew e @crewhouse no Instagram, YouTube e TikTok<br>
+      4. Decisão final de nome antes de qualquer investimento em identidade visual</p>
+    </div>
+
+    <h3>Visão do ecossistema no Horizonte 3</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Produto</th><th>Modelo</th><th>Público</th><th>Acesso</th><th>Monetização</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>CrewHouse / Pitcrew</strong></td>
+            <td>Plataforma mãe — cultura automotiva ampla</td>
+            <td>Todo entusiasta automotivo</td>
+            <td><span class="ok">Gratuito</span></td>
+            <td>Anunciantes, eventos, marketplace, patrocínios, dados</td>
+          </tr>
+          <tr>
+            <td><strong>DetailerHub</strong></td>
+            <td>Produto principal dentro da plataforma mãe</td>
+            <td>Profissionais e entusiastas sérios de estética</td>
+            <td><span class="warn">Assinatura paga</span></td>
+            <td>Assinaturas + caixa + marketplace + anunciantes segmentados</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 15 -->
+  <div class="section">
+    <div class="section-label">Seção 15</div>
+    <div class="section-title">Métricas-Chave e Indicadores de Sucesso</div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Métrica</th><th>O que mede</th><th>Meta inicial (6 meses)</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>MRR (Monthly Recurring Revenue)</strong></td>
+            <td>Receita recorrente mensal total. Indicador de saúde e previsibilidade do negócio.</td>
+            <td><span style="color:var(--green);font-weight:700">R$47.400 (600 membros)</span></td>
+          </tr>
+          <tr>
+            <td><strong>Churn Rate de Membros</strong></td>
+            <td>Taxa de cancelamento mensal. Acima de 8% indica problema de valor percebido.</td>
+            <td><span style="color:var(--green);font-weight:700">Abaixo de 7%</span></td>
+          </tr>
+          <tr>
+            <td><strong>Membros Ativos por Influenciador</strong></td>
+            <td>Indica se o criador está gerando valor suficiente para reter sua audiência.</td>
+            <td><span style="color:var(--teal-light);font-weight:700">Mínimo 50/influenciador</span></td>
+          </tr>
+          <tr>
+            <td><strong>PP Média dos Influenciadores</strong></td>
+            <td>Pontuação de performance média. Indica engajamento geral do ecossistema.</td>
+            <td>Crescimento mês a mês</td>
+          </tr>
+          <tr>
+            <td><strong>GMV do Marketplace</strong></td>
+            <td>Volume total de transações. Mede força comercial do ecossistema.</td>
+            <td><span style="color:var(--teal-light);font-weight:700">R$10.000/mês no mês 6</span></td>
+          </tr>
+          <tr>
+            <td><strong>Taxa de Conversão Vitrine→Membro</strong></td>
+            <td>Visitantes da área pública que se tornam membros. Meta de funil.</td>
+            <td><span style="color:var(--green);font-weight:700">Acima de 3%</span></td>
+          </tr>
+          <tr>
+            <td><strong>NPS dos Influenciadores</strong></td>
+            <td>Satisfação e propensão a indicar. Principal indicador de saúde da rede.</td>
+            <td><span style="color:var(--green);font-weight:700">Acima de 50</span></td>
+          </tr>
+          <tr>
+            <td><strong>Receita por Membro (ARPM)</strong></td>
+            <td>MRR ÷ membros ativos. Deve crescer com marketplace e eventos.</td>
+            <td><span style="color:var(--teal-light);font-weight:700">Acima de R$79 (ticket base)</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="highlight" style="margin-top:48px;text-align:center">
+      <p style="color:var(--gray-light);font-size:0.85rem">Documento preparado para uso interno e apresentação a influenciadores parceiros.</p>
+      <p style="color:var(--teal-light);font-weight:700;font-size:0.9rem;margin-top:8px">Confidencial — Versão 8.0 — 2026</p>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

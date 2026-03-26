@@ -17,14 +17,17 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'Mensagens',    href: '/dashboard/messages',    icon: 'MessageSquare', roles: 'ALL', group: 'principal' },
 
   // ── CONTEUDO (membro) ──
-  { label: 'Meu aprendizado', href: '/dashboard/meu-aprendizado', icon: 'BookOpen', roles: [UserRole.COMMUNITY_MEMBER, UserRole.MARKETPLACE_PARTNER], group: 'conteudo' },
+  { label: 'Meu aprendizado', href: '/dashboard/meu-aprendizado', icon: 'BookOpen',  roles: [UserRole.COMMUNITY_MEMBER, UserRole.MARKETPLACE_PARTNER], group: 'conteudo' },
+  { label: 'Ferramentas',     href: '/dashboard/ferramentas',     icon: 'Wrench',    roles: [UserRole.COMMUNITY_MEMBER, UserRole.MARKETPLACE_PARTNER], group: 'conteudo' },
 
   // ── GESTAO (influenciador) ──
-  { label: 'Analytics',      href: '/dashboard/analytics', icon: 'BarChart2', roles: [UserRole.INFLUENCER_ADMIN], group: 'gestao' },
-  { label: 'Criar conteudo', href: '/dashboard/content',   icon: 'FileVideo',  roles: [UserRole.INFLUENCER_ADMIN], group: 'gestao' },
+  { label: 'Analytics',         href: '/dashboard/analytics',                 icon: 'BarChart2',  roles: [UserRole.INFLUENCER_ADMIN], group: 'gestao' },
+  { label: 'Criar conteudo',    href: '/dashboard/content',                   icon: 'FileVideo',  roles: [UserRole.INFLUENCER_ADMIN], group: 'gestao' },
+  { label: 'Guia de inicio',    href: '/dashboard/onboarding-influenciador',  icon: 'Rocket',     roles: [UserRole.INFLUENCER_ADMIN], group: 'gestao' },
 
   // ── ADMIN (super admin) ──
   { label: 'Usuarios',            href: '/dashboard/usuarios',          icon: 'UserCog',   roles: [UserRole.SUPER_ADMIN], group: 'admin' },
+  { label: 'Membros',             href: '/dashboard/admin/membros',     icon: 'Users',     roles: [UserRole.SUPER_ADMIN], group: 'admin' },
   { label: 'Comunidades (admin)', href: '/dashboard/admin/comunidades', icon: 'Settings2', roles: [UserRole.SUPER_ADMIN], group: 'admin' },
 ];
 

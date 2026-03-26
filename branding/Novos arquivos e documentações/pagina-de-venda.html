@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DetailerHUB: Comunidade de Profissionais de Referência</title>
+  <style>
+    :root {
+      --teal: #006079;
+      --teal-light: #009cd9;
+      --black: #1a1a1a;
+      --off-white: #eee6e4;
+      --gray: #2e2e2e;
+      --gray-mid: #444;
+      --gray-light: #888;
+      --green: #2ecc71;
+      --yellow: #f1c40f;
+      --red: #e74c3c;
+      --border: #333;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--black);
+      color: var(--off-white);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ─── STICKY NAV ─── */
+    .sticky-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(26, 26, 26, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--teal-light);
+    }
+
+    .nav-cta {
+      background: var(--teal);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 18px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .nav-cta:hover {
+      background: #00778f;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      background: linear-gradient(160deg, #0a0a0a 0%, #0d2a33 55%, #006079 100%);
+      padding: 120px 0 80px;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(0, 156, 217, 0.15);
+      border: 1px solid rgba(0, 156, 217, 0.4);
+      border-radius: 20px;
+      padding: 5px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--teal-light);
+      margin-bottom: 28px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 5.5vw, 3.4rem);
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      max-width: 780px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero h1 span {
+      color: var(--teal-light);
+    }
+
+    .hero-sub {
+      font-size: clamp(1.05rem, 2.5vw, 1.25rem);
+      color: #b0a8a6;
+      margin-bottom: 36px;
+      max-width: 560px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-sub strong {
+      color: var(--off-white);
+    }
+
+    .hero-cta {
+      display: inline-block;
+      background: var(--teal-light);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      padding: 16px 40px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.1s;
+      margin-bottom: 16px;
+    }
+
+    .hero-cta:hover {
+      background: #0088bb;
+      transform: translateY(-1px);
+    }
+
+    .hero-note {
+      font-size: 12px;
+      color: var(--gray-light);
+      margin-top: 4px;
+    }
+
+    .hero-note strong {
+      color: var(--yellow);
+    }
+
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 52px;
+      padding-top: 36px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      flex-wrap: wrap;
+    }
+
+    .hero-stat-number {
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .hero-stat-label {
+      font-size: 11px;
+      color: var(--gray-light);
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
+
+    /* ─── SECTIONS ─── */
+    .section {
+      padding: 72px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-eyebrow {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--teal-light);
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-size: clamp(1.4rem, 3vw, 1.9rem);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+      line-height: 1.25;
+    }
+
+    .section-desc {
+      font-size: 14px;
+      color: var(--gray-light);
+      max-width: 620px;
+      margin-bottom: 36px;
+      line-height: 1.7;
+    }
+
+    /* ─── DOR / CHECKLIST ─── */
+    .pain-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .pain-card {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .pain-check {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(0, 156, 217, 0.15);
+      border: 1.5px solid var(--teal-light);
+      flex-shrink: 0;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--teal-light);
+    }
+
+    .pain-text {
+      font-size: 13.5px;
+      color: #c0b8b6;
+      line-height: 1.5;
+    }
+
+    .pain-full {
+      grid-column: 1 / -1;
+    }
+
+    /* ─── INIMIGO / STAT BOX ─── */
+    .enemy-box {
+      background: rgba(0, 96, 121, 0.12);
+      border: 1px solid rgba(0, 96, 121, 0.35);
+      border-radius: 12px;
+      padding: 32px 36px;
+      margin-top: 24px;
+    }
+
+    .enemy-box p {
+      font-size: 14px;
+      color: #b0a8a6;
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+
+    .enemy-box p:last-child {
+      margin-bottom: 0;
+    }
+
+    .enemy-stat {
+      font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+      font-weight: 700;
+      color: var(--off-white);
+      border-left: 3px solid var(--teal-light);
+      padding-left: 16px;
+      line-height: 1.45;
+    }
+
+    .enemy-stat strong {
+      color: var(--teal-light);
+    }
+
+    /* ─── PILARES ─── */
+    .pillar-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .pillar-card {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .pillar-number {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--teal-light);
+      margin-bottom: 8px;
+    }
+
+    .pillar-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    .pillar-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .pillar-list li {
+      font-size: 13px;
+      color: #a8a0a0;
+      padding-left: 14px;
+      position: relative;
+      line-height: 1.5;
+    }
+
+    .pillar-list li::before {
+      content: '·';
+      position: absolute;
+      left: 0;
+      color: var(--teal);
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    /* ─── ENTREGÁVEIS ─── */
+    .deliverable-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .deliverable-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      gap: 16px;
+    }
+
+    .deliverable-name {
+      font-size: 13.5px;
+      color: var(--off-white);
+      line-height: 1.45;
+    }
+
+    .deliverable-name span {
+      display: block;
+      font-size: 11.5px;
+      color: var(--gray-light);
+      margin-top: 2px;
+    }
+
+    .deliverable-value {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--teal-light);
+      white-space: nowrap;
+      background: rgba(0, 156, 217, 0.1);
+      border: 1px solid rgba(0, 156, 217, 0.3);
+      border-radius: 20px;
+      padding: 3px 10px;
+      flex-shrink: 0;
+    }
+
+    .deliverable-total {
+      background: rgba(0, 96, 121, 0.15);
+      border: 1px solid rgba(0, 96, 121, 0.4);
+      border-radius: 10px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .deliverable-total-label {
+      font-size: 13px;
+      color: var(--gray-light);
+    }
+
+    .deliverable-total-value {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    /* ─── BÔNUS ─── */
+    .bonus-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .bonus-card {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .bonus-header {
+      background: rgba(0, 96, 121, 0.2);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .bonus-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--off-white);
+      line-height: 1.35;
+    }
+
+    .bonus-value {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--teal-light);
+      background: rgba(0, 156, 217, 0.12);
+      border: 1px solid rgba(0, 156, 217, 0.3);
+      border-radius: 20px;
+      padding: 3px 10px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .bonus-body {
+      padding: 14px 16px;
+      font-size: 12.5px;
+      color: #a0a0a0;
+      line-height: 1.55;
+    }
+
+    .bonus-urgency {
+      font-size: 11px;
+      color: var(--yellow);
+      margin-top: 6px;
+    }
+
+    /* ─── PREÇO ─── */
+    .price-box {
+      background: linear-gradient(135deg, rgba(0, 96, 121, 0.18), rgba(0, 156, 217, 0.08));
+      border: 1px solid rgba(0, 156, 217, 0.3);
+      border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+    }
+
+    .price-anchor {
+      font-size: 12px;
+      color: var(--gray-light);
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .price-stack {
+      font-size: 1.1rem;
+      color: var(--gray-light);
+      text-decoration: line-through;
+      margin-bottom: 4px;
+    }
+
+    .price-main {
+      font-size: clamp(3rem, 8vw, 4.5rem);
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -2px;
+      line-height: 1;
+    }
+
+    .price-period {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--gray-light);
+      letter-spacing: 0;
+    }
+
+    .price-badge {
+      display: inline-block;
+      background: rgba(241, 196, 15, 0.15);
+      border: 1px solid rgba(241, 196, 15, 0.4);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--yellow);
+      margin: 10px 0 20px;
+    }
+
+    .price-annual {
+      font-size: 13px;
+      color: var(--gray-light);
+      margin-bottom: 28px;
+    }
+
+    .price-annual strong {
+      color: var(--off-white);
+    }
+
+    .price-cta {
+      display: inline-block;
+      background: var(--teal-light);
+      color: #fff;
+      font-size: 17px;
+      font-weight: 800;
+      padding: 18px 48px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.1s;
+      margin-bottom: 14px;
+    }
+
+    .price-cta:hover {
+      background: #0088bb;
+      transform: translateY(-1px);
+    }
+
+    .price-subtext {
+      font-size: 12px;
+      color: var(--gray-light);
+    }
+
+    .price-comparison {
+      margin-top: 28px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-size: 13.5px;
+      color: #a0a0a0;
+      font-style: italic;
+    }
+
+    .price-comparison strong {
+      color: var(--teal-light);
+    }
+
+    /* ─── GARANTIAS ─── */
+    .guarantee-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .guarantee-box {
+      background: rgba(46, 204, 113, 0.07);
+      border: 1px solid rgba(46, 204, 113, 0.25);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .guarantee-icon {
+      font-size: 28px;
+      margin-bottom: 12px;
+    }
+
+    .guarantee-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--green);
+      margin-bottom: 8px;
+    }
+
+    .guarantee-text {
+      font-size: 13px;
+      color: #a0a0a0;
+      line-height: 1.65;
+    }
+
+    .guarantee-text strong {
+      color: var(--off-white);
+    }
+
+    /* ─── OBJEÇÕES ─── */
+    .objection-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .objection-card {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--teal);
+      border-radius: 0 10px 10px 0;
+      padding: 18px 20px;
+    }
+
+    .objection-q {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--off-white);
+      margin-bottom: 8px;
+    }
+
+    .objection-q::before {
+      content: '"';
+      color: var(--teal);
+      margin-right: 2px;
+    }
+
+    .objection-q::after {
+      content: '"';
+      color: var(--teal);
+      margin-left: 2px;
+    }
+
+    .objection-a {
+      font-size: 13px;
+      color: #a8a0a0;
+      line-height: 1.65;
+    }
+
+    .objection-a strong {
+      color: var(--off-white);
+    }
+
+    /* ─── URGÊNCIA ─── */
+    .urgency-box {
+      background: rgba(241, 196, 15, 0.06);
+      border: 1px solid rgba(241, 196, 15, 0.25);
+      border-radius: 12px;
+      padding: 32px 36px;
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .urgency-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--yellow);
+      margin-bottom: 10px;
+    }
+
+    .urgency-text {
+      font-size: 13.5px;
+      color: #a0a0a0;
+      line-height: 1.7;
+      max-width: 580px;
+      margin: 0 auto 20px;
+    }
+
+    .urgency-text strong {
+      color: var(--off-white);
+    }
+
+    .urgency-cost {
+      background: rgba(231, 76, 60, 0.1);
+      border: 1px solid rgba(231, 76, 60, 0.25);
+      border-radius: 10px;
+      padding: 14px 20px;
+      font-size: 13px;
+      color: #d0a0a0;
+      line-height: 1.7;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .urgency-cost strong {
+      color: #e88;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: #111;
+      padding: 48px 0 32px;
+      text-align: center;
+    }
+
+    .footer-brand {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--teal-light);
+      margin-bottom: 16px;
+    }
+
+    .footer-moral {
+      font-size: 13px;
+      color: #555;
+      font-style: italic;
+      max-width: 480px;
+      margin: 0 auto 20px;
+      line-height: 1.7;
+    }
+
+    .footer-legal {
+      font-size: 11px;
+      color: #444;
+      line-height: 1.8;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 700px) {
+
+      .pain-grid,
+      .pillar-grid,
+      .bonus-grid,
+      .guarantee-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .pain-full {
+        grid-column: 1;
+      }
+
+      .hero {
+        padding: 100px 0 60px;
+      }
+
+      .hero-stats {
+        gap: 24px;
+      }
+
+      .price-box {
+        padding: 28px 20px;
+      }
+
+      .enemy-box {
+        padding: 24px 20px;
+      }
+
+      .section {
+        padding: 52px 0;
+      }
+
+      .sticky-nav {
+        padding: 10px 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero h1 {
+        font-size: 1.8rem;
+      }
+
+      .hero-cta {
+        padding: 14px 28px;
+        font-size: 14px;
+      }
+
+      .deliverable-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .price-main {
+        font-size: 3rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- STICKY NAV -->
+  <nav class="sticky-nav">
+    <span class="nav-brand">DetailerHUB</span>
+    <a href="#preco" class="nav-cta">Entrar por R$79/mês</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">DetailerHUB: conecte-se e evolua</div>
+      <h1>Domine as técnicas que pagam mais e <span>aprenda a cobrar por elas.</span></h1>
+      <p class="hero-sub">
+        Aprenda com os principais nomes do mercado
+        <strong>e se posicione.</strong>
+      </p>
+      <a href="#preco" class="hero-cta">Quero entrar por R$79/mês →</a>
+      <p class="hero-note"><strong>vagas limitadas para fundadores.</strong> R$79/mês enquanto mantiver assinatura
+        ativa.</p>
+
+      <div class="hero-stats">
+        <div>
+          <div class="hero-stat-number">45–60×</div>
+          <div class="hero-stat-label">Retorno potencial</div>
+        </div>
+        <div>
+          <div class="hero-stat-number">R$79</div>
+          <div class="hero-stat-label">Preço de fundador</div>
+        </div>
+        <div>
+          <div class="hero-stat-number">Limitadas</div>
+          <div class="hero-stat-label">Vagas neste ciclo</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOR -->
+  <section class="section">
+    <div class="container">
+      <p class="section-eyebrow">Você se reconhece?</p>
+      <h2 class="section-title">Se algum desses é você, o DetailerHUB foi feito para você.</h2>
+      <p class="section-desc">Não como crítica, como reconhecimento. Esses não são problemas de quem faz mal feito. São
+        problemas de quem faz bem e ainda não aprendeu a cobrar por isso.</p>
+
+      <div class="pain-grid">
+        <div class="pain-card">
+          <div class="pain-check">✓</div>
+          <div class="pain-text">Faz o mesmo serviço que outra estética cobra R$2.500, mas você cobra R$350.</div>
+        </div>
+        <div class="pain-card">
+          <div class="pain-check">✓</div>
+          <div class="pain-text">Sabe que o trabalho é bom, mas não consegue provar isso para o cliente certo.</div>
+        </div>
+        <div class="pain-card">
+          <div class="pain-check">✓</div>
+          <div class="pain-text">Clientes tratam o seu trabalho como "lavagem cara" e você não sabe como reverter isso.
+          </div>
+        </div>
+        <div class="pain-card">
+          <div class="pain-check">✓</div>
+          <div class="pain-text">Aprende sozinho, via YouTube, WhatsApp, tentativa e erro, sem ninguém para te ajudar a
+            crescer mais.</div>
+        </div>
+        <div class="pain-card">
+          <div class="pain-check">✓</div>
+          <div class="pain-text">Sente que fica para trás porque curso presencial custa caro e dura pouco tempo.</div>
+        </div>
+        <div class="pain-card">
+          <div class="pain-check">✓</div>
+          <div class="pain-text">Não consegue calcular o custo real por hora, então precifica no chute e às vezes
+            trabalha no prejuízo.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INIMIGO -->
+  <section class="section">
+    <div class="container">
+      <p class="section-eyebrow">O Diagnóstico Real</p>
+      <h2 class="section-title">O problema não é só técnico.</h2>
+      <p class="section-desc">A maioria dos profissionais executa serviços que valem muito mais. O problema não está na
+        mão: está em saber precificar e comunicar o valor do que foi feito.</p>
+
+      <div class="enemy-box">
+        <p>
+          Um ceramic coating aplicado por você custa o mesmo tempo e produto que de outra estética automotiva. A
+          diferença de R$600 para R$2.500 não está na técnica. Está em como o serviço é apresentado, documentado e
+          cobrado.
+        </p>
+        <p>
+          Grupos de WhatsApp têm dicas. Não têm método. Curso presencial pontual de R$3.000 atualiza a técnica por três
+          dias. Não te acompanha nos meses seguintes.
+        </p>
+        <div class="enemy-stat">
+          A grande maioria dos detailers no Brasil sabem executar serviços de alto valor mas cobram como iniciantes, e
+          estão deixando <strong>R$75.600/ano na mesa</strong>, cada um.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PILARES -->
+  <section class="section">
+    <div class="container">
+      <p class="section-eyebrow">O Mecanismo</p>
+      <h2 class="section-title">Quatro pilares. Um resultado.</h2>
+      <p class="section-desc">O DetailerHUB não é um curso. É uma plataforma de membros com conteúdo contínuo,
+        ferramentas práticas e comunidade ativa: tudo construído para que você e o seu negócio cresçam.</p>
+
+      <div class="pillar-grid">
+        <div class="pillar-card">
+          <div class="pillar-number">Pilar 01</div>
+          <div class="pillar-title">Domínio Técnico</div>
+          <ul class="pillar-list">
+            <li>Nunca mais erre na Lavagem Detalhada</li>
+            <li>Polimento técnico perfeito</li>
+            <li>Todos os tipos de proteção</li>
+            <li>Vidros, faróis e outros serviços que fazem parte de uma estética</li>
+            <li>Com os maiores nomes da estética automotiva no Brasil</li>
+          </ul>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-number">Pilar 02</div>
+          <div class="pillar-title">Precificação Estratégica</div>
+          <ul class="pillar-list">
+            <li>Precificação sem segredos</li>
+            <li>Planilha de Precificação Dinâmica com calculadora integrada</li>
+            <li>Mapeamento de preços das principais regiões</li>
+            <li>Como calcular lucro real por serviço</li>
+          </ul>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-number">Pilar 03</div>
+          <div class="pillar-title">Comunicação e Atração de Clientes</div>
+          <ul class="pillar-list">
+            <li>Scripts de WhatsApp, Instagram e abordagem presencial</li>
+            <li>Principais respostas para as objeções mais comuns</li>
+            <li>Templates de portfólio profissional</li>
+            <li>Fotografando resultado com celular: luz, ângulo, edição</li>
+          </ul>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-number">Pilar 04</div>
+          <div class="pillar-title">Comunidade e Feedback</div>
+          <ul class="pillar-list">
+            <li>Participe das comunidades das referências do mercado</li>
+            <li>Agenda mensal de encontros ao vivo</li>
+            <li>Aprenda com outros profissionais de verdade</li>
+            <li>Evolua junto</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ENTREGÁVEIS -->
+  <section class="section">
+    <div class="container">
+      <p class="section-eyebrow">O Que Você Recebe</p>
+      <h2 class="section-title">Tudo incluso na assinatura.</h2>
+      <p class="section-desc">Cada item abaixo resolve um problema específico. O valor avulso é o que você pagaria se
+        comprasse separado: a assinatura entrega tudo por R$79/mês para os membros fundadores.</p>
+
+      <div class="deliverable-list">
+        <div class="deliverable-item">
+          <div class="deliverable-name">
+            Módulos técnicos com influenciadores
+            <span>Desenvolva sua técnica com os maiores nomes do mercado</span>
+          </div>
+          <div class="deliverable-value">R$1.200–3.000 avulso</div>
+        </div>
+        <div class="deliverable-item">
+          <div class="deliverable-name">
+            Precificação Estratégica
+            <span>Custo real + margem mínima + valor percebido. Calculadora integrada.</span>
+          </div>
+          <div class="deliverable-value">R$297 avulso</div>
+        </div>
+        <div class="deliverable-item">
+          <div class="deliverable-name">
+            Planilha de Precificação Dinâmica DetailerHUB
+            <span>Calcula automaticamente preço mínimo, preço de mercado e preço de referência.
+              .</span>
+          </div>
+          <div class="deliverable-value">R$197 avulso</div>
+        </div>
+        <div class="deliverable-item">
+          <div class="deliverable-name">
+            Mapeamento de Preços por Região
+            <span>Preços praticados nas principais regiões levantados pela própria comunidade.
+            </span>
+          </div>
+          <div class="deliverable-value">R$97 avulso</div>
+        </div>
+        <div class="deliverable-item">
+          <div class="deliverable-name">
+            Módulo Comunicação e Atração de Clientes
+            <span>Scripts prontos para WhatsApp, Instagram e abordagem presencial.</span>
+          </div>
+          <div class="deliverable-value">R$197 avulso</div>
+        </div>
+        <div class="deliverable-item">
+          <div class="deliverable-name">
+            Comunidade dos Especialistas
+            <span>Cada referência tem sua comunidade, seu conteúdo e o espaço para você interagir.</span>
+          </div>
+          <div class="deliverable-value">incluso</div>
+        </div>
+        <div class="deliverable-item">
+          <div class="deliverable-name">
+            Agenda de lives mensais
+            <span>Espaço para encontros ao vivo e tira dúviadas todo mês.</span>
+          </div>
+          <div class="deliverable-value">incluso</div>
+        </div>
+        <div class="deliverable-total">
+          <div class="deliverable-total-label">Valor total se comprasse separado</div>
+          <div class="deliverable-total-value">R$3.000+</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PREÇO -->
+  <section class="section" id="preco">
+    <div class="container">
+      <p class="section-eyebrow">A Oferta</p>
+      <h2 class="section-title">Quanto custa, e por que é o preço certo.</h2>
+      <p class="section-desc">R$79 não é barato por humildade. É barato por estratégia: a oferta precisa ser tão
+        obviamente favorável que a única resposta inteligente é entrar.</p>
+
+      <div class="price-box">
+        <div class="price-anchor">Valor total dos entregáveis separados: R$3.000+</div>
+        <div class="price-stack">R$197/mês (preço após período de fundador)</div>
+        <div class="price-main">R$79<span class="price-period">/mês</span></div>
+        <div class="price-badge">Preço de Fundador: 500 vagas</div>
+        <div class="price-annual">Ou <strong>R$59/mês</strong> no plano anual: <strong>R$708 à vista</strong></div>
+        <a href="#" class="price-cta">Quero entrar por R$79/mês →</a>
+        <p class="price-subtext">Acesso imediato · Sem fidelidade · Cancele quando quiser</p>
+        <div class="price-comparison">
+          "R$79 é o que você cobra a mais em <strong>um único serviço</strong> depois de aprender a precificar. Um
+          serviço paga 8 meses de assinatura."
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GARANTIAS -->
+  <section class="section">
+    <div class="container">
+      <p class="section-eyebrow">Sem Risco</p>
+      <h2 class="section-title">Cancele quando quiser. Sem multa.</h2>
+      <p class="section-desc">Sem fidelidade, sem contrato, sem taxa de cancelamento. A única obrigação é com o seu
+        crescimento.</p>
+
+      <div class="guarantee-grid" style="grid-template-columns: 1fr;">
+        <div class="guarantee-box">
+          <div class="guarantee-icon">🚪</div>
+          <div class="guarantee-title">Cancele Quando Quiser, Sem Multa</div>
+          <div class="guarantee-text">
+            Sem fidelidade. Sem contrato. Sem taxa de cancelamento.<br><br>
+            Cancela → para de ser cobrado → mantém acesso até o fim do período pago. <strong>Sem surpresas, sem
+              complicação.</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OBJEÇÕES -->
+  <section class="section">
+    <div class="container">
+      <p class="section-eyebrow">Perguntas Frequentes</p>
+      <h2 class="section-title">Já antecipamos o que você está pensando.</h2>
+      <p class="section-desc">Respostas diretas para as dúvidas mais comuns.</p>
+
+      <div class="objection-list">
+        <div class="objection-card">
+          <div class="objection-q">R$79 é caro, estou apertado.</div>
+          <div class="objection-a">
+            A pergunta certa é: <strong>quanto você está perdendo por mês?</strong> 10 serviços a R$300 quando deveria
+            cobrar R$600 = R$3.000/mês perdidos. R$79 contra R$3.000 é um cálculo simples. E se não gostar, cancela
+            quando quiser, sem multa.
+          </div>
+        </div>
+        <div class="objection-card">
+          <div class="objection-q">Já fiz curso de detailing, não preciso de mais conteúdo.</div>
+          <div class="objection-a">
+            O DetailerHUB não é curso técnico. É para quem <strong>já sabe fazer</strong>. O problema que resolvemos não
+            é a execução: é o que acontece antes (precificação) e depois (comunicação com o cliente) do serviço.
+          </div>
+        </div>
+        <div class="objection-card">
+          <div class="objection-q">Não tenho tempo para consumir mais conteúdo.</div>
+          <div class="objection-a">
+            O módulo de precificação tem 6 aulas e 3 horas de duração. A planilha leva 20 minutos para preencher.
+            <strong>4 horas no primeiro mês</strong> é o suficiente para ter resultado mensurável.
+          </div>
+        </div>
+        <div class="objection-card">
+          <div class="objection-q">Como sei que vai funcionar no meu mercado? Minha cidade é diferente.</div>
+          <div class="objection-a">
+            A Tabela de Referência de Preços cobre SP, RJ, BH, Curitiba, Porto Alegre e Fortaleza. Além disso, a Sessão
+            de Diagnóstico Individual (primeiros 50 membros por ciclo) é exatamente para adaptar o método à sua
+            realidade específica.
+          </div>
+        </div>
+        <div class="objection-card">
+          <div class="objection-q">Tenho medo de entrar e ficar preso.</div>
+          <div class="objection-a">
+            Sem contrato. Sem fidelidade. Sem multa de cancelamento. <strong>Cancele quando quiser</strong>, em menos de
+            dois cliques. Não existe risco de "ficar preso".
+          </div>
+        </div>
+        <div class="objection-card">
+          <div class="objection-q">YouTube e redes sociais ensinam tudo de graça.</div>
+          <div class="objection-a">
+            YouTube ensina polimento. Não ensina como cobrar R$2.500 por ele. O conteúdo gratuito cobre técnica.
+            <strong>O que o DetailerHUB entrega (método de precificação, planilha, comunidade com feedback real,
+              templates prontos) não existe no YouTube.</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- URGÊNCIA + CTA FINAL -->
+  <section class="section" style="border-bottom: none;">
+    <div class="container">
+      <p class="section-eyebrow">Agir Agora</p>
+      <h2 class="section-title">500 vagas. Preço de fundador. Janela aberta.</h2>
+      <p class="section-desc">Duas razões para entrar agora: uma de preço, uma de mercado.</p>
+
+      <div class="urgency-box">
+        <div class="urgency-title">⏳ Preço de fundador: R$79/mês para as primeiras 500 vagas</div>
+        <div class="urgency-text">
+          Na vaga 501, o preço sobe para <strong>R$97/mês</strong>. Quem entrar agora trava R$79/mês enquanto mantiver a
+          assinatura ativa, mesmo quando o preço mudar para novos membros.
+        </div>
+        <div class="urgency-cost">
+          O custo de esperar:<br>
+          <strong>10 serviços/mês a R$300 quando deveria cobrar R$700 = R$4.000/mês perdidos.</strong><br>
+          3 meses esperando = R$12.000 em receita que nunca vai ser cobrada.
+        </div>
+      </div>
+
+      <div style="text-align: center;">
+        <a href="#" class="price-cta">Quero entrar por R$79/mês →</a>
+        <p class="price-subtext" style="margin-top: 12px;">Acesso imediato · Sem fidelidade · Cancele quando quiser</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-brand">DetailerHUB</div>
+      <p class="footer-moral">
+        "Criadores que constroem com excelência merecem ser donos da sua audiência, não inquilinos de algoritmos."
+      </p>
+      <p class="footer-legal">
+        DetailerHUB: Comunidade de Profissionais de Referência<br>
+        Os resultados mencionados são baseados em casos reais documentados, mas não garantem resultados idênticos para
+        todos os membros.<br>
+        A garantia de devolução é válida conforme os termos descritos na seção de garantias acima.
+      </p>
+    </div>
+  </footer>
+
+</body>
+
+</html>

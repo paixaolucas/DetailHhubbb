@@ -215,6 +215,32 @@ async function main() {
     },
   });
 
+  // ── Platform Academy influencer (SUPER_ADMIN owns the academy community) ──────
+  // We create a separate influencer user for the platform to host the Academy
+  const academyUser = await db.user.create({
+    data: {
+      email: "academy@detailerhub.com.br",
+      passwordHash: await bcrypt.hash("Influencer@123!", saltRounds),
+      firstName: "DetailerHUB",
+      lastName: "Academy",
+      role: UserRole.INFLUENCER_ADMIN,
+      referralCode: "ACADEMY001",
+      emailVerified: new Date(),
+    },
+  });
+
+  const influencerAcademy = await db.influencer.create({
+    data: {
+      userId: academyUser.id,
+      displayName: "DetailerHUB Academy",
+      bio: "Conteúdo oficial da plataforma: precificação, comunicação e captação de clientes. Módulos produzidos pela equipe DetailerHUB.",
+      isVerified: true,
+      isActive: true,
+      totalEarnings: 0,
+      pendingPayout: 0,
+    },
+  });
+
   console.log("✅ Influencers created");
 
   // =============================================================================
@@ -316,6 +342,27 @@ async function main() {
       isPublished: true,
       isPrivate: false,
       memberCount: 350,
+    },
+  });
+
+  const communityAcademy = await db.community.create({
+    data: {
+      influencerId: influencerAcademy.id,
+      name: "DetailerHUB Academy",
+      slug: "academy",
+      description:
+        "O conteúdo oficial da plataforma. Precificação estratégica, comunicação com o cliente, captação e retenção — produzido pela equipe DetailerHUB para transformar detailers em empresários.",
+      shortDescription: "Módulos da plataforma: do técnico ao empresarial.",
+      primaryColor: "#006079",
+      secondaryColor: "#009CD9",
+      accentColor: "#EEE6E4",
+      isPublished: true,
+      isPrivate: false,
+      memberCount: 0,
+      welcomeMessage:
+        "Bem-vindo à DetailerHUB Academy! Aqui você encontra os módulos produzidos pela plataforma: precificação estratégica, comunicação com o cliente, captação e muito mais. É o conteúdo que transforma detailers em empresários.",
+      rules: "1. Consuma o conteúdo com foco na aplicação\n2. Compartilhe seus resultados e dúvidas\n3. Respeite todos os membros",
+      tags: ["precificacao", "negocios", "detailing", "academy", "detailerhub"],
     },
   });
 
@@ -500,6 +547,53 @@ async function main() {
     ],
   });
 
+  // =============================================================================
+  // 7 MÓDULOS ESTRUTURADOS — DetailerHUB Academy
+  // Fonte: branding/Novos arquivos e documentações/operacional/pautas-de-conteudo.md
+  // Módulos 1–4: conteúdo técnico (gravado por produtores de conteúdo externos)
+  // Módulos 5–7: conteúdo da plataforma (produzido internamente)
+  // =============================================================================
+
+  const mod1 = await db.contentModule.create({ data: { communityId: communityAcademy.id, title: "Módulo 1 — Ceramic Coating do Zero ao Acabamento Profissional", description: "O membro aprende a executar ceramic coating com confiança técnica suficiente para cobrar por isso — incluindo os erros que fazem o serviço ficar ruim e como evitá-los.", sortOrder: 1, isPublished: true } });
+  const mod2 = await db.contentModule.create({ data: { communityId: communityAcademy.id, title: "Módulo 2 — Correção de Pintura Profissional", description: "O membro aprende a realizar correção de pintura em níveis 1, 2 e 3 — com controle técnico do processo e capacidade de orçar corretamente.", sortOrder: 2, isPublished: true } });
+  const mod3 = await db.contentModule.create({ data: { communityId: communityAcademy.id, title: "Módulo 3 — PPF: Instalação e Gestão do Serviço", description: "O membro entende o serviço de PPF o suficiente para orçar, vender e gerenciar terceiros — ou para começar a instalar em casos simples.", sortOrder: 3, isPublished: true } });
+  const mod4 = await db.contentModule.create({ data: { communityId: communityAcademy.id, title: "Módulo 4 — Higienização Técnica Avançada", description: "Transformar higienização — muitas vezes vendida como 'lavagem cara' — em serviço técnico com ticket 3–5x maior e resultado documentável.", sortOrder: 4, isPublished: true } });
+  const mod5 = await db.contentModule.create({ data: { communityId: communityAcademy.id, title: "Módulo 5 — Precificação Estratégica", description: "Planilhas, templates e vídeos para calcular o preço real dos seus serviços e nunca mais trabalhar no prejuízo.", sortOrder: 5, isPublished: true, unlockAfterDays: 0 } });
+  const mod6 = await db.contentModule.create({ data: { communityId: communityAcademy.id, title: "Módulo 6 — Comunicação e Atração de Clientes", description: "Como fotografar, descrever e comunicar seus serviços para atrair o cliente de maior ticket.", sortOrder: 6, isPublished: false } });
+  const mod7 = await db.contentModule.create({ data: { communityId: communityAcademy.id, title: "Módulo 7 — Captação e Retenção de Clientes", description: "Estratégias para construir uma carteira de clientes fiel e gerar renda recorrente.", sortOrder: 7, isPublished: false } });
+
+  await db.contentLesson.createMany({
+    data: [
+      // Módulo 1 — Ceramic Coating
+      { moduleId: mod1.id, title: "Aula 1.1 — Preparação de Superfície: o que 90% erra antes de abrir o frasco", description: "Leitura de espessura, descontaminação, correção mínima e checklist de preparação.", type: "VIDEO", videoDuration: 18 * 60, sortOrder: 1, isPublished: true, isFree: true },
+      { moduleId: mod1.id, title: "Aula 1.2 — Aplicação do Ceramic Coating: técnica de linha cruzada e controle de flash time", description: "Técnica de aplicação, flash time visual, remoção do excesso e high spots.", type: "VIDEO", videoDuration: 22 * 60, sortOrder: 2, isPublished: true },
+      { moduleId: mod1.id, title: "Aula 1.3 — Cura, Manutenção e Entrega para o Cliente", description: "Período de cura, roteiro de entrega, fotografia do resultado e como cobrar.", type: "VIDEO", videoDuration: 17 * 60, sortOrder: 3, isPublished: true },
+      { moduleId: mod1.id, title: "Aula 1.4 — Precificação do Ceramic Coating: custo real e preço mínimo", description: "Todos os custos esquecidos, calculando com a planilha, preço mínimo vs. mercado.", type: "VIDEO", videoDuration: 14 * 60, sortOrder: 4, isPublished: true },
+      // Módulo 2 — Correção de Pintura
+      { moduleId: mod2.id, title: "Aula 2.1 — Leitura de Pintura: o que o cliente não vê mas você precisa ver", description: "Identificação de imperfeições, espessura, classificação de nível e documentação fotográfica.", type: "VIDEO", videoDuration: 15 * 60, sortOrder: 1, isPublished: true, isFree: true },
+      { moduleId: mod2.id, title: "Aula 2.2 — Polimento de Nível 1: remoção de swirls e microriscos leves", description: "Escolha de combo, técnica de prime, velocidade/pressão/sobreposição e validação do resultado.", type: "VIDEO", videoDuration: 20 * 60, sortOrder: 2, isPublished: true },
+      { moduleId: mod2.id, title: "Aula 2.3 — Polimento de Nível 2 e 3: quando o DA não resolve", description: "Uso de rotativa, correção de oxidação, limite seguro de passes e refinamento pós-corte.", type: "VIDEO", videoDuration: 22 * 60, sortOrder: 3, isPublished: true },
+      // Módulo 3 — PPF
+      { moduleId: mod3.id, title: "Aula 3.1 — O que é PPF e como vender antes de instalar", description: "PPF vs. vinil vs. ceramic, tipos de cobertura, roteiro de venda e precificação.", type: "VIDEO", videoDuration: 15 * 60, sortOrder: 1, isPublished: true, isFree: true },
+      { moduleId: mod3.id, title: "Aula 3.2 — Instalação de Kit Básico: portas, maçanetas e para-choque", description: "Preparação de superfície, aplicação molhada, bordas e entrega ao cliente.", type: "VIDEO", videoDuration: 25 * 60, sortOrder: 2, isPublished: true },
+      // Módulo 4 — Higienização
+      { moduleId: mod4.id, title: "Aula 4.1 — Higienização de Estofados: a diferença entre limpo e higienizado", description: "Luz UV, tipos de estofado, extração em tecido, couro, ozonização.", type: "VIDEO", videoDuration: 18 * 60, sortOrder: 1, isPublished: true, isFree: true },
+      { moduleId: mod4.id, title: "Aula 4.2 — Higienização de Motor: serviço com alto ticket e baixo risco quando feito certo", description: "O que proteger, desengraxante, enxágue controlado, secagem e acabamento.", type: "VIDEO", videoDuration: 15 * 60, sortOrder: 2, isPublished: true },
+      // Módulo 5 — Precificação (plataforma)
+      { moduleId: mod5.id, title: "Aula 5.1 — Por que você cobra menos do que deveria", description: "O custo real de uma hora de trabalho, todos os custos esquecidos e preço mínimo vs. mercado.", type: "VIDEO", videoDuration: 12 * 60, sortOrder: 1, isPublished: true, isFree: true, attachments: JSON.stringify([{ name: "Planilha de Custo Real por Serviço", type: "spreadsheet" }]) },
+      { moduleId: mod5.id, title: "Aula 5.2 — Montando sua Tabela de Preços", description: "Três colunas de preço, porte do carro como variável, apresentação ao cliente e resposta ao 'está caro'.", type: "VIDEO", videoDuration: 15 * 60, sortOrder: 2, isPublished: true, attachments: JSON.stringify([{ name: "Template de Tabela de Preços por Serviço", type: "template" }]) },
+      { moduleId: mod5.id, title: "Aula 5.3 — O Orçamento que Fecha", description: "Por que orçamento escrito fecha mais, o modelo DetailerHUB e termos que protegem você.", type: "VIDEO", videoDuration: 12 * 60, sortOrder: 3, isPublished: true, attachments: JSON.stringify([{ name: "Template de Orçamento Profissional", type: "template" }]) },
+      // Módulo 6 — Comunicação (plataforma — não publicado ainda)
+      { moduleId: mod6.id, title: "Aula 6.1 — A Foto que Vende o Serviço", description: "Luz certa, ângulos que valorizam, antes e depois perfeito.", type: "VIDEO", videoDuration: 10 * 60, sortOrder: 1, isPublished: false },
+      { moduleId: mod6.id, title: "Aula 6.2 — O que postar e como descrever o serviço", description: "Estrutura do post que atrai, vocabulário do cliente premium, stories vs. feed.", type: "VIDEO", videoDuration: 10 * 60, sortOrder: 2, isPublished: false },
+      // Módulo 7 — Captação (plataforma — não publicado ainda)
+      { moduleId: mod7.id, title: "Aula 7.1 — Como construir carteira de clientes do zero", description: "Estratégias de captação, indicações e posicionamento de autoridade.", type: "VIDEO", videoDuration: 15 * 60, sortOrder: 1, isPublished: false },
+      { moduleId: mod7.id, title: "Aula 7.2 — Retenção: como fazer o cliente voltar sempre", description: "Follow-up, programa de fidelidade, agendamento recorrente.", type: "VIDEO", videoDuration: 12 * 60, sortOrder: 2, isPublished: false },
+    ],
+  });
+
+  console.log("✅ 7 Academy modules and lessons created");
+
   console.log("✅ Content modules and lessons created");
 
   // =============================================================================
@@ -525,7 +619,7 @@ async function main() {
     data: {
       name: "DetailHub Anual",
       description: "Acesso completo a todas as comunidades automotivas da plataforma.",
-      price: 948,
+      price: 708,
       currency: "brl",
       interval: "year",
       intervalCount: 1,
@@ -552,7 +646,7 @@ async function main() {
   // =============================================================================
   // 350 DEMO MEMBERS + PLATFORM MEMBERSHIPS
   // 70 per influencer × 5 influencers = 350 total
-  // Mix: every 5th member is monthly PIX (R$79), rest annual (R$948)
+  // Mix: every 5th member is monthly PIX (R$79), rest annual (R$708)
   // All memberships have currentPeriodEnd in the future
   // =============================================================================
   console.log("🔄 Creating 350 demo members...");
@@ -943,8 +1037,8 @@ async function main() {
   // =============================================================================
   await db.payment.createMany({
     data: [
-      { userId: member1.id, amount: 948, currency: "brl", status: "SUCCEEDED", type: "SUBSCRIPTION", createdAt: new Date(Date.now() - 30 * 86400000) },
-      { userId: member2.id, amount: 948, currency: "brl", status: "SUCCEEDED", type: "SUBSCRIPTION", createdAt: new Date(Date.now() - 25 * 86400000) },
+      { userId: member1.id, amount: 708, currency: "brl", status: "SUCCEEDED", type: "SUBSCRIPTION", createdAt: new Date(Date.now() - 30 * 86400000) },
+      { userId: member2.id, amount: 708, currency: "brl", status: "SUCCEEDED", type: "SUBSCRIPTION", createdAt: new Date(Date.now() - 25 * 86400000) },
     ],
   });
   console.log("✅ Payment history created");
@@ -985,15 +1079,15 @@ async function main() {
 ║ SuperAdmin    admin@comunidadehub.com / Admin@123456!      ║
 ╠═══════════════════════════════════════════════════════════╣
 ║ Barba         barba@comunidade.com / Influencer@123!       ║
-║               70 membros referidos · R$948 anual / R$79mês ║
+║               70 membros referidos · R$708 anual / R$59mês ║
 ║ Corujão       corujao@comunidade.com / Influencer@123!     ║
-║               70 membros referidos · R$948 anual / R$79mês ║
+║               70 membros referidos · R$708 anual / R$59mês ║
 ║ Neto          neto@comunidade.com / Influencer@123!        ║
-║               70 membros referidos · R$948 anual / R$79mês ║
+║               70 membros referidos · R$708 anual / R$59mês ║
 ║ Gimenez       gimenez@comunidade.com / Influencer@123!     ║
-║               70 membros referidos · R$948 anual / R$79mês ║
+║               70 membros referidos · R$708 anual / R$59mês ║
 ║ Gigi          gigi@comunidade.com / Influencer@123!        ║
-║               70 membros referidos · R$948 anual / R$79mês ║
+║               70 membros referidos · R$708 anual / R$59mês ║
 ╠═══════════════════════════════════════════════════════════╣
 ║ Member 1      membro1@email.com / Membro@123!              ║
 ║ Member 2      membro2@email.com / Membro@123!              ║

@@ -14,7 +14,7 @@ export function Footer() {
             Pronto para entrar na maior plataforma automotiva do Brasil?
           </h2>
           <p className="text-gray-400 mb-8 max-w-xl mx-auto">
-            Junte-se a milhares de entusiastas e criadores. Acesse tudo por R$948/ano.
+            Junte-se a milhares de entusiastas e criadores. Acesse tudo por R$708/ano.
           </p>
           <Link
             href="/register"

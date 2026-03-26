@@ -36,12 +36,12 @@ export const GET = withRole(UserRole.INFLUENCER_ADMIN)(async (_req, { session })
     select: { price: true, interval: true, intervalCount: true },
   });
 
-  // R$948/ano ou R$79/mês — fallback se não houver plano no banco
+  // R$708/ano ou R$79/mês — fallback se não houver plano no banco
   const annualPrice = activePlan?.interval === "year"
     ? Number(activePlan.price)
     : activePlan
       ? Number(activePlan.price) * (12 / (activePlan.intervalCount ?? 1))
-      : 948;
+      : 708;
 
   const monthlyEquivalent = activePlan?.interval === "month"
     ? Number(activePlan.price) / (activePlan.intervalCount ?? 1)

@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Missão 06 — Direção Estratégica | DetailerHUB</title>
+  <style>
+    :root {
+      --teal: #006079;
+      --teal-light: #009cd9;
+      --black: #1a1a1a;
+      --off-white: #eee6e4;
+      --gray: #2e2e2e;
+      --gray-mid: #444;
+      --gray-light: #888;
+      --green: #2ecc71;
+      --yellow: #f1c40f;
+      --red: #e74c3c;
+      --border: #333;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--black);
+      color: var(--off-white);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    /* ── COVER ── */
+    .cover {
+      background: linear-gradient(135deg, #080c0d 0%, #061f27 40%, #003d50 75%, #006079 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 80px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cover::before {
+      content: '';
+      position: absolute;
+      top: -40%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 900px;
+      background: radial-gradient(ellipse, rgba(0,156,217,0.07) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .cover::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--teal), transparent);
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(0, 96, 121, 0.4);
+      border: 1px solid var(--teal);
+      color: var(--teal-light);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      padding: 8px 22px;
+      border-radius: 24px;
+      margin-bottom: 44px;
+      position: relative;
+    }
+
+    .cover-title {
+      font-size: clamp(2.8rem, 7vw, 5rem);
+      font-weight: 900;
+      letter-spacing: -3px;
+      line-height: 1.05;
+      margin-bottom: 24px;
+      color: var(--off-white);
+      position: relative;
+    }
+
+    .cover-title span {
+      color: var(--teal-light);
+    }
+
+    .cover-subtitle {
+      font-size: clamp(1rem, 2.2vw, 1.2rem);
+      color: var(--gray-light);
+      max-width: 600px;
+      margin-bottom: 60px;
+      letter-spacing: 0.3px;
+      line-height: 1.65;
+      position: relative;
+    }
+
+    .cover-meta {
+      display: flex;
+      gap: 48px;
+      flex-wrap: wrap;
+      justify-content: center;
+      position: relative;
+    }
+
+    .cover-meta-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .cover-meta-label {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--teal);
+      font-weight: 700;
+    }
+
+    .cover-meta-value {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--off-white);
+    }
+
+    /* ── LAYOUT ── */
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    .section {
+      padding: 88px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section:last-of-type {
+      border-bottom: none;
+    }
+
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--teal);
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      margin-bottom: 12px;
+    }
+
+    .section-title span {
+      color: var(--teal-light);
+    }
+
+    .section-intro {
+      color: var(--gray-light);
+      max-width: 680px;
+      margin-bottom: 48px;
+    }
+
+    /* ── MORAL ENGINE BOX ── */
+    .moral-engine-box {
+      background: linear-gradient(135deg, rgba(0,96,121,0.25), rgba(0,156,217,0.1));
+      border: 2px solid var(--teal);
+      border-radius: 16px;
+      padding: 56px 48px;
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .moral-engine-box .moral-label {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--teal-light);
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .moral-engine-box .moral-quote {
+      font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+      font-weight: 600;
+      color: var(--off-white);
+      line-height: 1.7;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    /* ── VALUES GRID ── */
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .value-card {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 32px 28px;
+      transition: border-color 0.2s;
+    }
+
+    .value-card:hover {
+      border-color: var(--teal);
+    }
+
+    .value-card .value-number {
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--teal-light);
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .value-card .value-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--off-white);
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+
+    .value-card .value-body {
+      color: var(--gray-light);
+      font-size: 13.5px;
+      line-height: 1.65;
+    }
+
+    /* ── BIG STAT CARDS ── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 36px;
+    }
+
+    .stat-card {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 20px;
+      text-align: center;
+    }
+
+    .stat-card .stat-acronym {
+      font-size: 11px;
+      letter-spacing: 2.5px;
+      color: var(--teal);
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .big-number {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--teal-light);
+      letter-spacing: -1px;
+      line-height: 1.1;
+    }
+
+    .stat-card .stat-label {
+      font-size: 12px;
+      color: var(--gray-light);
+      margin-top: 6px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* ── SUCCESS METRIC CARD ── */
+    .metric-card {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .metric-card .metric-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--teal-light);
+      letter-spacing: -1px;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+
+    .metric-card .metric-label {
+      font-size: 12px;
+      color: var(--gray-light);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    /* ── TABLE ── */
+    .table-wrap {
+      overflow-x: auto;
+      margin-bottom: 28px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead th {
+      background: rgba(0,96,121,0.3);
+      color: var(--teal-light);
+      font-weight: 700;
+      text-align: left;
+      padding: 14px 18px;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--teal);
+    }
+
+    tbody td {
+      padding: 12px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      color: #ccc;
+      vertical-align: top;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(255,255,255,0.03);
+    }
+
+    tbody tr:hover {
+      background: rgba(0,156,217,0.06);
+    }
+
+    .td-highlight {
+      color: var(--off-white);
+      font-weight: 600;
+    }
+
+    .td-accent {
+      color: var(--teal-light);
+      font-weight: 700;
+    }
+
+    /* ── FILTER TABLE (more visible alternating rows) ── */
+    .filter-table tbody tr:nth-child(odd) {
+      background: rgba(0,96,121,0.12);
+    }
+
+    .filter-table tbody tr:nth-child(even) {
+      background: rgba(0,0,0,0.2);
+    }
+
+    .filter-table tbody tr:hover {
+      background: rgba(0,156,217,0.1);
+    }
+
+    .filter-table .advance-cell {
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    .filter-table .stop-cell {
+      color: var(--red);
+      font-weight: 600;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--teal-light);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .card-body {
+      color: #ccc;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .cards-grid .card {
+      margin-bottom: 0;
+    }
+
+    /* ── ICP CARD (2 col) ── */
+    .icp-card {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+
+    .icp-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .icp-left {
+      padding: 40px 36px;
+      border-right: 1px solid var(--border);
+    }
+
+    .icp-right {
+      padding: 40px 36px;
+      background: rgba(0,96,121,0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .icp-left .icp-sub {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--teal);
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    .icp-left .icp-definition {
+      color: #ccc;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .icp-right .icp-belief-label {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--yellow);
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .icp-right .icp-belief-quote {
+      font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+      font-weight: 700;
+      color: var(--off-white);
+      line-height: 1.5;
+      font-style: italic;
+      margin-bottom: 16px;
+    }
+
+    .icp-right .icp-hypothesis {
+      font-size: 13px;
+      color: var(--gray-light);
+      line-height: 1.6;
+    }
+
+    /* ── HIGHLIGHT / ALERT BOX ── */
+    .highlight-box {
+      background: rgba(0,96,121,0.15);
+      border: 1px solid rgba(0,156,217,0.3);
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-bottom: 28px;
+    }
+
+    .highlight-box .big-number {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 900;
+      color: var(--teal-light);
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+
+    .highlight-box .big-label {
+      color: var(--gray-light);
+      font-size: 14px;
+    }
+
+    .alert-box {
+      background: rgba(231,76,60,0.08);
+      border: 1px solid rgba(231,76,60,0.35);
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-top: 28px;
+    }
+
+    .alert-box .alert-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 12px;
+    }
+
+    .alert-box .alert-body {
+      color: #ccc;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .context-box {
+      background: rgba(241,196,15,0.07);
+      border: 1px solid rgba(241,196,15,0.3);
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-top: 28px;
+      color: #ccc;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    /* ── PILLARS ── */
+    .pillar-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .pillar-card {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 32px 26px;
+      border-top: 3px solid var(--teal);
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .pillar-card:hover {
+      border-top-color: var(--teal-light);
+      transform: translateY(-2px);
+    }
+
+    .pillar-card .pillar-num {
+      font-size: 11px;
+      letter-spacing: 2.5px;
+      color: var(--teal-light);
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .pillar-card .pillar-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--off-white);
+      margin-bottom: 10px;
+    }
+
+    .pillar-card .pillar-body {
+      color: var(--gray-light);
+      font-size: 13.5px;
+      line-height: 1.65;
+    }
+
+    /* ── DIFFERENTIALS ── */
+    .diff-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 32px;
+    }
+
+    .diff-card {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px 22px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .diff-card .diff-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(0,156,217,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .diff-card .diff-text {
+      font-size: 13.5px;
+      color: #ccc;
+      line-height: 1.6;
+    }
+
+    .diff-card .diff-text strong {
+      color: var(--off-white);
+    }
+
+    /* ── PRICE HIGHLIGHT ── */
+    .offer-highlight {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+
+    .offer-box {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 32px 24px;
+      text-align: center;
+    }
+
+    .offer-box.primary {
+      background: linear-gradient(135deg, rgba(0,96,121,0.35), rgba(0,156,217,0.15));
+      border: 2px solid var(--teal-light);
+    }
+
+    .offer-box .offer-label {
+      font-size: 11px;
+      letter-spacing: 2.5px;
+      color: var(--teal-light);
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .offer-box .offer-value {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 900;
+      color: var(--off-white);
+      letter-spacing: -1.5px;
+      margin-bottom: 6px;
+    }
+
+    .offer-box .offer-sub {
+      font-size: 13px;
+      color: var(--gray-light);
+      line-height: 1.5;
+    }
+
+    /* ── 3 SENTENCES BOX ── */
+    .sentences-box {
+      background: var(--gray);
+      border: 2px solid var(--teal-light);
+      border-radius: 16px;
+      padding: 48px 44px;
+    }
+
+    .sentences-box .sentence-item {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sentences-box .sentence-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .sentences-box .sentence-item:first-child {
+      padding-top: 0;
+    }
+
+    .sentences-box .sentence-num {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--teal);
+      line-height: 1;
+      flex-shrink: 0;
+      width: 36px;
+      padding-top: 4px;
+    }
+
+    .sentences-box .sentence-text {
+      font-size: 15px;
+      color: var(--off-white);
+      line-height: 1.8;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      background: #111;
+      padding: 40px 32px;
+      text-align: center;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer p {
+      font-size: 12px;
+      color: var(--gray-light);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .footer .footer-dot {
+      color: var(--teal);
+      margin: 0 6px;
+    }
+
+    /* ── MISC UTILS ── */
+    .text-teal { color: var(--teal-light); }
+    .text-yellow { color: var(--yellow); }
+    .text-green { color: var(--green); }
+    .text-muted { color: var(--gray-light); }
+    .mt-8 { margin-top: 8px; }
+    .mt-16 { margin-top: 16px; }
+    .mt-24 { margin-top: 24px; }
+    .mt-32 { margin-top: 32px; }
+    .mb-16 { margin-bottom: 16px; }
+    .mb-24 { margin-bottom: 24px; }
+    .mb-32 { margin-bottom: 32px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .container { padding: 0 20px; }
+      .section { padding: 60px 0; }
+      .moral-engine-box { padding: 36px 24px; }
+      .values-grid { grid-template-columns: 1fr; }
+      .stat-grid { grid-template-columns: 1fr; }
+      .metrics-grid { grid-template-columns: 1fr 1fr; }
+      .pillar-grid { grid-template-columns: 1fr; }
+      .offer-highlight { grid-template-columns: 1fr; }
+      .icp-inner { grid-template-columns: 1fr; }
+      .icp-left { border-right: none; border-bottom: 1px solid var(--border); }
+      .sentences-box { padding: 32px 24px; }
+      .cover-meta { gap: 28px; }
+      .cover { padding: 60px 24px; }
+    }
+
+    @media (max-width: 480px) {
+      .metrics-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════ COVER ═══ -->
+  <section class="cover">
+    <div class="badge">MISSÃO 06 · DOCUMENTO DE REFERÊNCIA</div>
+    <h1 class="cover-title">Direção <span>Estratégica</span></h1>
+    <p class="cover-subtitle">O documento que você abre quando precisa decidir algo importante — a bússola do DetailerHUB</p>
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <span class="cover-meta-label">Agente</span>
+        <span class="cover-meta-value">Ogilvy + Cagan</span>
+      </div>
+      <div class="cover-meta-item">
+        <span class="cover-meta-label">Data</span>
+        <span class="cover-meta-value">25 Mar 2026</span>
+      </div>
+      <div class="cover-meta-item">
+        <span class="cover-meta-label">Versão</span>
+        <span class="cover-meta-value">1.0</span>
+      </div>
+    </div>
+  </section>
+
+  <main>
+
+    <!-- ═══════════════════════════════ MOTOR MORAL ═══ -->
+    <section class="section">
+      <div class="container">
+        <p class="section-label">Fundação</p>
+        <h2 class="section-title">Motor <span>Moral</span></h2>
+
+        <div class="moral-engine-box">
+          <p class="moral-label">Por que Existimos</p>
+          <p class="moral-quote">"Criadores merecem ser donos da sua audiência, não inquilinos de algoritmos. Estamos aqui para transformar seguidores em membros, renda instável em negócio, e criadores em empreendedores."</p>
+        </div>
+
+        <div class="values-grid">
+          <div class="value-card">
+            <p class="value-number">Valor 01</p>
+            <h3 class="value-title">Transparência como Confiança</h3>
+            <p class="value-body">O membro sabe exatamente o que recebe. Sem promessas vagas. Sem letras miúdas.</p>
+          </div>
+          <div class="value-card">
+            <p class="value-number">Valor 02</p>
+            <h3 class="value-title">Ascensão Coletiva</h3>
+            <p class="value-body">Se a plataforma cresce e os membros não sobem de patamar, algo está errado.</p>
+          </div>
+          <div class="value-card">
+            <p class="value-number">Valor 03</p>
+            <h3 class="value-title">Permanência sobre Vaidade</h3>
+            <p class="value-body">Construímos ativos — habilidade, posicionamento, carteira — não entretenimento descartável.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ O MERCADO ═══ -->
+    <section class="section">
+      <div class="container">
+        <p class="section-label">Contexto de Mercado</p>
+        <h2 class="section-title">Onde Estamos <span>Jogando</span></h2>
+
+        <div class="stat-grid">
+          <div class="stat-card">
+            <p class="stat-acronym">TAM</p>
+            <p class="big-number">R$ 6B/ano</p>
+            <p class="stat-label">Total Addressable Market</p>
+          </div>
+          <div class="stat-card">
+            <p class="stat-acronym">SAM</p>
+            <p class="big-number">R$ 80M/ano</p>
+            <p class="stat-label">Serviceable Available Market</p>
+          </div>
+          <div class="stat-card">
+            <p class="stat-acronym">SOM</p>
+            <p class="big-number">R$ 25M/ano</p>
+            <p class="stat-label">Serviceable Obtainable (Ano 1)</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Camada</th>
+                <th>Valor</th>
+                <th>O que representa</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="td-accent">TAM</td>
+                <td class="td-highlight">R$ 6 bilhões/ano</td>
+                <td>O setor inteiro de estética automotiva BR</td>
+              </tr>
+              <tr>
+                <td class="td-accent">SAM</td>
+                <td class="td-highlight">R$ 53–132M/ano</td>
+                <td>~2,8M brasileiros qualificados</td>
+              </tr>
+              <tr>
+                <td class="td-accent">SOM</td>
+                <td class="td-highlight">R$ 22–28M/ano</td>
+                <td>5 influenciadores, conversão 2%, Ano 1</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="context-box">
+          <strong>A janela de diferenciação se fecha em 3–5 anos</strong> com a chegada de franquias. O mercado vai se profissionalizar — a questão é quem lidera esse movimento.
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ ICP ═══ -->
+    <section class="section">
+      <div class="container">
+        <p class="section-label">Alvo Primário</p>
+        <h2 class="section-title">Perfil Ideal de <span>Cliente</span></h2>
+
+        <div class="icp-card">
+          <div class="icp-inner">
+            <div class="icp-left">
+              <p class="icp-sub">Quem é</p>
+              <p class="icp-definition">
+                Detailer autônomo, 25–38 anos, R$3.000–8.000/mês, competente tecnicamente, estagnado financeiramente.<br><br>
+                <strong style="color: var(--off-white);">Avançado operacionalmente. Iniciante em negócios.</strong>
+              </p>
+            </div>
+            <div class="icp-right">
+              <p class="icp-belief-label">Crença Falsa</p>
+              <p class="icp-belief-quote">"Mais técnica = mais dinheiro."</p>
+              <p class="icp-hypothesis">A hipótese é incompleta — a técnica está lá. O gap está em saber precificar e comunicar o valor do trabalho.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ PROBLEMA CENTRAL ═══ -->
+    <section class="section">
+      <div class="container">
+        <p class="section-label">Diagnóstico</p>
+        <h2 class="section-title">O Problema <span>Central</span></h2>
+
+        <div class="highlight-box mb-32">
+          <p class="big-number">R$ 75.600</p>
+          <p class="big-label">por membro / por ano deixados na mesa</p>
+        </div>
+
+        <div class="card mb-32">
+          <p class="card-body" style="font-size:16px; font-weight:600; color: var(--off-white);">O detailer sabe executar serviços de alto valor — mas não consegue cobrar por eles.</p>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Detailer autônomo</th>
+                <th>Centro especializado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="td-highlight">Ticket médio</td>
+                <td style="color: var(--red); font-weight:600;">R$ 150–400</td>
+                <td style="color: var(--green); font-weight:600;">R$ 800–2.500</td>
+              </tr>
+              <tr>
+                <td class="td-highlight">Diferença técnica</td>
+                <td>Mínima</td>
+                <td>Mínima</td>
+              </tr>
+              <tr>
+                <td class="td-highlight">Diferença de posicionamento</td>
+                <td style="color: var(--red);">Baixo</td>
+                <td style="color: var(--green);">Alto</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="text-muted mt-16" style="font-size:14px;">A diferença não é técnica. São <strong style="color:var(--off-white);">~280.000 detailers autônomos</strong> nessa situação no Brasil.</p>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ SOLUÇÃO ═══ -->
+    <section class="section">
+      <div class="container">
+        <p class="section-label">Resposta</p>
+        <h2 class="section-title">O que <span>Fazemos</span></h2>
+
+        <div class="pillar-grid">
+          <div class="pillar-card">
+            <p class="pillar-num">Pilar 01</p>
+            <h3 class="pillar-title">Precificação</h3>
+            <p class="pillar-body">Aprende a calcular, montar pacotes e apresentar preços com confiança.</p>
+          </div>
+          <div class="pillar-card">
+            <p class="pillar-num">Pilar 02</p>
+            <h3 class="pillar-title">Posicionamento</h3>
+            <p class="pillar-body">Aprende a se comunicar como profissional de referência.</p>
+          </div>
+          <div class="pillar-card">
+            <p class="pillar-num">Pilar 03</p>
+            <h3 class="pillar-title">Presença Digital</h3>
+            <p class="pillar-body">Aprende a atrair o cliente certo.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <p class="card-body" style="font-size:15px; color: var(--off-white);">Não é um curso que você termina. É uma estrutura contínua de desenvolvimento — <strong>conhecimento aplicado + comunidade de padrão + referência de mercado</strong>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ A OFERTA ═══ -->
+    <section class="section">
+      <div class="container">
+        <p class="section-label">Produto</p>
+        <h2 class="section-title">A <span>Oferta</span></h2>
+
+        <div class="table-wrap mb-32">
+          <table>
+            <thead>
+              <tr>
+                <th>Entregável</th>
+                <th>O que resolve</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="td-highlight">Módulo: Precificação Estratégica</td>
+                <td>Cálculo de custo, margem, pacotes com valor percebido</td>
+              </tr>
+              <tr>
+                <td class="td-highlight">Módulo: Posicionamento e Comunicação</td>
+                <td>Linguagem de venda, abordagem ao cliente de maior ticket</td>
+              </tr>
+              <tr>
+                <td class="td-highlight">Módulo: Comunicação e Atração de Clientes</td>
+                <td>Instagram, portfólio, captação orgânica</td>
+              </tr>
+              <tr>
+                <td class="td-highlight">Comunidade e Feedback ao Vivo</td>
+                <td>Referência de mercado, correção de rota em tempo real</td>
+              </tr>
+              <tr>
+                <td class="td-highlight">Planilha de Precificação Dinâmica</td>
+                <td>Por serviço e por região</td>
+              </tr>
+              <tr>
+                <td class="td-highlight">Banco de 40 argumentos de venda</td>
+                <td>Respostas prontas para objeções</td>
+              </tr>
+              <tr>
+                <td class="td-highlight">Lives mensais</td>
+                <td>Atualização contínua</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="offer-highlight">
+          <div class="offer-box primary">
+            <p class="offer-label">Preço</p>
+            <p class="offer-value">R$79/mês</p>
+            <p class="offer-sub">Preço de lançamento · Acesso completo</p>
+          </div>
+          <div class="offer-box">
+            <p class="offer-label">Garantia</p>
+            <p class="offer-value" style="font-size:1.2rem;">Técnica + precificação + comunidade</p>
+            <p class="offer-sub">cancele quando quiser, sem multa</p>
+          </div>
+          <div class="offer-box">
+            <p class="offer-label">ROI</p>
+            <p class="offer-value">45x–60x</p>
+            <p class="offer-sub">o custo da assinatura</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ COMO VENCEMOS ═══ -->
+    <section class="section">
+      <div class="container">
+        <p class="section-label">Vantagem Competitiva</p>
+        <h2 class="section-title">Como <span>Vencemos</span></h2>
+
+        <div class="table-wrap mb-32">
+          <table>
+            <thead>
+              <tr>
+                <th>Competidor</th>
+                <th>O que não faz que fazemos</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="td-highlight">Cursos técnicos avulsos</td>
+                <td>Não tocam em preço, posicionamento nem negócio</td>
+              </tr>
+              <tr>
+                <td class="td-highlight">YouTube / Instagram</td>
+                <td>Não estruturam, não acompanham, sem resultado</td>
+              </tr>
+              <tr>
+                <td class="td-highlight">Grupos de WhatsApp</td>
+                <td>Sem método, sem filtro, sem progressão</td>
+              </tr>
+              <tr>
+                <td class="td-highlight">Franquias e centros de alto padrão</td>
+                <td>Servem o cliente final — são a ameaça que nos torna urgentes</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="section-label mt-32">5 diferenciais defensáveis</p>
+
+        <div class="diff-grid">
+          <div class="diff-card">
+            <div class="diff-icon">01</div>
+            <p class="diff-text"><strong>Único que combina evolução técnica com precificação e posicionamento</strong></p>
+          </div>
+          <div class="diff-card">
+            <div class="diff-icon">02</div>
+            <p class="diff-text"><strong>Método contínuo</strong> — técnica avançada + precificação + comunidade</p>
+          </div>
+          <div class="diff-card">
+            <div class="diff-icon">03</div>
+            <p class="diff-text"><strong>Modelo contínuo</strong> com comunidade — não um curso pontual</p>
+          </div>
+          <div class="diff-card">
+            <div class="diff-icon">04</div>
+            <p class="diff-text"><strong>Canal via influenciadores</strong> — confiança já existe</p>
+          </div>
+          <div class="diff-card">
+            <div class="diff-icon">05</div>
+            <p class="diff-text"><strong>Janela de tempo</strong> — 3–5 anos antes das franquias dominarem</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ FILTRO DE DECISÃO ═══ -->
+    <section class="section">
+      <div class="container">
+        <p class="section-label">Protocolo Interno</p>
+        <h2 class="section-title">Filtro de <span>Decisão</span></h2>
+        <p class="section-intro">Antes de qualquer decisão relevante, passe por aqui.</p>
+
+        <div class="table-wrap">
+          <table class="filter-table">
+            <thead>
+              <tr>
+                <th>Pergunta</th>
+                <th>Avançamos se...</th>
+                <th>Paramos se...</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="td-highlight">Serve o PIC?</td>
+                <td class="advance-cell">Benefício chega ao detailer R$3–8K/mês</td>
+                <td class="stop-cell">Serve persona diferente</td>
+              </tr>
+              <tr>
+                <td class="td-highlight">Resolve o problema central?</td>
+                <td class="advance-cell">Ajuda a precificar, posicionar, atrair o cliente certo</td>
+                <td class="stop-cell">É técnica pura ou entretenimento</td>
+              </tr>
+              <tr>
+                <td class="td-highlight">Alinhado ao Motor Moral?</td>
+                <td class="advance-cell">Aumenta autonomia e ativo do membro</td>
+                <td class="stop-cell">Cria dependência ou obscurece resultados</td>
+              </tr>
+              <tr>
+                <td class="td-highlight">Temos evidência?</td>
+                <td class="advance-cell">Dado real ou teste rápido possível</td>
+                <td class="stop-cell">Achismo não testável</td>
+              </tr>
+              <tr>
+                <td class="td-highlight">Mantém a garantia?</td>
+                <td class="advance-cell">Sustenta ROI 45x–60x</td>
+                <td class="stop-cell">Dilui o resultado</td>
+              </tr>
+              <tr>
+                <td class="td-highlight">O timing faz sentido?</td>
+                <td class="advance-cell">Exploramos a janela antes das franquias</td>
+                <td class="stop-cell">Postergamos por perfeição prematura</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ SUCESSO EM 12 MESES ═══ -->
+    <section class="section">
+      <div class="container">
+        <p class="section-label">Definição de Vitória</p>
+        <h2 class="section-title">Sucesso em <span>12 Meses</span></h2>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <p class="metric-value">R$ 22–28M/ano</p>
+            <p class="metric-label">Receita recorrente</p>
+          </div>
+          <div class="metric-card">
+            <p class="metric-value">25–30K</p>
+            <p class="metric-label">Membros ativos</p>
+          </div>
+          <div class="metric-card">
+            <p class="metric-value">&lt; 5%</p>
+            <p class="metric-label">Churn mensal</p>
+          </div>
+          <div class="metric-card">
+            <p class="metric-value">&gt; 70</p>
+            <p class="metric-label">NPS</p>
+          </div>
+          <div class="metric-card">
+            <p class="metric-value">500+</p>
+            <p class="metric-label">Cases de crescimento de ticket</p>
+          </div>
+          <div class="metric-card">
+            <p class="metric-value">5</p>
+            <p class="metric-label">Parceiros influenciadores ativos</p>
+          </div>
+        </div>
+
+        <div class="alert-box">
+          <p class="alert-title">O que NÃO é sucesso</p>
+          <p class="alert-body">Crescer membros enquanto NPS cai. Expandir nichos antes de dominar detailing. Virar agregador de conteúdo sem impacto no negócio do membro.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════ SÍNTESE EM 3 FRASES ═══ -->
+    <section class="section">
+      <div class="container">
+        <p class="section-label">Síntese Executiva</p>
+        <h2 class="section-title" style="margin-bottom:40px;">Síntese em <span>3 Frases</span></h2>
+
+        <div class="sentences-box">
+          <div class="sentence-item">
+            <span class="sentence-num">1</span>
+            <p class="sentence-text">O Brasil tem 280.000 detailers que sabem executar serviços de alto valor mas cobram como iniciantes — não por falta de técnica, mas por falta de precificação e posicionamento — e estão deixando <strong class="text-teal">R$75.600/ano na mesa</strong> cada um.</p>
+          </div>
+          <div class="sentence-item">
+            <span class="sentence-num">2</span>
+            <p class="sentence-text">O DetailerHUB é a única plataforma construída especificamente para fechar esse gap: por <strong class="text-teal">R$79/mês no lançamento</strong>, entrega método, comunidade e ferramentas práticas para que o detailer autônomo <strong class="text-teal">cobre mais pelo mesmo trabalho</strong>.</p>
+          </div>
+          <div class="sentence-item">
+            <span class="sentence-num">3</span>
+            <p class="sentence-text">Entramos agora porque a janela está aberta — o mercado vai se profissionalizar em <strong class="text-teal">3–5 anos</strong>, e o detailer autônomo que não se reposicionar antes disso vai perder espaço para franquias e redes estruturadas.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══════════════════════════════════════════ FOOTER ═══ -->
+  <footer class="footer">
+    <p>
+      DetailerHUB
+      <span class="footer-dot">·</span>
+      Trilha Estratégica
+      <span class="footer-dot">·</span>
+      Missão 06 de 06
+      <span class="footer-dot">·</span>
+      Documento de Referência Ativa
+      <span class="footer-dot">·</span>
+      Versão 1.0
+    </p>
+  </footer>
+
+</body>
+</html>

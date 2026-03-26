@@ -4,6 +4,7 @@
 // =============================================================================
 
 import Image from "next/image";
+import QRCode from "qrcode";
 import { LogoType } from "@/components/ui/logo";
 import { CheckCircle2, XCircle, Award, Calendar, Shield } from "lucide-react";
 import Link from "next/link";
@@ -50,6 +51,18 @@ function formatDate(dateStr: string): string {
   });
 }
 
+async function generateQRCode(url: string): Promise<string> {
+  try {
+    return await QRCode.toDataURL(url, {
+      width: 120,
+      margin: 1,
+      color: { dark: "#009CD9", light: "#00000000" },
+    });
+  } catch {
+    return "";
+  }
+}
+
 export default async function CertificatePage({
   params,
 }: {
@@ -57,6 +70,9 @@ export default async function CertificatePage({
 }) {
   const certificate = await getCertificate(params.code);
   const isValid = certificate !== null;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const verifyUrl = `${baseUrl}/certificates/${params.code}`;
+  const qrDataUrl = isValid ? await generateQRCode(verifyUrl) : "";
 
   return (
     <div className="min-h-screen bg-[#0a0f1a] flex flex-col items-center justify-center px-4 py-12">
@@ -174,6 +190,15 @@ export default async function CertificatePage({
                   </span>
                 </div>
               </div>
+
+              {/* QR Code */}
+              {qrDataUrl && (
+                <div className="flex flex-col items-center gap-2 py-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={qrDataUrl} alt="QR Code de verificação" width={120} height={120} className="rounded-xl" />
+                  <p className="text-[10px] text-gray-600 uppercase tracking-widest">Escaneie para verificar</p>
+                </div>
+              )}
 
               {/* Share buttons */}
               <CertificateShareButtons />

@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Missão 5 — A Oferta · DetailerHUB</title>
+  <style>
+    :root {
+      --teal: #006079;
+      --teal-light: #009cd9;
+      --black: #1a1a1a;
+      --off-white: #eee6e4;
+      --gray: #2e2e2e;
+      --gray-mid: #444;
+      --gray-light: #888;
+      --green: #2ecc71;
+      --yellow: #f1c40f;
+      --red: #e74c3c;
+      --border: #333;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--black);
+      color: var(--off-white);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    /* ── COVER ─────────────────────────────────────────────── */
+    .cover {
+      background: linear-gradient(135deg, #0a0a0a 0%, #0d2a33 60%, #006079 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 40px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(0, 156, 217, 0.15);
+      border: 1px solid rgba(0, 156, 217, 0.4);
+      color: var(--teal-light);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      padding: 6px 18px;
+      border-radius: 20px;
+      margin-bottom: 32px;
+    }
+
+    .cover h1 {
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+
+    .cover h1 span {
+      color: var(--teal-light);
+    }
+
+    .cover .subtitle {
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      color: var(--gray-light);
+      max-width: 600px;
+      margin-bottom: 48px;
+    }
+
+    .cover-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 28px;
+      justify-content: center;
+    }
+
+    .cover-meta-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .cover-meta-item .label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gray-light);
+    }
+
+    .cover-meta-item .value {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--off-white);
+    }
+
+    .cover-meta-divider {
+      width: 1px;
+      height: 36px;
+      background: var(--border);
+      align-self: center;
+    }
+
+    /* ── CONTAINER ──────────────────────────────────────────── */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ── SECTION ────────────────────────────────────────────── */
+    .section {
+      padding: 72px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section:last-of-type {
+      border-bottom: none;
+    }
+
+    .section-eyebrow {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--teal-light);
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-size: clamp(1.4rem, 3vw, 1.9rem);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .section-desc {
+      color: var(--gray-light);
+      font-size: 14px;
+      margin-bottom: 40px;
+    }
+
+    /* ── DREAM OUTCOME GRID ─────────────────────────────────── */
+    .dream-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 700px) {
+      .dream-grid { grid-template-columns: 1fr; }
+    }
+
+    .dream-card {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px 20px;
+    }
+
+    .dream-icon {
+      font-size: 28px;
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    .dream-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--teal-light);
+      margin-bottom: 10px;
+    }
+
+    .dream-card p {
+      font-size: 13.5px;
+      color: #c0b8b6;
+      line-height: 1.7;
+    }
+
+    /* ── OFFER BOX ──────────────────────────────────────────── */
+    .offer-box {
+      background: linear-gradient(135deg, rgba(0,96,121,0.2), rgba(0,156,217,0.1));
+      border: 1px solid rgba(0,156,217,0.4);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 32px;
+    }
+
+    .offer-name {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--teal-light);
+      margin-bottom: 10px;
+    }
+
+    .offer-title {
+      font-size: clamp(1.3rem, 3vw, 1.7rem);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #fff;
+      margin-bottom: 20px;
+    }
+
+    .offer-promise {
+      background: rgba(0,156,217,0.1);
+      border-left: 3px solid var(--teal-light);
+      border-radius: 0 8px 8px 0;
+      padding: 16px 20px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--off-white);
+      font-style: italic;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .offer-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    @media (max-width: 580px) {
+      .offer-meta-grid { grid-template-columns: 1fr; }
+    }
+
+    .offer-meta-item {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .offer-meta-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--gray-light);
+      margin-bottom: 6px;
+    }
+
+    .offer-meta-value {
+      font-size: 13.5px;
+      color: var(--off-white);
+      line-height: 1.6;
+    }
+
+    .price-block {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .price-main {
+      font-size: 2.8rem;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -1.5px;
+      line-height: 1;
+    }
+
+    .price-main sub {
+      font-size: 1.1rem;
+      font-weight: 700;
+      vertical-align: middle;
+      margin-right: 2px;
+    }
+
+    .price-period {
+      font-size: 13px;
+      color: var(--gray-light);
+    }
+
+    .price-alt {
+      background: rgba(0,156,217,0.12);
+      border: 1px solid rgba(0,156,217,0.25);
+      border-radius: 8px;
+      padding: 8px 14px;
+    }
+
+    .price-alt strong {
+      display: block;
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--teal-light);
+    }
+
+    .price-alt span {
+      font-size: 11px;
+      color: var(--gray-light);
+    }
+
+    /* ── VALUE COMPARISON TABLE ─────────────────────────────── */
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+
+    thead tr {
+      background: rgba(0, 96, 121, 0.3);
+    }
+
+    thead th {
+      padding: 14px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--teal-light);
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-top: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+
+    tbody tr:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    tbody td {
+      padding: 12px 16px;
+      vertical-align: middle;
+    }
+
+    .td-item {
+      font-weight: 500;
+      color: var(--off-white);
+    }
+
+    .td-cost {
+      color: var(--gray-light);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .anchor-phrase {
+      background: rgba(0,156,217,0.08);
+      border: 1px solid rgba(0,156,217,0.2);
+      border-radius: 10px;
+      padding: 18px 22px;
+      font-size: 14px;
+      color: var(--off-white);
+      line-height: 1.65;
+    }
+
+    .anchor-phrase strong {
+      color: var(--teal-light);
+    }
+
+    /* ── PILLAR CARDS ───────────────────────────────────────── */
+    .pillar-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 640px) {
+      .pillar-grid { grid-template-columns: 1fr; }
+    }
+
+    .pillar-card {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .pillar-number {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gray-light);
+      margin-bottom: 6px;
+    }
+
+    .pillar-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--off-white);
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .pillar-items {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .pillar-items li {
+      font-size: 13.5px;
+      color: #c0b8b6;
+      padding-left: 16px;
+      position: relative;
+      line-height: 1.6;
+    }
+
+    .pillar-items li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 9px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--teal-light);
+      opacity: 0.6;
+    }
+
+    /* ── BONUS GRID ─────────────────────────────────────────── */
+    .bonus-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    @media (max-width: 640px) {
+      .bonus-grid { grid-template-columns: 1fr; }
+    }
+
+    .bonus-card {
+      background: var(--gray);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      position: relative;
+    }
+
+    .bonus-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .bonus-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--off-white);
+      line-height: 1.4;
+    }
+
+    .value-tag {
+      background: rgba(0,156,217,0.15);
+      color: var(--teal-light);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .bonus-desc {
+      font-size: 13px;
+      color: #c0b8b6;
+      line-height: 1.65;
+      margin-bottom: 8px;
+    }
+
+    .bonus-avail {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--green);
+    }
+
+    /* ── GUARANTEE BOX ──────────────────────────────────────── */
+    .guarantee-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 640px) {
+      .guarantee-grid { grid-template-columns: 1fr; }
+    }
+
+    .guarantee-box {
+      background: rgba(46,204,113,0.1);
+      border: 1px solid rgba(46,204,113,0.3);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .guarantee-icon {
+      font-size: 28px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .guarantee-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 8px;
+    }
+
+    .guarantee-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 14px;
+    }
+
+    .guarantee-text {
+      font-size: 13.5px;
+      color: #c0b8b6;
+      line-height: 1.7;
+    }
+
+    .guarantee-text em {
+      color: var(--green);
+      font-style: normal;
+      font-weight: 600;
+    }
+
+    /* ── OBJECTION CARDS ────────────────────────────────────── */
+    .objection-card {
+      border-left: 3px solid var(--teal);
+      background: var(--gray);
+      border-radius: 0 12px 12px 0;
+      padding: 20px 24px;
+      margin-bottom: 12px;
+    }
+
+    .objection-card:last-child {
+      margin-bottom: 0;
+    }
+
+    .objection-q {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--off-white);
+      margin-bottom: 8px;
+    }
+
+    .objection-q::before {
+      content: '"';
+      color: var(--teal-light);
+    }
+
+    .objection-q::after {
+      content: '"';
+      color: var(--teal-light);
+    }
+
+    .objection-a {
+      font-size: 13.5px;
+      color: #c0b8b6;
+      line-height: 1.7;
+    }
+
+    /* ── HIGHLIGHT BOX ──────────────────────────────────────── */
+    .highlight-box {
+      background: rgba(0, 96, 121, 0.15);
+      border: 1px solid rgba(0, 156, 217, 0.3);
+      border-radius: 12px;
+      padding: 24px 28px;
+    }
+
+    /* ── VALUE FORMULA ──────────────────────────────────────── */
+    .formula-display {
+      text-align: center;
+      padding: 28px 0 20px;
+    }
+
+    .formula-text {
+      font-size: clamp(0.85rem, 2vw, 1rem);
+      font-weight: 700;
+      color: var(--off-white);
+      letter-spacing: 0.5px;
+      line-height: 1.5;
+    }
+
+    .formula-text span {
+      color: var(--teal-light);
+    }
+
+    .formula-fraction {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      vertical-align: middle;
+      margin: 0 8px;
+    }
+
+    .formula-fraction .numerator {
+      border-bottom: 2px solid var(--teal-light);
+      padding: 0 6px 4px;
+      color: var(--teal-light);
+    }
+
+    .formula-fraction .denominator {
+      padding: 4px 6px 0;
+      color: var(--off-white);
+    }
+
+    .formula-equals {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--teal-light);
+      vertical-align: middle;
+      margin: 0 10px;
+    }
+
+    .formula-value {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--teal-light);
+      vertical-align: middle;
+    }
+
+    /* ── VALUE TABLE ROW COLORS ─────────────────────────────── */
+    .td-factor { font-weight: 600; color: var(--off-white); min-width: 160px; }
+    .td-eval { color: var(--teal-light); font-size: 13px; }
+    .td-how { color: #c0b8b6; font-size: 13px; }
+
+    /* ── ROI HIGHLIGHT ──────────────────────────────────────── */
+    .roi-block {
+      text-align: center;
+      padding: 28px;
+      margin-top: 24px;
+      background: linear-gradient(135deg, rgba(0,96,121,0.25), rgba(0,156,217,0.12));
+      border: 1px solid rgba(0,156,217,0.4);
+      border-radius: 12px;
+    }
+
+    .roi-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gray-light);
+      margin-bottom: 10px;
+    }
+
+    .roi-value {
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      font-weight: 900;
+      color: var(--teal-light);
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+
+    .roi-desc {
+      font-size: 13px;
+      color: var(--gray-light);
+      margin-top: 8px;
+    }
+
+    /* ── FOOTER ─────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+      color: var(--gray-light);
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    footer span {
+      color: var(--teal-light);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ COVER ═══════════════════════════════════════════════ -->
+  <section class="cover">
+    <div class="badge">MISSÃO 05 · TRILHA ESTRATÉGICA</div>
+
+    <h1>A <span>Oferta</span></h1>
+
+    <p class="subtitle">
+      $100M Offers framework aplicado — transformando valor em algo que ninguém se recusa
+    </p>
+
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <span class="label">Agente</span>
+        <span class="value">Alex Hormozi</span>
+      </div>
+      <div class="cover-meta-divider"></div>
+      <div class="cover-meta-item">
+        <span class="label">Data</span>
+        <span class="value">25 Mar 2026</span>
+      </div>
+      <div class="cover-meta-divider"></div>
+      <div class="cover-meta-item">
+        <span class="label">Status</span>
+        <span class="value">Concluído</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SECTION 1 — DREAM OUTCOME ══════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <p class="section-eyebrow">Horizonte Desejado</p>
+      <h2 class="section-title">Dream Outcome</h2>
+      <p class="section-desc">O que o detailer realmente quer quando pensa em chegar ao próximo nível.</p>
+
+      <div class="dream-grid">
+
+        <div class="dream-card">
+          <span class="dream-icon">💰</span>
+          <div class="dream-label">Financeiro</div>
+          <p>Dobrar o ticket médio sem dobrar as horas. De R$300 por serviço para R$700–R$1.200. De R$6.000/mês para R$12.000–R$18.000/mês sem contratar ninguém.</p>
+        </div>
+
+        <div class="dream-card">
+          <span class="dream-icon">👑</span>
+          <div class="dream-label">Identidade</div>
+          <p>Ser o profissional de referência em detailing de alto padrão na cidade. O especialista que clientes de BMW e Porsche procuram por indicação.</p>
+        </div>
+
+        <div class="dream-card">
+          <span class="dream-icon">🗽</span>
+          <div class="dream-label">Liberdade</div>
+          <p>Trabalhar com clientes que respeitam o trabalho, pagam sem pechinchar e voltam. Nunca mais negociar preço com quem compara coating com cera de posto.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SECTION 2 — OFERTA CENTRAL ════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <p class="section-eyebrow">Produto Principal</p>
+      <h2 class="section-title">A Oferta Central</h2>
+      <p class="section-desc">Tudo que R$79/mês no lançamento compra — e o que isso representa em valor real.</p>
+
+      <div class="offer-box">
+        <div class="offer-name">DetailerHUB — Comunidade de Profissionais de Referência</div>
+        <h3 class="offer-title">DetailerHUB</h3>
+
+        <div class="offer-promise">
+          "Domine as técnicas que pagam mais — e aprenda a cobrar por elas."
+        </div>
+
+        <div class="offer-meta-grid">
+          <div class="offer-meta-item">
+            <div class="offer-meta-label">Para quem</div>
+            <div class="offer-meta-value">Detailer autônomo com 1+ ano de mercado que sabe executar mas não consegue precificar, comunicar e atrair o cliente que paga por isso.</div>
+          </div>
+          <div class="offer-meta-item">
+            <div class="offer-meta-label">Preço</div>
+            <div class="price-block">
+              <div>
+                <div class="price-main"><sub>R$</sub>79</div>
+                <div class="price-period">/ mês</div>
+              </div>
+              <div class="price-alt">
+                <strong>R$59/mês</strong>
+                <span>no plano anual</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrapper" style="margin-bottom: 20px;">
+        <table>
+          <thead>
+            <tr>
+              <th>O que R$79 compra...</th>
+              <th>Custo alternativo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-item">Curso de detailing presencial</td>
+              <td class="td-cost">R$1.200–R$3.000 (único)</td>
+            </tr>
+            <tr>
+              <td class="td-item">Consultoria de precificação (1h)</td>
+              <td class="td-cost">R$200–R$500</td>
+            </tr>
+            <tr>
+              <td class="td-item">Template de proposta profissional</td>
+              <td class="td-cost">R$97–R$197 (avulso)</td>
+            </tr>
+            <tr>
+              <td class="td-item">1 serviço bem precificado</td>
+              <td class="td-cost">R$800–R$1.800</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="anchor-phrase">
+        <strong>R$79 é o que você cobra a mais em um único serviço depois de aprender a precificar.</strong> Um mês paga 8 meses de assinatura.
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ SECTION 3 — ENTREGÁVEIS ════════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <p class="section-eyebrow">O Que Está Incluído</p>
+      <h2 class="section-title">Entregáveis</h2>
+      <p class="section-desc">Quatro pilares que cobrem toda a jornada de reposicionamento de valor.</p>
+
+      <div class="pillar-grid">
+
+        <div class="pillar-card">
+          <div class="pillar-number">Pilar 01</div>
+          <div class="pillar-title">Técnica Avançada</div>
+          <ul class="pillar-items">
+            <li>Conteúdo técnico com os influenciadores parceiros: ceramic coating, PPF, correção de pintura, higienização técnica avançada</li>
+            <li>Biblioteca de técnicas por categoria, organizada por serviço</li>
+            <li>Atualizações de novidades do mercado com avaliação prática de profissionais de referência</li>
+          </ul>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-number">Pilar 02</div>
+          <div class="pillar-title">Precificação Estratégica</div>
+          <ul class="pillar-items">
+            <li>Módulo com 6 aulas (~3h de conteúdo)</li>
+            <li>Planilha de Precificação Dinâmica por serviço, atualizada trimestralmente</li>
+            <li>Tabela de Referência por Região (SP, RJ, BH, Curitiba, Porto Alegre, Fortaleza)</li>
+          </ul>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-number">Pilar 03</div>
+          <div class="pillar-title">Comunicação e Atração de Clientes</div>
+          <ul class="pillar-items">
+            <li>Módulo com 5 aulas (~2h30 de conteúdo)</li>
+            <li>Banco de 40 Argumentos de Venda prontos para usar</li>
+            <li>Templates de Portfólio Profissional (12 layouts Canva)</li>
+            <li>Guia de Parcerias Locais: concessionárias, corretores de luxo, grupos de colecionadores</li>
+          </ul>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-number">Pilar 04</div>
+          <div class="pillar-title">Comunidade e Feedback</div>
+          <ul class="pillar-items">
+            <li>Comunidade privada no app (não WhatsApp)</li>
+            <li>Live mensal "Revisão de Preço" (90 min)</li>
+            <li>Live mensal "Case de Sucesso" (60 min)</li>
+            <li>Biblioteca completa de lives anteriores</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SECTION 4 — BÔNUS ═══════════════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <p class="section-eyebrow">Incluído na Assinatura</p>
+      <h2 class="section-title">Bônus</h2>
+      <p class="section-desc">Cinco bônus que transformam o valor percebido muito acima dos R$79/mês no lançamento.</p>
+
+      <div class="bonus-grid">
+
+        <div class="bonus-card">
+          <div class="bonus-card-header">
+            <div class="bonus-title">Kit Proposta Profissional</div>
+            <div class="value-tag">R$297</div>
+          </div>
+          <p class="bonus-desc">Template completo de proposta com 3 opções de pacote para ancorar o preço alto.</p>
+          <div class="bonus-avail">Disponível imediatamente</div>
+        </div>
+
+        <div class="bonus-card">
+          <div class="bonus-card-header">
+            <div class="bonus-title">Masterclass: Fotografia com Celular</div>
+            <div class="value-tag">R$197</div>
+          </div>
+          <p class="bonus-desc">4 aulas. Iluminação, ângulos, edição em 5 minutos. Portfólio que converte.</p>
+          <div class="bonus-avail">Disponível imediatamente</div>
+        </div>
+
+        <div class="bonus-card">
+          <div class="bonus-card-header">
+            <div class="bonus-title">Diretório de Fornecedores Premium</div>
+            <div class="value-tag">~R$150/ano em economia</div>
+          </div>
+          <p class="bonus-desc">Descontos de 8–18% em marcas premium: Gtechniq, Carpro, Koch Chemie.</p>
+          <div class="bonus-avail">Disponível no 1º mês</div>
+        </div>
+
+        <div class="bonus-card">
+          <div class="bonus-card-header">
+            <div class="bonus-title">Sessão de Diagnóstico Individual</div>
+            <div class="value-tag">R$250</div>
+          </div>
+          <p class="bonus-desc">30 minutos com mentor. Apenas 50 vagas por ciclo. Agendável nos primeiros 7 dias.</p>
+          <div class="bonus-avail">50 vagas por ciclo</div>
+        </div>
+
+        <div class="bonus-card" style="grid-column: 1 / -1;">
+          <div class="bonus-card-header">
+            <div class="bonus-title">Certificado Profissional de Referência</div>
+            <div class="value-tag">Sinal de mercado</div>
+          </div>
+          <p class="bonus-desc">Verificável via QR code. Para Instagram, WhatsApp Business e portfólio.</p>
+          <div class="bonus-avail">Disponível ao completar os módulos</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SECTION 5 — GARANTIAS ══════════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <p class="section-eyebrow">Risco Zero</p>
+      <h2 class="section-title">Garantias</h2>
+      <p class="section-desc">Duas garantias que eliminam qualquer fricção na decisão de entrar.</p>
+
+      <div class="guarantee-grid" style="grid-template-columns: 1fr;">
+
+        <div class="guarantee-box">
+          <span class="guarantee-icon">🚪</span>
+          <div class="guarantee-label">Garantia</div>
+          <div class="guarantee-title">Cancele Quando Quiser</div>
+          <p class="guarantee-text">
+            Sem fidelidade, sem multa, sem ligação de retenção. <em>Cancela → para de ser cobrado → mantém acesso até fim do período pago.</em>
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SECTION 6 — OBJEÇÕES ═══════════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <p class="section-eyebrow">Antecipando Resistências</p>
+      <h2 class="section-title">Objeções e Respostas</h2>
+      <p class="section-desc">As seis objeções mais comuns e as respostas que dissolvem cada uma.</p>
+
+      <div class="objection-card">
+        <div class="objection-q">R$79 é caro</div>
+        <p class="objection-a">A pergunta certa: quanto estou perdendo por mês? 10 serviços a R$300 quando deveria cobrar R$600 = R$3.000/mês perdidos.</p>
+      </div>
+
+      <div class="objection-card">
+        <div class="objection-q">Já fiz curso de detailing</div>
+        <p class="objection-a">O DetailerHUB não é curso técnico. É para quem JÁ sabe fazer — o problema não é técnica, é o que acontece antes e depois do serviço.</p>
+      </div>
+
+      <div class="objection-card">
+        <div class="objection-q">Não tenho tempo</div>
+        <p class="objection-a">Os módulos são 3h no total. A planilha, 20 minutos. 4h no primeiro mês podem mudar seu ticket ainda naquele mês.</p>
+      </div>
+
+      <div class="objection-card">
+        <div class="objection-q">Meu mercado é diferente</div>
+        <p class="objection-a">Tabela de Referência por Região + Sessão de Diagnóstico individual na sua cidade, com seu perfil de cliente.</p>
+      </div>
+
+      <div class="objection-card">
+        <div class="objection-q">Medo de ficar preso</div>
+        <p class="objection-a">Impossível. Cancele quando quiser. A única coisa que te mantém aqui é o resultado.</p>
+      </div>
+
+      <div class="objection-card">
+        <div class="objection-q">YouTube ensina de graça</div>
+        <p class="objection-a">YouTube ensina polimento. Não ensina como cobrar R$2.500 por ele. Quem sabe não ensina de graça para a concorrência.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ SECTION 7 — ANÁLISE DE VALOR ══════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <p class="section-eyebrow">Framework Hormozi</p>
+      <h2 class="section-title">Análise de Valor</h2>
+      <p class="section-desc">Aplicando a equação de valor de Alex Hormozi ao DetailerHUB.</p>
+
+      <div class="highlight-box" style="margin-bottom: 28px;">
+        <div class="formula-display">
+          <p style="font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--gray-light); margin-bottom:16px;">Equação de Valor</p>
+          <div style="display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:8px;">
+            <span style="font-size:1.3rem; font-weight:900; color:var(--teal-light);">Valor</span>
+            <span class="formula-equals">=</span>
+            <div class="formula-fraction">
+              <div class="numerator" style="font-size:13px; font-weight:700; padding-bottom:6px;">Dream Outcome &times; Perceived Likelihood</div>
+              <div class="denominator" style="font-size:13px; font-weight:700; padding-top:6px;">Time Delay &times; Effort &amp; Sacrifice</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrapper" style="margin-bottom: 24px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Fator</th>
+              <th>Avaliação</th>
+              <th>Como maximizamos</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-factor">Dream Outcome</td>
+              <td class="td-eval">R$43.200–R$57.600/ano em receita incremental</td>
+              <td class="td-how">Específico, financeiro, calculável</td>
+            </tr>
+            <tr>
+              <td class="td-factor">Perceived Likelihood</td>
+              <td class="td-eval">Alta</td>
+              <td class="td-how">Garantia de resultado + ferramentas prontas + prova social</td>
+            </tr>
+            <tr>
+              <td class="td-factor">Time Delay</td>
+              <td class="td-eval">Comprimido</td>
+              <td class="td-how">48–72h para 1º resultado; 90 dias para a meta completa</td>
+            </tr>
+            <tr>
+              <td class="td-factor">Effort &amp; Sacrifice</td>
+              <td class="td-eval">Mínimo</td>
+              <td class="td-how">4h no mês 1; tudo pronto para usar imediatamente</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="roi-block">
+        <div class="roi-label">ROI da Assinatura</div>
+        <div class="roi-value">45x – 60x</div>
+        <div class="roi-desc">o custo anual da assinatura em receita incremental gerada</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ═════════════════════════════════════════════ -->
+  <footer>
+    <span>DetailerHUB</span> · Trilha Estratégica · Missão 05 de 06 · Agente: Alex Hormozi
+  </footer>
+
+</body>
+</html>

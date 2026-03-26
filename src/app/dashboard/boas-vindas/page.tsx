@@ -9,7 +9,7 @@ const STEPS = [
   {
     icon: Users,
     title: "Assine a plataforma",
-    desc: "R$948/ano — acesso a todas as comunidades, cursos, lives e muito mais.",
+    desc: "R$708/ano (R$59/mês) — acesso a todas as comunidades, cursos, lives e muito mais.",
     cta: { label: "Assinar agora", href: "/dashboard/assinar" },
     color: "text-[#009CD9]",
     bg: "bg-[#006079]/10",
@@ -80,8 +80,8 @@ export default function BoasVindasPage() {
               <p className="text-gray-400 text-sm">Uma assinatura. Acesso a tudo.</p>
             </div>
             <div className="ml-auto text-right">
-              <p className="text-2xl font-black text-[#EEE6E4]">R$948<span className="text-gray-400 text-sm font-normal">/ano</span></p>
-              <p className="text-gray-500 text-xs">R$79/mês</p>
+              <p className="text-2xl font-black text-[#EEE6E4]">R$708<span className="text-gray-400 text-sm font-normal">/ano</span></p>
+              <p className="text-gray-500 text-xs">R$59/mês no plano anual</p>
             </div>
           </div>
 

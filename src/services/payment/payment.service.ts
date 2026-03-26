@@ -370,8 +370,7 @@ async function handleCheckoutCompleted(
         currentPeriodEnd: new Date(subscription.current_period_end * 1000),
         cancelAtPeriodEnd: false,
         canceledAt: null,
-        // Only set referredByInfluencerId on first activation (don't overwrite)
-        ...(referredByInfluencerId ? { referredByInfluencerId } : {}),
+        // referredByInfluencerId is immutable — never overwrite on reactivations
       },
     });
 
@@ -383,7 +382,7 @@ async function handleCheckoutCompleted(
       });
       const amount = plan
         ? `R$${(Number(plan.price) / 100).toFixed(2).replace(".", ",")}`
-        : "R$948,00";
+        : "R$708,00";
       await sendPlatformMembershipEmail(
         { email: userRecord.email, firstName: userRecord.firstName },
         { planName: plan?.name ?? "Assinatura Anual", amount }
