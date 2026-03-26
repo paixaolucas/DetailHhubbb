@@ -1,5 +1,3 @@
-import { ScrollReveal } from "@/components/landing/ScrollReveal";
-
 const objections = [
   {
     question: '"R$79 é caro, estou apertado."',
@@ -37,7 +35,7 @@ export function ObjectionsSection() {
   return (
     <section className="bg-[#1A1A1A] py-20 border-b border-white/5">
       <div className="container mx-auto px-4">
-        <ScrollReveal className="text-center mb-14">
+        <div className="text-center mb-14 animate-fade-in">
           <p className="text-[#009CD9] text-xs font-bold tracking-[2.5px] uppercase mb-4">
             PERGUNTAS FREQUENTES
           </p>
@@ -45,18 +43,20 @@ export function ObjectionsSection() {
             Já antecipamos o que você está pensando.
           </h2>
           <p className="text-gray-400 text-lg">Respostas diretas para as dúvidas mais comuns.</p>
-        </ScrollReveal>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-4xl mx-auto">
           {objections.map((item, i) => (
-            <ScrollReveal key={i} delay={i * 80} direction="up">
-              <div className="glass-card p-6 h-full">
-                <p className="text-[#009CD9] font-semibold text-sm mb-3 leading-snug">
-                  {item.question}
-                </p>
-                <p className="text-gray-300 text-sm leading-relaxed">{item.answer}</p>
-              </div>
-            </ScrollReveal>
+            <div
+              key={i}
+              className="glass-card p-6 h-full animate-slide-up"
+              style={{ animationDelay: `${i * 70}ms` }}
+            >
+              <p className="text-[#009CD9] font-semibold text-sm mb-3 leading-snug">
+                {item.question}
+              </p>
+              <p className="text-gray-300 text-sm leading-relaxed">{item.answer}</p>
+            </div>
           ))}
         </div>
       </div>

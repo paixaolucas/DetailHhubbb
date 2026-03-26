@@ -30,20 +30,28 @@ export function ScrollReveal({
     const el = ref.current;
     if (!el) return;
 
+    // Fallback: sempre mostra após 1.5s, mesmo que o observer falhe
+    const fallback = setTimeout(() => setVisible(true), 1500);
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setVisible(true);
+          clearTimeout(fallback);
           if (once) observer.disconnect();
         } else if (!once) {
           setVisible(false);
         }
       },
-      { threshold: 0.12 }
+      // threshold:0 = qualquer pixel visível dispara; rootMargin antecipa 100px
+      { threshold: 0, rootMargin: "0px 0px 100px 0px" }
     );
 
     observer.observe(el);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      clearTimeout(fallback);
+    };
   }, [once]);
 
   const translate = {

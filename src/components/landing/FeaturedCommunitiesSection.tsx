@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { Trophy, Users, ArrowRight, ChevronRight } from "lucide-react";
+import { Trophy, Users, ChevronRight, ArrowRight } from "lucide-react";
 import { CommunityThumbnail } from "@/components/community/CommunityThumbnail";
-import { ScrollReveal } from "@/components/ui/scroll-reveal";
 
 const featuredCommunities = [
   {
@@ -39,7 +38,7 @@ const featuredCommunities = [
   {
     name: "Sala do Gigi",
     slug: "sala-do-gigi",
-    primaryColor: "#8E44AD",
+    primaryColor: "#006079",
     bannerUrl: null,
     members: "350",
     description: "A sala do Gigi — estética automotiva com estilo e precisão.",
@@ -50,7 +49,7 @@ export function FeaturedCommunitiesSection() {
   return (
     <section id="comunidades" className="bg-[#1A1A1A] py-24 overflow-hidden">
       <div className="container mx-auto px-4">
-        <ScrollReveal className="text-center mb-12">
+        <div className="text-center mb-12 animate-fade-in">
           <div className="inline-flex items-center gap-2 bg-[#006079]/10 border border-[#006079]/20 rounded-full px-3 py-1 text-xs text-[#009CD9] mb-4">
             <Trophy className="w-3 h-3" />
             Comunidades em destaque
@@ -61,7 +60,7 @@ export function FeaturedCommunitiesSection() {
           <p className="text-gray-400 text-lg max-w-xl mx-auto">
             Dezenas de comunidades automotivas esperando por você. Uma assinatura, acesso a todas.
           </p>
-        </ScrollReveal>
+        </div>
 
         {/* Horizontal scroll mobile / 5-col grid desktop */}
         <div className="flex gap-5 overflow-x-auto pb-4 md:grid md:grid-cols-3 lg:grid-cols-5 md:overflow-visible md:pb-0 snap-x snap-mandatory md:snap-none">
@@ -75,7 +74,7 @@ export function FeaturedCommunitiesSection() {
                 bannerUrl={community.bannerUrl}
                 primaryColor={community.primaryColor}
                 name={community.name}
-                className="!aspect-auto h-52"
+                className="h-40 md:h-44"
               />
               <div className="p-5">
                 <div className="flex items-center justify-between mb-2">
@@ -98,7 +97,7 @@ export function FeaturedCommunitiesSection() {
           ))}
         </div>
 
-        <div className="text-center mt-10">
+        <div className="text-center mt-10 animate-fade-in" style={{ animationDelay: "400ms" }}>
           <Link
             href="/register"
             className="inline-flex items-center gap-2 text-[#009CD9] hover:text-[#007A99] font-medium text-sm border border-[#006079]/20 hover:border-[#006079]/30 px-5 py-2.5 rounded-xl transition-all hover:bg-[#006079]/10"

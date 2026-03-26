@@ -165,6 +165,19 @@ Decisão do fundador: migrar para Asaas. Sprint 21 criado com a implementação 
 - `src/app/(landing)/page.tsx` atualizado com sequência completa
 - **Pendente (fase 2):** contador de vagas em tempo real (17.2) e página `/obrigado` pós-checkout (17.3)
 
+### Sprint 17 — Overhaul de UX/Animações (Sessão 2026-03-26) ✅
+- **ScrollReveal removido de todas as seções** — causava conteúdo invisível no SSR do Next.js (opacity:0 persistia sem hidratação JS). Substituído por CSS `animate-slide-up` / `animate-fade-in` (sempre visível)
+- `globals.css` — adicionadas classes `.animate-marquee`, `.animate-float`, `.animate-gradient-x`, `.animate-pulse-glow`, `.animate-breathe` + keyframes completos. `@keyframes slide-up` sem opacity (nunca invisível)
+- `InfluencerStripSection` — marquee infinito corrigido (4× duplication + `mr-14` por item em vez de `gap`)
+- `TestimonialsSection` removida da landing (sem depoimentos reais)
+- `HeroSection` — mockup mostra 5 comunidades (Barba, Corujão, No Mel, Gimenez, Sala do Gigi); orbs de background com mouse-tracking
+- `FeaturedCommunitiesSection` — bannerUrls reais para Barba, Corujão, No Mel; imagens responsivas (`h-40 md:h-44`)
+- `Footer` — apenas Instagram + TikTok @detailerhub (removidos GitHub, Twitter, YouTube)
+- `CTASection` — "Stripe" substituído por "Asaas"
+- `InfluencerStripSection` — Widnei (@widnei_detail) e Tarcísio (@tarcisio_veneto) removidos (não são parceiros da plataforma)
+- **Login/Register fix crítico:** canvas `LoginBackground` não renderizava porque `h-full` num filho de `flex-1` sem `height` explícito retorna `clientHeight=0`. Fix: container com `relative overflow-hidden` + canvas `absolute inset-0`
+- `ScrollReveal.tsx` — threshold 0, rootMargin 100px, fallback timeout 1.5s (mantido como componente mas não mais usado nas seções principais)
+
 ---
 
 ## ✅ SPRINT 18 — Dashboard do Influenciador Completo — COMPLETO

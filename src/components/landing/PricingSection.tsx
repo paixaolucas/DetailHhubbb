@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ArrowRight, CheckCircle, Star } from "lucide-react";
-import { ScrollReveal } from "@/components/landing/ScrollReveal";
 
 const pricingFeatures = [
   "Acesso a todos os 4 pilares de crescimento",
@@ -17,7 +16,7 @@ export function PricingSection() {
   return (
     <section id="preco" className="bg-[#1A1A1A] py-20 border-b border-white/5">
       <div className="container mx-auto px-4">
-        <ScrollReveal className="text-center mb-12">
+        <div className="text-center mb-12 animate-fade-in">
           <p className="text-[#009CD9] text-xs font-bold tracking-[2.5px] uppercase mb-4">
             INVESTIMENTO
           </p>
@@ -29,11 +28,10 @@ export function PricingSection() {
             Valor total dos entregáveis separados:{" "}
             <span className="text-gray-400 line-through">R$3.000+</span>
           </p>
-        </ScrollReveal>
+        </div>
 
         <div className="max-w-lg mx-auto">
-          <ScrollReveal direction="up">
-            <div className="glass-card border-[#006079]/30 relative overflow-hidden">
+          <div className="glass-card border-[#006079]/30 relative overflow-hidden animate-pulse-glow">
               {/* Glow */}
               <div className="absolute inset-0 bg-gradient-to-b from-[#006079]/5 to-transparent pointer-events-none" />
 
@@ -46,24 +44,23 @@ export function PricingSection() {
                   </div>
                 </div>
 
-                {/* Preço anterior riscado */}
+                {/* Preço principal */}
                 <div className="text-center mb-6">
-                  <p className="text-gray-500 text-sm line-through mb-1">
-                    R$197/mês (preço após período de fundador)
-                  </p>
-
-                  {/* Preço principal */}
-                  <div className="flex items-end justify-center gap-1 mb-1">
+                  <div className="flex items-end justify-center gap-1 mb-3">
                     <span className="text-gray-400 text-xl">R$</span>
                     <span className="text-6xl font-bold text-[#EEE6E4]">79</span>
                     <span className="text-gray-400 text-xl mb-2">/mês</span>
                   </div>
 
-                  {/* Opção anual */}
-                  <div className="inline-flex items-center gap-2 bg-[#006079]/10 border border-[#006079]/20 rounded-lg px-4 py-2 mt-3">
-                    <span className="text-gray-400 text-sm">Ou</span>
-                    <span className="text-[#EEE6E4] font-bold">R$59/mês</span>
-                    <span className="text-gray-400 text-sm">no plano anual — R$708 à vista</span>
+                  {/* Opção anual com destaque de economia */}
+                  <div className="inline-flex items-center gap-3 bg-[#006079]/10 border border-[#006079]/20 rounded-lg px-4 py-2.5 mt-2">
+                    <div className="text-left">
+                      <p className="text-[#EEE6E4] font-bold text-sm">R$59/mês no plano anual</p>
+                      <p className="text-gray-500 text-xs">R$708 à vista · você economiza R$240</p>
+                    </div>
+                    <div className="bg-[#006079]/20 border border-[#006079]/30 rounded-full px-2 py-0.5 text-[#009CD9] text-xs font-bold whitespace-nowrap">
+                      −25%
+                    </div>
                   </div>
                 </div>
 
@@ -79,7 +76,7 @@ export function PricingSection() {
 
                 <Link
                   href="/register"
-                  className="btn-premium w-full flex items-center justify-center gap-2 py-4 text-base font-bold rounded-xl"
+                  className="btn-premium w-full flex items-center justify-center gap-2 py-4 text-base font-bold rounded-xl hover:scale-[1.02] active:scale-[0.98]"
                 >
                   Começar agora por R$79/mês <ArrowRight className="w-4 h-4" />
                 </Link>
@@ -88,21 +85,18 @@ export function PricingSection() {
                 </p>
               </div>
             </div>
-          </ScrollReveal>
+          </div>
 
           {/* Box de comparação */}
-          <ScrollReveal direction="up" delay={120}>
-            <div className="mt-5 bg-[#006079]/10 border border-[#006079]/30 rounded-xl p-5">
-              <p className="text-gray-300 text-sm leading-relaxed text-center">
-                <strong className="text-[#EEE6E4]">
-                  &ldquo;R$79 é o que você cobra a mais em um único serviço
-                </strong>{" "}
-                depois de aprender a precificar. Um serviço paga 8 meses de assinatura.&rdquo;
-              </p>
-            </div>
-          </ScrollReveal>
+          <div className="mt-5 bg-[#006079]/10 border border-[#006079]/30 rounded-xl p-5">
+            <p className="text-gray-300 text-sm leading-relaxed text-center">
+              <strong className="text-[#EEE6E4]">
+                &ldquo;R$79 é o que você cobra a mais em um único serviço
+              </strong>{" "}
+              depois de aprender a precificar. Um serviço paga 8 meses de assinatura.&rdquo;
+            </p>
+          </div>
         </div>
-      </div>
     </section>
   );
 }

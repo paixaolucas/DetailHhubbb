@@ -25,7 +25,8 @@ function useNavAuth() {
     }
   }, []);
 
-  function logout() {
+  async function logout() {
+    await fetch("/api/auth/logout", { method: "POST", credentials: "include" }).catch(() => {});
     [STORAGE_KEYS.ACCESS_TOKEN, STORAGE_KEYS.REFRESH_TOKEN, STORAGE_KEYS.USER_ROLE,
      STORAGE_KEYS.USER_NAME, STORAGE_KEYS.USER_EMAIL, STORAGE_KEYS.USER_ID].forEach(
       (k) => localStorage.removeItem(k)

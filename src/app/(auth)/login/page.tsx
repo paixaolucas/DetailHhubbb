@@ -233,8 +233,8 @@ function LoginFormContent() {
       </div>
 
       {/* ── PAINEL DIREITO — Canvas animado ───────────────────────────── */}
-      <div className="hidden md:block flex-1 bg-[#0a1520]">
-        <LoginBackground className="w-full h-full" />
+      <div className="hidden md:block flex-1 bg-[#0a1520] relative overflow-hidden">
+        <LoginBackground className="absolute inset-0 w-full h-full" />
       </div>
 
     </div>

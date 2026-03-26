@@ -239,11 +239,17 @@ export default function LoginBackground({ className = '' }: LoginBackgroundProps
     resize();
     ro.observe(el);
 
+    // Fallback: se clientWidth era 0 no mount, tenta novamente após layout
+    const initTimeout = setTimeout(() => {
+      if (el.clientWidth > 0 && symbols.current.length === 0) resize();
+    }, 80);
+
     el.addEventListener('mousemove', handleMouseMove);
     el.addEventListener('mouseleave', handleMouseLeave);
 
     return () => {
       ro.disconnect();
+      clearTimeout(initTimeout);
       el.removeEventListener('mousemove', handleMouseMove);
       el.removeEventListener('mouseleave', handleMouseLeave);
       if (rafId.current !== null) cancelAnimationFrame(rafId.current);

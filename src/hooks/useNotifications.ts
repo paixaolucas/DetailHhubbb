@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 export function useNotifications() {
   const [unreadCount, setUnreadCount] = useState(0);
@@ -6,7 +7,7 @@ export function useNotifications() {
   const fetchUnreadCount = useCallback(async () => {
     const token =
       typeof window !== "undefined"
-        ? localStorage.getItem("detailhub_access_token")
+        ? localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN)
         : null;
     if (!token) return;
 

@@ -1,28 +1,27 @@
 import Link from "next/link";
-import { ArrowRight, Wrench } from "lucide-react";
-import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import { ArrowRight, TrendingUp } from "lucide-react";
 
 export function CTASection() {
   return (
     <section className="bg-[#1A1A1A] py-24">
       <div className="container mx-auto px-4">
         <div className="relative rounded-3xl overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#006079] to-[#009CD9]" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#006079] via-[#007A99] to-[#009CD9] animate-gradient-x" />
           <div className="absolute inset-0 grid-pattern opacity-20" />
           <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
 
-          <ScrollReveal className="relative p-6 sm:p-12 md:p-20 text-center">
+          <div className="relative p-6 sm:p-12 md:p-20 text-center">
             <div className="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-1.5 text-sm text-white mb-6">
-              <Wrench className="w-4 h-4" />
-              Pronto para começar?
+              <TrendingUp className="w-4 h-4" />
+              Para detailers que fazem bem feito
             </div>
 
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6 max-w-2xl mx-auto">
-              Sua audiência merece uma casa. O Detailer&apos;HUB é essa casa.
+              Você já sabe executar. Aprenda a cobrar o que merece.
             </h2>
 
             <p className="text-white/80 text-lg mb-10 max-w-xl mx-auto">
-              Junte-se a milhares de apaixonados por automóveis que já fazem parte da plataforma.
+              Junte-se a detailers de todo o Brasil que pararam de deixar dinheiro na mesa.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -35,9 +34,9 @@ export function CTASection() {
             </div>
 
             <p className="text-white/60 text-sm mt-6">
-              Pagamento seguro via Stripe. Sem cartão para testar.
+              Pagamento seguro via Asaas. Sem cartão para testar.
             </p>
-          </ScrollReveal>
+          </div>
         </div>
       </div>
     </section>

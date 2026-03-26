@@ -3,6 +3,7 @@
 // =============================================================================
 
 import type { ApiResponse } from "@/types";
+import { STORAGE_KEYS } from "@/lib/constants";
 
 /**
  * Standardized API response builder
@@ -79,7 +80,7 @@ export async function apiFetch<T = unknown>(
 ): Promise<ApiResponse<T>> {
   const token =
     typeof window !== "undefined"
-      ? localStorage.getItem("detailhub_access_token")
+      ? localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN)
       : null;
 
   const headers: Record<string, string> = {
@@ -104,10 +105,7 @@ export async function apiFetch<T = unknown>(
     if (refreshRes.ok) {
       const refreshData = await refreshRes.json();
       if (refreshData.data?.accessToken) {
-        localStorage.setItem(
-          "detailhub_access_token",
-          refreshData.data.accessToken
-        );
+        localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, refreshData.data.accessToken);
         headers["Authorization"] = `Bearer ${refreshData.data.accessToken}`;
         return apiFetch(url, { ...options, headers });
       }
