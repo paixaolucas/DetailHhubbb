@@ -42,6 +42,7 @@ async function main() {
   await db.commissionTransaction.deleteMany();
   await db.commissionRule.deleteMany();
   await db.payment.deleteMany();
+  await db.communityOptIn.deleteMany();
   await db.communityMembership.deleteMany();
   await db.platformMembership.deleteMany();
   await db.platformPlan.deleteMany();
