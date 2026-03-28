@@ -810,6 +810,30 @@ async function main() {
   console.log("✅ Community memberships created (70 per community)");
 
   // =============================================================================
+  // COMMUNITY OPT-INS — needed for sidebar nav and MiniRankingCard
+  // Each member opts into their primary community
+  // =============================================================================
+  const makeOptIns = (members: { id: string }[], communityId: string) =>
+    members.map((m) => ({ userId: m.id, communityId, joinedAt: new Date() }));
+
+  await db.communityOptIn.createMany({
+    data: [
+      { userId: member1.id, communityId: communityBarba.id, joinedAt: new Date() },
+      { userId: member1.id, communityId: communityCorujao.id, joinedAt: new Date() },
+      { userId: member2.id, communityId: communityCorujao.id, joinedAt: new Date() },
+      { userId: member2.id, communityId: communityNoMel.id, joinedAt: new Date() },
+      ...makeOptIns(barbaMembers, communityBarba.id),
+      ...makeOptIns(corujaoMembers, communityCorujao.id),
+      ...makeOptIns(netoMembers, communityNoMel.id),
+      ...makeOptIns(gimenezMembers, communityGimenez.id),
+      ...makeOptIns(gigiMembers, communityGigi.id),
+    ],
+    skipDuplicates: true,
+  });
+
+  console.log("✅ CommunityOptIns created (sidebar + ranking)");
+
+  // =============================================================================
   // POSTS IN SPACES
   // =============================================================================
   const feedBarba = spacesBarba[0]; // Feed Geral

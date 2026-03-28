@@ -54,7 +54,7 @@ export async function GET(
     // For period filters we need to aggregate from transactions;
     // for "all" we use the denormalized points field directly.
     if (period === "all" || !dateFilter) {
-      const leaderboard = await db.userPoints.findMany({
+      const rows = await db.userPoints.findMany({
         where: { communityId },
         orderBy: { points: "desc" },
         take: limit,
@@ -69,6 +69,14 @@ export async function GET(
           },
         },
       });
+
+      const leaderboard = rows.map((r, i) => ({
+        rank: i + 1,
+        userId: r.userId,
+        totalPoints: r.points,
+        level: r.level,
+        user: r.user,
+      }));
 
       return NextResponse.json({ success: true, data: leaderboard });
     }
