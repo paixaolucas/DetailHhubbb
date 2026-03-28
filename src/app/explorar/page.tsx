@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -197,7 +197,7 @@ const SORT_TABS: { value: SortOption; label: string }[] = [
   { value: "active", label: "Mais ativas" },
 ];
 
-export default function ExplorarPage() {
+function ExplorarContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -341,5 +341,13 @@ export default function ExplorarPage() {
         )}
       </div>
     </main>
+  );
+}
+
+export default function ExplorarPage() {
+  return (
+    <Suspense>
+      <ExplorarContent />
+    </Suspense>
   );
 }
