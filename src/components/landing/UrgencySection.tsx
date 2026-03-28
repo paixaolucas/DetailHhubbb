@@ -14,7 +14,7 @@ export function UrgencySection() {
           </h2>
         </div>
 
-        <div className="max-w-2xl mx-auto bg-[#006079]/10 border border-[#006079]/30 rounded-xl p-8 mb-10 animate-pulse-glow animate-slide-up">
+        <div className="max-w-2xl mx-auto bg-[#006079]/10 border border-[#006079]/30 rounded-xl p-5 sm:p-8 mb-10 animate-pulse-glow animate-slide-up">
           <div className="flex items-start gap-3 mb-5">
             <span className="text-xl" aria-hidden="true">⏳</span>
             <div>
@@ -43,7 +43,7 @@ export function UrgencySection() {
         <div className="text-center animate-slide-up" style={{ animationDelay: "150ms" }}>
           <Link
             href="/register"
-            className="btn-premium inline-flex items-center gap-3 px-10 py-5 text-lg font-bold rounded-xl"
+            className="btn-premium inline-flex w-full sm:w-auto items-center justify-center gap-3 px-10 py-5 text-lg font-bold rounded-xl"
           >
             Quero entrar por R$79/mês <ArrowRight className="w-5 h-5" />
           </Link>

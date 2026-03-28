@@ -13,6 +13,7 @@ export const NAV_ITEMS: NavItem[] = [
   // ── PRINCIPAL (todos os roles autenticados) ──
   { label: 'Inicio',       href: '/inicio',                icon: 'Home',          roles: [UserRole.COMMUNITY_MEMBER, UserRole.MARKETPLACE_PARTNER], group: 'principal' },
   { label: 'Inicio',       href: '/dashboard',             icon: 'Home',          roles: [UserRole.SUPER_ADMIN, UserRole.INFLUENCER_ADMIN], group: 'principal' },
+  { label: 'Explorar',     href: '/explorar',              icon: 'Compass',       roles: [UserRole.COMMUNITY_MEMBER, UserRole.MARKETPLACE_PARTNER], group: 'principal' },
   { label: 'Calendario',   href: '/dashboard/calendar',    icon: 'CalendarDays',  roles: 'ALL', group: 'principal' },
   { label: 'Mensagens',    href: '/dashboard/messages',    icon: 'MessageSquare', roles: 'ALL', group: 'principal' },
 

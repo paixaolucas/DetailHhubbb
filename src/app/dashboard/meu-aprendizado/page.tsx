@@ -51,7 +51,7 @@ function LessonRow({ lesson, communitySlug }: { lesson: LessonData; communitySlu
     <div
       onClick={handleClick}
       className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all ${
-        isCurrent ? "bg-[#007A99]/10 border border-[#007A99]/20" : "hover:bg-[#E6F4F7]"
+        isCurrent ? "bg-[#007A99]/10 border border-[#007A99]/20" : "hover:bg-white/5"
       }`}
     >
       <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
@@ -146,7 +146,8 @@ export default function MeuAprendizadoPage() {
       .then((r) => r.json())
       .then((d) => {
         if (d.success) {
-          setCommunities(d.data.communities ?? []);
+          const allCommunities: CommunityData[] = d.data.communities ?? [];
+          setCommunities(allCommunities.filter(c => c.totalLessons > 0));
           setStats(d.data.stats ?? {});
         } else { setError(d.error ?? "Erro ao carregar dados"); }
       })
@@ -186,7 +187,7 @@ export default function MeuAprendizadoPage() {
           { label: "Comunidades", value: stats.totalCommunities, icon: BookOpen, color: "text-[#009CD9] bg-[#007A99]/10" },
           { label: "Total de aulas", value: stats.totalLessons, icon: Award, color: "text-yellow-400 bg-yellow-500/10" },
         ].map(({ label, value, icon: Icon, color }) => (
-          <div key={label} className="glass-card p-5">
+          <div key={label} className="bg-white/5 border border-white/10 rounded-xl p-5">
             <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-3 ${color.split(" ")[1]}`}>
               <Icon className={`w-4 h-4 ${color.split(" ")[0]}`} />
             </div>
@@ -209,7 +210,7 @@ export default function MeuAprendizadoPage() {
           </a>
         </div>
       ) : (
-        communities.map((community) => (
+        communities.filter(c => c.totalLessons > 0).map((community) => (
           <div key={community.communityId} className="glass-card overflow-hidden">
             {/* Community header */}
             <div className="p-5 border-b border-white/10">

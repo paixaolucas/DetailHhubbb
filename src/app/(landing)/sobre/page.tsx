@@ -11,7 +11,7 @@ const TEAM = [
     name: "Lucas Paixão",
     role: "Co-Fundador & CTO",
     initials: "LP",
-    bio: "Engenheiro de software especializado em plataformas de comunidade, Lucas é responsável pela arquitetura e desenvolvimento do Detailer'HUB.",
+    bio: "Especializado em plataformas de comunidade, Lucas é responsável pela arquitetura e desenvolvimento do Detailer'HUB.",
   },
 ];
 

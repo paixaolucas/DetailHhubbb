@@ -156,9 +156,10 @@ export function NavBar() {
 
           {/* Hamburger button — mobile only */}
           <button
-            className="md:hidden text-gray-500 hover:text-[#EEE6E4] transition-colors p-1"
+            className="md:hidden text-gray-500 hover:text-[#EEE6E4] transition-colors p-2.5"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Menu"
+            aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>

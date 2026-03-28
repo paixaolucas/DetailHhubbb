@@ -11,11 +11,11 @@ export function HowItWorksSection() {
     <section id="como-funciona" className="bg-[#222222] py-24">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16 animate-fade-in">
-          <h2 className="text-4xl font-bold text-[#EEE6E4] mb-4">Como funciona</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold text-[#EEE6E4] mb-4">Como funciona</h2>
           <p className="text-gray-400 text-lg">Simples, direto e sem fricção.</p>
         </div>
 
-        <div className="grid sm:grid-cols-3 gap-8 max-w-3xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
           {steps.map(({ step, title, desc, icon: Icon }, i) => (
             <div
               key={step}

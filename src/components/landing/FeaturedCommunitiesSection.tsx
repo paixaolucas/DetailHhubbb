@@ -54,7 +54,7 @@ export function FeaturedCommunitiesSection() {
             <Trophy className="w-3 h-3" />
             Comunidades em destaque
           </div>
-          <h2 className="text-4xl font-bold text-[#EEE6E4] mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-[#EEE6E4] mb-4">
             Explore comunidades premium
           </h2>
           <p className="text-gray-400 text-lg max-w-xl mx-auto">
@@ -63,11 +63,11 @@ export function FeaturedCommunitiesSection() {
         </div>
 
         {/* Horizontal scroll mobile / 5-col grid desktop */}
-        <div className="flex gap-5 overflow-x-auto pb-4 md:grid md:grid-cols-3 lg:grid-cols-5 md:overflow-visible md:pb-0 snap-x snap-mandatory md:snap-none">
+        <div className="flex gap-5 overflow-x-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:grid md:grid-cols-2 lg:grid-cols-5 md:overflow-visible md:pb-0 snap-x snap-mandatory md:snap-none">
           {featuredCommunities.map((community, i) => (
             <div
               key={community.slug}
-              className="flex-shrink-0 w-72 md:w-auto glass-card overflow-hidden card-hover snap-start animate-slide-up"
+              className="flex-shrink-0 w-[78vw] max-w-[280px] md:w-auto glass-card overflow-hidden card-hover snap-start animate-slide-up"
               style={{ animationDelay: `${i * 75}ms` }}
             >
               <CommunityThumbnail

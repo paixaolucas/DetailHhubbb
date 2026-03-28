@@ -1,14 +1,18 @@
 "use client";
 
 // =============================================================================
-// Trilhas page — lists all COURSE spaces and their modules
+// Trilhas page — Netflix-style horizontal scroll per COURSE space
 // Route: /community/[communitySlug]/trilhas
 // =============================================================================
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { BookOpen, AlertCircle } from "lucide-react";
+import Link from "next/link";
+import { BookOpen, AlertCircle, ArrowLeft } from "lucide-react";
 import ModuleCard from "@/components/content/ModuleCard";
+import { CommunityHeader } from "@/components/community/CommunityHeader";
+import { CommunityTabs } from "@/components/community/CommunityTabs";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { STORAGE_KEYS } from "@/lib/constants";
 
 interface Space {
@@ -17,6 +21,22 @@ interface Space {
   slug: string;
   icon?: string | null;
   type: string;
+}
+
+interface Community {
+  id: string;
+  name: string;
+  slug: string;
+  logoUrl?: string | null;
+  bannerUrl?: string | null;
+  primaryColor: string;
+  memberCount?: number;
+  shortDescription?: string | null;
+}
+
+interface Influencer {
+  displayName?: string | null;
+  user?: { firstName: string; lastName: string; avatarUrl?: string | null } | null;
 }
 
 interface Module {
@@ -35,18 +55,56 @@ interface SpaceWithModules extends Space {
   modulesLoading: boolean;
 }
 
-function Skeleton() {
+interface ActiveTrailData {
+  moduleId: string;
+  moduleTitle: string;
+  moduleSortOrder: number;
+  spaceSlug: string;
+  currentLessonId: string;
+  currentLessonTitle: string;
+  percentComplete: number;
+  completedLessons: number;
+  totalLessons: number;
+}
+
+function PageSkeleton() {
   return (
-    <div className="space-y-3">
-      {[1, 2, 3].map((i) => (
-        <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-5 animate-pulse">
-          <div className="flex items-start gap-4">
-            <div className="w-10 h-10 bg-white/10 rounded-xl flex-shrink-0" />
-            <div className="flex-1 space-y-2">
-              <div className="h-4 bg-white/10 rounded w-2/3" />
-              <div className="h-3 bg-white/10 rounded w-1/2" />
-              <div className="h-1.5 bg-white/10 rounded-full mt-3" />
-            </div>
+    <div className="max-w-5xl mx-auto px-4 py-8">
+      {[1, 2].map((i) => (
+        <div key={i} className="mb-10">
+          <div className="h-5 bg-white/10 rounded w-36 animate-pulse mb-4" />
+          <div className="flex gap-4 overflow-x-auto pb-3">
+            {[1, 2, 3, 4].map((j) => (
+              <div
+                key={j}
+                className="w-52 flex-shrink-0 rounded-xl overflow-hidden animate-pulse"
+              >
+                <div className="h-32 bg-white/10" />
+                <div className="p-3 bg-[#0D0D0D] space-y-2">
+                  <div className="h-4 bg-white/10 rounded w-3/4" />
+                  <div className="h-3 bg-white/10 rounded w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SpaceRowSkeleton() {
+  return (
+    <div className="flex gap-4 overflow-x-auto pb-3">
+      {[1, 2, 3, 4].map((i) => (
+        <div
+          key={i}
+          className="w-52 flex-shrink-0 rounded-xl overflow-hidden animate-pulse"
+        >
+          <div className="h-32 bg-white/10" />
+          <div className="p-3 bg-[#0D0D0D] space-y-2">
+            <div className="h-4 bg-white/10 rounded w-3/4" />
+            <div className="h-3 bg-white/10 rounded w-1/2" />
           </div>
         </div>
       ))}
@@ -59,10 +117,15 @@ export default function TrilhasPage() {
   const router = useRouter();
   const communitySlug = params.communitySlug as string;
 
-  const [communityId, setCommunityId] = useState<string | null>(null);
+  const [community, setCommunity] = useState<Community | null>(null);
+  const [influencer, setInfluencer] = useState<Influencer | null>(null);
   const [spaces, setSpaces] = useState<SpaceWithModules[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [optedIn, setOptedIn] = useState<boolean | null>(null);
+  const [optInLoading, setOptInLoading] = useState(false);
+  const [activeTrail, setActiveTrail] = useState<ActiveTrailData | null>(null);
+  const [trailLoading, setTrailLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
@@ -76,27 +139,43 @@ export default function TrilhasPage() {
         }
         const headers = { Authorization: `Bearer ${token}` };
 
-        // Find community
-        const commRes = await fetch("/api/communities?published=true", { headers });
-        const commJson = await commRes.json();
-        if (!commJson.success) throw new Error("Erro ao carregar comunidade");
-
-        const comm = (commJson.communities as { id: string; slug: string }[]).find(
-          (c) => c.slug === communitySlug
+        // Single call for community + spaces + influencer
+        const overviewRes = await fetch(
+          `/api/communities/${communitySlug}/overview`,
+          { headers }
         );
-        if (!comm) {
+        const overviewJson = overviewRes.ok ? await overviewRes.json() : { success: false };
+
+        if (!overviewJson.success) {
           setError("Comunidade não encontrada.");
           setLoading(false);
+          setTrailLoading(false);
           return;
         }
-        setCommunityId(comm.id);
 
-        // Get all spaces
-        const spacesRes = await fetch(`/api/communities/${comm.id}/spaces`, { headers });
-        const spacesJson = await spacesRes.json();
-        if (!spacesJson.success) throw new Error("Erro ao carregar trilhas");
+        const comm: Community = overviewJson.data.community;
+        setCommunity(comm);
+        if (overviewJson.data.influencer) setInfluencer(overviewJson.data.influencer);
 
-        const courseSpaces: Space[] = (spacesJson.data as Space[]).filter(
+        // Fetch opt-in status
+        fetch(`/api/communities/${comm.id}/join`, { headers })
+          .then((r) => r.json())
+          .then((jd) => {
+            if (jd.success) setOptedIn(jd.data?.joined ?? false);
+          })
+          .catch(() => {});
+
+        // Fetch active trail
+        fetch(`/api/communities/${communitySlug}/active-trail`, { headers })
+          .then((r) => r.json())
+          .then((td) => {
+            if (td.success && td.data) setActiveTrail(td.data);
+          })
+          .catch(() => {})
+          .finally(() => setTrailLoading(false));
+
+        // Filter to COURSE spaces only
+        const courseSpaces: Space[] = (overviewJson.data.spaces as Space[]).filter(
           (s) => s.type === "COURSE"
         );
 
@@ -108,7 +187,7 @@ export default function TrilhasPage() {
         setSpaces(withModules);
         setLoading(false);
 
-        // Load modules for each course space
+        // Load modules for each course space in parallel
         await Promise.all(
           courseSpaces.map(async (space) => {
             try {
@@ -136,15 +215,35 @@ export default function TrilhasPage() {
       } catch {
         setError("Erro de conexão. Tente novamente.");
         setLoading(false);
+        setTrailLoading(false);
       }
     }
 
     load();
   }, [communitySlug, router]);
 
+  const handleOptIn = useCallback(async () => {
+    if (!community) return;
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+    setOptInLoading(true);
+    try {
+      const method = optedIn ? "DELETE" : "POST";
+      const res = await fetch(`/api/communities/${community.id}/join`, {
+        method,
+        headers: { Authorization: `Bearer ${token ?? ""}` },
+      });
+      const d = await res.json();
+      if (d.success) setOptedIn(d.data.joined);
+    } catch {
+      // ignore
+    } finally {
+      setOptInLoading(false);
+    }
+  }, [community, optedIn]);
+
   if (!loading && error) {
     return (
-      <div className="min-h-screen bg-[#1A1A1A] flex items-center justify-center p-4">
+      <div className="flex items-center justify-center p-4 py-20">
         <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-8 max-w-md w-full text-center">
           <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-3" />
           <p className="text-red-400 text-sm">{error}</p>
@@ -154,22 +253,39 @@ export default function TrilhasPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1A1A1A] text-[#EEE6E4]">
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 rounded-xl bg-[#006079]/20 border border-[#006079]/30 flex items-center justify-center">
-            <BookOpen className="w-5 h-5 text-[#009CD9]" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-[#EEE6E4]">Trilhas</h1>
-            <p className="text-sm text-gray-400">Aprenda no seu ritmo</p>
-          </div>
-        </div>
+    <div className="text-[#EEE6E4]">
+      {/* Mobile top bar */}
+      <header className="h-14 bg-[#1A1A1A]/90 border-b border-white/8 flex items-center px-4 gap-3 sticky top-0 z-30 backdrop-blur-sm md:hidden">
+        <Link href="/inicio" className="flex items-center gap-1.5 text-gray-400 hover:text-[#EEE6E4] transition-colors shrink-0 bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5">
+          <ArrowLeft className="w-4 h-4" />
+          <span className="text-xs font-medium">Início</span>
+        </Link>
+        <span className="text-sm font-semibold text-[#EEE6E4] truncate flex-1 min-w-0">
+          {community?.name ?? "Comunidade"}
+        </span>
+        <NotificationBell />
+      </header>
 
-        {loading ? (
-          <Skeleton />
-        ) : spaces.length === 0 ? (
+      {community && (
+        <>
+          <CommunityHeader
+            community={community}
+            influencer={influencer}
+            optedIn={optedIn}
+            onOptIn={handleOptIn}
+            optInLoading={optInLoading}
+          />
+          <CommunityTabs
+            communitySlug={communitySlug}
+            primaryColor={community.primaryColor}
+          />
+        </>
+      )}
+
+      {loading ? (
+        <PageSkeleton />
+      ) : spaces.length === 0 ? (
+        <div className="max-w-5xl mx-auto px-4 py-8">
           <div className="bg-white/5 border border-white/10 rounded-xl p-12 text-center">
             <BookOpen className="w-10 h-10 text-gray-400 mx-auto mb-3" />
             <p className="text-gray-400 font-medium">Nenhuma trilha disponível</p>
@@ -177,41 +293,101 @@ export default function TrilhasPage() {
               A comunidade ainda não publicou trilhas de conteúdo.
             </p>
           </div>
-        ) : (
-          <div className="space-y-8">
-            {spaces.map((space) => (
-              <section key={space.id}>
-                {/* Space header */}
-                <div className="flex items-center gap-2 mb-4">
-                  {space.icon && <span className="text-lg">{space.icon}</span>}
-                  <h2 className="text-base font-semibold text-[#EEE6E4]">{space.name}</h2>
+        </div>
+      ) : (
+        <div className="max-w-5xl mx-auto px-4 py-8">
+          {/* Hero: Continue estudando */}
+          {!trailLoading && activeTrail && (
+            <div className="mb-8">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-3">
+                Continue estudando
+              </p>
+              <Link
+                href={`/community/${communitySlug}/trilhas/${activeTrail.moduleId}`}
+                className="flex items-center gap-4 bg-[#111] border border-white/8 rounded-xl p-4 hover:border-[#006079]/40 transition-all group"
+              >
+                {/* Module number circle */}
+                <div
+                  className="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center text-lg font-black"
+                  style={{
+                    backgroundColor: `${community?.primaryColor ?? "#006079"}20`,
+                    color: community?.primaryColor ?? "#009CD9",
+                  }}
+                >
+                  {activeTrail.moduleSortOrder + 1}
                 </div>
 
-                {space.modulesLoading ? (
-                  <Skeleton />
-                ) : space.modules.length === 0 ? (
-                  <div className="bg-white/5 border border-white/10 rounded-xl p-6 text-center">
-                    <p className="text-gray-500 text-sm">Nenhum módulo publicado ainda.</p>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-[#EEE6E4] truncate">
+                    {activeTrail.moduleTitle}
+                  </p>
+                  <p className="text-xs text-gray-400 truncate mt-0.5">
+                    {activeTrail.currentLessonTitle}
+                  </p>
+                  <div className="mt-2 h-1.5 bg-white/10 rounded-full overflow-hidden w-full">
+                    <div
+                      className="h-full bg-gradient-to-r from-[#006079] to-[#009CD9] rounded-full transition-all"
+                      style={{ width: `${activeTrail.percentComplete}%` }}
+                    />
                   </div>
-                ) : (
-                  <div className="space-y-3">
-                    {space.modules
-                      .filter((m) => m.isPublished)
-                      .map((module) => (
+                </div>
+
+                <div className="text-right flex-shrink-0">
+                  <p className="text-xs font-bold text-[#009CD9]">
+                    {activeTrail.percentComplete}%
+                  </p>
+                  <p className="text-[10px] text-gray-500">
+                    {activeTrail.completedLessons}/{activeTrail.totalLessons} aulas
+                  </p>
+                </div>
+              </Link>
+            </div>
+          )}
+
+          {/* Trilhas sections — one horizontal scroll row per COURSE space */}
+          {spaces.map((space) => (
+            <section key={space.id} className="mb-10">
+              {/* Section header */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  {space.icon && <span className="text-xl">{space.icon}</span>}
+                  <h2 className="text-lg font-bold text-[#EEE6E4]">{space.name}</h2>
+                  <span className="text-xs text-gray-500 bg-white/5 px-2 py-0.5 rounded-full">
+                    {space.modules.filter((m) => m.isPublished).length} módulos
+                  </span>
+                </div>
+              </div>
+
+              {/* Horizontal scroll */}
+              {space.modulesLoading ? (
+                <SpaceRowSkeleton />
+              ) : space.modules.filter((m) => m.isPublished).length === 0 ? (
+                <div className="bg-white/5 border border-white/10 rounded-xl p-6 text-center">
+                  <p className="text-gray-500 text-sm">Nenhum módulo publicado ainda.</p>
+                </div>
+              ) : (
+                <div
+                  className="flex gap-4 overflow-x-auto pb-3 -mx-4 px-4"
+                  style={{ scrollSnapType: "x mandatory" }}
+                >
+                  {space.modules
+                    .filter((m) => m.isPublished)
+                    .map((module) => (
+                      <div key={module.id} style={{ scrollSnapAlign: "start" }}>
                         <ModuleCard
-                          key={module.id}
                           module={module}
                           communitySlug={communitySlug}
                           spaceSlug={space.slug}
+                          primaryColor={community?.primaryColor}
                         />
-                      ))}
-                  </div>
-                )}
-              </section>
-            ))}
-          </div>
-        )}
-      </div>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </section>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

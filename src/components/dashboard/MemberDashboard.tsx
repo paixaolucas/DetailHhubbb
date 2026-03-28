@@ -5,14 +5,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/components/ui/toast-provider";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import { apiClient } from "@/lib/api-client";
-import { HeroBanner } from "./HeroBanner";
-import { HealthScore } from "./HealthScore";
-import { getGreeting } from "@/lib/greeting";
-import { TrackInProgress } from "./TrackInProgress";
-import { CommunitiesRow } from "./CommunitiesRow";
-import { RankingBlock } from "./RankingBlock";
+import { GreetingBar } from "./GreetingBar";
+import { ActivityPulse } from "./ActivityPulse";
+import { HeroContinueWatching } from "./HeroContinueWatching";
+import { MemberCommunitiesGrid } from "./MemberCommunitiesGrid";
+import { MiniRankingCard } from "./MiniRankingCard";
 import { NextLiveCard } from "./NextLiveCard";
-import { TrendingFeed } from "./TrendingFeed";
+import { TrendingHorizontal } from "./TrendingHorizontal";
 import { MemberHealthWidget } from "./MemberHealthWidget";
 import { MemberOnboarding } from "./MemberOnboarding";
 
@@ -56,56 +55,43 @@ export function MemberDashboard({
   useEffect(() => { fetchMembership(); }, [fetchMembership]);
   useAutoRefresh(fetchMembership, 60_000);
 
-  const [greeting, setGreeting] = useState("");
-
-  // Calcula no cliente com o timezone real do browser — evita SSR com UTC do servidor
-  useEffect(() => {
-    setGreeting(getGreeting(firstName));
-  }, [firstName]);
-
   return (
     <div className="space-y-4">
-      {/* Block 1: Hero banner */}
-      <HeroBanner />
-
-      {/* Block 2: Saudação + Score */}
-      <div className="animate-fade-in space-y-3">
-        <div className="flex items-baseline gap-2 px-1">
-          <h2 className="text-2xl sm:text-3xl font-black text-[#EEE6E4] leading-tight">
-            {greeting}
-          </h2>
-          <span className="text-gray-500 text-sm hidden sm:inline">que bom que voltou.</span>
-        </div>
-        <HealthScore />
+      {/* Block 1: Saudação com streak, XP e contexto */}
+      <div className="animate-fade-in">
+        <GreetingBar firstName={firstName} />
       </div>
 
-      {/* Block 2.5: Onboarding quick win */}
-      {hasPlatform && (
-        <div className="animate-fade-in delay-75">
-          <MemberOnboarding />
-        </div>
-      )}
-
-      {/* Block 3: Comunidades — largura total */}
-      <div className="animate-slide-up delay-75">
-        <CommunitiesRow hasPlatform={hasPlatform} />
+      {/* Block 2: Activity pulse — novidades desde a última visita */}
+      <div className="animate-fade-in" style={{ animationDelay: "100ms" }}>
+        <ActivityPulse />
       </div>
 
-      {/* Block 4: Trilha em andamento */}
-      <div className="animate-slide-up delay-150">
-        <TrackInProgress />
+      {/* Block 3: Hero — continuar assistindo (substitui HeroBanner + TrackInProgress) */}
+      <div className="animate-slide-up" style={{ animationDelay: "150ms" }}>
+        <HeroContinueWatching hasPlatform={hasPlatform} />
       </div>
 
-      {/* Block 5: Em alta (2/3) + Ranking (1/3) */}
-      <div className="animate-slide-up delay-225 grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 space-y-4">
-          <TrendingFeed />
-          <NextLiveCard />
+      {/* Block 4: Comunidades (2/3) + Live + Saúde + Ranking (1/3) */}
+      <div className="animate-slide-up delay-75 grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2">
+          <MemberCommunitiesGrid hasPlatform={hasPlatform} />
         </div>
         <div className="lg:col-span-1 space-y-4">
+          <NextLiveCard />
           <MemberHealthWidget />
-          <RankingBlock userId={userId} />
+          <MiniRankingCard />
         </div>
+      </div>
+
+      {/* Block 5: Em alta — scroll horizontal */}
+      <div className="animate-slide-up delay-150">
+        <TrendingHorizontal />
+      </div>
+
+      {/* Block 6: Onboarding quick win — sempre visível */}
+      <div className="animate-fade-in delay-300">
+        <MemberOnboarding />
       </div>
     </div>
   );

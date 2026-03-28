@@ -52,7 +52,7 @@ interface Tool {
 const BADGE_STYLES: Record<BadgeVariant, string> = {
   teal:   "text-[#009CD9] bg-[#007A99]/15 border border-[#007A99]/30",
   blue:   "text-blue-300 bg-blue-500/10 border border-blue-500/20",
-  purple: "text-purple-300 bg-[#5E35B1]/15 border border-[#5E35B1]/30",
+  purple: "text-[#009CD9] bg-[#006079]/15 border border-[#006079]/30",
   orange: "text-orange-300 bg-[#E65100]/15 border border-[#E65100]/30",
   green:  "text-emerald-300 bg-emerald-500/10 border border-emerald-500/20",
 };

@@ -11,7 +11,7 @@ export default function DashboardPage() {
   const [actualRole, setActualRole] = useState<string | null>(null);
   const [actualName, setActualName] = useState("");
   const router = useRouter();
-  const { effectiveRole, effectiveName } = useViewAs();
+  const { viewAs, effectiveRole, effectiveName } = useViewAs();
 
   useEffect(() => {
     const storedRole = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
@@ -43,7 +43,8 @@ export default function DashboardPage() {
 
     case "COMMUNITY_MEMBER":
     case "MARKETPLACE_PARTNER":
-      // Membros têm página própria em /inicio
+      // Se em modo ViewAs, a navegação já foi feita pelo sidebar — não redirecionar de novo
+      if (viewAs) return null;
       router.replace("/inicio");
       return null;
 

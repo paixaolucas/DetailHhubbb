@@ -8,48 +8,104 @@ import { db } from "@/lib/db";
 
 export const GET = withAuth(async (req, { session }) => {
   try {
-    const memberships = await db.communityMembership.findMany({
-      where: { userId: session.userId, status: "ACTIVE" },
-      include: {
-        community: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-            primaryColor: true,
-            logoUrl: true,
-            contentModules: {
-              where: { isPublished: true },
-              orderBy: { sortOrder: "asc" },
-              include: {
-                lessons: {
-                  where: { isPublished: true },
-                  orderBy: { sortOrder: "asc" },
-                  select: {
-                    id: true,
-                    title: true,
-                    type: true,
-                    videoDuration: true,
-                    isFree: true,
-                    sortOrder: true,
-                    progress: {
-                      where: { userId: session.userId },
-                      select: { isCompleted: true, progressSecs: true },
-                    },
+    // Verifica se o usuário tem PlatformMembership ativo
+    const platformMembership = await db.platformMembership.findUnique({
+      where: { userId: session.userId },
+      select: { status: true, currentPeriodEnd: true },
+    });
+
+    const hasPlatform =
+      platformMembership?.status === "ACTIVE" &&
+      (platformMembership.currentPeriodEnd == null ||
+        platformMembership.currentPeriodEnd > new Date());
+
+    // Seleciona as comunidades com conteúdo publicado
+    // — Platform member: todas as comunidades com módulos publicados
+    // — Membership individual: apenas as comunidades em que está inscrito
+    let communities;
+
+    if (hasPlatform) {
+      communities = await db.community.findMany({
+        where: {
+          isPublished: true,
+          contentModules: { some: { isPublished: true } },
+        },
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          primaryColor: true,
+          logoUrl: true,
+          contentModules: {
+            where: { isPublished: true },
+            orderBy: { sortOrder: "asc" },
+            include: {
+              lessons: {
+                where: { isPublished: true },
+                orderBy: { sortOrder: "asc" },
+                select: {
+                  id: true,
+                  title: true,
+                  type: true,
+                  videoDuration: true,
+                  isFree: true,
+                  sortOrder: true,
+                  progress: {
+                    where: { userId: session.userId },
+                    select: { isCompleted: true, progressSecs: true },
                   },
                 },
-                _count: { select: { lessons: { where: { isPublished: true } } } },
+              },
+              _count: { select: { lessons: { where: { isPublished: true } } } },
+            },
+          },
+        },
+        orderBy: { name: "asc" },
+      });
+    } else {
+      const memberships = await db.communityMembership.findMany({
+        where: { userId: session.userId, status: "ACTIVE" },
+        include: {
+          community: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              primaryColor: true,
+              logoUrl: true,
+              contentModules: {
+                where: { isPublished: true },
+                orderBy: { sortOrder: "asc" },
+                include: {
+                  lessons: {
+                    where: { isPublished: true },
+                    orderBy: { sortOrder: "asc" },
+                    select: {
+                      id: true,
+                      title: true,
+                      type: true,
+                      videoDuration: true,
+                      isFree: true,
+                      sortOrder: true,
+                      progress: {
+                        where: { userId: session.userId },
+                        select: { isCompleted: true, progressSecs: true },
+                      },
+                    },
+                  },
+                  _count: { select: { lessons: { where: { isPublished: true } } } },
+                },
               },
             },
           },
         },
-      },
-      orderBy: { joinedAt: "desc" },
-    });
+        orderBy: { joinedAt: "desc" },
+      });
+      communities = memberships.map((m) => m.community);
+    }
 
     // Calculate progress per community
-    const data = memberships.map((membership) => {
-      const community = membership.community;
+    const data = communities.map((community) => {
       let totalLessons = 0;
       let completedLessons = 0;
 
@@ -94,7 +150,7 @@ export const GET = withAuth(async (req, { session }) => {
         totalLessons,
         completedLessons,
         progress,
-        joinedAt: membership.joinedAt,
+        joinedAt: new Date(),
         modules,
       };
     });

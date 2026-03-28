@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   User,
   Lock,
@@ -15,7 +16,6 @@ import {
   Globe,
   Camera,
   CreditCard,
-  ExternalLink,
   AlertTriangle,
   Clock,
 } from "lucide-react";
@@ -127,7 +127,14 @@ export default function SettingsPage() {
     lastName: "",
     phone: "",
     avatarUrl: "",
+    headline: "",
     bio: "",
+    location: "",
+    website: "",
+    instagram: "",
+    twitter: "",
+    facebook: "",
+    linkedin: "",
   });
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: "",
@@ -155,7 +162,7 @@ export default function SettingsPage() {
   const [paymentsLoading, setPaymentsLoading] = useState(false);
   const [paymentsPage, setPaymentsPage] = useState(1);
   const [paymentsTotalPages, setPaymentsTotalPages] = useState(1);
-  const [billingPortalLoading, setBillingPortalLoading] = useState(false);
+  // billingPortalLoading removed — billing portal replaced by /dashboard/assinatura
 
   // Avatar upload
   const avatarInputRef = useRef<HTMLInputElement>(null);
@@ -214,18 +221,37 @@ export default function SettingsPage() {
             lastName: u.lastName ?? "",
             phone: u.phone ?? "",
             avatarUrl: u.avatarUrl ?? "",
+            headline: "",
             bio: "",
+            location: "",
+            website: "",
+            instagram: "",
+            twitter: "",
+            facebook: "",
+            linkedin: "",
           });
           if (u.notificationPrefs && typeof u.notificationPrefs === "object") {
             setNotifPrefs((prev) => ({ ...prev, ...(u.notificationPrefs as Record<string, boolean>) }));
           }
-          // Fetch bio from UserProfile
           const uid = u.id;
           fetch(`/api/users/${uid}/profile`, { headers: { Authorization: `Bearer ${token}` } })
             .then((r) => r.json())
             .then((pd) => {
-              if (pd.success && pd.data?.bio) {
-                setProfileForm((p) => ({ ...p, bio: pd.data.bio ?? "" }));
+              if (pd.success && pd.data) {
+                const sl = (typeof pd.data.socialLinks === "object" && pd.data.socialLinks !== null)
+                  ? pd.data.socialLinks as Record<string, string>
+                  : {};
+                setProfileForm((p) => ({
+                  ...p,
+                  headline: pd.data.headline ?? "",
+                  bio: pd.data.bio ?? "",
+                  location: pd.data.location ?? "",
+                  website: sl.website ?? "",
+                  instagram: sl.instagram ?? "",
+                  twitter: sl.twitter ?? "",
+                  facebook: sl.facebook ?? "",
+                  linkedin: sl.linkedin ?? "",
+                }));
               }
             })
             .catch(() => {});
@@ -303,28 +329,7 @@ export default function SettingsPage() {
       .finally(() => setPaymentsLoading(false));
   }, [activeTab, membership, paymentsPage]);
 
-  async function openBillingPortal() {
-    setBillingPortalLoading(true);
-    try {
-      const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
-      const returnUrl = `${window.location.origin}/dashboard/settings`;
-      const res = await fetch("/api/stripe/billing-portal", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ returnUrl }),
-      });
-      const data = await res.json();
-      if (!data.success) {
-        toast.error(data.error ?? "Erro ao acessar portal de cobrança");
-        return;
-      }
-      window.open(data.data.url, "_blank", "noopener,noreferrer");
-    } catch {
-      toast.error("Erro ao acessar portal de cobrança");
-    } finally {
-      setBillingPortalLoading(false);
-    }
-  }
+  // openBillingPortal removed — use Link to /dashboard/assinatura instead
 
   function formatCurrency(amount: string, currency: string) {
     return new Intl.NumberFormat("pt-BR", {
@@ -386,12 +391,23 @@ export default function SettingsPage() {
         return;
       }
       localStorage.setItem(STORAGE_KEYS.USER_NAME, `${profileForm.firstName} ${profileForm.lastName}`);
-      // Also save bio to UserProfile
       if (data.data?.id) {
+        const socialLinks: Record<string, string> = {};
+        if (profileForm.website) socialLinks.website = profileForm.website;
+        if (profileForm.instagram) socialLinks.instagram = profileForm.instagram;
+        if (profileForm.twitter) socialLinks.twitter = profileForm.twitter;
+        if (profileForm.facebook) socialLinks.facebook = profileForm.facebook;
+        if (profileForm.linkedin) socialLinks.linkedin = profileForm.linkedin;
+
         fetch(`/api/users/${data.data.id}/profile`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ bio: profileForm.bio || undefined }),
+          body: JSON.stringify({
+            headline: profileForm.headline || null,
+            bio: profileForm.bio || null,
+            location: profileForm.location || null,
+            socialLinks,
+          }),
         }).catch(() => {});
       }
       setProfileMsg({ type: "success", text: "Perfil atualizado com sucesso!" });
@@ -570,76 +586,138 @@ export default function SettingsPage() {
 
       {/* Profile tab */}
       {activeTab === "profile" && (
-        <form onSubmit={saveProfile} className="glass-card p-6 space-y-4">
-          <h2 className="text-base font-semibold text-[#EEE6E4]">Informações do Perfil</h2>
+        <form onSubmit={saveProfile} className="space-y-6">
           {profileMsg && <AlertBanner msg={profileMsg} />}
-          <div className="grid grid-cols-2 gap-4">
-            <InputField
-              label="Nome"
-              value={profileForm.firstName}
-              onChange={(e: any) => setProfileForm((p) => ({ ...p, firstName: e.target.value }))}
-            />
-            <InputField
-              label="Sobrenome"
-              value={profileForm.lastName}
-              onChange={(e: any) => setProfileForm((p) => ({ ...p, lastName: e.target.value }))}
-            />
-          </div>
-          <InputField label="Email" value={user.email} disabled />
-          <p className="text-xs text-gray-500 -mt-2">O email não pode ser alterado</p>
-          <InputField
-            label="Telefone"
-            value={profileForm.phone}
-            onChange={(e: any) => setProfileForm((p) => ({ ...p, phone: e.target.value }))}
-            type="tel"
-            placeholder="+55 11 99999-9999"
-          />
-          <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1.5">Bio</label>
-            <textarea
-              value={profileForm.bio}
-              onChange={(e) => setProfileForm((p) => ({ ...p, bio: e.target.value }))}
-              placeholder="Conte um pouco sobre você..."
-              rows={3}
-              maxLength={500}
-              className="w-full bg-white/5 border border-white/10 hover:border-[#009CD9]/20 rounded-xl px-4 py-3 text-[#EEE6E4] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 focus:border-[#009CD9] transition-all text-sm resize-none"
-            />
-            <p className="text-xs text-gray-600 text-right mt-1">{profileForm.bio.length}/500</p>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1.5">Foto de perfil</label>
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#006079] to-[#009CD9] flex items-center justify-center text-white text-xl font-bold flex-shrink-0 overflow-hidden">
+
+          {/* Foto de perfil */}
+          <div className="bg-white/5 border border-white/10 rounded-xl p-5">
+            <h3 className="text-sm font-semibold text-[#EEE6E4] mb-4">Foto de perfil</h3>
+            <div className="flex items-center gap-5">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#006079] to-[#009CD9] flex items-center justify-center text-white text-2xl font-bold flex-shrink-0 overflow-hidden border border-white/10">
                 {(avatarPreview || profileForm.avatarUrl) ? (
-                  <Image src={avatarPreview || profileForm.avatarUrl} alt="" width={64} height={64} className="w-full h-full object-cover" />
+                  <Image src={avatarPreview || profileForm.avatarUrl} alt="" width={80} height={80} className="w-full h-full object-cover" />
                 ) : initials}
               </div>
-              <div>
-                <button
-                  type="button"
-                  onClick={() => avatarInputRef.current?.click()}
-                  disabled={avatarUploading}
-                  className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-[#006079]/10 border border-white/10 hover:border-[#009CD9]/20 rounded-xl text-sm text-gray-400 hover:text-[#EEE6E4] transition-all disabled:opacity-50"
-                >
-                  <Camera className="w-4 h-4" />
-                  {avatarUploading ? "Enviando..." : "Trocar foto"}
-                </button>
-                <p className="text-xs text-gray-400 mt-1">JPG, PNG até 4MB</p>
+              <div className="space-y-2">
+                <p className="text-xs text-gray-500">Tamanho recomendado: 300 × 300 px. JPG ou PNG, máx 4 MB.</p>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => avatarInputRef.current?.click()}
+                    disabled={avatarUploading}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-[#006079]/20 hover:bg-[#006079]/40 border border-[#006079]/30 text-[#009CD9] rounded-lg text-xs font-medium transition-all disabled:opacity-50"
+                  >
+                    <Camera className="w-3.5 h-3.5" />
+                    {avatarUploading ? "Enviando..." : "Alterar"}
+                  </button>
+                  {profileForm.avatarUrl && (
+                    <button
+                      type="button"
+                      onClick={() => { setProfileForm((p) => ({ ...p, avatarUrl: "" })); setAvatarPreview(null); }}
+                      className="flex items-center gap-2 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 rounded-lg text-xs font-medium transition-all"
+                    >
+                      Remover
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
-            <input
-              ref={avatarInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleAvatarFileChange}
+            <input ref={avatarInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarFileChange} />
+          </div>
+
+          {/* Informações básicas */}
+          <div className="bg-white/5 border border-white/10 rounded-xl p-5 space-y-4">
+            <h3 className="text-sm font-semibold text-[#EEE6E4]">Informações básicas</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <InputField
+                label="Nome*"
+                value={profileForm.firstName}
+                onChange={(e) => setProfileForm((p) => ({ ...p, firstName: e.target.value }))}
+              />
+              <InputField
+                label="Sobrenome*"
+                value={profileForm.lastName}
+                onChange={(e) => setProfileForm((p) => ({ ...p, lastName: e.target.value }))}
+              />
+            </div>
+            <InputField label="Email" value={user.email} disabled />
+            <InputField
+              label="Telefone"
+              value={profileForm.phone}
+              onChange={(e) => setProfileForm((p) => ({ ...p, phone: e.target.value }))}
+              type="tel"
+              placeholder="+55 11 99999-9999"
+            />
+            <InputField
+              label="Headline*"
+              value={profileForm.headline}
+              onChange={(e) => setProfileForm((p) => ({ ...p, headline: e.target.value }))}
+              placeholder="Ex: Detailer profissional há 10 anos"
+            />
+            <InputField
+              label="Localização (opcional)"
+              value={profileForm.location}
+              onChange={(e) => setProfileForm((p) => ({ ...p, location: e.target.value }))}
+              placeholder="Ex: Belo Horizonte, MG"
+            />
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-1.5">Bio*</label>
+              <textarea
+                value={profileForm.bio}
+                onChange={(e) => setProfileForm((p) => ({ ...p, bio: e.target.value }))}
+                placeholder="Fale sobre você, sua experiência e especialidades..."
+                rows={4}
+                maxLength={2000}
+                className="w-full bg-white/5 border border-white/10 hover:border-[#009CD9]/20 rounded-xl px-4 py-3 text-[#EEE6E4] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#009CD9]/30 focus:border-[#009CD9] transition-all text-sm resize-none"
+              />
+              <p className="text-xs text-gray-600 text-right mt-1">{profileForm.bio.length}/2000</p>
+            </div>
+          </div>
+
+          {/* Redes sociais */}
+          <div className="bg-white/5 border border-white/10 rounded-xl p-5 space-y-4">
+            <div>
+              <h3 className="text-sm font-semibold text-[#EEE6E4]">Redes sociais e links</h3>
+              <p className="text-xs text-gray-500 mt-1">Todos os campos abaixo são <span className="text-[#009CD9]">opcionais</span>. Cole o link completo do seu perfil.</p>
+            </div>
+            <InputField
+              label="Website (opcional)"
+              value={profileForm.website}
+              onChange={(e) => setProfileForm((p) => ({ ...p, website: e.target.value }))}
+              placeholder="https://seusite.com.br"
+              type="url"
+            />
+            <InputField
+              label="Instagram (opcional)"
+              value={profileForm.instagram}
+              onChange={(e) => setProfileForm((p) => ({ ...p, instagram: e.target.value }))}
+              placeholder="instagram.com/seu_usuario"
+            />
+            <InputField
+              label="Twitter / X (opcional)"
+              value={profileForm.twitter}
+              onChange={(e) => setProfileForm((p) => ({ ...p, twitter: e.target.value }))}
+              placeholder="twitter.com/seu_usuario"
+            />
+            <InputField
+              label="Facebook (opcional)"
+              value={profileForm.facebook}
+              onChange={(e) => setProfileForm((p) => ({ ...p, facebook: e.target.value }))}
+              placeholder="facebook.com/seu_usuario"
+            />
+            <InputField
+              label="LinkedIn (opcional)"
+              value={profileForm.linkedin}
+              onChange={(e) => setProfileForm((p) => ({ ...p, linkedin: e.target.value }))}
+              placeholder="linkedin.com/in/seu_usuario"
             />
           </div>
+
           <div className="flex justify-end">
             <button
               type="submit"
               disabled={isSaving}
-              className="flex items-center gap-2 bg-[#006079] hover:bg-[#007A99] disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-[#007A99]/30"
+              className="flex items-center gap-2 bg-[#006079] hover:bg-[#007A99] disabled:opacity-50 text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg hover:shadow-[#007A99]/30"
             >
               {isSaving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Save className="w-4 h-4" />}
               {isSaving ? "Salvando..." : "Salvar Alterações"}
@@ -853,18 +931,13 @@ export default function SettingsPage() {
                   </div>
                 )}
 
-                <button
-                  type="button"
-                  onClick={openBillingPortal}
-                  disabled={billingPortalLoading}
-                  className="flex items-center gap-2 bg-[#006079] hover:bg-[#007A99] disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all"
+                <Link
+                  href="/dashboard/assinatura"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-[#EEE6E4] hover:bg-white/10 transition-all"
                 >
-                  {billingPortalLoading
-                    ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    : <ExternalLink className="w-4 h-4" />
-                  }
-                  {billingPortalLoading ? "Abrindo..." : "Gerenciar Assinatura"}
-                </button>
+                  <CreditCard className="w-4 h-4 text-[#009CD9]" />
+                  Gerenciar assinatura
+                </Link>
               </div>
 
               {/* Payment history */}

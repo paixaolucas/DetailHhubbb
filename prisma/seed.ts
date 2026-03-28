@@ -1070,6 +1070,227 @@ async function main() {
   console.log("✅ Marketplace listings created");
 
   // =============================================================================
+  // FETCH REMAINING SPACES
+  // =============================================================================
+  const spacesGimenez = await db.space.findMany({ where: { communityId: communityGimenez.id }, orderBy: { sortOrder: "asc" } });
+  const spacesGigi = await db.space.findMany({ where: { communityId: communityGigi.id }, orderBy: { sortOrder: "asc" } });
+
+  const feedGimenez = spacesGimenez[0];
+  const feedGigi = spacesGigi[0];
+
+  // =============================================================================
+  // BADGES
+  // =============================================================================
+  const badgeQueimaMitos = await db.badge.create({ data: { name: "Queima-Mitos", description: "Participante ativo que questiona e aprende sem aceitar enrolação", icon: "🔥", color: "#FA4616", requirement: { type: "manual" } } });
+  const badgeTopDetailer  = await db.badge.create({ data: { name: "Top Detailer", description: "Ranqueado entre os 10 primeiros da comunidade", icon: "🏆", color: "#F7941D", requirement: { type: "ranking", threshold: 10 } } });
+  const badgePrimeiroPost = await db.badge.create({ data: { name: "Primeiro Post", description: "Publicou sua primeira mensagem na comunidade", icon: "✍️", color: "#009CD9", requirement: { type: "post_count", threshold: 1 } } });
+  const badgePremium      = await db.badge.create({ data: { name: "Assinante", description: "Assinante ativo da plataforma", icon: "💎", color: "#006079", requirement: { type: "platform_member" } } });
+  const badgeDetailerPro  = await db.badge.create({ data: { name: "Detailer Pro", description: "Profissional reconhecido pela comunidade", icon: "⚡", color: "#007A99", requirement: { type: "manual" } } });
+  const badgeZikaDaRua    = await db.badge.create({ data: { name: "Zika da Rua", description: "Membro veterano da comunidade do Corujão", icon: "🦉", color: "#F7941D", requirement: { type: "manual" } } });
+  const badgeFormadoNoMel = await db.badge.create({ data: { name: "Formado no Mel", description: "Completou os módulos de fundamentos", icon: "🎓", color: "#FCB749", requirement: { type: "module_complete" } } });
+
+  console.log("✅ Badges created");
+
+  // =============================================================================
+  // MORE POSTS — Barba, Corujão, NoMel, Gimenez, Gigi
+  // =============================================================================
+  const d = (daysAgo: number) => new Date(Date.now() - daysAgo * 86400000);
+
+  await db.post.createMany({ data: [
+    // ── Barba (feed + tira-duvidas)
+    { spaceId: feedBarba.id, authorId: demoMembers[2].id, communityId: communityBarba.id, type: PostType.TEXT, title: "Antes x depois — Audi A4 preta após polimento nível 2", body: "Carro veio com arranhões profundos em toda a lateral. Após 8h de trabalho e seguindo o método do Barba, saiu assim. Cliente ficou sem acreditar que era o mesmo carro 🤩", likeCount: 134, commentCount: 18, viewCount: 892, createdAt: d(4) },
+    { spaceId: feedBarba.id, authorId: demoMembers[3].id, communityId: communityBarba.id, type: PostType.TEXT, body: "Alguém já usou o Gyeon Q2 em preto fosco? Como foi a durabilidade? Pensando em indicar para um cliente com Porsche Macan.", likeCount: 56, commentCount: 21, viewCount: 340, createdAt: d(5) },
+    { spaceId: feedBarba.id, authorId: demoMembers[4].id, communityId: communityBarba.id, type: PostType.TEXT, title: "Meu primeiro serviço de vitrificação completa — R$1.800 cobrado!", body: "Demorei 2 meses pra ter coragem de oferecer vitrificação pro cliente. Hoje fechei o primeiro por R$1.800. Obrigado pela aula de precificação! Antes eu cobrava R$600 'pra fechar'... que vergonha.", likeCount: 203, commentCount: 31, viewCount: 1240, createdAt: d(6) },
+    { spaceId: feedBarba.id, authorId: demoMembers[5].id, communityId: communityBarba.id, type: PostType.TEXT, body: "Pergunta técnica: ao aplicar vitrificação em temperatura de 32°C, o flash time fica mais curto? Estou tendo dificuldade de remover o excesso sem marcar.", likeCount: 78, commentCount: 24, viewCount: 465, createdAt: d(7) },
+    { spaceId: feedBarba.id, authorId: barbaUser.id, communityId: communityBarba.id, type: PostType.TEXT, title: "ATENÇÃO: cuidado com produtos sem registro no INMETRO", body: "Recebi mensagem de 3 membros sobre produtos piratas causando manchas permanentes. Antes de comprar qualquer produto, verifique o registro. Listei aqui os que eu uso e confio. ⚠️", likeCount: 445, commentCount: 62, viewCount: 3210, createdAt: d(8) },
+    { spaceId: feedBarba.id, authorId: demoMembers[6].id, communityId: communityBarba.id, type: PostType.TEXT, body: "Montei meu setup completo esse mês: politriz Rupes LK21 + Flex XFE 15 + 12 pads variados + suporte de parede. Investimento total R$4.200. Já recuperei em 3 serviços de polimento.", likeCount: 167, commentCount: 27, viewCount: 1080, createdAt: d(9) },
+    { spaceId: feedBarba.id, authorId: demoMembers[7].id, communityId: communityBarba.id, type: PostType.TEXT, body: "Clay bar ou descontaminação química primeiro? Sempre fico em dúvida na ordem do processo.", likeCount: 45, commentCount: 19, viewCount: 287, createdAt: d(10) },
+    { spaceId: feedBarba.id, authorId: demoMembers[8].id, communityId: communityBarba.id, type: PostType.TEXT, title: "Resultado do workshop presencial em SP — resumo", body: "Quem foi no workshop do Barba semana passada — valeu DEMAIS. Aprendi mais em 8h do que em 1 ano vendo vídeo. Se tiver oportunidade, não perca o próximo. 🙌", likeCount: 289, commentCount: 44, viewCount: 1780, createdAt: d(11) },
+    { spaceId: mithBarba.id, authorId: barbaUser.id, communityId: communityBarba.id, type: PostType.TEXT, title: "MITO: 'Polimento remove a pintura do carro'", body: "ERRADO. O polimento remove material da camada de clear (verniz), não da tinta base. Um clear novo tem em média 40-60 microns. Um polimento profissional consome 1-3 microns. Com medidor de espessura e técnica correta, você pode fazer dezenas de polimentos sem problema.", likeCount: 512, commentCount: 93, viewCount: 4670, createdAt: d(12) },
+    { spaceId: mithBarba.id, authorId: barbaUser.id, communityId: communityBarba.id, type: PostType.TEXT, title: "MITO: 'Lavagem a seco não danifica a pintura'", body: "MITO PERIGOSO. Lavagem a seco arrasta partículas sólidas (areia, poeira) diretamente sobre o verniz. Mesmo com produto 'premium', você está criando microriscos. A água lubrifica e suspende o contaminante. Não existe substituto seguro para a lavagem com água.", likeCount: 387, commentCount: 68, viewCount: 3120, createdAt: d(14) },
+    { spaceId: techBarba.id, authorId: barbaUser.id, communityId: communityBarba.id, type: PostType.TEXT, title: "Guia de velocidade e pressão por tipo de serviço", body: "Salvem isso:\n\n🔧 Correção pesada (compound): vel. 5-6, pressão média-alta\n🔧 Correção leve (polish): vel. 4-5, pressão média\n✨ Acabamento (finishing): vel. 3-4, pressão leve\n\nO erro mais comum é usar vel. 6 para tudo. Isso esquenta demais e pode marcar.", likeCount: 456, commentCount: 74, viewCount: 3890, createdAt: d(15) },
+    { spaceId: techBarba.id, authorId: demoMembers[9].id, communityId: communityBarba.id, type: PostType.TEXT, body: "Alguém tem experiência com a LC800 da Lake Country nos pads de espuma laranja para finishing? Comparando com o pad preto da Scholl.", likeCount: 34, commentCount: 12, viewCount: 198, createdAt: d(16) },
+
+    // ── Corujão (feed + tira-duvidas)
+    { spaceId: feedCorujao.id, authorId: demoMembers[70].id, communityId: communityCorujao.id, type: PostType.TEXT, title: "Meu BMW M3 após detailing completo na garagem", body: "3 dias de trabalho, polimento nível 2, Gtechniq Crystal Serum Ultra, e o resultado foi absurdo. Quem tiver dúvida sobre investir no conteúdo do Corujão, pode vir de olhos fechados 🦉", likeCount: 245, commentCount: 37, viewCount: 1950, createdAt: d(4) },
+    { spaceId: feedCorujao.id, authorId: demoMembers[71].id, communityId: communityCorujao.id, type: PostType.TEXT, body: "Alguém sabe quando sai o próximo meet & greet? Quero muito participar mas não consigo ir a SP.", likeCount: 67, commentCount: 15, viewCount: 412, createdAt: d(5) },
+    { spaceId: feedCorujao.id, authorId: corujaoUser.id, communityId: communityCorujao.id, type: PostType.TEXT, title: "Minha visão sobre equipamento barato vs. caro", body: "Vi muita gente na dúvida: 'Corujão, vale a pena comprar politriz importada sendo iniciante?'\n\nMinha resposta: Não. Aprenda a técnica primeiro. Uma politriz nacional de R$400 nas mãos de quem sabe polir entrega resultado melhor que uma Rupes de R$2.000 sem técnica. Técnica primeiro, equipamento depois.", likeCount: 678, commentCount: 112, viewCount: 5230, createdAt: d(6) },
+    { spaceId: feedCorujao.id, authorId: demoMembers[72].id, communityId: communityCorujao.id, type: PostType.TEXT, body: "Primeira vez que cobrei R$2.000 num serviço. VW Tiguan, polimento completo + cerâmica 2 camadas. Cliente deu gorjeta de R$200. Isso aqui não tem preço 🙏", likeCount: 389, commentCount: 55, viewCount: 2780, createdAt: d(7) },
+    { spaceId: feedCorujao.id, authorId: demoMembers[73].id, communityId: communityCorujao.id, type: PostType.TEXT, body: "Pergunta: qual a diferença real entre cerâmica 1 camada e 2 camadas? Vale a cobrança extra?", likeCount: 89, commentCount: 28, viewCount: 567, createdAt: d(8) },
+    { spaceId: feedCorujao.id, authorId: corujaoUser.id, communityId: communityCorujao.id, type: PostType.TEXT, title: "📢 COMUNICADO: próxima live sexta-feira 20h", body: "Fala galera! Sexta que vem, 20h, vou fazer uma live mostrando um Porsche 911 completo sendo preparado do zero pro salão do automóvel. Prometo que vai surpreender. Não percam!", likeCount: 534, commentCount: 89, viewCount: 4120, createdAt: d(9) },
+    { spaceId: feedCorujao.id, authorId: demoMembers[74].id, communityId: communityCorujao.id, type: PostType.TEXT, body: "Acabei de terminar meu primeiro PPF em parachoque dianteiro. Levei 4h mas o resultado ficou profissional. Quem disse que não dava não estava errado — era só questão de praticar.", likeCount: 156, commentCount: 22, viewCount: 987, createdAt: d(11) },
+    { spaceId: zikaCorujao.id, authorId: corujaoUser.id, communityId: communityCorujao.id, type: PostType.TEXT, title: "Ferrari 488 GTB — full detailing + proteção total", body: "Carro chegou do cliente com swirls em toda lataria. Após 3 dias: polimento nível 2, Ceramic Pro Platinum (5 anos), PPF nas zonas críticas. Ticket: R$8.500. Às vezes a galera não acredita que tem esse mercado no Brasil — tem sim. 🏎️", likeCount: 892, commentCount: 156, viewCount: 8970, createdAt: d(3) },
+    { spaceId: zikaCorujao.id, authorId: demoMembers[75].id, communityId: communityCorujao.id, type: PostType.TEXT, body: "Inspirado pelo Corujão, fiz hoje meu primeiro trabalho em carro de alto padrão. Range Rover Vogue. Vitrificação 9H. Tirei fotos antes e depois com iluminação correta como ensinado. Cliente amou. Que sensação!", likeCount: 234, commentCount: 33, viewCount: 1560, createdAt: d(5) },
+
+    // ── No Mel (feed + aulas)
+    { spaceId: feedNoMel.id, authorId: demoMembers[140].id, communityId: communityNoMel.id, type: PostType.TEXT, title: "Apliquei a planilha do módulo 5 e triplicou meu faturamento", body: "Sério. Antes eu cobrava R$80 por lavagem + cera. Depois de fazer o módulo de precificação, calculei meu custo real e montei minha tabela. Hoje cobro R$350 pelo mesmo serviço com uma apresentação diferente. Em 45 dias, triplicou o faturamento.", likeCount: 312, commentCount: 47, viewCount: 2130, createdAt: d(4) },
+    { spaceId: feedNoMel.id, authorId: demoMembers[141].id, communityId: communityNoMel.id, type: PostType.TEXT, body: "Qual produto de limpeza de couro vocês recomendam? Tenho visto o Sonax e o Meguiar's. Preço muito diferente, mas não sei se entrega diferença proporcional.", likeCount: 67, commentCount: 19, viewCount: 412, createdAt: d(5) },
+    { spaceId: feedNoMel.id, authorId: netoUser.id, communityId: communityNoMel.id, type: PostType.TEXT, title: "Dica de ouro: como fotografar antes e depois corretamente", body: "Vejo muita foto de before/after mal feita. Dicas:\n\n1. Sempre na mesma posição (mesma distância, ângulo, altura)\n2. Luz artificial consistente — não dependa do sol\n3. Fundo limpo ou neutro\n4. Resolução máxima do celular\n5. Não edite as fotos — cliente percebe\n\nFoto honesta vende mais que foto editada.", likeCount: 423, commentCount: 67, viewCount: 3340, createdAt: d(6) },
+    { spaceId: feedNoMel.id, authorId: demoMembers[142].id, communityId: communityNoMel.id, type: PostType.TEXT, body: "Fechei hoje um contrato de manutenção mensal com garagem! R$800/mês, 4 carros, visita quinzenal. Esse modelo de recorrência que o Neto ensinou no módulo 7 é gold.", likeCount: 278, commentCount: 38, viewCount: 1780, createdAt: d(7) },
+    { spaceId: feedNoMel.id, authorId: demoMembers[143].id, communityId: communityNoMel.id, type: PostType.TEXT, body: "Dúvida: como explico para o cliente a diferença entre polish e vitrificação sem parecer que estou empurrando serviço mais caro?", likeCount: 89, commentCount: 24, viewCount: 567, createdAt: d(8) },
+    { spaceId: feedNoMel.id, authorId: netoUser.id, communityId: communityNoMel.id, type: PostType.TEXT, title: "Módulo 4 atualizado com aula bônus de higienização de motor", body: "Pessoal, atualizei o Módulo 4 com uma aula bônus de 20 minutos sobre higienização de motor de alta performance (turbos, V8, etc). Acessa na aba de trilhas. Bom aprendizado! 🍯", likeCount: 189, commentCount: 28, viewCount: 1230, createdAt: d(9) },
+    { spaceId: aulasNoMel.id, authorId: demoMembers[144].id, communityId: communityNoMel.id, type: PostType.TEXT, body: "Terminei o módulo de polimento hoje. A aula 2.3 sobre rotativa me abriu a cabeça. Estava com medo de usar rotativa há 2 anos. Agora me sinto preparado para testar com supervisão.", likeCount: 145, commentCount: 18, viewCount: 876, createdAt: d(10) },
+    { spaceId: aulasNoMel.id, authorId: demoMembers[145].id, communityId: communityNoMel.id, type: PostType.TEXT, body: "Dúvida técnica aula 1.2: o Neto menciona flash time 'visual' no ceramic. Como identificar esse momento exatamente? Às vezes fico confuso se é um reflexo ou se realmente flashou.", likeCount: 56, commentCount: 15, viewCount: 345, createdAt: d(12) },
+    { spaceId: aulasNoMel.id, authorId: netoUser.id, communityId: communityNoMel.id, type: PostType.TEXT, title: "Resposta: como identificar o flash time visualmente", body: "Boa pergunta! O flash time visual tem 3 indicadores:\n\n1. A superfície perde o brilho 'molhado' e fica levemente fosca\n2. Ao passar o dedo (com luva), não estica mais — resiste\n3. Em luz lateral, aparecem microestrias de aplicação\n\nEm dias quentes (>28°C), acontece em 30-60 segundos. Em dias frios, pode levar 3-5 minutos.", likeCount: 234, commentCount: 29, viewCount: 1560, createdAt: d(13) },
+
+    // ── Gimenez (feed)
+    { spaceId: feedGimenez.id, authorId: gimenezUser.id, communityId: communityGimenez.id, type: PostType.TEXT, body: "Bem-vindos à Garagem do Gimenez! Aqui é o lugar onde a paixão por carros encontra a técnica. Vamos juntos nessa! 🚗", isPinned: true, likeCount: 198, commentCount: 32, viewCount: 1340, createdAt: d(30) },
+    { spaceId: feedGimenez.id, authorId: demoMembers[210].id, communityId: communityGimenez.id, type: PostType.TEXT, body: "Galera, alguém já vitrificou um carro laranja pérola? Tenho dúvida se a cerâmica altera o brilho da cor.", likeCount: 45, commentCount: 17, viewCount: 289, createdAt: d(5) },
+    { spaceId: feedGimenez.id, authorId: gimenezUser.id, communityId: communityGimenez.id, type: PostType.TEXT, title: "Live desta semana — preparação de Ferrari antes de salão", body: "Quinta-feira, 19h! Vou mostrar ao vivo a preparação completa de uma Ferrari 296 GTB para exposição em salão. Desde a descontaminação até o acabamento final. Não percam 🔴", likeCount: 312, commentCount: 45, viewCount: 2230, createdAt: d(4) },
+    { spaceId: feedGimenez.id, authorId: demoMembers[211].id, communityId: communityGimenez.id, type: PostType.TEXT, body: "Hoje finalizei meu primeiro trabalho em carro de luxo: Jaguar F-PACE. Cliente muito exigente, muito nervoso antes. Depois... foto com o carro e indicou 2 amigos. A técnica entregou o resultado 🙌", likeCount: 178, commentCount: 23, viewCount: 1120, createdAt: d(6) },
+    { spaceId: feedGimenez.id, authorId: demoMembers[212].id, communityId: communityGimenez.id, type: PostType.TEXT, body: "Vocês fazem orçamento por WhatsApp ou só presencial? Estou tendo muita dificuldade de converter orçamento remoto.", likeCount: 67, commentCount: 28, viewCount: 434, createdAt: d(7) },
+    { spaceId: feedGimenez.id, authorId: gimenezUser.id, communityId: communityGimenez.id, type: PostType.TEXT, title: "Minha resposta ao 'está muito caro'", body: "Quando o cliente diz que está caro, ele não está dizendo que não tem dinheiro. Está dizendo que não entendeu o valor. Sua resposta não deve ser baixar o preço — deve ser apresentar melhor o resultado e a transformação que ele vai ter. Aprendi isso depois de dar muitos descontos que não converteram. 💡", likeCount: 445, commentCount: 78, viewCount: 3560, createdAt: d(9) },
+    { spaceId: feedGimenez.id, authorId: demoMembers[213].id, communityId: communityGimenez.id, type: PostType.TEXT, body: "Acabei de comprar minha primeira politriz profissional: Rupes LHR21. Alguém tem dica de qual pad usar para iniciante em pintura branca?", likeCount: 89, commentCount: 31, viewCount: 567, createdAt: d(11) },
+    { spaceId: feedGimenez.id, authorId: demoMembers[214].id, communityId: communityGimenez.id, type: PostType.TEXT, title: "Resultado do mês: R$9.400 em detailing", body: "Nunca imaginei ganhar isso em um mês fazendo algo que amo. 11 carros, mix entre higienização, polimento e vitrificação. Meta do próximo mês: R$12.000. Obrigado pela comunidade! 🙏", likeCount: 334, commentCount: 52, viewCount: 2450, createdAt: d(13) },
+
+    // ── Gigi (feed)
+    { spaceId: feedGigi.id, authorId: gigiUser.id, communityId: communityGigi.id, type: PostType.TEXT, body: "Seja bem-vindo à Sala do Gigi! Aqui cada detalhe importa. Vamos elevar o nível juntos. ✨", isPinned: true, likeCount: 156, commentCount: 24, viewCount: 1120, createdAt: d(30) },
+    { spaceId: feedGigi.id, authorId: demoMembers[280].id, communityId: communityGigi.id, type: PostType.TEXT, body: "Dúvida: alguém usa aspirador extrator para higienização? Qual marca/modelo recomendam para iniciante?", likeCount: 45, commentCount: 19, viewCount: 287, createdAt: d(5) },
+    { spaceId: feedGigi.id, authorId: gigiUser.id, communityId: communityGigi.id, type: PostType.TEXT, title: "A importância da luz de inspeção no trabalho profissional", body: "Sem luz de inspeção adequada, você não vê o que está fazendo. Já perdi clientes por entregar trabalho com marca de hologramas que eu não enxerguei com a luz do teto da garagem. Hoje trabalho sempre com painel LED de inspeção. Mudou tudo. ✨", likeCount: 289, commentCount: 41, viewCount: 2340, createdAt: d(4) },
+    { spaceId: feedGigi.id, authorId: demoMembers[281].id, communityId: communityGigi.id, type: PostType.TEXT, body: "Primeiro trabalho completo da semana: Maserati Levante branco. Polimento de refino + Gtechniq Crystal Serum Light. Cliente pediu NF e tudo — hora de regularizar o negócio!", likeCount: 198, commentCount: 28, viewCount: 1340, createdAt: d(6) },
+    { spaceId: feedGigi.id, authorId: demoMembers[282].id, communityId: communityGigi.id, type: PostType.TEXT, body: "Qual vocês preferem: Sonax Profiline ou Menzerna para correção de nível 1? Preço similar no mercado aqui de SP.", likeCount: 78, commentCount: 22, viewCount: 489, createdAt: d(7) },
+    { spaceId: feedGigi.id, authorId: gigiUser.id, communityId: communityGigi.id, type: PostType.TEXT, title: "Como documentar cada serviço e construir portfólio de autoridade", body: "Cada carro que você faz é uma oportunidade de marketing. Minha rotina: 1) Foto do estado original (sempre) 2) Foto processual (durante) 3) Foto final (depois de 24h de cura) 4) Print do elogio do cliente\n\nEsse material no Instagram/Reels trouxe 40% dos meus clientes em 2024.", likeCount: 378, commentCount: 56, viewCount: 2890, createdAt: d(9) },
+    { spaceId: feedGigi.id, authorId: demoMembers[283].id, communityId: communityGigi.id, type: PostType.TEXT, body: "Seguindo o método de documentação da Gigi, comecei a postar meus resultados com mais qualidade. Em 3 semanas, 4 novos clientes pelo Instagram. Vale muito a pena!", likeCount: 189, commentCount: 24, viewCount: 1230, createdAt: d(11) },
+    { spaceId: feedGigi.id, authorId: demoMembers[284].id, communityId: communityGigi.id, type: PostType.TEXT, title: "Encerrei o mês com R$7.200 líquidos", body: "Maio foi o melhor mês da minha vida. 8 clientes, ticket médio R$900. Tem 6 meses eu ganhava R$1.500 fazendo coisas que não gostava. Agora faço o que amo e ganho muito mais. A plataforma mudou minha trajetória.", likeCount: 267, commentCount: 39, viewCount: 1870, createdAt: d(14) },
+  ]});
+
+  console.log("✅ Additional posts created");
+
+  // =============================================================================
+  // COMMENTS on top posts
+  // =============================================================================
+  const topPosts = await db.post.findMany({
+    where: { communityId: { in: [communityBarba.id, communityCorujao.id, communityNoMel.id, communityGimenez.id, communityGigi.id] } },
+    orderBy: { likeCount: "desc" },
+    take: 15,
+    select: { id: true, communityId: true },
+  });
+
+  const commentBodies = [
+    "Cara, muito obrigado por compartilhar isso! Me ajudou demais 🙏",
+    "Exatamente o que eu precisava saber. Salvei essa aqui.",
+    "Perfeito! Já apliquei essa técnica e confirmei o resultado.",
+    "Alguém tem esse mesmo problema? Aqui em Curitiba acontece bastante.",
+    "Gold! Esse conteúdo vale mais que curso de R$2.000.",
+    "Sempre aprendo algo novo aqui. Comunidade top! 🔥",
+    "Fiz isso exatamente assim no fim de semana, cliente ficou vidrado.",
+    "Confirmado! Fiz o teste e o resultado foi impressionante.",
+    "Muito bom! Já estava com essa dúvida faz tempo.",
+    "Compartilhei com meu grupo de detailers, todo mundo amou.",
+    "Esse post deveria ser fixado. Informação demais aqui.",
+    "Podia ter um vídeo sobre isso? Fica mais fácil de visualizar.",
+    "Barba, você poderia fazer uma live só sobre isso? 🙏",
+    "Experiência minha: funcionou perfeitamente em carro preto.",
+    "Aqui em SP o mercado ainda não valoriza muito isso. Como vocês convencem o cliente?",
+    "Aplicando isso amanhã no Honda Civic do meu cliente. Volto com o resultado!",
+    "Isso muda tudo. Obrigado pela transparência 💪",
+    "Esse método funciona em carros de película também?",
+    "3 anos de trabalho e nunca tinha visto isso explicado tão claramente.",
+    "Excelente conteúdo! Plataforma tá pagando demais 🙌",
+  ];
+
+  const allCommentAuthors = [...demoMembers.slice(0, 50), member1, member2];
+
+  for (const post of topPosts) {
+    const numComments = 3 + Math.floor(Math.random() * 4); // 3-6 comments per post
+    await db.comment.createMany({
+      data: Array.from({ length: numComments }, (_, i) => ({
+        postId: post.id,
+        authorId: allCommentAuthors[(i * 7 + topPosts.indexOf(post) * 3) % allCommentAuthors.length].id,
+        body: commentBodies[(i * 3 + topPosts.indexOf(post)) % commentBodies.length],
+        likeCount: Math.floor(Math.random() * 25),
+        createdAt: new Date(Date.now() - Math.floor(Math.random() * 10) * 86400000),
+      })),
+    });
+  }
+
+  console.log(`✅ Comments created on top ${topPosts.length} posts`);
+
+  // =============================================================================
+  // USER POINTS — leaderboard data per community
+  // =============================================================================
+  const pointsData: { userId: string; communityId: string; points: number; totalEarned: number; level: number }[] = [];
+
+  const pointsConfig = [
+    { members: barbaMembers.slice(0, 20), communityId: communityBarba.id },
+    { members: corujaoMembers.slice(0, 20), communityId: communityCorujao.id },
+    { members: netoMembers.slice(0, 20), communityId: communityNoMel.id },
+    { members: gimenezMembers.slice(0, 20), communityId: communityGimenez.id },
+    { members: gigiMembers.slice(0, 20), communityId: communityGigi.id },
+  ];
+
+  // Realistic point distribution: top member has ~3200 pts, drops off progressively
+  const pointDistribution = [3240, 2890, 2650, 2410, 2180, 1950, 1720, 1540, 1380, 1210, 1080, 940, 820, 710, 620, 530, 450, 380, 290, 210];
+
+  for (const { members, communityId } of pointsConfig) {
+    for (let i = 0; i < members.length; i++) {
+      const pts = pointDistribution[i];
+      const level = pts >= 2000 ? 5 : pts >= 1500 ? 4 : pts >= 1000 ? 3 : pts >= 500 ? 2 : 1;
+      pointsData.push({ userId: members[i].id, communityId, points: pts, totalEarned: pts, level });
+    }
+  }
+
+  // Also add member1 to Barba leaderboard with good points
+  pointsData.push({ userId: member1.id, communityId: communityBarba.id, points: 1650, totalEarned: 1650, level: 4 });
+  pointsData.push({ userId: member2.id, communityId: communityCorujao.id, points: 980, totalEarned: 980, level: 3 });
+
+  await db.userPoints.createMany({ data: pointsData });
+
+  console.log(`✅ UserPoints created for leaderboard (${pointsData.length} entries)`);
+
+  // =============================================================================
+  // USER BADGES — assign to top members
+  // =============================================================================
+  const userBadgesData: { userId: string; badgeId: string; communityId: string | null }[] = [];
+
+  // Premium badge for first 30 demo members
+  for (const m of demoMembers.slice(0, 30)) {
+    userBadgesData.push({ userId: m.id, badgeId: badgePremium.id, communityId: null });
+  }
+  // Premium for named members
+  userBadgesData.push({ userId: member1.id, badgeId: badgePremium.id, communityId: null });
+  userBadgesData.push({ userId: member2.id, badgeId: badgePremium.id, communityId: null });
+
+  // Top Detailer for top 5 of each community
+  for (const m of barbaMembers.slice(0, 5))   userBadgesData.push({ userId: m.id, badgeId: badgeTopDetailer.id, communityId: communityBarba.id });
+  for (const m of corujaoMembers.slice(0, 5)) userBadgesData.push({ userId: m.id, badgeId: badgeTopDetailer.id, communityId: communityCorujao.id });
+  for (const m of netoMembers.slice(0, 5))    userBadgesData.push({ userId: m.id, badgeId: badgeTopDetailer.id, communityId: communityNoMel.id });
+
+  // Community-specific badges
+  for (const m of barbaMembers.slice(0, 15))   userBadgesData.push({ userId: m.id, badgeId: badgeQueimaMitos.id, communityId: communityBarba.id });
+  for (const m of corujaoMembers.slice(0, 15)) userBadgesData.push({ userId: m.id, badgeId: badgeZikaDaRua.id, communityId: communityCorujao.id });
+  for (const m of netoMembers.slice(0, 15))    userBadgesData.push({ userId: m.id, badgeId: badgeFormadoNoMel.id, communityId: communityNoMel.id });
+
+  // Detailer Pro for top 3 across all
+  for (const m of demoMembers.slice(0, 3)) userBadgesData.push({ userId: m.id, badgeId: badgeDetailerPro.id, communityId: null });
+  for (const m of demoMembers.slice(0, 8)) userBadgesData.push({ userId: m.id, badgeId: badgePrimeiroPost.id, communityId: communityBarba.id });
+
+  // member1 special badges
+  userBadgesData.push({ userId: member1.id, badgeId: badgeQueimaMitos.id, communityId: communityBarba.id });
+  userBadgesData.push({ userId: member1.id, badgeId: badgePrimeiroPost.id, communityId: communityBarba.id });
+  userBadgesData.push({ userId: member1.id, badgeId: badgeDetailerPro.id, communityId: null });
+
+  await db.userBadge.createMany({ data: userBadgesData });
+  console.log(`✅ UserBadges created (${userBadgesData.length} entries)`);
+
+  // =============================================================================
+  // USER PROFILES — bio, location, car info for named + top members
+  // =============================================================================
+  const profilesData = [
+    { userId: member1.id, headline: "Detailer profissional — especialista em polimento e cerâmica", bio: "Trabalho com estética automotiva há 4 anos em BH. Especializado em correção de pintura e proteção cerâmica. Atendo carros nacionais e importados.", location: "Belo Horizonte, MG", socialLinks: { instagram: "instagram.com/carlosoliveira_detail" } },
+    { userId: member2.id, headline: "Detailer e apaixonada por carros clássicos", bio: "Comecei na estética automotiva por paixão e hoje é meu negócio principal. Especialidade em higienização premium e cuidado com carros clássicos.", location: "São Paulo, SP", socialLinks: { instagram: "instagram.com/maria.detailing" } },
+    { userId: barbaMembers[0].id, headline: "Detailer profissional — 6 anos de experiência", bio: "Aprendiz do método Barba. Especializado em polimento de correção nível 2 e 3. Atendo na Grande SP.", location: "São Paulo, SP", socialLinks: {} },
+    { userId: barbaMembers[1].id, headline: "Especialista em PPF e proteção premium", bio: "Foco em carros de alto padrão: PPF, cerâmica e detailing completo. Certificado pelos principais cursos do setor.", location: "Campinas, SP", socialLinks: {} },
+    { userId: corujaoMembers[0].id, headline: "Detailer da rua — técnica e autenticidade", bio: "Cresci no mercado de estética automotiva pela escola da rua. Hoje atendo clientes premium sem perder a essência.", location: "Rio de Janeiro, RJ", socialLinks: {} },
+    { userId: netoMembers[0].id, headline: "Aluno do Mel — formado em 3 módulos", bio: "Terminei os módulos de fundamentos, polimento e precificação. Resultado: faturamento dobrou em 2 meses.", location: "Curitiba, PR", socialLinks: {} },
+    { userId: gimenezMembers[0].id, headline: "Entusiasta e profissional de detailing", bio: "Pai de família que transformou hobby em negócio. Atendo finais de semana com qualidade de semana toda.", location: "Porto Alegre, RS", socialLinks: {} },
+    { userId: gigiMembers[0].id, headline: "Detailer com foco em documentação e resultados", bio: "Aprendi na comunidade do Gigi a importância de documentar cada trabalho. Portfólio cresceu 300% em 6 meses.", location: "Florianópolis, SC", socialLinks: {} },
+  ];
+
+  await db.userProfile.createMany({ data: profilesData });
+  console.log(`✅ UserProfiles created (${profilesData.length} entries)`);
+
+  // =============================================================================
   // SUMMARY
   // =============================================================================
   console.log(`

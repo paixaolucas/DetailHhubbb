@@ -1,21 +1,21 @@
 "use client";
 
 // =============================================================================
-// Community Feed Layout — redesigned with banner sidebar + color header
+// Community Feed Layout — redesigned with CommunityHeader + CommunityTabs
 // =============================================================================
 
 import { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import {
-  Hash, Menu, X, Users, Trophy, UserPlus, UserCheck,
-  Loader2, ChevronRight, LayoutDashboard, BookOpen,
+  Hash, Menu, X, ChevronRight, LayoutDashboard, Loader2, ArrowLeft,
 } from "lucide-react";
 import { LogoType } from "@/components/ui/logo";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { STORAGE_KEYS } from "@/lib/constants";
 import { ChatWidget } from "@/components/community/ChatWidget";
+import { CommunityHeader } from "@/components/community/CommunityHeader";
+import { CommunityTabs } from "@/components/community/CommunityTabs";
 
 interface Space {
   id: string;
@@ -36,6 +36,11 @@ interface Community {
   shortDescription?: string | null;
 }
 
+interface Influencer {
+  displayName?: string | null;
+  user?: { firstName: string; lastName: string; avatarUrl?: string | null } | null;
+}
+
 export default function CommunityFeedLayout({ children }: { children: React.ReactNode }) {
   const params = useParams();
   const pathname = usePathname();
@@ -43,6 +48,7 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
   const communitySlug = params.communitySlug as string;
 
   const [community, setCommunity] = useState<Community | null>(null);
+  const [influencer, setInfluencer] = useState<Influencer | null>(null);
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [userName, setUserName] = useState("");
   const [userInitials, setUserInitials] = useState("U");
@@ -55,7 +61,12 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
     const name = localStorage.getItem(STORAGE_KEYS.USER_NAME) ?? "";
     setUserName(name);
     setUserInitials(
-      name.split(" ").slice(0, 2).map((n: string) => n[0]).join("").toUpperCase() || "U"
+      name
+        .split(" ")
+        .slice(0, 2)
+        .map((n: string) => n[0])
+        .join("")
+        .toUpperCase() || "U"
     );
 
     if (!token) {
@@ -65,22 +76,21 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
 
     const headers = { Authorization: `Bearer ${token}` };
 
-    fetch("/api/communities?published=true", { headers })
+    fetch(`/api/communities/${communitySlug}/overview`, { headers })
       .then((r) => r.json())
-      .then((d) => {
-        if (d.success) {
-          const found = (d.communities as Community[]).find((c) => c.slug === communitySlug);
-          if (found) {
-            setCommunity(found);
-            Promise.all([
-              fetch(`/api/communities/${found.id}/spaces`, { headers }).then((r) => r.json()),
-              fetch(`/api/communities/${found.id}/join`, { headers }).then((r) => r.json()),
-            ]).then(([sd, jd]) => {
-              if (sd.success) setSpaces(sd.data ?? []);
-              if (jd.success) setOptedIn(jd.data?.joined ?? false);
-            });
-          }
-        }
+      .then((json) => {
+        if (!json.success) return;
+        const comm: Community = json.data.community;
+        setCommunity(comm);
+        setSpaces(json.data.spaces ?? []);
+        if (json.data.influencer) setInfluencer(json.data.influencer);
+
+        fetch(`/api/communities/${comm.id}/join`, { headers })
+          .then((r) => r.json())
+          .then((jd) => {
+            if (jd.success) setOptedIn(jd.data?.joined ?? false);
+          })
+          .catch(() => {});
       })
       .catch(console.error);
   }, [communitySlug, router]);
@@ -107,299 +117,230 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
   const activeSpaceSlug =
     pathname.split(`/community/${communitySlug}/feed/`)[1]?.split("/")[0] ?? "";
 
-  const Sidebar = () => (
-    <div className="flex flex-col h-full bg-[#181818] border-r border-white/8">
+  const channelSpaces = spaces.filter((s) => s.type !== "COURSE");
 
-      {/* ── Community banner header ── */}
-      <div className="relative flex-shrink-0 overflow-hidden" style={{ minHeight: "80px" }}>
-        {community?.bannerUrl ? (
-          <>
-            <Image
-              src={community.bannerUrl}
-              alt={community.name ?? ""}
-              fill
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-[#181818]" />
-          </>
-        ) : (
-          <div
-            className="absolute inset-0"
-            style={{
-              background: community
-                ? `linear-gradient(135deg, ${community.primaryColor}50 0%, ${community.primaryColor}10 100%)`
-                : "linear-gradient(135deg, #006079 0%, #003344 100%)",
-            }}
-          />
-        )}
+  const SidebarNav = () => (
+    <nav className="flex-1 overflow-y-auto py-3 px-2">
+      <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-600 px-2 mb-2">
+        Canais
+      </p>
 
-        {/* Logo + name over banner */}
-        <div className="relative p-3 pt-4 flex items-end gap-2.5 h-20">
-          {community?.logoUrl ? (
-            <Image
-              src={community.logoUrl}
-              alt={community.name ?? ""}
-              width={32}
-              height={32}
-              className="w-8 h-8 rounded-xl object-cover border-2 border-[#181818] shadow-lg flex-shrink-0"
-            />
-          ) : (
-            <div
-              className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold text-[#EEE6E4] flex-shrink-0 border-2 border-[#181818] shadow-lg"
-              style={{ backgroundColor: community?.primaryColor ?? "#007A99" }}
-            >
-              {community?.name?.charAt(0) ?? "C"}
-            </div>
-          )}
-          <div className="min-w-0 flex-1">
-            <p className="font-bold text-[#EEE6E4] text-sm truncate leading-tight drop-shadow">
-              {community?.name ?? "Comunidade"}
-            </p>
-            {community?.memberCount != null && (
-              <p className="text-[10px] text-gray-300/80 drop-shadow">
-                {community.memberCount.toLocaleString("pt-BR")} membros
-              </p>
+      {channelSpaces.length === 0 && (
+        <p className="text-xs text-gray-600 px-2 py-2">Nenhum canal disponível</p>
+      )}
+
+      {channelSpaces.map((space) => {
+        const href = `/community/${communitySlug}/feed/${space.slug}`;
+        const isActive = space.slug === activeSpaceSlug;
+        return (
+          <Link
+            key={space.id}
+            href={href}
+            onClick={() => setSidebarOpen(false)}
+            className={[
+              "flex items-center gap-2 px-2.5 py-2 rounded-xl text-sm transition-all group relative",
+              isActive
+                ? "text-[#EEE6E4] font-medium"
+                : "text-gray-500 hover:text-gray-300 hover:bg-white/5",
+            ].join(" ")}
+          >
+            {isActive && (
+              <div
+                className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-full"
+                style={{ backgroundColor: community?.primaryColor ?? "#009CD9" }}
+              />
             )}
-          </div>
-        </div>
-      </div>
-
-      {/* ── Spaces nav ── */}
-      <nav className="flex-1 overflow-y-auto py-3 px-2">
-        <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-600 px-2 mb-2">
-          Canais
-        </p>
-
-        {spaces.filter((s) => s.type !== "COURSE").length === 0 && (
-          <p className="text-xs text-gray-600 px-2 py-2">Nenhum canal disponível</p>
-        )}
-
-        {spaces.filter((s) => s.type !== "COURSE").slice(0, 3).map((space) => {
-          const href = `/community/${communitySlug}/feed/${space.slug}`;
-          const isActive = space.slug === activeSpaceSlug;
-          return (
-            <Link
-              key={space.id}
-              href={href}
-              onClick={() => setSidebarOpen(false)}
-              className={[
-                "flex items-center gap-2 px-2.5 py-2 rounded-xl text-sm transition-all group relative",
-                isActive
-                  ? "text-[#EEE6E4] font-medium"
-                  : "text-gray-500 hover:text-gray-300 hover:bg-white/5",
-              ].join(" ")}
-            >
-              {/* Active indicator bar */}
-              {isActive && (
-                <div
-                  className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-full"
-                  style={{ backgroundColor: community?.primaryColor ?? "#009CD9" }}
-                />
-              )}
-              {/* Active bg */}
-              {isActive && (
-                <div
-                  className="absolute inset-0 rounded-xl opacity-10"
-                  style={{ backgroundColor: community?.primaryColor ?? "#009CD9" }}
-                />
-              )}
-
-              <span className="relative flex items-center gap-2 w-full">
-                {space.icon ? (
-                  <span className="text-base leading-none w-4 text-center flex-shrink-0">
-                    {space.icon}
-                  </span>
-                ) : (
-                  <Hash
-                    className={[
-                      "w-4 h-4 flex-shrink-0 transition-colors",
-                      isActive
-                        ? "text-[#EEE6E4]"
-                        : "text-gray-600 group-hover:text-gray-400",
-                    ].join(" ")}
-                  />
-                )}
-                <span className="truncate">{space.name}</span>
-              </span>
-            </Link>
-          );
-        })}
-
-        {/* ── Opt-in button ── */}
-        {optedIn !== null && (
-          <div className="mt-4 px-1 space-y-1.5">
-            <button
-              onClick={handleOptIn}
-              disabled={optInLoading}
-              className={[
-                "w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all",
-                optedIn
-                  ? "bg-white/5 text-gray-400 hover:bg-red-500/10 hover:text-red-400 border border-white/10 hover:border-red-500/30"
-                  : "text-white border border-transparent hover:opacity-90",
-              ].join(" ")}
-              style={!optedIn ? { backgroundColor: community?.primaryColor ?? "#006079" } : {}}
-            >
-              {optInLoading ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : optedIn ? (
-                <UserCheck className="w-3.5 h-3.5" />
+            {isActive && (
+              <div
+                className="absolute inset-0 rounded-xl opacity-10"
+                style={{ backgroundColor: community?.primaryColor ?? "#009CD9" }}
+              />
+            )}
+            <span className="relative flex items-center gap-2 w-full">
+              {space.icon ? (
+                <span className="text-base leading-none w-4 text-center flex-shrink-0">
+                  {space.icon}
+                </span>
               ) : (
-                <UserPlus className="w-3.5 h-3.5" />
+                <Hash
+                  className={[
+                    "w-4 h-4 flex-shrink-0 transition-colors",
+                    isActive ? "text-[#EEE6E4]" : "text-gray-600 group-hover:text-gray-400",
+                  ].join(" ")}
+                />
               )}
-              {optedIn ? "Seguindo esta comunidade" : "Seguir esta comunidade"}
-            </button>
-            {!optedIn && (
-              <p className="text-[10px] text-gray-600 text-center px-1 leading-relaxed">
-                Apareça no ranking e mostre sua participação ativa
-              </p>
-            )}
-          </div>
-        )}
+              <span className="truncate">{space.name}</span>
+            </span>
+          </Link>
+        );
+      })}
 
-        {/* ── Extra nav links ── */}
-        <div className="mt-4 pt-3 border-t border-white/8 flex flex-col gap-0.5">
-          <Link
-            href={`/community/${communitySlug}/trilhas`}
-            onClick={() => setSidebarOpen(false)}
-            className="flex items-center gap-2 px-2.5 py-2 rounded-xl text-sm text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-all"
-          >
-            <BookOpen className="w-4 h-4 text-gray-600" />
-            <span>Trilhas</span>
-          </Link>
-          <Link
-            href={`/community/${communitySlug}/members`}
-            onClick={() => setSidebarOpen(false)}
-            className="flex items-center gap-2 px-2.5 py-2 rounded-xl text-sm text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-all"
-          >
-            <Users className="w-4 h-4 text-gray-600" />
-            <span>Membros</span>
-          </Link>
-          <Link
-            href={`/community/${communitySlug}/leaderboard`}
-            onClick={() => setSidebarOpen(false)}
-            className="flex items-center gap-2 px-2.5 py-2 rounded-xl text-sm text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-all"
-          >
-            <Trophy className="w-4 h-4 text-gray-600" />
-            <span>Leaderboard</span>
-          </Link>
-        </div>
-      </nav>
-
-      {/* ── Back to dashboard ── */}
-      <div className="p-3 border-t border-white/8 flex-shrink-0">
+      {/* Back to home */}
+      <div className="mt-4 pt-3 border-t border-white/8">
         <Link
           href="/inicio"
+          onClick={() => setSidebarOpen(false)}
           className="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs text-gray-600 hover:text-gray-400 hover:bg-white/5 transition-all"
         >
           <LayoutDashboard className="w-3.5 h-3.5" />
           Início
         </Link>
       </div>
-    </div>
+    </nav>
   );
 
+  const activeSpace = activeSpaceSlug
+    ? spaces.find((s) => s.slug === activeSpaceSlug)
+    : null;
+
   return (
-    <div className="min-h-screen bg-[#1A1A1A] flex">
+    <div className="min-h-screen bg-[#1A1A1A] flex flex-col">
 
-      {/* Desktop sidebar */}
-      <aside className="hidden md:flex w-60 flex-col fixed h-full z-30">
-        <Sidebar />
-      </aside>
+      {/* Sticky top bar — z-30 */}
+      <header className="h-14 bg-[#1A1A1A]/90 border-b border-white/8 flex items-center px-4 gap-3 flex-shrink-0 sticky top-0 z-30 backdrop-blur-sm">
 
-      {/* Mobile overlay */}
-      {sidebarOpen && (
-        <div
-          className="md:hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-40"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Mobile sidebar */}
-      <aside
-        className={`md:hidden fixed top-0 left-0 h-full w-60 z-50 flex flex-col transition-transform duration-300 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
-        <div className="absolute top-3 right-3 z-10">
-          <button
-            onClick={() => setSidebarOpen(false)}
-            className="text-gray-400 hover:text-[#EEE6E4] p-1.5 rounded-lg hover:bg-white/5 transition-colors"
+        {/* Mobile: ← Início + nome da comunidade */}
+        <div className="flex items-center gap-2 flex-1 min-w-0 md:hidden">
+          <Link
+            href="/inicio"
+            className="flex items-center gap-1.5 text-gray-400 hover:text-[#EEE6E4] transition-colors shrink-0 bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5"
+            aria-label="Voltar ao início"
           >
-            <X className="w-4 h-4" />
-          </button>
+            <ArrowLeft className="w-4 h-4" />
+            <span className="text-xs font-medium">Início</span>
+          </Link>
+          <span className="text-sm font-semibold text-[#EEE6E4] truncate">
+            {community?.name ?? "Comunidade"}
+          </span>
         </div>
-        <Sidebar />
-      </aside>
 
-      {/* ── Main content ── */}
-      <div className="flex-1 md:ml-60 flex flex-col min-h-screen">
-
-        {/* Top header */}
-        <header className="h-14 bg-[#1A1A1A]/90 border-b border-white/8 flex items-center px-4 gap-3 flex-shrink-0 sticky top-0 z-20 backdrop-blur-sm">
-          {/* Mobile hamburger */}
+        {/* Mobile: canais + notificações */}
+        <div className="flex items-center gap-2 shrink-0 md:hidden">
+          <NotificationBell />
           <button
             onClick={() => setSidebarOpen(true)}
-            className="md:hidden text-gray-400 hover:text-[#EEE6E4] transition-colors p-1"
+            className="text-gray-400 hover:text-[#EEE6E4] transition-colors p-1.5 bg-white/5 border border-white/10 rounded-lg"
+            aria-label="Ver canais"
           >
-            <Menu className="w-5 h-5" />
+            <Menu className="w-4 h-4" />
           </button>
+        </div>
 
-          {/* Breadcrumb */}
-          <Link href="/inicio" className="flex items-center flex-shrink-0">
-            <LogoType height={18} variant="light" />
-          </Link>
+        {/* Desktop: logo + breadcrumb */}
+        <Link href="/inicio" className="hidden md:flex items-center flex-shrink-0">
+          <LogoType height={18} variant="light" />
+        </Link>
 
-          <ChevronRight className="w-3.5 h-3.5 text-gray-600 hidden sm:block" />
+        <ChevronRight className="w-3.5 h-3.5 text-gray-600 hidden md:block" />
+        <Link
+          href={`/community/${communitySlug}/feed`}
+          className="text-gray-400 hover:text-[#EEE6E4] text-sm truncate hidden md:block max-w-[160px] transition-colors font-medium"
+        >
+          {community?.name ?? communitySlug}
+        </Link>
+
+        {activeSpaceSlug && activeSpace && (
+          <>
+            <ChevronRight className="w-3.5 h-3.5 text-gray-600 hidden md:block flex-shrink-0" />
+            <span className="text-[#EEE6E4] text-sm truncate hidden md:block max-w-[140px] font-medium">
+              {activeSpace.icon ? `${activeSpace.icon} ` : "#"}
+              {activeSpace.name}
+            </span>
+          </>
+        )}
+
+        {/* Desktop: notificações + avatar */}
+        <div className="ml-auto hidden md:flex items-center gap-3">
+          <NotificationBell />
           <Link
-            href={`/community/${communitySlug}/feed`}
-            className="text-gray-400 hover:text-[#EEE6E4] text-sm truncate hidden sm:block max-w-[160px] transition-colors font-medium"
+            href="/dashboard/settings"
+            className="w-8 h-8 rounded-xl flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity shadow-lg"
+            style={{ background: "linear-gradient(135deg, #006079, #009CD9)" }}
+            title={userName}
+            aria-label="Configurações da conta"
           >
-            {community?.name ?? communitySlug}
+            {userInitials}
           </Link>
+        </div>
+      </header>
 
-          {activeSpaceSlug && spaces.length > 0 && (() => {
-            const activeSpace = spaces.find((s) => s.slug === activeSpaceSlug);
-            return activeSpace ? (
-              <>
-                <ChevronRight className="w-3.5 h-3.5 text-gray-600 hidden sm:block flex-shrink-0" />
-                <span className="text-[#EEE6E4] text-sm truncate hidden sm:block max-w-[140px] font-medium">
-                  {activeSpace.icon ? `${activeSpace.icon} ` : "#"}{activeSpace.name}
-                </span>
-              </>
-            ) : null;
-          })()}
-
-          <div className="ml-auto flex items-center gap-3">
-            <NotificationBell />
-            <Link
-              href="/dashboard/settings"
-              className="w-8 h-8 rounded-xl flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity shadow-lg"
-              style={{ background: `linear-gradient(135deg, #006079, #009CD9)` }}
-              title={userName}
-            >
-              {userInitials}
-            </Link>
+      {/* Community hero */}
+      {community ? (
+        <CommunityHeader
+          community={community}
+          influencer={influencer}
+          optedIn={optedIn}
+          onOptIn={handleOptIn}
+          optInLoading={optInLoading}
+        />
+      ) : (
+        /* Skeleton for banner + info bar */
+        <div className="flex-shrink-0">
+          <div className="h-28 md:h-40 bg-white/5 animate-pulse" />
+          <div className="bg-[#151515] border-b border-white/8 px-4 md:px-6 py-3">
+            <div className="flex items-end gap-4">
+              <div className="w-16 h-16 -mt-10 bg-white/10 rounded-2xl animate-pulse flex-shrink-0" />
+              <div className="flex-1 pb-1 space-y-2">
+                <div className="h-5 bg-white/10 rounded w-48 animate-pulse" />
+                <div className="h-3 bg-white/10 rounded w-32 animate-pulse" />
+              </div>
+            </div>
           </div>
-        </header>
+        </div>
+      )}
 
-        {/* ── Community accent strip (below header, above content) ── */}
-        {community && (
+      {/* Tab navigation — z-20 */}
+      <CommunityTabs
+        communitySlug={communitySlug}
+        primaryColor={community?.primaryColor}
+      />
+
+      {/* Two-column body */}
+      <div className="flex flex-1">
+
+        {/* Desktop sidebar */}
+        <aside className="hidden md:flex w-48 flex-col border-r border-white/8 bg-[#181818] flex-shrink-0">
+          <SidebarNav />
+        </aside>
+
+        {/* Mobile overlay */}
+        {sidebarOpen && (
           <div
-            className="h-0.5 flex-shrink-0"
-            style={{ background: `linear-gradient(90deg, ${community.primaryColor}, ${community.primaryColor}00)` }}
+            className="md:hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-40"
+            onClick={() => setSidebarOpen(false)}
           />
         )}
 
-        {/* Page content */}
-        <main className="flex-1">
+        {/* Mobile sidebar drawer */}
+        <aside
+          className={`md:hidden fixed top-0 left-0 h-full w-56 z-50 flex flex-col bg-[#181818] border-r border-white/8 transition-transform duration-300 ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
+          <div className="flex items-center justify-between p-3 border-b border-white/8">
+            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              {community?.name ?? "Canais"}
+            </span>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="text-gray-400 hover:text-[#EEE6E4] p-1.5 rounded-lg hover:bg-white/5 transition-colors"
+              aria-label="Fechar menu"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <SidebarNav />
+        </aside>
+
+        {/* Main content */}
+        <div className="flex-1 min-w-0">
           {children}
-        </main>
+        </div>
       </div>
 
       {/* Chat widget */}
-      {community && (() => {
-        const activeSpace = activeSpaceSlug ? spaces.find((s) => s.slug === activeSpaceSlug) : null;
-        return activeSpace ? (
+      {community && (
+        optInLoading ? null : activeSpace ? (
           <ChatWidget
             communityId={community.id}
             spaceId={activeSpace.id}
@@ -407,8 +348,16 @@ export default function CommunityFeedLayout({ children }: { children: React.Reac
           />
         ) : (
           <ChatWidget communityId={community.id} />
-        );
-      })()}
+        )
+      )}
+
+      {/* Inline loading indicator while community loads */}
+      {!community && (
+        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2 bg-[#151515] border border-white/10 rounded-xl px-3 py-2 shadow-xl">
+          <Loader2 className="w-4 h-4 animate-spin text-[#009CD9]" />
+          <span className="text-xs text-gray-400">Carregando...</span>
+        </div>
+      )}
     </div>
   );
 }

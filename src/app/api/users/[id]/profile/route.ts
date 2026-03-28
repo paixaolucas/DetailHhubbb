@@ -1,91 +1,76 @@
-// =============================================================================
-// GET  /api/users/[id]/profile — Public user profile (no auth required)
-// PATCH /api/users/[id]/profile — Update own profile (auth required)
-//
-// NOTE: carColor, carPower, carFuel, carPhotos are stored inside the
-// socialLinks Json field under a "garage" key, since the UserProfile model
-// does not yet have a dedicated metadata column.
-// =============================================================================
-
 import { NextRequest, NextResponse } from "next/server";
-import { getSessionFromRequest } from "@/middleware/auth.middleware";
+import { withAuth } from "@/middleware/auth.middleware";
 import { db } from "@/lib/db";
 import { z } from "zod";
 
-// ─── Validation ───────────────────────────────────────────────────────────────
-
 const updateProfileSchema = z.object({
-  bio: z.string().max(500).optional(),
-  location: z.string().max(100).optional(),
-  carBrand: z.string().max(60).optional(),
-  carModel: z.string().max(60).optional(),
-  carYear: z.number().int().min(1900).max(new Date().getFullYear() + 2).optional().nullable(),
-  interests: z.array(z.string()).optional(),
-  socialLinks: z.record(z.string(), z.string()).optional(),
-  isPublic: z.boolean().optional(),
-  // Garage metadata fields (stored in socialLinks JSON under "garage" key)
-  carColor: z.string().max(50).optional(),
-  carPower: z.string().max(20).optional(),
-  carFuel: z.string().max(30).optional(),
-  carPhotos: z.array(z.string().url()).max(10).optional(),
+  headline: z.string().max(120).optional().nullable(),
+  bio: z.string().max(2000).optional().nullable(),
+  location: z.string().max(100).optional().nullable(),
+  socialLinks: z
+    .object({
+      website: z.string().url().optional().or(z.literal("")).optional(),
+      instagram: z.string().optional(),
+      twitter: z.string().optional(),
+      facebook: z.string().optional(),
+      linkedin: z.string().optional(),
+    })
+    .optional(),
 });
 
-// Helper to extract garage extras from the socialLinks Json field
-function extractGarageFromSocialLinks(socialLinks: unknown): Record<string, unknown> {
-  if (socialLinks && typeof socialLinks === "object" && !Array.isArray(socialLinks)) {
-    const sl = socialLinks as Record<string, unknown>;
-    if (sl.__garage && typeof sl.__garage === "object") {
-      return sl.__garage as Record<string, unknown>;
-    }
-  }
-  return {};
-}
-
-// ─── GET — Public profile ─────────────────────────────────────────────────────
-
+// GET — público, sem autenticação
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
-    if (!id) {
-      return NextResponse.json(
-        { success: false, error: "User ID required" },
-        { status: 400 }
-      );
-    }
-
-    const profile = await db.userProfile.findUnique({
-      where: { userId: id },
-      include: {
-        user: {
+    const userId = params.id;
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        avatarUrl: true,
+        createdAt: true,
+        lastLoginAt: true,
+        profile: {
           select: {
-            firstName: true,
-            lastName: true,
-            avatarUrl: true,
-            createdAt: true,
-            role: true,
+            bio: true,
+            location: true,
+            socialLinks: true,
+            isPublic: true,
           },
         },
       },
     });
 
-    // Profile not created yet — return null data, not 404
-    if (!profile) {
-      return NextResponse.json({ success: true, data: null });
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: "User not found" },
+        { status: 404 }
+      );
     }
 
-    // Expose garage extras as a top-level "metadata" key for the client
-    const garage = extractGarageFromSocialLinks(profile.socialLinks);
-    const responseData = {
-      ...profile,
-      metadata: garage,
-    };
-
-    return NextResponse.json({ success: true, data: responseData });
-  } catch (error) {
-    console.error("[UserProfile GET]", error);
+    return NextResponse.json({
+      success: true,
+      data: {
+        user: {
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          avatarUrl: user.avatarUrl,
+          createdAt: user.createdAt,
+          lastLoginAt: user.lastLoginAt,
+        },
+        headline: null,
+        bio: user.profile?.bio ?? null,
+        location: user.profile?.location ?? null,
+        socialLinks: user.profile?.socialLinks ?? {},
+        isPublic: user.profile?.isPublic ?? true,
+      },
+    });
+  } catch {
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 }
@@ -93,36 +78,19 @@ export async function GET(
   }
 }
 
-// ─── PATCH — Update own profile ───────────────────────────────────────────────
-
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  // Manually extract session so we can return 401 without wrapping the whole
-  // function in withAuth (which doesn't accept params from Next.js context)
-  const session = await getSessionFromRequest(req);
-  if (!session) {
-    return NextResponse.json(
-      { success: false, error: "Authentication required" },
-      { status: 401 }
-    );
-  }
-
-  const { id } = params;
-
-  // Users can only update their own profile
-  if (session.userId !== id) {
-    return NextResponse.json(
-      { success: false, error: "Forbidden: cannot update another user's profile" },
-      { status: 403 }
-    );
-  }
-
+// PATCH — protegido, usuário só edita seu próprio perfil
+export const PATCH = withAuth(async (req, { session, params }) => {
   try {
+    const userId = params?.id;
+    if (!userId || userId !== session.userId) {
+      return NextResponse.json(
+        { success: false, error: "Forbidden" },
+        { status: 403 }
+      );
+    }
+
     const body = await req.json();
     const parsed = updateProfileSchema.safeParse(body);
-
     if (!parsed.success) {
       return NextResponse.json(
         { success: false, error: parsed.error.errors[0].message },
@@ -130,60 +98,34 @@ export async function PATCH(
       );
     }
 
-    const { carColor, carPower, carFuel, carPhotos, socialLinks, ...standardData } = parsed.data;
-
-    // Read existing profile to merge socialLinks / garage data
-    const existingProfile = await db.userProfile.findUnique({
-      where: { userId: id },
-      select: { socialLinks: true },
-    });
-
-    // Existing socialLinks (excluding __garage)
-    const existingSL = (existingProfile?.socialLinks &&
-      typeof existingProfile.socialLinks === "object" &&
-      !Array.isArray(existingProfile.socialLinks))
-      ? (existingProfile.socialLinks as Record<string, unknown>)
-      : {};
-
-    // Existing garage extras
-    const existingGarage = extractGarageFromSocialLinks(existingSL);
-
-    // New garage extras (merge)
-    const newGarage: Record<string, unknown> = {
-      ...existingGarage,
-      ...(carColor !== undefined && { carColor }),
-      ...(carPower !== undefined && { carPower }),
-      ...(carFuel !== undefined && { carFuel }),
-      ...(carPhotos !== undefined && { carPhotos }),
-    };
-
-    // Build final socialLinks: merge caller-supplied socialLinks with __garage
-    const incomingSL = socialLinks ?? {};
-    const { __garage: _drop, ...existingPublicSL } = existingSL as Record<string, unknown> & { __garage?: unknown };
-    const finalSocialLinks: Record<string, unknown> = {
-      ...existingPublicSL,
-      ...incomingSL,
-      __garage: newGarage,
-    };
+    const { bio, location, socialLinks } = parsed.data;
 
     const profile = await db.userProfile.upsert({
-      where: { userId: id },
-      update: { ...standardData, socialLinks: finalSocialLinks as object },
-      create: { userId: id, ...standardData, socialLinks: finalSocialLinks as object },
+      where: { userId },
+      create: {
+        userId,
+        bio: bio ?? undefined,
+        location: location ?? undefined,
+        socialLinks: socialLinks ?? {},
+      },
+      update: {
+        ...(bio !== undefined && { bio }),
+        ...(location !== undefined && { location }),
+        ...(socialLinks !== undefined && { socialLinks }),
+      },
+      select: {
+        bio: true,
+        location: true,
+        socialLinks: true,
+        isPublic: true,
+      },
     });
 
-    // Return metadata (garage extras) alongside profile for client convenience
-    const responseData = {
-      ...profile,
-      metadata: newGarage,
-    };
-
-    return NextResponse.json({ success: true, data: responseData });
-  } catch (error) {
-    console.error("[UserProfile PATCH]", error);
+    return NextResponse.json({ success: true, data: profile });
+  } catch {
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 }
     );
   }
-}
+});

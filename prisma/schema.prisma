@@ -30,6 +30,7 @@ model User {
   twoFactorEnabled       Boolean                 @default(false)
   twoFactorSecret        String?
   stripeCustomerId       String?                 @unique
+  asaasCustomerId        String?                 @unique
   referralCode           String?                 @unique
   referredById           String?
   notificationPrefs      Json                    @default("{}")
@@ -89,6 +90,7 @@ model User {
   @@index([role])
   @@index([googleId])
   @@index([stripeCustomerId])
+  @@index([asaasCustomerId])
   @@index([referralCode])
   @@index([createdAt])
   @@map("users")
@@ -333,6 +335,7 @@ model CommentReaction {
 model UserProfile {
   id          String   @id @default(cuid())
   userId      String   @unique
+  headline    String?
   bio         String?  @db.Text
   location    String?
   carBrand    String?
@@ -702,6 +705,7 @@ model Payment {
   type                  PaymentType             @default(SUBSCRIPTION)
   stripePaymentIntentId String?                 @unique
   stripeInvoiceId       String?                 @unique
+  asaasPaymentId        String?
   description           String?
   metadata              Json                    @default("{}")
   failureCode           String?
@@ -1237,6 +1241,7 @@ model PlatformMembership {
   planId                 String
   status                 PlatformMembershipStatus @default(ACTIVE)
   stripeSubscriptionId   String?                  @unique
+  asaasSubscriptionId    String?                  @unique
   currentPeriodStart     DateTime?
   currentPeriodEnd       DateTime?
   tier                   PlatformMembershipTier   @default(STANDARD)
@@ -1256,6 +1261,7 @@ model PlatformMembership {
   @@index([status])
   @@index([userId, status])
   @@index([referredByInfluencerId])
+  @@index([asaasSubscriptionId])
   @@map("platform_memberships")
 }
 

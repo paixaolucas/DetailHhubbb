@@ -1,11 +1,11 @@
 "use client";
 
 // =============================================================================
-// ModuleCard — displays a content module with progress bar
+// ModuleCard — Netflix-style vertical card for horizontal scroll rows
 // =============================================================================
 
 import Link from "next/link";
-import { BookOpen, Lock, ChevronRight } from "lucide-react";
+import { Lock, CheckCircle } from "lucide-react";
 
 interface ModuleCardProps {
   module: {
@@ -20,78 +20,104 @@ interface ModuleCardProps {
   };
   communitySlug: string;
   spaceSlug: string;
+  primaryColor?: string;
 }
 
-export default function ModuleCard({ module, communitySlug, spaceSlug }: ModuleCardProps) {
+export default function ModuleCard({
+  module,
+  communitySlug,
+  primaryColor,
+}: ModuleCardProps) {
   const href = `/community/${communitySlug}/trilhas/${module.id}`;
   const isLocked = module.isLocked ?? false;
   const pct = module.progressPercent ?? 0;
   const lessonCount = module._count.lessons;
+  const color = primaryColor ?? "#006079";
+  const accentColor = primaryColor ?? "#009CD9";
+
+  const isCompleted = pct === 100;
+  const isInProgress = pct > 0 && pct < 100;
 
   return (
     <Link
       href={isLocked ? "#" : href}
-      className={`block bg-white/5 border border-white/10 rounded-xl p-5 transition-all group ${
+      onClick={isLocked ? (e) => e.preventDefault() : undefined}
+      className={`block w-52 flex-shrink-0 rounded-xl overflow-hidden border border-white/8 bg-[#0D0D0D] ${
         isLocked
           ? "opacity-60 cursor-not-allowed"
-          : "hover:bg-white/10 hover:border-[#006079]/30"
+          : "hover:border-white/20 hover:scale-[1.02] transition-all cursor-pointer"
       }`}
-      onClick={isLocked ? (e) => e.preventDefault() : undefined}
     >
-      <div className="flex items-start gap-4">
-        {/* Module number */}
-        <div className="w-10 h-10 rounded-xl bg-[#006079]/20 border border-[#006079]/30 flex items-center justify-center flex-shrink-0">
-          {isLocked ? (
-            <Lock className="w-4 h-4 text-gray-400" />
-          ) : (
-            <span className="text-sm font-bold text-[#009CD9]">{module.sortOrder + 1}</span>
-          )}
-        </div>
+      {/* Gradient area */}
+      <div className="relative h-32 overflow-hidden">
+        {isLocked ? (
+          <div className="w-full h-full bg-[#111] flex items-center justify-center">
+            <Lock className="w-8 h-8 text-gray-600" />
+          </div>
+        ) : (
+          <div
+            className="w-full h-full flex items-center justify-center"
+            style={{
+              background: `linear-gradient(135deg, ${color}30 0%, ${color}10 100%)`,
+            }}
+          >
+            {/* Module number */}
+            <span
+              className="text-4xl font-black select-none"
+              style={{ color: `${accentColor}60` }}
+            >
+              {module.sortOrder + 1}
+            </span>
 
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <h3 className="font-semibold text-[#EEE6E4] text-sm leading-snug truncate">
-              {module.title}
-            </h3>
-            {!module.isPublished && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 flex-shrink-0">
-                Rascunho
-              </span>
+            {/* Completed overlay */}
+            {isCompleted && (
+              <div className="absolute inset-0 bg-green-900/20 flex items-center justify-center">
+                <CheckCircle className="w-10 h-10 text-green-400 opacity-80" />
+              </div>
             )}
           </div>
+        )}
 
-          {module.description && (
-            <p className="text-xs text-gray-400 leading-relaxed line-clamp-2 mb-3">
-              {module.description}
-            </p>
-          )}
+        {/* Draft badge */}
+        {!module.isPublished && (
+          <span className="absolute top-2 left-2 text-[9px] px-1.5 py-0.5 bg-amber-500/80 text-white rounded font-semibold">
+            Rascunho
+          </span>
+        )}
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 text-xs text-gray-500">
-              <BookOpen className="w-3.5 h-3.5" />
-              {lessonCount} {lessonCount === 1 ? "aula" : "aulas"}
-            </div>
+        {/* In-progress dot */}
+        {isInProgress && (
+          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-orange-400 animate-pulse" />
+        )}
+      </div>
 
-            {pct > 0 && (
-              <span className="text-xs text-[#009CD9]">{pct}% concluído</span>
-            )}
+      {/* Content area */}
+      <div className="p-3 bg-[#0D0D0D]">
+        <p className="font-semibold text-[#EEE6E4] text-sm leading-snug line-clamp-2 mb-1">
+          {module.title}
+        </p>
+        <p className="text-[10px] text-gray-500">
+          {lessonCount} {lessonCount === 1 ? "aula" : "aulas"}
+        </p>
+
+        {/* Progress state */}
+        {isInProgress && (
+          <div className="mt-2 h-1 bg-white/10 rounded-full overflow-hidden">
+            <div
+              className="h-full rounded-full"
+              style={{
+                width: `${pct}%`,
+                background: `linear-gradient(to right, ${color}, ${accentColor})`,
+              }}
+            />
           </div>
+        )}
 
-          {/* Progress bar */}
-          {lessonCount > 0 && (
-            <div className="mt-3 h-1.5 bg-white/10 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-[#006079] to-[#009CD9] rounded-full transition-all duration-500"
-                style={{ width: `${pct}%` }}
-              />
-            </div>
-          )}
-        </div>
-
-        {/* Arrow */}
-        {!isLocked && (
-          <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-[#009CD9] flex-shrink-0 mt-1 transition-colors" />
+        {isCompleted && (
+          <div className="flex items-center gap-1 mt-1">
+            <CheckCircle className="w-3 h-3 text-green-400" />
+            <span className="text-[10px] text-green-400">Concluído</span>
+          </div>
         )}
       </div>
     </Link>

@@ -101,6 +101,10 @@ export async function checkRateLimit(
   windowMs: number,
   max: number
 ): Promise<NextResponse | null> {
+  // Se o IP não pôde ser determinado, a chave seria compartilhada por todos
+  // os usuários — skip para evitar bloquear requisições legítimas
+  if (key.endsWith(":unknown")) return null;
+
   if (hasUpstash) {
     return checkUpstash(key, windowMs, max);
   }

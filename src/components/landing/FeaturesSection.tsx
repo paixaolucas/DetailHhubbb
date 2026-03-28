@@ -54,7 +54,7 @@ export function FeaturesSection() {
             <Gauge className="w-3 h-3" />
             O que está incluído
           </div>
-          <h2 className="text-4xl font-bold text-[#EEE6E4] mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-[#EEE6E4] mb-4">
             Tudo que você precisa para crescer
           </h2>
           <p className="text-gray-400 text-lg max-w-xl mx-auto">
@@ -66,7 +66,7 @@ export function FeaturesSection() {
           {features.map(({ icon: Icon, title, desc, color, bg }, i) => (
             <div
               key={title}
-              className="glass-card p-8 hover:border-[#006079]/20 transition-all duration-300 group h-full animate-slide-up"
+              className="glass-card p-5 sm:p-8 hover:border-[#006079]/20 transition-all duration-300 group h-full animate-slide-up"
               style={{ animationDelay: `${i * 80}ms` }}
             >
               <div className={`w-12 h-12 ${bg} rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>

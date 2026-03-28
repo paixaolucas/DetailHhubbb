@@ -95,11 +95,11 @@ export function HeroSection() {
       <div className="container mx-auto px-4 text-center relative">
         {/* Badge */}
         <div
-          className="inline-flex items-center gap-2 bg-[#006079]/10 border border-[#007A99]/30 rounded-full px-4 py-1.5 text-sm text-[#009CD9] mb-8 animate-fade-in"
+          className="inline-flex flex-wrap items-center justify-center gap-2 bg-[#006079]/10 border border-[#007A99]/30 rounded-full px-4 py-1.5 text-sm text-[#009CD9] mb-8 animate-fade-in max-w-full"
           style={{ animationDelay: "0ms" }}
         >
-          <Car className="w-4 h-4" />
-          Para detailers que sabem executar e querem cobrar o que merecem
+          <Car className="w-4 h-4 flex-shrink-0" />
+          <span>Para detailers que sabem executar e querem cobrar o que merecem</span>
         </div>
 
         {/* Headline */}
@@ -155,9 +155,9 @@ export function HeroSection() {
           ))}
         </div>
 
-        {/* Dashboard mockup */}
+        {/* Dashboard mockup — hidden on very small screens, shown from sm up */}
         <div
-          className="relative mt-16 max-w-3xl mx-auto animate-slide-up"
+          className="relative mt-16 max-w-3xl mx-auto animate-slide-up hidden sm:block"
           style={{ animationDelay: "500ms" }}
         >
           <div style={{ perspective: "1200px" }}>
@@ -177,7 +177,7 @@ export function HeroSection() {
                 </div>
               </div>
               {/* Content */}
-              <div className="bg-[#1A1A1A] p-4 grid grid-cols-5 gap-2">
+              <div className="bg-[#1A1A1A] p-4 grid grid-cols-2 md:grid-cols-5 gap-2">
                 {featuredCommunities.map((c) => (
                   <div key={c.slug} className="bg-white/5 rounded-xl overflow-hidden shadow-sm border border-white/10">
                     <CommunityThumbnail

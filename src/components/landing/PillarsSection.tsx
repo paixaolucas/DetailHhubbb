@@ -107,11 +107,11 @@ export function PillarsSection() {
             {deliverables.map((item, i) => (
               <div
                 key={i}
-                className="flex items-center justify-between px-6 py-4 hover:bg-white/3 transition-colors"
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-6 py-4 hover:bg-white/3 transition-colors gap-0.5 sm:gap-0"
               >
-                <span className="text-gray-300 text-sm">{item.label}</span>
+                <span className="text-gray-300 text-sm min-w-0">{item.label}</span>
                 <span
-                  className={`text-sm font-semibold ${
+                  className={`text-sm font-semibold flex-shrink-0 ${
                     item.value === "incluso" ? "text-[#009CD9]" : "text-gray-400 line-through"
                   }`}
                 >
@@ -120,9 +120,9 @@ export function PillarsSection() {
               </div>
             ))}
           </div>
-          <div className="flex items-center justify-between px-6 py-5 bg-[#006079]/10 border-t border-[#006079]/30">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-6 py-5 bg-[#006079]/10 border-t border-[#006079]/30 gap-1 sm:gap-0">
             <span className="text-[#EEE6E4] font-bold">Valor total se comprasse separado</span>
-            <span className="text-[#EEE6E4] font-bold text-lg">R$3.000+</span>
+            <span className="text-[#EEE6E4] font-bold text-lg flex-shrink-0">R$3.000+</span>
           </div>
         </div>
       </div>

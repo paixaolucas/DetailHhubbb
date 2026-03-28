@@ -516,7 +516,7 @@ export default function AnalyseResultPage() {
                 title="Sugestões de Copy — Versões Reescritas"
                 items={result.copy_suggestions}
                 icon={PenLine}
-                color="text-purple-400"
+                color="text-[#009CD9]"
               />
             </div>
           )}

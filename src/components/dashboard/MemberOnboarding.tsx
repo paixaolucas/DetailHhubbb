@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { CheckCircle, Circle, X, Rocket } from "lucide-react";
+import { CheckCircle, ChevronUp, Circle, Rocket } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -95,6 +95,7 @@ export function MemberOnboarding() {
   const [state, setState] = useState<OnboardingState>({ dismissed: false, completedSteps: [] });
   const [mounted, setMounted] = useState(false);
   const [celebrating, setCelebrating] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   const [priceValue, setPriceValue] = useState("");
   const celebrationTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -137,12 +138,6 @@ export function MemberOnboarding() {
     },
     []
   );
-
-  const handleDismiss = useCallback(() => {
-    const next: OnboardingState = { ...state, dismissed: true };
-    writeState(next);
-    setState(next);
-  }, [state]);
 
   const handleLinkStep = useCallback(
     (step: Step) => {
@@ -192,57 +187,56 @@ export function MemberOnboarding() {
       {/* Top accent border */}
       <div className="h-0.5 w-full bg-gradient-to-r from-[#006079] via-[#007A99] to-[#009CD9]" />
 
-      <div className="p-5 space-y-4">
-        {/* Header */}
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex items-start gap-2.5 min-w-0">
-            <Rocket
-              className="text-[#009CD9] mt-0.5 shrink-0"
-              size={18}
-              aria-hidden="true"
-            />
-            <div className="min-w-0">
-              <h3 className="text-[#EEE6E4] font-bold text-sm leading-tight">
-                Sua jornada de 7 dias — Quick Win
-              </h3>
-              <p className="text-gray-400 text-xs mt-0.5 leading-relaxed">
-                Esses 5 passos vão te mostrar quanto você pode ganhar a mais no próximo
-                serviço. Leva menos de 1 hora.
-              </p>
-            </div>
+      <div className="p-5">
+        {/* Header — sempre visível */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <Rocket className="text-[#009CD9] shrink-0" size={16} aria-hidden="true" />
+            <h3 className="text-[#EEE6E4] font-bold text-sm leading-tight truncate">
+              Jornada 7 dias — Quick Win
+            </h3>
           </div>
           <button
-            onClick={handleDismiss}
-            aria-label="Dispensar onboarding"
-            className="shrink-0 text-gray-500 hover:text-gray-300 transition-colors p-0.5 rounded focus:outline-none focus:ring-1 focus:ring-[#009CD9]"
+            onClick={() => setCollapsed(v => !v)}
+            aria-label={collapsed ? "Expandir" : "Minimizar"}
+            className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-[#006079]/20 hover:bg-[#006079]/40 text-[#009CD9] border border-[#006079]/30 transition-all focus:outline-none shrink-0"
           >
-            <X size={16} />
+            <ChevronUp size={13} className={`transition-transform ${collapsed ? "rotate-180" : ""}`} />
+            <span>{collapsed ? "Expandir" : "Minimizar"}</span>
           </button>
         </div>
-
-        {/* Progress bar */}
-        <div className="space-y-1.5">
-          <div
-            className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden"
-            role="progressbar"
-            aria-valuenow={completedCount}
-            aria-valuemin={0}
-            aria-valuemax={TOTAL_STEPS}
-            aria-label={`${completedCount} de ${TOTAL_STEPS} passos concluídos`}
-          >
-            <div
-              className="h-full bg-gradient-to-r from-[#006079] to-[#009CD9] rounded-full transition-all duration-500"
-              style={{ width: `${progressPercent}%` }}
-            />
-          </div>
-          <p className="text-gray-400 text-xs">
-            {completedCount} de {TOTAL_STEPS} passos concluídos
+        {!collapsed && (
+          <p className="text-gray-400 text-xs mt-2 leading-relaxed">
+            Esses 5 passos vão te mostrar quanto você pode ganhar a mais no próximo serviço. Leva menos de 1 hora.
           </p>
-        </div>
+        )}
 
-        {/* Steps list */}
-        <ul className="space-y-2" role="list">
-          {STEPS.map((step) => {
+        {/* Conteúdo colapsável */}
+        {!collapsed && (
+          <div className="space-y-4 mt-4">
+            {/* Progress bar */}
+            <div className="space-y-1.5">
+              <div
+                className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden"
+                role="progressbar"
+                aria-valuenow={completedCount}
+                aria-valuemin={0}
+                aria-valuemax={TOTAL_STEPS}
+                aria-label={`${completedCount} de ${TOTAL_STEPS} passos concluídos`}
+              >
+                <div
+                  className="h-full bg-gradient-to-r from-[#006079] to-[#009CD9] rounded-full transition-all duration-500"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+              <p className="text-gray-400 text-xs">
+                {completedCount} de {TOTAL_STEPS} passos concluídos
+              </p>
+            </div>
+
+            {/* Steps list */}
+            <ul className="space-y-2" role="list">
+              {STEPS.map((step) => {
             const isDone = completedSteps.includes(step.id);
             // First non-completed step gets the highlight
             const isNext =
@@ -339,7 +333,9 @@ export function MemberOnboarding() {
               </li>
             );
           })}
-        </ul>
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   );

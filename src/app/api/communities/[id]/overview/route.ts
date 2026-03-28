@@ -28,7 +28,13 @@ export const GET = withAuth(async (req, { params }) => {
         bannerUrl: true,
         primaryColor: true,
         isPublished: true,
-        influencer: { select: { userId: true } },
+        influencer: {
+          select: {
+            userId: true,
+            displayName: true,
+            user: { select: { firstName: true, lastName: true, avatarUrl: true } },
+          },
+        },
         spaces: {
           select: {
             id: true,
@@ -54,6 +60,12 @@ export const GET = withAuth(async (req, { params }) => {
     }
 
     const { spaces, influencer, isPublished, ...community } = result;
+    const influencerData = influencer
+      ? {
+          displayName: influencer.displayName,
+          user: influencer.user,
+        }
+      : null;
 
     return NextResponse.json(
       {
@@ -62,6 +74,7 @@ export const GET = withAuth(async (req, { params }) => {
           community,
           spaces,
           influencerUserId: influencer?.userId ?? null,
+          influencer: influencerData,
         },
       },
       {

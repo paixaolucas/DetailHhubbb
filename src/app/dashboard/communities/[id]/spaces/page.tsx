@@ -78,7 +78,7 @@ const TYPE_COLORS: Record<SpaceType, string> = {
   ANNOUNCEMENT: "bg-amber-500/10 text-amber-400 border-amber-500/20",
   QA:           "bg-[#007A99]/10 text-[#009CD9] border-[#007A99]/20",
   SHOWCASE:     "bg-green-500/10 text-green-400 border-green-500/20",
-  COURSE:       "bg-purple-500/10 text-purple-400 border-purple-500/20",
+  COURSE:       "bg-[#006079]/10 text-[#009CD9] border-[#006079]/20",
 };
 
 // ---------------------------------------------------------------------------

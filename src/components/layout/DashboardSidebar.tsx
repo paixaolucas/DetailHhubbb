@@ -7,7 +7,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   Home, CalendarDays, MessageSquare, BookOpen, BarChart2,
   FileVideo, UserCog, Settings2, LogOut, Eye, UserCheck,
-  Lock, Crown, Search, X, HelpCircle,
+  Lock, Crown, Search, X, HelpCircle, Compass, Wrench,
 } from 'lucide-react';
 import { Logo, LogoType } from '@/components/ui/logo';
 import { RoleBadge } from '@/components/ui/badge';
@@ -29,6 +29,14 @@ interface UserResult {
   hasPlatform?: boolean;
 }
 
+interface MemberCommunity {
+  id: string;
+  name: string;
+  slug: string;
+  logoUrl: string | null;
+  primaryColor: string;
+}
+
 interface NavSection {
   key: string;
   label: string;
@@ -43,14 +51,16 @@ interface NavItem {
   liveIndicator?: boolean;
 }
 
-function buildSections(hasLiveToday: boolean): NavSection[] {
+function buildSections(hasLiveToday: boolean, navRole: UserRole): NavSection[] {
+  const isMember = navRole === UserRole.COMMUNITY_MEMBER || navRole === UserRole.MARKETPLACE_PARTNER;
   return [
     {
       key: 'principal',
       label: 'Principal',
       roles: 'ALL',
       items: [
-        { label: 'Inicio', href: '/inicio', icon: Home },
+        { label: 'Inicio', href: isMember ? '/inicio' : '/dashboard', icon: Home },
+        ...(isMember ? [{ label: 'Explorar', href: '/explorar', icon: Compass }] : []),
         { label: 'Calendario', href: '/dashboard/calendar', icon: CalendarDays, liveIndicator: hasLiveToday },
         { label: 'Mensagens', href: '/dashboard/messages', icon: MessageSquare },
       ],
@@ -61,6 +71,7 @@ function buildSections(hasLiveToday: boolean): NavSection[] {
       roles: [UserRole.COMMUNITY_MEMBER, UserRole.MARKETPLACE_PARTNER],
       items: [
         { label: 'Meu aprendizado', href: '/dashboard/meu-aprendizado', icon: BookOpen },
+        { label: 'Ferramentas', href: '/dashboard/ferramentas', icon: Wrench },
       ],
     },
     {
@@ -120,6 +131,7 @@ export function DashboardSidebar({
   const [memberSearching, setMemberSearching] = useState(false);
   const [influencerSearching, setInfluencerSearching] = useState(false);
   const [viewAsPreloaded, setViewAsPreloaded] = useState(false);
+  const [memberCommunities, setMemberCommunities] = useState<MemberCommunity[]>([]);
   const memberDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
   const influencerDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -130,6 +142,8 @@ export function DashboardSidebar({
       : viewAs === 'INFLUENCER' || viewAs === 'INFLUENCER_ADMIN'
       ? UserRole.INFLUENCER_ADMIN
       : safeRole;
+
+  const isMemberRole = navRole === UserRole.COMMUNITY_MEMBER || navRole === UserRole.MARKETPLACE_PARTNER;
 
   const userInitials = userName
     .split(' ')
@@ -157,6 +171,22 @@ export function DashboardSidebar({
       })
       .catch(() => {});
   }, []);
+
+  // Fetch member communities for sidebar
+  useEffect(() => {
+    if (!isMemberRole) return;
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+    fetch('/api/communities?view=sidebar', {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && Array.isArray(d.communities)) {
+          setMemberCommunities(d.communities);
+        }
+      })
+      .catch(() => {});
+  }, [isMemberRole]);
 
   // Pre-load users when ViewAs panel opens
   useEffect(() => {
@@ -207,7 +237,7 @@ export function DashboardSidebar({
     }, 300);
   }
 
-  const sections = buildSections(hasLiveToday);
+  const sections = buildSections(hasLiveToday, navRole);
   const visibleSections = sections.filter(
     (s) => s.roles === 'ALL' || (s.roles as UserRole[]).includes(navRole)
   );
@@ -217,17 +247,17 @@ export function DashboardSidebar({
       {/* Logo */}
       <div className={`h-16 flex items-center border-b border-white/10 flex-shrink-0 ${collapsed ? 'px-3 justify-center' : 'px-4'}`}>
         {collapsed ? (
-          <Link href={navRole === UserRole.COMMUNITY_MEMBER || navRole === UserRole.MARKETPLACE_PARTNER ? "/inicio" : "/dashboard"} onClick={onMobileClose}>
+          <Link href={isMemberRole ? "/inicio" : "/dashboard"} onClick={onMobileClose}>
             <Logo size="md" />
           </Link>
         ) : (
-          <Link href={navRole === UserRole.COMMUNITY_MEMBER || navRole === UserRole.MARKETPLACE_PARTNER ? "/inicio" : "/dashboard"} className="flex items-center flex-1 min-w-0" onClick={onMobileClose}>
+          <Link href={isMemberRole ? "/inicio" : "/dashboard"} className="flex items-center flex-1 min-w-0" onClick={onMobileClose}>
             <LogoType height={24} variant="light" />
           </Link>
         )}
       </div>
 
-      {/* User identity — avatar + nome + role only */}
+      {/* User identity */}
       <div className={`border-b border-white/10 flex-shrink-0 ${collapsed ? 'flex justify-center py-3' : 'px-4 py-3'}`}>
         {collapsed ? (
           <div className="w-8 h-8 bg-gradient-to-br from-[#006079] to-[#009CD9] rounded-xl flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
@@ -250,14 +280,11 @@ export function DashboardSidebar({
       <nav className="flex-1 py-3 overflow-y-auto px-2 space-y-4">
         {visibleSections.map((section) => (
           <div key={section.key}>
-            {/* Section label — visual separator only */}
             {!collapsed && (
               <p className="text-[10px] uppercase tracking-widest font-semibold text-gray-600 px-3 pb-1">
                 {section.label}
               </p>
             )}
-
-            {/* Nav items */}
             <div className="space-y-0.5">
               {section.items.map((item) => {
                 const Icon = item.icon;
@@ -278,18 +305,11 @@ export function DashboardSidebar({
                         : 'text-gray-400 hover:text-[#EEE6E4] hover:bg-white/5'
                     }`}
                   >
-                    {/* Active indicator: 2px left border */}
                     {isActive && (
                       <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-[#009CD9] rounded-r-full" />
                     )}
-
                     <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-[#009CD9]' : 'text-gray-500 group-hover:text-[#EEE6E4]'}`} />
-
-                    {!collapsed && (
-                      <span className="truncate text-sm">{item.label}</span>
-                    )}
-
-                    {/* Live indicator dot */}
+                    {!collapsed && <span className="truncate text-sm">{item.label}</span>}
                     {item.liveIndicator && (
                       <span className="ml-auto w-2 h-2 rounded-full bg-red-500 animate-pulse flex-shrink-0" />
                     )}
@@ -299,11 +319,118 @@ export function DashboardSidebar({
             </div>
           </div>
         ))}
+
+        {/* Minhas Comunidades — apenas para membros */}
+        {isMemberRole && memberCommunities.length > 0 && (
+          <div>
+            {!collapsed && (
+              <p className="text-[10px] uppercase tracking-widest font-semibold text-gray-600 px-3 pb-1">
+                Minhas Comunidades
+              </p>
+            )}
+            <div className="space-y-0.5">
+              {memberCommunities.map((community) => {
+                const isActive = pathname.startsWith(`/community/${community.slug}`);
+                return (
+                  <Link
+                    key={community.id}
+                    href={`/community/${community.slug}/feed`}
+                    onClick={onMobileClose}
+                    title={collapsed ? community.name : undefined}
+                    className={`relative flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-all group ${
+                      isActive
+                        ? 'bg-white/8 text-[#EEE6E4]'
+                        : 'text-gray-400 hover:text-[#EEE6E4] hover:bg-white/5'
+                    }`}
+                  >
+                    {/* Active indicator usando primaryColor da comunidade */}
+                    {isActive && (
+                      <span
+                        className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-r-full"
+                        style={{ backgroundColor: community.primaryColor }}
+                      />
+                    )}
+
+                    {/* Logo ou inicial */}
+                    {community.logoUrl ? (
+                      <Image
+                        src={community.logoUrl}
+                        alt={community.name}
+                        width={18}
+                        height={18}
+                        className="w-[18px] h-[18px] rounded-md object-cover flex-shrink-0"
+                      />
+                    ) : (
+                      <div
+                        className="w-[18px] h-[18px] rounded-md flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0"
+                        style={{ backgroundColor: community.primaryColor }}
+                      >
+                        {community.name[0]}
+                      </div>
+                    )}
+
+                    {!collapsed && (
+                      <span className="truncate text-sm">{community.name}</span>
+                    )}
+                  </Link>
+                );
+              })}
+
+              {/* Explorar mais */}
+              {!collapsed && (
+                <Link
+                  href="/explorar"
+                  onClick={onMobileClose}
+                  className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs text-gray-600 hover:text-[#009CD9] hover:bg-white/5 transition-all"
+                >
+                  <span className="w-[18px] text-center text-base leading-none text-gray-700">+</span>
+                  <span>Explorar comunidades</span>
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Collapsed: comunidades como ícones empilhados */}
+        {isMemberRole && collapsed && memberCommunities.length > 0 && (
+          <div className="flex flex-col items-center gap-1 pt-1 border-t border-white/10">
+            {memberCommunities.slice(0, 6).map((community) => {
+              const isActive = pathname.startsWith(`/community/${community.slug}`);
+              return (
+                <Link
+                  key={community.id}
+                  href={`/community/${community.slug}/feed`}
+                  title={community.name}
+                  className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all hover:scale-105 ${
+                    isActive ? 'ring-2 ring-white/30' : ''
+                  }`}
+                  style={{ backgroundColor: `${community.primaryColor}25` }}
+                >
+                  {community.logoUrl ? (
+                    <Image
+                      src={community.logoUrl}
+                      alt={community.name}
+                      width={16}
+                      height={16}
+                      className="rounded-lg object-cover"
+                    />
+                  ) : (
+                    <span
+                      className="text-[10px] font-bold"
+                      style={{ color: community.primaryColor }}
+                    >
+                      {community.name[0]}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </nav>
 
       {/* Footer */}
       <div className="p-2 border-t border-white/10 flex-shrink-0 space-y-0.5">
-        {/* Help */}
         <Link
           href="/dashboard/settings"
           onClick={onMobileClose}

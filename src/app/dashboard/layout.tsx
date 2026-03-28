@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
-import { ArrowLeft, Eye, Menu, X } from "lucide-react";
+import { ArrowLeft, Eye, Menu, X, User, Settings, Bell, Shield, LogOut, ChevronDown } from "lucide-react";
 import { RoleBadge } from "@/components/ui/badge";
 import { LogoType } from "@/components/ui/logo";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
@@ -32,9 +33,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [mobileOpen, setMobileOpen] = useState(false);
   const [role, setRole] = useState("INFLUENCER_ADMIN");
   const [userName, setUserName] = useState("");
+  const [userAvatarUrl, setUserAvatarUrl] = useState<string | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [viewAs, setViewAs] = useState<string | null>(null);
   const [viewAsUser, setViewAsUser] = useState<ViewAsUser | null>(null);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState("");
+  const profileMenuRef = useRef<HTMLDivElement>(null);
+
+  // Restore viewAs from sessionStorage on mount (survives layout remounts across /dashboard ↔ /inicio)
+  useEffect(() => {
+    try {
+      const savedViewAs = sessionStorage.getItem("detailhub_view_as");
+      const savedViewAsUser = sessionStorage.getItem("detailhub_view_as_user");
+      if (savedViewAs) {
+        setViewAs(savedViewAs);
+        if (savedViewAsUser) setViewAsUser(JSON.parse(savedViewAsUser) as ViewAsUser);
+      }
+    } catch { /* ignore */ }
+  }, []);
 
   useEffect(() => {
     async function checkAuth() {
@@ -89,9 +107,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       const storedRole = localStorage.getItem(STORAGE_KEYS.USER_ROLE) ?? "INFLUENCER_ADMIN";
       const storedName = localStorage.getItem(STORAGE_KEYS.USER_NAME) ?? "";
+      const storedUserId = localStorage.getItem(STORAGE_KEYS.USER_ID) ?? null;
+      const storedEmail = localStorage.getItem(STORAGE_KEYS.USER_EMAIL) ?? "";
       setRole(storedRole);
       setUserName(storedName);
+      setUserId(storedUserId);
+      setUserEmail(storedEmail);
       setAuthChecked(true);
+
+      // Fetch avatar
+      const t = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+      if (t) {
+        fetch("/api/users/me/settings", { headers: { Authorization: `Bearer ${t}` } })
+          .then((r) => r.json())
+          .then((d) => { if (d.success && d.data?.avatarUrl) setUserAvatarUrl(d.data.avatarUrl); })
+          .catch(() => {});
+      }
     }
 
     checkAuth();
@@ -129,6 +160,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return () => clearInterval(refreshInterval);
   }, [router]);
 
+  // Close profile menu on outside click
+  useEffect(() => {
+    if (!profileMenuOpen) return;
+    function handleOutside(e: MouseEvent) {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target as Node)) {
+        setProfileMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, [profileMenuOpen]);
+
   // Inject X-View-As-User header into all /api/ calls when ViewAs is active
   useEffect(() => {
     if (!viewAsUser) return;
@@ -158,6 +201,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       localStorage.removeItem(STORAGE_KEYS.USER_NAME);
       localStorage.removeItem(STORAGE_KEYS.USER_EMAIL);
       localStorage.removeItem(STORAGE_KEYS.USER_ID);
+      try { sessionStorage.removeItem("detailhub_view_as"); sessionStorage.removeItem("detailhub_view_as_user"); } catch { /* ignore */ }
       router.push("/login");
     }
   }
@@ -165,6 +209,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   function handleViewAsChange(newViewAs: string | null, newUser: ViewAsUser | null) {
     setViewAs(newViewAs);
     setViewAsUser(newUser);
+    try {
+      if (newViewAs) {
+        sessionStorage.setItem("detailhub_view_as", newViewAs);
+        sessionStorage.setItem("detailhub_view_as_user", newUser ? JSON.stringify(newUser) : "");
+      } else {
+        sessionStorage.removeItem("detailhub_view_as");
+        sessionStorage.removeItem("detailhub_view_as_user");
+      }
+    } catch { /* ignore */ }
   }
 
   const userInitials = userName
@@ -243,13 +296,83 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
           <div className="flex items-center gap-3">
             <NotificationBell />
-            <Link
-              href="/dashboard/settings"
-              className="w-8 h-8 bg-gradient-to-br from-[#006079] to-[#009CD9] rounded-xl flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity"
-              title={userName}
-            >
-              {userInitials || "U"}
-            </Link>
+            {/* Profile dropdown */}
+            <div className="relative" ref={profileMenuRef}>
+              <button
+                onClick={() => setProfileMenuOpen((v) => !v)}
+                className="flex items-center gap-1.5 hover:opacity-90 transition-opacity"
+                title={userName}
+              >
+                {userAvatarUrl ? (
+                  <Image
+                    src={userAvatarUrl}
+                    alt={userName}
+                    width={32}
+                    height={32}
+                    className="w-8 h-8 rounded-xl object-cover border border-white/10"
+                  />
+                ) : (
+                  <div className="w-8 h-8 bg-gradient-to-br from-[#006079] to-[#009CD9] rounded-xl flex items-center justify-center text-white font-bold text-xs">
+                    {userInitials || "U"}
+                  </div>
+                )}
+                <ChevronDown className={`w-3.5 h-3.5 text-gray-500 transition-transform ${profileMenuOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              {profileMenuOpen && (
+                <div className="absolute right-0 top-full mt-2 w-52 bg-[#222] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden py-1">
+                  {/* User info */}
+                  <div className="px-4 py-3 border-b border-white/8">
+                    <p className="text-sm font-semibold text-[#EEE6E4] truncate">{userName}</p>
+                    <p className="text-xs text-gray-500 truncate">{userEmail}</p>
+                  </div>
+                  {/* Menu items */}
+                  {userId && (
+                    <Link
+                      href={`/dashboard/perfil/${userId}`}
+                      onClick={() => setProfileMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-300 hover:text-[#EEE6E4] hover:bg-white/5 transition-colors"
+                    >
+                      <User className="w-4 h-4 text-gray-500" />
+                      Ver perfil
+                    </Link>
+                  )}
+                  <Link
+                    href="/dashboard/settings"
+                    onClick={() => setProfileMenuOpen(false)}
+                    className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-300 hover:text-[#EEE6E4] hover:bg-white/5 transition-colors"
+                  >
+                    <Settings className="w-4 h-4 text-gray-500" />
+                    Editar perfil
+                  </Link>
+                  <Link
+                    href="/dashboard/notifications"
+                    onClick={() => setProfileMenuOpen(false)}
+                    className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-300 hover:text-[#EEE6E4] hover:bg-white/5 transition-colors"
+                  >
+                    <Bell className="w-4 h-4 text-gray-500" />
+                    Notificações
+                  </Link>
+                  <Link
+                    href="/dashboard/settings#security"
+                    onClick={() => setProfileMenuOpen(false)}
+                    className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-300 hover:text-[#EEE6E4] hover:bg-white/5 transition-colors"
+                  >
+                    <Shield className="w-4 h-4 text-gray-500" />
+                    Autenticação
+                  </Link>
+                  <div className="border-t border-white/8 mt-1 pt-1">
+                    <button
+                      onClick={() => { setProfileMenuOpen(false); handleLogout(); }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/5 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Sair
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -296,7 +419,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </span>
             )}
             <button
-              onClick={() => { setViewAs(null); setViewAsUser(null); router.push("/dashboard"); }}
+              onClick={() => { handleViewAsChange(null, null); router.push("/dashboard"); }}
               className="ml-auto flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 px-3 py-1 rounded-lg transition-all flex-shrink-0"
             >
               <ArrowLeft className="w-3 h-3" />

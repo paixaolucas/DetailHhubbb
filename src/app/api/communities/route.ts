@@ -51,6 +51,126 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
     }
 
+    // Sidebar view: retorna apenas comunidades do membro, campos mínimos
+    if (view === "sidebar") {
+      const { db } = await import("@/lib/db");
+      const session = await getSessionFromRequest(req);
+      const userId = session?.userId ?? null;
+
+      if (!userId) {
+        return NextResponse.json(
+          { success: true, communities: [] },
+          { headers: { "Cache-Control": "private, max-age=60" } }
+        );
+      }
+
+      const optIns = await db.communityOptIn.findMany({
+        where: { userId },
+        include: {
+          community: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              logoUrl: true,
+              primaryColor: true,
+            },
+          },
+        },
+        orderBy: { joinedAt: "asc" },
+      });
+
+      const communities = optIns.map((o) => o.community);
+
+      return NextResponse.json(
+        { success: true, communities },
+        { headers: { "Cache-Control": "private, max-age=60" } }
+      );
+    }
+
+    // Explore view: enriched community cards for the discovery page
+    if (view === "explore") {
+      const { db } = await import("@/lib/db");
+      const session = await getSessionFromRequest(req);
+      const userId = session?.userId ?? null;
+
+      const sort = searchParams.get("sort") ?? "popular";
+      const now = new Date();
+
+      const orderBy =
+        sort === "new"
+          ? { createdAt: "desc" as const }
+          : { memberCount: "desc" as const }; // popular + active both sort by memberCount for now
+
+      const communities = await db.community.findMany({
+        where: {
+          isPublished: true,
+          ...(search
+            ? {
+                OR: [
+                  { name: { contains: search, mode: "insensitive" } },
+                  { shortDescription: { contains: search, mode: "insensitive" } },
+                ],
+              }
+            : {}),
+        },
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          shortDescription: true,
+          logoUrl: true,
+          bannerUrl: true,
+          primaryColor: true,
+          memberCount: true,
+          createdAt: true,
+          influencer: {
+            select: {
+              displayName: true,
+              user: { select: { firstName: true, lastName: true, avatarUrl: true } },
+            },
+          },
+          spaces: {
+            where: { type: "COURSE" },
+            select: { id: true },
+          },
+          ...(userId
+            ? { optIns: { where: { userId }, select: { id: true }, take: 1 } }
+            : {}),
+          liveSessions: {
+            where: {
+              status: { in: ["LIVE", "SCHEDULED"] },
+              scheduledAt: { gte: now },
+            },
+            select: { id: true },
+          },
+        },
+        orderBy,
+        take: 50,
+      });
+
+      const mapped = communities.map((c) => {
+        const optIns = (c as any).optIns as { id: string }[] | undefined;
+        return {
+          id: c.id,
+          name: c.name,
+          slug: c.slug,
+          shortDescription: c.shortDescription,
+          logoUrl: c.logoUrl,
+          bannerUrl: c.bannerUrl,
+          primaryColor: c.primaryColor,
+          memberCount: c.memberCount,
+          createdAt: c.createdAt,
+          influencer: c.influencer,
+          moduleSpaceCount: c.spaces.length,
+          livesCount: c.liveSessions.length,
+          isMember: userId ? (optIns?.length ?? 0) > 0 : false,
+        };
+      });
+
+      return NextResponse.json({ success: true, communities: mapped });
+    }
+
     // Dashboard view: ordered by member opt-in first, includes isMember flag
     if (view === "dashboard") {
       const { db } = await import("@/lib/db");
@@ -85,6 +205,8 @@ export async function GET(req: NextRequest) {
         take: 50,
       });
 
+      const communityIds = communities.map((c) => c.id);
+
       // 2. Engajamento — isolado: se falhar, segue sem personalização
       const engagementMap = new Map<string, number>();
       if (userId) {
@@ -107,6 +229,51 @@ export async function GET(req: NextRequest) {
         }
       }
 
+      // 3. Novos conteúdos (últimos 7 dias) — ContentLesson não tem communityId direto,
+      //    por isso agrupamos por ContentModule.communityId (conta módulos, não lições)
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+      const newLessonsMap = new Map<string, number>();
+      try {
+        const newLessonsRaw = await db.contentModule.groupBy({
+          by: ["communityId"],
+          where: {
+            communityId: { in: communityIds },
+            isPublished: true,
+            createdAt: { gte: sevenDaysAgo },
+          },
+          _count: { id: true },
+        });
+        for (const l of newLessonsRaw) {
+          newLessonsMap.set(l.communityId, l._count.id);
+        }
+      } catch {
+        // Falha silenciosa — newContentCount padrão 0
+      }
+
+      // 4. Lives hoje (status LIVE ou SCHEDULED com scheduledAt no dia corrente)
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date();
+      endOfDay.setHours(23, 59, 59, 999);
+      const liveTodaySet = new Set<string>();
+      try {
+        const livesToday = await db.liveSession.findMany({
+          where: {
+            communityId: { in: communityIds },
+            OR: [
+              { status: "LIVE" },
+              { status: "SCHEDULED", scheduledAt: { gte: startOfDay, lte: endOfDay } },
+            ],
+          },
+          select: { communityId: true },
+        });
+        for (const l of livesToday) {
+          liveTodaySet.add(l.communityId);
+        }
+      } catch {
+        // Falha silenciosa — hasLiveToday padrão false
+      }
+
       const dailySeed = Math.floor(Date.now() / 86_400_000);
 
       const mapped = communities.map((c) => {
@@ -124,6 +291,8 @@ export async function GET(req: NextRequest) {
           isMember: userId ? (optIns?.length ?? 0) > 0 : false,
           isNew: c.createdAt >= thirtyDaysAgo,
           engagementCount: engagementMap.get(c.id) ?? 0,
+          newContentCount: newLessonsMap.get(c.id) ?? 0,
+          hasLiveToday: liveTodaySet.has(c.id),
         };
       });
 

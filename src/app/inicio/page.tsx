@@ -34,8 +34,11 @@ export default function InicioPage() {
     const storedRole = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
     if (!storedRole) { router.replace("/login"); return; }
 
-    // Admins e influencers vão para /dashboard
-    if (storedRole === "SUPER_ADMIN" || storedRole === "INFLUENCER_ADMIN") {
+    // Admins e influencers vão para /dashboard — EXCETO quando estão em modo ViewAs
+    if (
+      (storedRole === "SUPER_ADMIN" || storedRole === "INFLUENCER_ADMIN") &&
+      !viewAs
+    ) {
       router.replace("/dashboard");
       return;
     }
@@ -43,7 +46,7 @@ export default function InicioPage() {
     setActualRole(storedRole);
     setActualName(localStorage.getItem(STORAGE_KEYS.USER_NAME) ?? "");
     setActualUserId(localStorage.getItem(STORAGE_KEYS.USER_ID) ?? "");
-  }, [router]);
+  }, [router, viewAs]);
 
   if (!actualRole) {
     return (

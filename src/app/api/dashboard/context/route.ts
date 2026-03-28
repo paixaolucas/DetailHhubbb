@@ -12,7 +12,7 @@ export const GET = withAuth(async (_req, { session }) => {
   const userId = session.userId;
   const isInfluencer = session.role === UserRole.INFLUENCER_ADMIN;
 
-  const [user, unreadCount, optInCount] = await Promise.all([
+  const [user, unreadCount, optInCount, nextLiveForMember] = await Promise.all([
     db.user.findUnique({
       where: { id: userId },
       select: {
@@ -24,6 +24,17 @@ export const GET = withAuth(async (_req, { session }) => {
     }),
     db.notification.count({ where: { recipientId: userId, isRead: false } }),
     db.communityOptIn.count({ where: { userId } }),
+    db.liveSession.findFirst({
+      where: {
+        status: { in: ["SCHEDULED", "LIVE"] },
+        scheduledAt: { gte: new Date() },
+        community: {
+          optIns: { some: { userId } },
+        },
+      },
+      orderBy: { scheduledAt: "asc" },
+      select: { id: true, title: true, scheduledAt: true, status: true },
+    }),
   ]);
 
   if (!user) {
@@ -168,6 +179,14 @@ export const GET = withAuth(async (_req, { session }) => {
     pendingLessons,
     optedCommunities: optInCount,
     role: user.role,
+    nextLive: nextLiveForMember
+      ? {
+          id: nextLiveForMember.id,
+          title: nextLiveForMember.title,
+          scheduledAt: nextLiveForMember.scheduledAt.toISOString(),
+          status: nextLiveForMember.status,
+        }
+      : null,
   };
 
   if (!isInfluencer) {
